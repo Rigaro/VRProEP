@@ -19,5 +19,5 @@ public interface IFeedbackManager
     /// Should only be called during Physics updates, Monobehaviour : FixedUpdate.
     /// </summary>
     /// <param name="sensorData">The sensor data from the device.</param>
-    void UpdateFeedback(float[] sensorData);
+    void UpdateAllFeedback(float[] sensorData);
 }

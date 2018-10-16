@@ -17,18 +17,18 @@ public interface IAdaptable {
     /// Updates a given parameter or set of parameters to the given values.
     /// </summary>
     /// <param name="parameters">The new parameters values set to be updated.</param>
-    void UpdateParameter(float[] parameters);
+    void UpdateAllParameters(float[] parameters);
 
     /// <summary>
     /// Returns the given parameter value.
     /// </summary>
     /// <param name="channel">The parameter number or channel to be read.</param>
     /// <returns>The desired parameter value</returns>
-    T GetParameter<T>(int channel);
+    float GetParameter(int channel);
 
     /// <summary>
     /// Returns all the parameter values.
     /// </summary>
     /// <returns>The set of parameter values.</returns>
-    T GetParameter<T>();
+    float[] GetAllParameters();
 }

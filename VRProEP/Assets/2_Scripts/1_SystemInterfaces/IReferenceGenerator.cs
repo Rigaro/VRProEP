@@ -22,7 +22,7 @@ public interface IReferenceGenerator
     /// </summary>
     /// <param name="input">The input to use to update the references.</param>
     /// <returns>The updated set of references.</returns>
-    float[] UpdateReference(float[] input);
+    float[] UpdateAllReferences(float[] input);
 
     /// <summary>
     /// Returns the current reference value for the provided channel.
@@ -35,7 +35,7 @@ public interface IReferenceGenerator
     /// Returns the current references.
     /// </summary>
     /// <returns>The current set of references.</returns>
-    float[] GetReference();
+    float[] GetAllReferences();
 
     /// <summary>
     /// Forces a value into the reference. It is recommended that it is used only for re-setting/intializing a reference.
@@ -48,5 +48,5 @@ public interface IReferenceGenerator
     /// Forces a set of values into the references. It is recommended that it is used only for re-setting/intializing a reference.
     /// </summary>
     /// <param name="refs">The set of values to set the references to.</param>
-    void SetReference(float[] refs);
+    void SetAllReferences(float[] refs);
 }

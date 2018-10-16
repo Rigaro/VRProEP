@@ -19,5 +19,5 @@ public interface IInputManager
     /// Should only be called during Physics updates, Monobehaviour : FixedUpdate.
     /// </summary>
     /// <returns>The updated set of references.</returns>
-    float[] GenerateReference();
+    float[] GenerateAllReferences();
 }

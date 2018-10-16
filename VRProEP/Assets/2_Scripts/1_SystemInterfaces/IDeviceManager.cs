@@ -19,5 +19,5 @@ public interface IDeviceManager
     /// Should only be called during Physics updates, Monobehaviour : FixedUpdate.
     /// </summary>
     /// <param name="references">The set of references for the device to track.</param>
-    void UpdateState(float[] references);
+    void UpdateAllStates(float[] references);
 }
