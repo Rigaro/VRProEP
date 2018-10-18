@@ -17,6 +17,6 @@ namespace Valve.VR
         LeftHand,
 
         [Description("/user/hand/right")]
-        RightHand,
+        RightHand
     }
 }
