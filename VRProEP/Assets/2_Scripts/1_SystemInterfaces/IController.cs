@@ -1,4 +1,5 @@
 ﻿//======= Copyright (c) Melbourne Robotics Lab, All rights reserved. ===============
+
 namespace VRProEP.ProsthesisCore
 {
     /// <summary>
@@ -15,6 +16,6 @@ namespace VRProEP.ProsthesisCore
         /// <param name="reference">The references for the controller to track.</param>
         /// <param name="feedback">The feedback provided by sensors.</param>
         /// <returns>The updated control input.</returns>
-        dynamic UpdateControlInput(dynamic reference, dynamic feedback);
+        float UpdateControlInput(float[] reference, float[] feedback);
     }
 }
