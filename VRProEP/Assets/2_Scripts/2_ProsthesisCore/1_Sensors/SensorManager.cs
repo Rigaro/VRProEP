@@ -7,8 +7,8 @@ namespace VRProEP
         public enum SensorType
         {
             OculusSensor,
-            ViveController,
-            VirtualTracker
+            VIVEController,
+            VIVETracker
         }
         /// <summary>
         /// Abstract class for the implementation of sensor managers such as Oculus controllers, Vive controllers, IMUs, etc.
