@@ -7,7 +7,7 @@ namespace VRProEP.ProsthesisCore
     /// </summary>
     public abstract class AdaptiveGenerator : IReferenceGenerator, IAdaptable
     {
-        private int thetaChannelSize;
+        private int parameterChannelSize;
         private float[] theta; // The interface parameters.
         private float[] thetaMin;
         private float[] thetaMax;
@@ -15,6 +15,15 @@ namespace VRProEP.ProsthesisCore
         protected float[] xBar; // The reference state
         protected float[] xMin;
         protected float[] xMax;
+
+        public int ParameterChannelSize()
+        {
+                return parameterChannelSize;
+        }
+        public int ChannelSize()
+        {
+                return channelSize;
+        }
 
         public enum ChannelType
         {
@@ -181,7 +190,7 @@ namespace VRProEP.ProsthesisCore
             }
             else
             {
-                if (channel > thetaChannelSize)
+                if (channel > parameterChannelSize)
                     return false;
             }
             return true;

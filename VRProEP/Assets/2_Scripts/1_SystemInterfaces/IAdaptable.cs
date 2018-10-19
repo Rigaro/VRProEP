@@ -33,5 +33,11 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <returns>The set of parameter values.</returns>
         float[] GetAllParameters();
+
+        /// <summary>
+        /// Provides access to the length of the parameter vector.
+        /// </summary>
+        /// <returns>The parameter vector length.</returns>
+        int ParameterChannelSize();
     }
 }

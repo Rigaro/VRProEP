@@ -12,6 +12,11 @@ namespace VRProEP.ProsthesisCore
         protected float[] xMin;
         protected float[] xMax;
 
+        public int ChannelSize()
+        {
+                return channelSize;
+        }
+
         /// <summary>
         /// Updates the reference for the given channel to be tracked by a controller or device.
         /// Should only be called during Physics updates, Monobehaviour : FixedUpdate.

@@ -5,7 +5,7 @@ using UnityEngine.XR;
 namespace VRProEP.ProsthesisCore
 {
     /// <summary>
-    /// Virtual tracker that uses Unity's physics engine to obtain tracking data.
+    /// Tracks a body part using a VIVE Tracker. Uses Unity's XR API to obtain tracking data.
     /// Requires reference to a Rigidbody object.
     /// </summary>
     public class VIVETrackerManager : MonoBehaviour, ISensor

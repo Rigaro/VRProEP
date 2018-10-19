@@ -51,5 +51,11 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <param name="refs">The set of values to set the references to.</param>
         void SetAllReferences(float[] refs);
+
+        /// <summary>
+        /// Provides access to the number of channels.
+        /// </summary>
+        /// <returns>The number of channels.</returns>
+        int ChannelSize();
     }
 }
