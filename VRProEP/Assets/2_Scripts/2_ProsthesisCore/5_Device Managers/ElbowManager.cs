@@ -68,8 +68,8 @@ namespace VRProEP.ProsthesisCore
             float[] x = sensor.GetAllProcessedData();
             // Create a full reference for controller
             float[] xBar = { reference, 0.0f };
-            // Update device torque
-
+            // Update device joint torque
+            float u = controller.UpdateControlInput(xBar, x);
             elbowRB.AddRelativeTorque(Vector3.left * u);
         }
 
