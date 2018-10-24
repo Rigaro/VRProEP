@@ -14,7 +14,7 @@ namespace VRProEP.ProsthesisCore
         /// <remarks>Commands are defined by the implementing class.</remarks>
         /// <param name="command">The configuration command as established by the implementing class.</param>
         /// <param name="value">The value to update the configuration parameter determined by "command".</param>
-        void Configure(string command, float value);
+        void Configure(string command, dynamic value);
 
         /// <summary>
         /// Updates the configuration of a parameter defined by the "command" parameter to the provided "value".

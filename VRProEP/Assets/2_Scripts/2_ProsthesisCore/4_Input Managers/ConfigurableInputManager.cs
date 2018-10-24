@@ -13,6 +13,8 @@ namespace VRProEP.ProsthesisCore
 
         public const string CMD_SET_ACTIVE_SENSOR = "CMD_SET_ACTIVE_SENSOR";
         public const string CMD_SET_ACTIVE_REFGEN = "CMD_SET_ACTIVE_REFGEN";
+        public const string CMD_ADD_SENSOR = "CMD_ADD_SENSOR";
+        public const string CMD_ADD_REFGEN = "CMD_ADD_REFGEN";
         public const string VAL_SENSOR_VIVETRACKER = "VAL_SENSOR_VIVETRACKER";
         public const string VAL_SENSOR_OCULUSTOUCH = "VAL_SENSOR_OCULUSTOUCH";
         public const string VAL_REFGEN_LINKINSYN = "VAL_REFGEN_LINKINSYN";
@@ -104,9 +106,30 @@ namespace VRProEP.ProsthesisCore
         /// <remarks>Commands are defined by the implementing class.</remarks>
         /// <param name="command">The configuration command as established by the implementing class.</param>
         /// <param name="value">The value to update the configuration parameter determined by "command".</param>
-        public void Configure(string command, float value)
+        public void Configure(string command, dynamic value)
         {
-            throw new System.NotImplementedException();
+            switch (command)
+            {
+                case CMD_ADD_SENSOR:
+                    if (value is ISensor)
+                        AddSensor(value);
+                    else
+                        throw new System.ArgumentException("Invalid value provided.");
+                    break;
+                case CMD_ADD_REFGEN:
+                    if (value is IReferenceGenerator)
+                        AddReferenceGenerator(value);
+                    else
+                        throw new System.ArgumentException("Invalid value provided.");
+                    break;
+                /*
+                 * 
+                 * Add commands for removing sensors and reference generators. 
+                 * 
+                 */
+                default:
+                    throw new System.ArgumentException("Invalid command provided.");
+            }
         }
 
         /// <summary>

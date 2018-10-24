@@ -51,7 +51,7 @@ namespace VRProEP.ProsthesisCore
         /// Adds a given sensor to the list of sensors held by the input manager.
         /// </summary>
         /// <param name="sensor">The sensor to be attached to the input manager.</param>
-        public void AddSensor(ISensor sensor)
+        protected void AddSensor(ISensor sensor)
         {
             if (sensor == null)
                 throw new System.ArgumentNullException("The provided sensor object is empty.");
@@ -64,7 +64,7 @@ namespace VRProEP.ProsthesisCore
         /// Adds a given reference generator to the list of sensors held by the input manager.
         /// </summary>
         /// <param name="referenceGenerator">The reference generator to be attached to the input manager.</param>
-        public void AddReferenceGenerator(IReferenceGenerator referenceGenerator)
+        protected void AddReferenceGenerator(IReferenceGenerator referenceGenerator)
         {
 
             if (referenceGenerator == null)
@@ -79,7 +79,7 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <param name="sensor">The sensor to be removed from the input manager.</param>
         /// <returns>True if the sensor was removed successfully.</returns>
-        public bool RemoveSensor(ISensor sensor)
+        protected bool RemoveSensor(ISensor sensor)
         {
             if (sensor == null)
                 throw new System.ArgumentNullException("The provided sensor object is empty.");
@@ -93,7 +93,7 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <param name="index">The sensor index to be removed from the input manager.</param>
         /// <returns>True if the sensor was removed successfully.</returns>
-        public bool RemoveSensor(int index)
+        protected bool RemoveSensor(int index)
         {
             try
             {
@@ -113,7 +113,7 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <param name="sensor">The reference generator to be removed from the input manager.</param>
         /// <returns>True if the reference generator was removed successfully.</returns>
-        public bool RemoveReferenceGenerator(IReferenceGenerator referenceGenerator)
+        protected bool RemoveReferenceGenerator(IReferenceGenerator referenceGenerator)
         {
             if (referenceGenerator == null)
                 throw new System.ArgumentNullException("The provided reference generator object is empty.");
@@ -127,7 +127,7 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <param name="index">The reference generator index to be removed from the input manager.</param>
         /// <returns>True if the reference generator was removed successfully.</returns>
-        public bool RemoveReferenceGenerator(int index)
+        protected bool RemoveReferenceGenerator(int index)
         {
             try
             {
@@ -148,7 +148,7 @@ namespace VRProEP.ProsthesisCore
         /// <param name="sensorType">The type of sensor to look for.</param>
         /// <param name="outSensor">The sensor object to put the found sensor in.</param>
         /// <returns>True if a sensor was found.</returns>
-        public bool GetSensor(SensorType sensorType, out ISensor outSensor)
+        protected bool GetSensor(SensorType sensorType, out ISensor outSensor)
         {
             // Look for a sensor with the given type.
             foreach (ISensor sensor in sensorManagers)
@@ -171,7 +171,7 @@ namespace VRProEP.ProsthesisCore
         /// <param name="refGenType">The type of reference generator to look for.</param>
         /// <param name="outRefGen">The reference generator object to put the found reference generator in.</param>
         /// <returns>True if a reference generator was found.</returns>
-        public bool GetReferenceGenerator(ReferenceGeneratorType refGenType, out IReferenceGenerator outRefGen)
+        protected bool GetReferenceGenerator(ReferenceGeneratorType refGenType, out IReferenceGenerator outRefGen)
         {
             // Look for a reference generator with the given type.
             foreach (IReferenceGenerator refGen in referenceGenerators)
