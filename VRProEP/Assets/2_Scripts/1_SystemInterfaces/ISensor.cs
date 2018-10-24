@@ -3,6 +3,13 @@
 
 namespace VRProEP.ProsthesisCore
 {
+    public enum SensorType
+    {
+        OculusSensor,
+        VIVEController,
+        VIVETracker,
+        VirtualEncoder
+    }
     /// <summary>
     /// Interface for sensor hardware the will provide input to the prosthesis system.
     /// Whether it is a sensor for human interface or prosthetic device sensor (e.g. touch)
@@ -55,6 +62,6 @@ namespace VRProEP.ProsthesisCore
         /// Returns the sensor's type.
         /// </summary>
         /// <returns>The sensor type.</returns>
-        SensorType SensorType();
+        SensorType GetSensorType();
     }
 }

@@ -6,9 +6,9 @@ namespace VRProEP.ProsthesisCore
 {
     /// <summary>
     /// Tracks a body part using a VIVE Tracker. Uses Unity's XR API to obtain tracking data.
-    /// Requires reference to a Rigidbody object.
+    /// Requires reference to a the Tracker's object Transform.
     /// </summary>
-    public class VIVETrackerManager : MonoBehaviour, ISensor
+    public class VIVETrackerManager : SensorManager
     {    
         // Local enumeration for channels
         public enum VIVETrackerChannels
@@ -22,9 +22,7 @@ namespace VRProEP.ProsthesisCore
         }
 
         // Configuration variables.
-        private int channelSize = 6;
-        private SensorType sensorType = SensorType.VIVETracker;
-        public int trackerNumber = 1; // Sets tracker number for when there are multiple ones.
+        private static int trackerNumber = 0; // Sets tracker number for when there are multiple ones.
 
         // Transform to get position information
         private Transform trackerTransform;
@@ -32,22 +30,34 @@ namespace VRProEP.ProsthesisCore
         // Unity XR nodes for accessing VIVETracker data.
         private List<XRNodeState> xrNodes = new List<XRNodeState>();
         private XRNodeState trackerState;
+
+        /// <summary>
+        /// Tracks a body part using a VIVE Tracker. Uses Unity's XR API to obtain tracking data.
+        /// Requires reference to a the Tracker's object Transform.
+        /// </summary>
+        public VIVETrackerManager() : base (6, SensorType.VIVETracker)
+        {
+            trackerNumber++;
+        }
+
+        /// <summary>
+        /// Tracks a body part using a VIVE Tracker. Uses Unity's XR API to obtain tracking data.
+        /// Requires reference to a the Tracker's object Transform.
+        /// </summary>
+        /// <param name="trackerTransform">The Tracker's Transform to refer to for position data.</param>
+        public VIVETrackerManager(Transform trackerTransform) : base(6, SensorType.VIVETracker)
+        {
+            SetTrackerTransform(trackerTransform);
+            trackerNumber++;
+        }
+
+        public void SetTrackerTransform(Transform trackerTransform)
+        {
+            if (trackerTransform == null)
+                throw new System.ArgumentNullException();
+            this.trackerTransform = trackerTransform;
+        }
         
-        void Start()
-        {
-            // Get transform to obtain positional data.
-            trackerTransform = GetComponent<Transform>();
-        }
-
-        /*
-         * Debug
-         */
-
-        void Update()
-        {
-            Debug.Log(GetRawData("Z_AngVel"));
-        }
-
         /// <summary>
         /// Uses Unity's XR API to extract angular velocity information from the tracker.
         /// </summary>
@@ -77,13 +87,13 @@ namespace VRProEP.ProsthesisCore
 
         /// <summary>
         /// Returns raw tracking information for the selected channel.
-        /// See VirtualTrackerChannels for channel information. 
+        /// See VIVETrackerChannels for channel information. 
         /// Angular velocity given radians per second.
         /// Angular displacement given in Euler angles.
         /// </summary>
         /// <param name="channel">The channel number.</param>
         /// <returns>Raw tracking data for the given channel.</returns>
-        public float GetRawData(int channel)
+        public override float GetRawData(int channel)
         {
             if (channel > ChannelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels.");
@@ -117,7 +127,7 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <param name="channel">The channel/data identifier.</param>
         /// <returns>Raw tracking data for the given channel.</returns>
-        public float GetRawData(string channel)
+        public override float GetRawData(string channel)
         {
             int channelNum = (int)System.Enum.Parse(typeof(VIVETrackerChannels), channel);
 
@@ -130,7 +140,7 @@ namespace VRProEP.ProsthesisCore
         /// Angular displacement given in Euler angles.
         /// </summary>
         /// <returns>The array with all raw tracking data.</returns>
-        public float[] GetAllRawData()
+        public override float[] GetAllRawData()
         {
             Vector3 angVel;
             TryGetTrackerAngularVelocity(out angVel);
@@ -144,7 +154,7 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <param name="channel">The channel number.</param>
         /// <returns>Pre-processed sensor data for the given channel.</returns>
-        public float GetProcessedData(int channel)
+        public override float GetProcessedData(int channel)
         {
             return GetRawData(channel);
         }
@@ -154,7 +164,7 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <param name="channel">The channel/data identifier.</param>
         /// <returns>Pre-processed sensor data for the given channel.</returns>
-        public float GetProcessedData(string channel)
+        public override float GetProcessedData(string channel)
         {
             return GetRawData(channel);
         }
@@ -163,22 +173,32 @@ namespace VRProEP.ProsthesisCore
         /// Not implemented, performs GetAllRawData.
         /// </summary>
         /// <returns>The array with all pre-processed sensor data.</returns>
-        public float[] GetAllProcessedData()
+        public override float[] GetAllProcessedData()
         {
             return GetAllRawData();
         }
 
-        // Encapsulation
-        public int ChannelSize
+        /// <summary>
+        /// Updates the configuration of a parameter defined by the "command" parameter to the provided "value".
+        /// Not implemented
+        /// </summary>
+        /// <remarks>Commands are defined by the implementing class.</remarks>
+        /// <param name="command">The configuration command as established by the implementing class.</param>
+        /// <param name="value">The value to update the configuration parameter determined by "command".</param>
+        public override void Configure(string command, dynamic value)
         {
-            get
-            {
-                return channelSize;
-            }
+            throw new System.NotImplementedException();
         }
-        public SensorType SensorType()
+
+        /// <summary>
+        /// Updates the configuration of a parameter defined by the "command" parameter to the provided "value".
+        /// </summary>
+        /// <remarks>Commands are defined by the implementing class.</remarks>
+        /// <param name="command">The configuration command as established by the implementing class.</param>
+        /// <param name="value">The value to update the configuration parameter determined by "command".</param>
+        public override void Configure(string command, string value)
         {
-                return sensorType;
+            throw new System.NotImplementedException();
         }
     }
 }

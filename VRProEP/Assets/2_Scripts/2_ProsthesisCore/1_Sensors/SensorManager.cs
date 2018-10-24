@@ -2,12 +2,6 @@
 
 namespace VRProEP.ProsthesisCore
 {
-    public enum SensorType
-    {
-        OculusSensor,
-        VIVEController,
-        VIVETracker
-    }
     /// <summary>
     /// Abstract class for the implementation of sensor managers such as Oculus controllers, Vive controllers, IMUs, etc.
     /// Includes an enumerator with all the sensor types currently implemented.
@@ -96,7 +90,7 @@ namespace VRProEP.ProsthesisCore
             }
         }
 
-        public SensorType SensorType()
+        public SensorType GetSensorType()
         {
                 return sensorType;
         }
