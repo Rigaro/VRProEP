@@ -154,7 +154,7 @@ namespace VRProEP.ProsthesisCore
             foreach (ISensor sensor in sensorManagers)
             {
                 // If found set it to the referenced sensor and return true.
-                if (sensor.SensorType().Equals(sensorType))
+                if (sensor.GetSensorType().Equals(sensorType))
                 {
                     outSensor = sensor;
                     return true;
