@@ -2,6 +2,12 @@
 
 namespace VRProEP.ProsthesisCore
 {
+    public enum ReferenceGeneratorType
+    {
+        PointGradient,
+        Integrator,
+        LinearKinematicSynergy
+    }
     /// <summary>
     /// Abstract reference generator to add basic variables used across all generators.
     /// </summary>
@@ -11,6 +17,7 @@ namespace VRProEP.ProsthesisCore
         protected float[] xBar;
         protected float[] xMin;
         protected float[] xMax;
+        protected ReferenceGeneratorType generatorType;
 
         public int ChannelSize()
         {
@@ -125,6 +132,11 @@ namespace VRProEP.ProsthesisCore
                 return false;
             else
                 return true;
+        }
+
+        public ReferenceGeneratorType GeneratorType()
+        {
+            return generatorType;
         }
     }
 }

@@ -20,6 +20,7 @@ namespace VRProEP.ProsthesisCore
         {
             channelSize = xBar.Length;
             this.xBar = xBar;
+            generatorType = ReferenceGeneratorType.LinearKinematicSynergy;
         }
 
         /// <summary>
@@ -38,6 +39,7 @@ namespace VRProEP.ProsthesisCore
             this.xBar = xBar;
             this.xMin = xMin;
             this.xMax = xMax;
+            generatorType = ReferenceGeneratorType.LinearKinematicSynergy;
         }
 
         /// <summary>

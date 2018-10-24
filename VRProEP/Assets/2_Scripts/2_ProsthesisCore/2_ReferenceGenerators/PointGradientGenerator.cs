@@ -24,6 +24,7 @@ namespace VRProEP.ProsthesisCore
             channelSize = xBar.Length;
             this.xBar = xBar;
             SetDefaultGains();
+            generatorType = ReferenceGeneratorType.PointGradient;
         }
 
         /// <summary>
@@ -39,6 +40,7 @@ namespace VRProEP.ProsthesisCore
             channelSize = xBar.Length;
             this.xBar = xBar;
             this.gains = gains;
+            generatorType = ReferenceGeneratorType.PointGradient;
         }
 
         /// <summary>
@@ -58,6 +60,7 @@ namespace VRProEP.ProsthesisCore
             this.xMin = xMin;
             this.xMax = xMax;
             SetDefaultGains();
+            generatorType = ReferenceGeneratorType.PointGradient;
         }
 
         /// <summary>
@@ -78,6 +81,7 @@ namespace VRProEP.ProsthesisCore
             this.xMin = xMin;
             this.xMax = xMax;
             this.gains = gains;
+            generatorType = ReferenceGeneratorType.PointGradient;
         }
 
         /// <summary>

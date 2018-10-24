@@ -57,5 +57,11 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <returns>The number of channels.</returns>
         int ChannelSize();
+
+        /// <summary>
+        /// Returns the reference generator's type.
+        /// </summary>
+        /// <returns>The reference generator's type</returns>
+        ReferenceGeneratorType GeneratorType();
     }
 }

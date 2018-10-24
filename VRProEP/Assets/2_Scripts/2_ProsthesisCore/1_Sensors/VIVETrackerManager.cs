@@ -176,12 +176,9 @@ namespace VRProEP.ProsthesisCore
                 return channelSize;
             }
         }
-        public SensorType SensorType
+        public SensorType SensorType()
         {
-            get
-            {
                 return sensorType;
-            }
         }
     }
 }

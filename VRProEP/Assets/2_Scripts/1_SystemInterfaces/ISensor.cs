@@ -50,5 +50,11 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <returns>The array with all pre=processed sensor data.</returns>
         float[] GetAllProcessedData();
+
+        /// <summary>
+        /// Returns the sensor's type.
+        /// </summary>
+        /// <returns>The sensor type.</returns>
+        SensorType SensorType();
     }
 }

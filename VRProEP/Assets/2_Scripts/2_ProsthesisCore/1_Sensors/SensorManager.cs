@@ -96,12 +96,9 @@ namespace VRProEP.ProsthesisCore
             }
         }
 
-        public SensorType SensorType
+        public SensorType SensorType()
         {
-            get
-            {
                 return sensorType;
-            }
         }
     }
 
