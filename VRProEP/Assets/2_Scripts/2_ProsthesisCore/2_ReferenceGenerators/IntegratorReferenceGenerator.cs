@@ -11,6 +11,19 @@ namespace VRProEP.ProsthesisCore
 
         private float[] gains;
 
+        public float[] Gains
+        {
+            get
+            {
+                return gains;
+            }
+
+            set
+            {
+                gains = value;
+            }
+        }
+
         /// <summary>
         /// Basic reference generator that integrates the given input. Suitable for velocity control type of interfaces.
         /// Examples of IRGs: velocity control EMG, joystick manual control.
@@ -38,7 +51,7 @@ namespace VRProEP.ProsthesisCore
 
             channelSize = xBar.Length;
             this.xBar = xBar;
-            this.gains = gains;
+            this.Gains = gains;
             generatorType = ReferenceGeneratorType.Integrator;
         }
 
@@ -81,7 +94,7 @@ namespace VRProEP.ProsthesisCore
             this.xBar = xBar;
             this.xMin = xMin;
             this.xMax = xMax;
-            this.gains = gains;
+            this.Gains = gains;
             generatorType = ReferenceGeneratorType.Integrator;
         }
 
@@ -99,11 +112,11 @@ namespace VRProEP.ProsthesisCore
                 throw new System.ArgumentOutOfRangeException("The requested channel number is invalid.");
 
             // Check validity of the provided input
-            if (xBar.Length != gains.Length)
+            if (xBar.Length != Gains.Length)
                 throw new System.ArgumentOutOfRangeException("The length of the parameters does not match.");
 
             // Integrate
-            float tempXBar = xBar[channel - 1] + gains[channel - 1] * input[channel - 1] * Time.fixedDeltaTime;
+            float tempXBar = xBar[channel - 1] + Gains[channel - 1] * input[channel - 1] * Time.fixedDeltaTime;
             // Saturate reference
             if (tempXBar > xMax[channel - 1])
                 tempXBar = xMax[channel - 1];
@@ -141,7 +154,7 @@ namespace VRProEP.ProsthesisCore
         {
             for (int i = 0; i < xBar.Length; i++)
             {
-                gains[i] = 1.0f;
+                Gains[i] = 1.0f;
             }
         }
     }
