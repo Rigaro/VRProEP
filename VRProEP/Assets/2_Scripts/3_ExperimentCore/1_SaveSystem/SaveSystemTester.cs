@@ -42,10 +42,35 @@ public class SaveSystemTester : MonoBehaviour {
         saveSystem.CreateNewUser(newUser);
         */
 
+        // Create a data stream logger
+        DataStreamLogger logger = new DataStreamLogger("FSF", "Motion");
+        Debug.Log(logger.IsConfigured);
+        Debug.Log(logger.GetActiveExperiment() + " " + logger.GetActiveLogType());
+
+        saveSystem.AddExperimentLogger(logger);
+
+        Debug.Log(logger.IsConfigured);
+
+        IExperimentLogger tempLogger = saveSystem.GetActiveLogger(0);
+
+        logger.ConfigureLogger("Test", "Score");
+        Debug.Log(tempLogger.GetActiveExperiment() + " " + tempLogger.GetActiveLogType());
+
+        Debug.Log(logger.IsInitialized.ToString() + logger.IsConfigured.ToString());
+        logger.AddNewLogFile(1, 1, "test, format, does, it, work");
+        logger.AppendData("it, is, fucking, working, yeah");
+        logger.SaveLog();
+        logger.AddNewLogFile(1, 2, "did, it, overwrite, the, data");
+        saveSystem.GetActiveLogger(0).CloseLog();
     }
 
     // Update is called once per frame
     void Update () {
 		
 	}
+
+    private void OnApplicationQuit()
+    {
+        saveSystem.GetActiveLogger(0).CloseLog();
+    }
 }

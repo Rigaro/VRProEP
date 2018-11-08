@@ -5,11 +5,14 @@ using UnityEngine;
 
 namespace VRProEP.ExperimentCore
 {
+    /// <summary>
+    /// Save system for VRProEP platform. Handles user and experimental data.
+    /// </summary>
     public class SaveSystem
     {
         private UserData activeUser;
         private string activeSaveFolder;
-        private List<IExperimentLogger> activeLoggers;
+        private List<IExperimentLogger> activeLoggers = new List<IExperimentLogger>();
 
         // Encapsulation
         public UserData ActiveUser
@@ -17,11 +20,6 @@ namespace VRProEP.ExperimentCore
             get
             {
                 return activeUser;
-            }
-
-            set
-            {
-                activeUser = value;
             }
         }
         public string ActiveSaveFolder
@@ -74,12 +72,12 @@ namespace VRProEP.ExperimentCore
             }
 
             // If successfully created then we can proceed to make it the active user.
-            ActiveUser = newUser;
-            activeSaveFolder = Application.dataPath + "/UserData/" + ActiveUser.id.ToString();
+            activeUser = newUser;
+            activeSaveFolder = Application.dataPath + "/UserData/" + activeUser.id.ToString();
             // And save its data
             SaveActiveUserData();
 
-            return ActiveUser;
+            return activeUser;
         }
 
         /// <summary>
@@ -100,12 +98,12 @@ namespace VRProEP.ExperimentCore
             }
 
             // If successfully created then we can proceed to make it the active user.
-            ActiveUser = newUser;
-            activeSaveFolder = Application.dataPath + "/UserData/" + ActiveUser.id.ToString();
+            activeUser = newUser;
+            activeSaveFolder = Application.dataPath + "/UserData/" + activeUser.id.ToString();
             // And save its data
             SaveActiveUserData();
 
-            return ActiveUser;
+            return activeUser;
         }
 
         /// <summary>
@@ -149,7 +147,7 @@ namespace VRProEP.ExperimentCore
         {
             // Set file, format data as JSON, and save.
             string saveFilePath = activeSaveFolder + "/" + "userInfo.json";
-            string userDataAsJson = JsonUtility.ToJson(ActiveUser);
+            string userDataAsJson = JsonUtility.ToJson(activeUser);
             File.WriteAllText(saveFilePath, userDataAsJson);
         }
 
@@ -176,7 +174,7 @@ namespace VRProEP.ExperimentCore
                 throw new System.Exception("The provided user does not exist in the user file directory.");
             }
             // Set as active user
-            ActiveUser = loadedUserData;
+            activeUser = loadedUserData;
             activeSaveFolder = userPath;
 
             // Re-initialize the experiment logger for the new active user.
@@ -190,7 +188,7 @@ namespace VRProEP.ExperimentCore
         /// Initializes and adds an experiment logger to the save system.
         /// </summary>
         /// <param name="logger">The logger to be initialized and added.</param>
-        public void InitializeExperimentLogger(IExperimentLogger logger)
+        public void AddExperimentLogger(IExperimentLogger logger)
         {
             if (logger == null)
                 throw new System.ArgumentNullException("The provided logger is empty.");
@@ -198,6 +196,32 @@ namespace VRProEP.ExperimentCore
             logger.InitializeLog(activeSaveFolder);
             activeLoggers.Add(logger);
         }
+
+        /// <summary>
+        /// Gets an experiment logger by index from the list of active loggers.
+        /// </summary>
+        /// <param name="index">The logger index.</param>
+        /// <returns>The requested logger.</returns>
+        public IExperimentLogger GetActiveLogger(int index)
+        {
+            if (index < 0 || index >= activeLoggers.Count)
+                throw new System.IndexOutOfRangeException("The provided index does exceeds the number of experiment loggers available.");
+
+            return activeLoggers[index];
+        }
+
+        /// <summary>
+        /// Closes all active loggers that have been added to the save system.
+        /// </summary>
+        public void CloseAllExperimentLoggers()
+        {
+            foreach (IExperimentLogger logger in activeLoggers)
+            {
+                logger.SaveLog(); // Save data just in case it was forgotten.
+                logger.CloseLog();
+            }
+        }
+
     }
 
 }

@@ -2,6 +2,9 @@
 
 namespace VRProEP.ExperimentCore
 {
+    /// <summary>
+    /// The types of users supported.
+    /// </summary>
     public enum UserType
     {
         Transhumeral,
@@ -9,6 +12,9 @@ namespace VRProEP.ExperimentCore
         AbleBodied
     }
 
+    /// <summary>
+    /// Structure to save user data for persistency.
+    /// </summary>
     public class UserData
     {
         public string name;
