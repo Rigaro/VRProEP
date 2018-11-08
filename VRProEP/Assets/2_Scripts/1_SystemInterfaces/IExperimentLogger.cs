@@ -8,6 +8,18 @@ namespace VRProEP.ExperimentCore
     public interface IExperimentLogger
     {
         /// <summary>
+        /// Returns the experiment type identified that is currently active.
+        /// </summary>
+        /// <returns>The active experiment identifier.</returns>
+        string GetActiveExperiment();
+
+        /// <summary>
+        /// Returns the data log type identified that is currently active.
+        /// </summary>
+        /// <returns>The active log type identifier.</returns>
+        string GetActiveLogType();
+
+        /// <summary>
         /// Sets the configuration parameters for the experiment data logger.
         /// </summary>
         /// <param name="experimentID">The identifier for the experiment that is being run.</param>

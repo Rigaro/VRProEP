@@ -7,9 +7,12 @@ using UnityEngine;
 
 namespace VRProEP.ExperimentCore
 {
+    /// <summary>
+    /// Experiment logger that handles data streams in text format.
+    /// </summary>
     public class DataStreamLogger : IExperimentLogger
     {
-        protected StreamWriter writer;
+        protected StreamWriter fileWriter;
         private string activeUserPath;
         private string activeDataPath;
         private string activeExperimentID;
@@ -17,6 +20,51 @@ namespace VRProEP.ExperimentCore
 
         private bool isInitialized = false;
         private bool isConfigured = false;
+
+        public bool IsInitialized
+        {
+            get
+            {
+                return isInitialized;
+            }
+        }
+        public bool IsConfigured
+        {
+            get
+            {
+                return isConfigured;
+            }
+        }
+
+        /// <summary>
+        /// Experiment logger that handles data streams in text format.
+        /// </summary>
+        /// <param name="experimentID">The experiment identifier.</param>
+        /// <param name="dataLogTypeID">The log type identifier.</param>
+        public DataStreamLogger(string experimentID, string dataLogTypeID)
+        {
+            activeExperimentID = experimentID;
+            activeDataLogTypeID = dataLogTypeID;
+        }
+
+        /// <summary>
+        /// Returns the experiment type identified that is currently active.
+        /// </summary>
+        /// <returns>The active experiment identifier.</returns>
+        public string GetActiveExperiment()
+        {
+            return activeExperimentID;
+        }
+
+        /// <summary>
+        /// Returns the data log type identified that is currently active.
+        /// </summary>
+        /// <returns>The active log type identifier.</returns>
+        public string GetActiveLogType()
+        {
+            return activeDataLogTypeID;
+        }
+
 
         /// <summary>
         /// Sets the configuration parameters for the experiment data logger.
@@ -28,6 +76,9 @@ namespace VRProEP.ExperimentCore
         {
             if (experimentID == null || dataLogTypeID == null)
                 throw new System.ArgumentNullException("The provided experiment or data log type identifier is empty.");
+
+            if (activeUserPath == null)
+                throw new System.ArgumentNullException("The logger has not been initialized with the active user data path.");
 
             // Create the file path
             string experimentPath = activeUserPath + "/" + experimentID;
@@ -65,19 +116,20 @@ namespace VRProEP.ExperimentCore
         /// <param name="format">The format to be used as header for the data in the Log.</param>
         public void AddNewLogFile(int sessionNum, int iteration, string format)
         {
-            if (isInitialized && isConfigured)
+            if (!isInitialized || !isConfigured)
                 throw new System.Exception("The logger has not been initialized or configured.");
             // Create directory for the given session number if not available.
-            string newFilePath = Path.Combine(activeDataPath, "/session" + "_" + sessionNum.ToString());
+            string newFilePath = Path.Combine(activeDataPath, "session" + "_" + sessionNum.ToString());
             if (!Directory.Exists(newFilePath))
                 Directory.CreateDirectory(newFilePath);
             // Create comma separated file to hold data stream for the given iteration
             newFilePath = Path.Combine(newFilePath, "i" + "_" + iteration + ".csv");
             FileStream sb = new FileStream(newFilePath, FileMode.Create);
             // Initialize file StreamWriter with the given file.
-            writer = new StreamWriter(sb);
+            fileWriter = new StreamWriter(sb);
             // Add log format as header
-            writer.WriteLine(format);
+            fileWriter.WriteLine(format);
+            SaveLog();
         }
 
         /// <summary>
@@ -88,7 +140,7 @@ namespace VRProEP.ExperimentCore
         {
             try
             {
-                writer.WriteLine(data);
+                fileWriter.WriteLine(data);
             }
             catch (System.Exception e)
             {
@@ -101,11 +153,11 @@ namespace VRProEP.ExperimentCore
         /// </summary>
         public void CloseLog()
         {
-            if (writer != null)
+            if (fileWriter != null)
             {
                 try
                 {
-                    writer.Close();
+                    fileWriter.Close();
                 }
                 catch (System.Exception e)
                 {
@@ -119,11 +171,11 @@ namespace VRProEP.ExperimentCore
         /// </summary>
         public void SaveLog()
         {
-            if (writer != null)
+            if (fileWriter != null)
             {
                 try
                 {
-                    writer.Flush();
+                    fileWriter.Flush();
                 }
                 catch (System.Exception e)
                 {
