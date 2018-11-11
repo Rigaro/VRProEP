@@ -1,6 +1,6 @@
 ﻿//======= Copyright (c) Melbourne Robotics Lab, All rights reserved. ===============
 
-namespace VRProEP.ExperimentCore
+namespace VRProEP.GameEngineCore
 {
     /// <summary>
     /// The types of users supported.

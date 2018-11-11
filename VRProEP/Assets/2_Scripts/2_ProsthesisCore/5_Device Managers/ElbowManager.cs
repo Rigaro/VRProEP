@@ -7,6 +7,10 @@ namespace VRProEP.ProsthesisCore
     {
         private Rigidbody elbowRB;
 
+        /// <summary>
+        /// Manager for a virtual elbow prosthetic device based on Unity's Rigidbody.
+        /// </summary>
+        /// <param name="sensor">Virtual encoder to be attached to the virtual elbow.</param>
         public ElbowManager(ISensor sensor)
         {
             if (sensor == null)
@@ -17,6 +21,11 @@ namespace VRProEP.ProsthesisCore
             this.sensor = sensor;
         }
 
+        /// <summary>
+        /// Manager for a virtual elbow prosthetic device based on Unity's Rigidbody.
+        /// </summary>
+        /// <param name="sensor">Virtual encoder to be attached to the virtual elbow.</param>
+        /// <param name="elbowRB">The Rigidbody that is attached to the elbow Hingejoint.</param>
         public ElbowManager(ISensor sensor, Rigidbody elbowRB)
         {
             if (sensor == null)
@@ -28,6 +37,11 @@ namespace VRProEP.ProsthesisCore
             SetElbowDevice(elbowRB);
         }
 
+        /// <summary>
+        /// Manager for a virtual elbow prosthetic device based on Unity's Rigidbody.
+        /// </summary>
+        /// <param name="controllerGains">The state feedback controller gains for the elbow.</param>
+        /// <param name="sensor">Virtual encoder to be attached to the virtual elbow.</param>
         public ElbowManager(float[] controllerGains, ISensor sensor)
         {
             if (sensor == null)
@@ -39,6 +53,12 @@ namespace VRProEP.ProsthesisCore
             this.sensor = sensor;
         }
 
+        /// <summary>
+        /// Manager for a virtual elbow prosthetic device based on Unity's Rigidbody.
+        /// </summary>
+        /// <param name="controllerGains">The state feedback controller gains for the elbow.</param>
+        /// <param name="sensor">Virtual encoder to be attached to the virtual elbow.</param>
+        /// <param name="elbowRB">The Rigidbody that is attached to the elbow Hingejoint.</param>
         public ElbowManager(float[] controllerGains, ISensor sensor, Rigidbody elbowRB)
         {
             if (sensor == null)
@@ -74,15 +94,21 @@ namespace VRProEP.ProsthesisCore
         }
 
         /// <summary>
-        /// Updates all the states of the device. Useful for multi DOF devices.
-        /// Since it's 1DOF, only one channel available.
-        /// Reference determines the desired joint displacement, only first reference will be used.
+        /// Updates all the states of the device. Since it's 1DOF, only one channel available.
+        /// Reference determines the desired joint displacement and velocity, only length 2 allowed.
         /// Should only be called during Physics updates, Monobehaviour : FixedUpdate.
         /// </summary>
         /// <param name="references">The set of references for the device to track.</param>
         public override void UpdateAllStates(float[] references)
         {
+            if (references.Length != 2)
+                throw new System.ArgumentException("Only 2 references (position and velocity) required since 1DOF.");
 
+            // Get sensor data
+            float[] x = sensor.GetAllProcessedData();
+            // Update device joint torque
+            float u = controller.UpdateControlInput(references, x);
+            elbowRB.AddRelativeTorque(Vector3.left * u);
         }
 
         /// <summary>

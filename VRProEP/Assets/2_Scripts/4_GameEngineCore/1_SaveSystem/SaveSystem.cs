@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using VRProEP.ExperimentCore;
 
-namespace VRProEP.ExperimentCore
+namespace VRProEP.GameEngineCore
 {
     /// <summary>
     /// Save system for VRProEP platform. Handles user and experimental data.

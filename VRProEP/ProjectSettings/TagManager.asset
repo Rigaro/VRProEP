@@ -5,6 +5,13 @@ TagManager:
   serializedVersion: 2
   tags:
   - ResidualLimbTracker
+  - ProsthesisManager
+  - ElbowParent
+  - ElbowChild
+  - ResidualLimbAvatar
+  - Socket
+  - ShoulderLocation
+  - Avatar
   layers:
   - Default
   - TransparentFX

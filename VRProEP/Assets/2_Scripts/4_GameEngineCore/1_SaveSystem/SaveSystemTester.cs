@@ -1,5 +1,6 @@
 ﻿//======= Copyright (c) Melbourne Robotics Lab, All rights reserved. ===============
 using VRProEP.ExperimentCore;
+using VRProEP.GameEngineCore;
 using UnityEngine;
 
 public class SaveSystemTester : MonoBehaviour {
@@ -16,11 +17,14 @@ public class SaveSystemTester : MonoBehaviour {
 
     private UserData activeUserData;
     private SaveSystem saveSystem;
+
+    private AvatarSpawner avatarSpawner;
     
 
     // Use this for initialization
     void Start () {
         saveSystem = new SaveSystem();
+        avatarSpawner = new AvatarSpawner();
         //saveSystem.CreateNewUser(userName, familyName, yob, upperArmLength, upperArmWidth, foreArmLength, foreArmWidth, handLength, type);
         //Debug.Log("The loaded user is: " + saveSystem.ActiveUser.name + " " + saveSystem.ActiveUser.familyName);
         activeUserData = saveSystem.LoadUserData("RG1988");
@@ -62,6 +66,9 @@ public class SaveSystemTester : MonoBehaviour {
         logger.SaveLog();
         logger.AddNewLogFile(1, 2, "did, it, overwrite, the, data");
         saveSystem.GetActiveLogger(0).CloseLog();
+
+        // Test AvatarSpawner
+        avatarSpawner.SpawnDefaultAvatar();
     }
 
     // Update is called once per frame
