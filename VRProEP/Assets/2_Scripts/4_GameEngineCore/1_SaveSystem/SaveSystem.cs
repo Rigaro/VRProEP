@@ -14,6 +14,7 @@ namespace VRProEP.GameEngineCore
         private UserData activeUser;
         private string activeSaveFolder;
         private List<IExperimentLogger> activeLoggers = new List<IExperimentLogger>();
+        private AvatarManager avatarManager;
 
         // Encapsulation
         public UserData ActiveUser
@@ -77,6 +78,8 @@ namespace VRProEP.GameEngineCore
             activeSaveFolder = Application.dataPath + "/UserData/" + activeUser.id.ToString();
             // And save its data
             SaveActiveUserData();
+
+            // Create an avatar for the user
 
             return activeUser;
         }
@@ -181,7 +184,7 @@ namespace VRProEP.GameEngineCore
             // Re-initialize the experiment logger for the new active user.
             foreach (IExperimentLogger logger in activeLoggers)
                 logger.InitializeLog(activeSaveFolder);
-
+            
             return loadedUserData;
         }
 
@@ -218,11 +221,18 @@ namespace VRProEP.GameEngineCore
         {
             foreach (IExperimentLogger logger in activeLoggers)
             {
-                logger.SaveLog(); // Save data just in case it was forgotten.
+                logger.SaveLog(); // Save data just in case it was not saved.
                 logger.CloseLog();
             }
         }
 
+        public void LoadUser(string userID, AvatarType avatarType)
+        {
+            // Load user data.
+            // Load a tracking frame depending on user and avatar type
+            // Customize upper arm markers and colliders
+            // Load avatar.
+        }
     }
 
 }

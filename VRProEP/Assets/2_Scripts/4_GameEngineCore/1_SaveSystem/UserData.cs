@@ -14,6 +14,7 @@ namespace VRProEP.GameEngineCore
 
     /// <summary>
     /// Structure to save user data for persistency.
+    /// Lengths given in meters.
     /// </summary>
     public class UserData
     {

@@ -2,6 +2,7 @@
 using VRProEP.ExperimentCore;
 using VRProEP.GameEngineCore;
 using UnityEngine;
+using System.IO;
 
 public class SaveSystemTester : MonoBehaviour {
 
@@ -69,6 +70,16 @@ public class SaveSystemTester : MonoBehaviour {
 
         // Test AvatarSpawner
         avatarSpawner.SpawnDefaultAvatar();
+
+        AvatarObjectData residualLimbUpperDefault = new AvatarObjectData();
+        residualLimbUpperDefault.name = "ResidualLimbUpperDefault";
+        residualLimbUpperDefault.dimensions = new Vector2(0.1f, 0.1f);
+        residualLimbUpperDefault.objectType = AvatarObjectType.ResidualLimb;
+
+        // Set file, format data as JSON, and save.
+        string saveFilePath = Application.dataPath + "/ResidualLimbUpperDefault.json";
+        string avatarDataAsJson = JsonUtility.ToJson(residualLimbUpperDefault);
+        File.WriteAllText(saveFilePath, avatarDataAsJson);
     }
 
     // Update is called once per frame
