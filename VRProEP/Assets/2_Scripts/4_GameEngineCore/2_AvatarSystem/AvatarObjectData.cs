@@ -17,10 +17,16 @@ namespace VRProEP.GameEngineCore
         Hand
     }
 
+    /// <summary>
+    /// Structure to save avatar object data which contains:
+    /// - Object name.
+    /// - The object general dimensions: length and width.
+    /// - The object type as defined by the enum AvatarObjectType.
+    /// </summary>
     public class AvatarObjectData
     {
         public string name;
-        public Vector2 dimensions;
+        public Vector2 dimensions; // Length, Width
         public AvatarObjectType objectType;
     }
 }

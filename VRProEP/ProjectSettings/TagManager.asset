@@ -6,12 +6,16 @@ TagManager:
   tags:
   - ResidualLimbTracker
   - ProsthesisManager
-  - ElbowParent
-  - ElbowChild
   - ResidualLimbAvatar
   - Socket
   - ShoulderLocation
   - Avatar
+  - Elbow
+  - Elbow_Upper
+  - Elbow_Lower
+  - UpperArmCollider
+  - Forearm
+  - ElbowLocation
   layers:
   - Default
   - TransparentFX

@@ -14,7 +14,6 @@ namespace VRProEP.GameEngineCore
         private UserData activeUser;
         private string activeSaveFolder;
         private List<IExperimentLogger> activeLoggers = new List<IExperimentLogger>();
-        private AvatarManager avatarManager;
 
         // Encapsulation
         public UserData ActiveUser
@@ -31,8 +30,7 @@ namespace VRProEP.GameEngineCore
                 return activeSaveFolder;
             }
         }
-
-
+        
         /// <summary>
         /// Creates a new user data object with the given data, creates a folder for its data, saves the data in a file, and sets as the active user
         /// </summary>
@@ -58,30 +56,12 @@ namespace VRProEP.GameEngineCore
             newUser.id = userID;
             newUser.upperArmLength = uArmL;
             newUser.upperArmWidth = uArmW;
-            newUser.foreArmLength = fArmL;
-            newUser.foreArmWidth = fArmW;
+            newUser.forearmLength = fArmL;
+            newUser.forearmWidth = fArmW;
             newUser.handLength = handL;
             newUser.type = userType;
-
-            // Create new folder for user or throw exception if it already exists.
-            try
-            {
-                CreateNewUserFolder(newUser);
-            }
-            catch
-            {
-                throw new System.Exception("The provided user data already exists in the user file directory.");
-            }
-
-            // If successfully created then we can proceed to make it the active user.
-            activeUser = newUser;
-            activeSaveFolder = Application.dataPath + "/UserData/" + activeUser.id.ToString();
-            // And save its data
-            SaveActiveUserData();
-
-            // Create an avatar for the user
-
-            return activeUser;
+                        
+            return CreateNewUser(newUser);
         }
 
         /// <summary>
@@ -224,14 +204,6 @@ namespace VRProEP.GameEngineCore
                 logger.SaveLog(); // Save data just in case it was not saved.
                 logger.CloseLog();
             }
-        }
-
-        public void LoadUser(string userID, AvatarType avatarType)
-        {
-            // Load user data.
-            // Load a tracking frame depending on user and avatar type
-            // Customize upper arm markers and colliders
-            // Load avatar.
         }
     }
 

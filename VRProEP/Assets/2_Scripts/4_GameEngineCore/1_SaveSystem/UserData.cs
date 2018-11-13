@@ -24,8 +24,8 @@ namespace VRProEP.GameEngineCore
         public string id;
         public float upperArmLength;
         public float upperArmWidth;
-        public float foreArmLength;
-        public float foreArmWidth;
+        public float forearmLength;
+        public float forearmWidth;
         public float handLength;
         public UserType type;
     }

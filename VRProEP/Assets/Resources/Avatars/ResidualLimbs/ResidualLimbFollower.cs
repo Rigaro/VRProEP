@@ -1,26 +1,38 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using VRProEP.GameEngineCore;
 using UnityEngine;
 
 public class ResidualLimbFollower : MonoBehaviour {
 
-    private Transform shoulderTransform;
-    private Vector3 offset;
+    private Transform trackerTransform;
+
+    public AvatarType avatarType;
+    public Vector3 offset;
 
 	// Use this for initialization
 	void Start ()
     {
-        // Get the shoulder location object and initialize
-        GameObject residualLimbTracker = GameObject.FindGameObjectWithTag("ShoulderLocation");
-        shoulderTransform = residualLimbTracker.transform;
-        offset = new Vector3(0.0f, -transform.localScale.y, 0.0f);
+        if (avatarType == AvatarType.Transhumeral)
+        {
+            // Get the shoulder location object and initialize
+            GameObject residualLimbTracker = GameObject.FindGameObjectWithTag("ShoulderLocation");
+            trackerTransform = residualLimbTracker.transform;
+        }
+        if (avatarType == AvatarType.Transradial)
+        {
+            throw new System.NotImplementedException("Transradial avatars not yet implemented");
+            // Get the shoulder location object and initialize
+            GameObject residualLimbTracker = GameObject.FindGameObjectWithTag("ElbowLocation");
+            trackerTransform = residualLimbTracker.transform;
+        }
+        //offset = new Vector3(0.0f, -transform.localScale.y, 0.0f);
     }
 	
-	// Update is called once per frame
+	// LateUpdate is called once per frame at the end of everything else
 	void LateUpdate () {
         // Update the residual limb position to tracker.
-        transform.position = shoulderTransform.position;
-        transform.rotation = shoulderTransform.rotation;
-        transform.Translate(offset);
+        transform.position = trackerTransform.position;
+        transform.rotation = trackerTransform.rotation;
+        if (offset != null)
+            transform.Translate(offset);
     }
 }

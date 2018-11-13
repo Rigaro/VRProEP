@@ -19,13 +19,13 @@ public class SaveSystemTester : MonoBehaviour {
     private UserData activeUserData;
     private SaveSystem saveSystem;
 
-    private AvatarSpawner avatarSpawner;
+    private AvatarSystem avatarSystem;
     
 
     // Use this for initialization
     void Start () {
         saveSystem = new SaveSystem();
-        avatarSpawner = new AvatarSpawner();
+        avatarSystem = new AvatarSystem();
         //saveSystem.CreateNewUser(userName, familyName, yob, upperArmLength, upperArmWidth, foreArmLength, foreArmWidth, handLength, type);
         //Debug.Log("The loaded user is: " + saveSystem.ActiveUser.name + " " + saveSystem.ActiveUser.familyName);
         activeUserData = saveSystem.LoadUserData("RG1988");
@@ -68,18 +68,9 @@ public class SaveSystemTester : MonoBehaviour {
         logger.AddNewLogFile(1, 2, "did, it, overwrite, the, data");
         saveSystem.GetActiveLogger(0).CloseLog();
 
-        // Test AvatarSpawner
-        avatarSpawner.SpawnDefaultAvatar();
-
-        AvatarObjectData residualLimbUpperDefault = new AvatarObjectData();
-        residualLimbUpperDefault.name = "ResidualLimbUpperDefault";
-        residualLimbUpperDefault.dimensions = new Vector2(0.1f, 0.1f);
-        residualLimbUpperDefault.objectType = AvatarObjectType.ResidualLimb;
-
-        // Set file, format data as JSON, and save.
-        string saveFilePath = Application.dataPath + "/ResidualLimbUpperDefault.json";
-        string avatarDataAsJson = JsonUtility.ToJson(residualLimbUpperDefault);
-        File.WriteAllText(saveFilePath, avatarDataAsJson);
+        // Create avatar configuration for user
+        //avatarSystem.CreateAvatarCustomizationData(saveSystem.ActiveUser.id, "ResidualLimbUpperDefault", "SocketDefault", "ElbowDefault", "ForearmDefault", "HandDefault", AvatarType.Transhumeral);
+        avatarSystem.LoadAvatar(saveSystem.ActiveUser, AvatarType.Transhumeral);
     }
 
     // Update is called once per frame
