@@ -10,11 +10,20 @@ namespace VRProEP.ProsthesisCore
         private ConfigurableInputManager inputManager;
         private ElbowManager elbowManager;
 
-        // Use this for initialization
-        public void AssignAvatar()
+        /// <summary>
+        /// Initializes the Elbow prosthesis with basic functionality.
+        /// Must be called only after the avatar is available.
+        /// </summary>
+        public void InitializeProsthesis()
         {
-            // Find ResidualLimbTracker GameObject.
-            // Find Elbow
+            // ConfigurableInputManagar
+            // Create a VIVETracker and basic reference generator.
+            // Create configurable input manager.
+            
+            // ElbowManager
+            // Find Elbow_Lower GameObject and extract its HingeJoint and Rigidbody
+            // Create VirtualEncoder and attach to HingeJoint.
+            // Create ElbowManager with the given VirtualEncoder and Rigidbody.
         }
 
     }

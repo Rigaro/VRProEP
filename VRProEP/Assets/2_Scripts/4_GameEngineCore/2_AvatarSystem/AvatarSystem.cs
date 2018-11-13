@@ -6,24 +6,35 @@ using UnityEngine;
 namespace VRProEP.GameEngineCore
 {
     /// <summary>
-    /// 
+    /// Handles avatar data management and spawning.
     /// </summary>
     public class AvatarSystem
     {
         private readonly string dataFolder = Application.dataPath + "/UserData/";
         private AvatarData activeAvatarData;
         private AvatarSpawner avatarSpawner = new AvatarSpawner();
-               
+
+        private bool isAvatarAvaiable = false;
+
+        public bool IsAvatarAvaiable
+        {
+            get
+            {
+                return isAvatarAvaiable;
+            }
+        }
+
         /// <summary>
-        /// 
+        /// Creates an avatar configuration file.
+        /// Object types are referenced by prefab name.
         /// </summary>
-        /// <param name="userID"></param>
-        /// <param name="residualLimbType"></param>
-        /// <param name="socketType"></param>
-        /// <param name="elbowType"></param>
-        /// <param name="forearmType"></param>
-        /// <param name="handType"></param>
-        /// <param name="avatarType"></param>
+        /// <param name="userID">The user ID to generate the file for.</param>
+        /// <param name="residualLimbType">The type of residual limb.</param>
+        /// <param name="socketType">The type of socket.</param>
+        /// <param name="elbowType">The type of elbow.</param>
+        /// <param name="forearmType">The type of forearm.</param>
+        /// <param name="handType">The type of hand.</param>
+        /// <param name="avatarType">The type of avatar.</param>
         /// <returns></returns>
         public AvatarData CreateAvatarCustomizationData(string userID, string residualLimbType, string socketType, string elbowType, string forearmType, string handType, AvatarType avatarType)
         {
@@ -111,6 +122,8 @@ namespace VRProEP.GameEngineCore
                 CustomizeTrackingFrame(userData, avatarType);
                 avatarSpawner.SpawnTransradialAvatar(userData, activeAvatarData);
             }
+
+            isAvatarAvaiable = true;
         }
 
         /// <summary>

@@ -5,6 +5,7 @@ using UnityEngine;
 namespace VRProEP.GameEngineCore
 {
     /// <summary>
+    /// Handles avatar loading and spawning into game scene.
     /// Avatar objects should be placed within: /Resources/Avatars/
     /// </summary>
     public class AvatarSpawner
@@ -19,7 +20,12 @@ namespace VRProEP.GameEngineCore
         private const float objectGap = 0.0f; // Helps with the gap between certain objects to avoid overlapping issues.
 
         private readonly string resourcesDataPath = Application.dataPath + "/Resources/Avatars";
-        
+
+        /// <summary>
+        /// Spawns a transradial avatar for the given user.
+        /// </summary>
+        /// <param name="userData">The user's physical data.</param>
+        /// <param name="avatarData">The user's avatar configuration data.</param>
         public void SpawnTranshumeralAvatar(UserData userData, AvatarData avatarData)
         {
             LoadResidualLimb(avatarData.residualLimbType);
@@ -29,6 +35,11 @@ namespace VRProEP.GameEngineCore
             // LoadHand
         }
 
+        /// <summary>
+        /// Spawns a transradial avatar for the given user.
+        /// </summary>
+        /// <param name="userData">The user's physical data.</param>
+        /// <param name="avatarData">The user's avatar configuration data.</param>
         public void SpawnTransradialAvatar(UserData userData, AvatarData avatarData)
         {
             // Load
