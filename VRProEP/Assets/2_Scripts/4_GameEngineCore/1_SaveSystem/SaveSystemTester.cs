@@ -1,7 +1,9 @@
 ﻿//======= Copyright (c) Melbourne Robotics Lab, All rights reserved. ===============
 using VRProEP.ExperimentCore;
 using VRProEP.GameEngineCore;
+using VRProEP.ProsthesisCore;
 using UnityEngine;
+using UnityEngine.XR;
 using System.IO;
 
 public class SaveSystemTester : MonoBehaviour {
@@ -24,6 +26,9 @@ public class SaveSystemTester : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        // Start XR Tracking
+        //XRSettings.enabled = true;
+
         saveSystem = new SaveSystem();
         avatarSystem = new AvatarSystem();
         //saveSystem.CreateNewUser(userName, familyName, yob, upperArmLength, upperArmWidth, foreArmLength, foreArmWidth, handLength, type);
@@ -71,6 +76,13 @@ public class SaveSystemTester : MonoBehaviour {
         // Create avatar configuration for user
         //avatarSystem.CreateAvatarCustomizationData(saveSystem.ActiveUser.id, "ResidualLimbUpperDefault", "SocketDefault", "ElbowDefault", "ForearmDefault", "HandDefault", AvatarType.Transhumeral);
         avatarSystem.LoadAvatar(saveSystem.ActiveUser, AvatarType.Transhumeral);
+
+        // Initialize prosthesis
+        GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+        ConfigurableElbowManager elbowManager = prosthesisManagerGO.AddComponent<ConfigurableElbowManager>();
+        elbowManager.InitializeProsthesis();
+
+        elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
     }
 
     // Update is called once per frame

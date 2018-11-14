@@ -41,6 +41,7 @@ namespace VRProEP.GameEngineCore
             transform.rotation = trackerTransform.rotation;
             if (offset != null)
                 transform.Translate(offset);
+
         }
     }
 }

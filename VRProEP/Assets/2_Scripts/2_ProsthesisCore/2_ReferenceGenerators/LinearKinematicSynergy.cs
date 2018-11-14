@@ -11,35 +11,20 @@ namespace VRProEP.ProsthesisCore
     public class LinearKinematicSynergy : AdaptiveGenerator
     {
 
-        /// <summary>
-        /// Basic synergistic prosthesis reference generator.
-        /// Provides position reference for prosthesis joints through a simple linear kinematic synergy.
-        /// </summary>
-        /// <param name="xBar">The initial condition for the references.</param>
-        public LinearKinematicSynergy(float[] xBar)
-        {
-            channelSize = xBar.Length;
-            this.xBar = xBar;
-            generatorType = ReferenceGeneratorType.LinearKinematicSynergy;
-        }
 
         /// <summary>
         /// Basic synergistic prosthesis reference generator.
         /// Provides position reference for prosthesis joints through a simple linear kinematic synergy.
         /// </summary>
-        /// <param name="xBar">The initial condition for the references.</param>
-        /// <param name="xMin">The lower limits for the references.</param>
-        /// <param name="xMax">The upper limits for the references.</param>
-        public LinearKinematicSynergy(float[] xBar, float[] xMin, float[] xMax)
+        /// <param name="xBar">The initial references.</param>
+        /// <param name="xMin">The lower limit for the references.</param>
+        /// <param name="xMax">The upper limit for the references.</param>
+        /// <param name="theta">The initial parameters.</param>
+        /// <param name="thetaMin">The lower limit for the parameters.</param>
+        /// <param name="thetaMax">The upper limit for the parameters.</param>
+        public LinearKinematicSynergy(float[] xBar, float[] xMin, float[] xMax, float[] theta, float[] thetaMin, float[] thetaMax) : base(xBar, xMin, xMax, theta, thetaMin, thetaMax)
         {
-            if (xBar.Length != xMin.Length || xBar.Length != xMax.Length)
-                throw new System.ArgumentOutOfRangeException("The length of the parameters does not match.");
 
-            channelSize = xBar.Length;
-            this.xBar = xBar;
-            this.xMin = xMin;
-            this.xMax = xMax;
-            generatorType = ReferenceGeneratorType.LinearKinematicSynergy;
         }
 
         /// <summary>

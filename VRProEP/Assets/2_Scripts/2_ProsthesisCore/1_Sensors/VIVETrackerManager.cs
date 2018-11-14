@@ -88,8 +88,8 @@ namespace VRProEP.ProsthesisCore
         /// <summary>
         /// Returns raw tracking information for the selected channel.
         /// See VIVETrackerChannels for channel information. 
-        /// Angular velocity given radians per second.
-        /// Angular displacement given in Euler angles.
+        /// Angular velocity given radians per second, world coordinates.
+        /// Angular displacement given in Euler angles, world coordinates.
         /// </summary>
         /// <param name="channel">The channel number.</param>
         /// <returns>Raw tracking data for the given channel.</returns>
@@ -99,6 +99,8 @@ namespace VRProEP.ProsthesisCore
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels.");
             else if (channel <= 0)
                 throw new System.ArgumentOutOfRangeException("The channel range is 1-6.");
+            else if (trackerTransform == null)
+                throw new System.Exception("The tracker transform has not been set.");
 
             // Angular velocity requested
             if (channel <=3)
@@ -111,7 +113,7 @@ namespace VRProEP.ProsthesisCore
             else if(channel > 3)
             {
                 int chan = channel - 4;
-                Vector3 angPos = trackerTransform.localEulerAngles;
+                Vector3 angPos = trackerTransform.eulerAngles;
                 return angPos[chan];
             }
             else
@@ -122,8 +124,8 @@ namespace VRProEP.ProsthesisCore
         /// <summary>
         /// Returns raw tracking information for the selected channel identifier.
         /// See VIVETrackerChannels for channel information.
-        /// Angular velocity given radians per second.
-        /// Angular displacement given in Euler angles.
+        /// Angular velocity given radians per second, world coordinates.
+        /// Angular displacement given in Euler angles, world coordinates.
         /// </summary>
         /// <param name="channel">The channel/data identifier.</param>
         /// <returns>Raw tracking data for the given channel.</returns>
@@ -136,27 +138,54 @@ namespace VRProEP.ProsthesisCore
 
         /// <summary>
         /// Returns all raw tracking data in an array.
-        /// Angular velocity given radians per second.
-        /// Angular displacement given in Euler angles.
+        /// Angular velocity given radians per second, world coordinates.
+        /// Angular displacement given in Euler angles, world coordinates.
         /// </summary>
         /// <returns>The array with all raw tracking data.</returns>
         public override float[] GetAllRawData()
         {
+            if (trackerTransform == null)
+                throw new System.Exception("The tracker transform has not been set.");
+
             Vector3 angVel;
             TryGetTrackerAngularVelocity(out angVel);
-            Vector3 angPos = trackerTransform.localEulerAngles;
+            Vector3 angPos = trackerTransform.eulerAngles;
             float[] data = { angVel.x, angVel.y, angVel.z, angPos.x, angPos.y, angPos.z };
             return data;
         }
 
         /// <summary>
-        /// Not implemented, performs GetRawData.
+        /// Returns processed tracking data in .
+        /// Converts from world coordinates to local residual limb coordinates.
+        /// Angular velocity given radians per second, world coordinates.
+        /// Angular displacement given in Euler angles, world coordinates.
         /// </summary>
         /// <param name="channel">The channel number.</param>
         /// <returns>Pre-processed sensor data for the given channel.</returns>
         public override float GetProcessedData(int channel)
         {
-            return GetRawData(channel);
+            if (channel > ChannelSize)
+                throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels.");
+            else if (channel <= 0)
+                throw new System.ArgumentOutOfRangeException("The channel range is 1-6.");
+            else if (trackerTransform == null)
+                throw new System.Exception("The tracker transform has not been set.");
+
+            Vector3 angVel;
+            TryGetTrackerAngularVelocity(out angVel);
+            Vector3 localAngVel = trackerTransform.InverseTransformVector(angVel);
+            if (channel == 1)
+                return localAngVel.z;
+            else if (channel == 2)
+                return localAngVel.y;
+            else if (channel == 3)
+                return localAngVel.x;
+            else if (channel == 4)
+                return trackerTransform.localEulerAngles.x;
+            else if (channel == 5)
+                return trackerTransform.localEulerAngles.y;
+            else
+                return trackerTransform.localEulerAngles.z;
         }
 
         /// <summary>
@@ -166,7 +195,9 @@ namespace VRProEP.ProsthesisCore
         /// <returns>Pre-processed sensor data for the given channel.</returns>
         public override float GetProcessedData(string channel)
         {
-            return GetRawData(channel);
+            int channelNum = (int)System.Enum.Parse(typeof(VIVETrackerChannels), channel);
+
+            return GetProcessedData(channelNum);
         }
 
         /// <summary>
@@ -175,7 +206,15 @@ namespace VRProEP.ProsthesisCore
         /// <returns>The array with all pre-processed sensor data.</returns>
         public override float[] GetAllProcessedData()
         {
-            return GetAllRawData();
+            if (trackerTransform == null)
+                throw new System.Exception("The tracker transform has not been set.");
+
+            Vector3 angVel;
+            TryGetTrackerAngularVelocity(out angVel);
+            Vector3 localAngVel = trackerTransform.InverseTransformVector(angVel);
+            Vector3 localAngPos = trackerTransform.eulerAngles;
+            float[] data = { localAngVel.z, localAngVel.y, localAngVel.x, localAngPos.x, localAngPos.y, localAngPos.z };
+            return data;
         }
 
         /// <summary>

@@ -23,7 +23,10 @@ namespace VRProEP.ProsthesisCore
             float[] xBar = { 0.0f };
             float[] xMin = { -5.0f };
             float[] xMax = { 145.0f };
-            referenceGenerator = new LinearKinematicSynergy(xBar, xMin, xMax);
+            float[] theta = { 1.0f };
+            float[] thetaMin = { 0.8f };
+            float[] thetaMax = { 2.4f };
+            referenceGenerator = new LinearKinematicSynergy(xBar, xMin, xMax, theta, thetaMin, thetaMax);
         }
 
         /// <summary>
@@ -33,14 +36,14 @@ namespace VRProEP.ProsthesisCore
         /// <param name="xBar">The initial condition for the references.</param>
         /// <param name="xMin">The lower limits for the references.</param>
         /// <param name="xMax">The upper limits for the references.</param>
-        public KinematicVIVEInputManager(VIVETrackerManager sensorManager, float[] xBar, float[] xMin, float[] xMax)
+        public KinematicVIVEInputManager(VIVETrackerManager sensorManager, float[] xBar, float[] xMin, float[] xMax, float[] theta, float[] thetaMin, float[] thetaMax)
         {
             if (sensorManager == null)
                 throw new System.ArgumentNullException("The provided sensor manager is empty.");
 
             this.sensorManager = sensorManager;
             // Create a custom KSRG
-            referenceGenerator = new LinearKinematicSynergy(xBar, xMin, xMax);
+            referenceGenerator = new LinearKinematicSynergy(xBar, xMin, xMax, theta, thetaMin, thetaMax);
         }
 
         /// <summary>

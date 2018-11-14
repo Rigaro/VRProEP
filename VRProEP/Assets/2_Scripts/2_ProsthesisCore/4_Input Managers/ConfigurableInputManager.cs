@@ -59,7 +59,7 @@ namespace VRProEP.ProsthesisCore
         private void SetActiveReferenceGenerator(ReferenceGeneratorType refGenType)
         {
             IReferenceGenerator refGen;
-            if (!GetReferenceGenerator(refGenType, out refGen))
+            if (GetReferenceGenerator(refGenType, out refGen))
                 activeGenerator = refGen;
             else
                 throw new System.ArgumentException("Reference generator " + refGenType.ToString() + " unavailable.");
@@ -76,7 +76,7 @@ namespace VRProEP.ProsthesisCore
         public override float GenerateReference(int channel)
         {
             // First read the angular velocity from sensor
-            float[] input = { activeSensor.GetRawData(channel) };
+            float[] input = { activeSensor.GetProcessedData(channel) };
             // Compute reference with that angular velocity
             return activeGenerator.UpdateReference(channel, input);
         }

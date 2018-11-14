@@ -6,6 +6,21 @@ namespace VRProEP.ProsthesisCore
     public class ElbowManager : BasicDeviceManager
     {
         private Rigidbody elbowRB;
+        private Vector3 axis;
+
+        public Vector3 Axis
+        {
+            get
+            {
+                return axis;
+            }
+
+            set
+            {
+                axis = value;
+            }
+        }
+
 
         /// <summary>
         /// Manager for a virtual elbow prosthetic device based on Unity's Rigidbody.
@@ -31,7 +46,7 @@ namespace VRProEP.ProsthesisCore
             if (sensor == null)
                 throw new System.ArgumentNullException("The provided sensor object is empty.");
 
-            float[] gains = { 100.0f, 5.0f };
+            float[] gains = { 150.0f, 5.0f };
             controller = new StateFeedbackController(2, gains);
             this.sensor = sensor;
             SetElbowDevice(elbowRB);
@@ -90,7 +105,7 @@ namespace VRProEP.ProsthesisCore
             float[] xBar = { reference, 0.0f };
             // Update device joint torque
             float u = controller.UpdateControlInput(xBar, x);
-            elbowRB.AddRelativeTorque(Vector3.left * u);
+            elbowRB.AddRelativeTorque(axis * u);
         }
 
         /// <summary>
@@ -108,7 +123,7 @@ namespace VRProEP.ProsthesisCore
             float[] x = sensor.GetAllProcessedData();
             // Update device joint torque
             float u = controller.UpdateControlInput(references, x);
-            elbowRB.AddRelativeTorque(Vector3.left * u);
+            elbowRB.AddRelativeTorque(axis * u);
         }
 
         /// <summary>

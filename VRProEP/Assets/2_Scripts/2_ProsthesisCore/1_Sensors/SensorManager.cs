@@ -18,7 +18,7 @@ namespace VRProEP.ProsthesisCore
         /// <param name="sensorType">The type of sensor.</param>
         public SensorManager(int channelSize, SensorType sensorType)
         {
-            if (channelSize >= 0)
+            if (channelSize <= 0)
                 throw new System.ArgumentException("The given channel size is invalid. It should be greater than zero.");
             this.channelSize = channelSize;
             this.sensorType = sensorType;

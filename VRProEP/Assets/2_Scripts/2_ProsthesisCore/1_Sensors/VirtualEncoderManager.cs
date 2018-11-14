@@ -96,7 +96,7 @@ namespace VRProEP.ProsthesisCore
         }
 
         /// <summary>
-        /// Not implemented, performs GetRawData.
+        /// Gives data in radians instead of degrees.
         /// </summary>
         /// <param name="channel">The channel number.</param>
         /// <returns>Pre-processed sensor data for the given channel.</returns>

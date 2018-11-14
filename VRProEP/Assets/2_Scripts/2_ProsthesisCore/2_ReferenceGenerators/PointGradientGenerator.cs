@@ -1,4 +1,5 @@
 ﻿//======= Copyright (c) Melbourne Robotics Lab, All rights reserved. ===============
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace VRProEP.ProsthesisCore
@@ -9,7 +10,7 @@ namespace VRProEP.ProsthesisCore
     public class PointGradientGenerator : ReferenceGenerator
     {
 
-        private float[] gains;
+        private List<float> gains;
 
         /// <summary>
         /// Autonomous reference generator that minimizes the distance to a given point in task space.
@@ -32,9 +33,9 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <param name="xBar">The initial condition for the references.</param>
         /// <param name="gains">The desired integrator gain for each reference.</param>
-        public PointGradientGenerator(float[] xBar, float[] gains)
+        public PointGradientGenerator(float[] xBar, List<float> gains)
         {
-            if (xBar.Length != gains.Length)
+            if (xBar.Length != gains.Count)
                 throw new System.ArgumentOutOfRangeException("The length of the parameters does not match.");
 
             channelSize = xBar.Length;
@@ -71,9 +72,9 @@ namespace VRProEP.ProsthesisCore
         /// <param name="xMin">The lower limits for the references.</param>
         /// <param name="xMax">The upper limits for the references.</param>
         /// <param name="gains">The desired integrator gain for each reference.</param>
-        public PointGradientGenerator(float[] xBar, float[] xMin, float[] xMax, float[] gains)
+        public PointGradientGenerator(float[] xBar, float[] xMin, float[] xMax, List<float> gains)
         {
-            if (xBar.Length != xMin.Length || xBar.Length != xMax.Length || xBar.Length != gains.Length)
+            if (xBar.Length != xMin.Length || xBar.Length != xMax.Length || xBar.Length != gains.Count)
                 throw new System.ArgumentOutOfRangeException("The length of the parameters does not match.");
 
             channelSize = xBar.Length;
@@ -147,7 +148,7 @@ namespace VRProEP.ProsthesisCore
         {
             for (int i = 0; i < xBar.Length; i++)
             {
-                gains[i] = 1.0f;
+                gains.Add(1.0f);
             }
         }
     }

@@ -32,6 +32,30 @@ namespace VRProEP.ProsthesisCore
             Reference
         }
 
+        /// <summary>
+        /// Abstract adaptive reference generator to add basic variables used across all generators.
+        /// </summary>
+        /// <param name="xBar">The initial references.</param>
+        /// <param name="xMin">The lower limit for the references.</param>
+        /// <param name="xMax">The upper limit for the references.</param>
+        /// <param name="theta">The initial parameters.</param>
+        /// <param name="thetaMin">The lower limit for the parameters.</param>
+        /// <param name="thetaMax">The upper limit for the parameters.</param>
+        public AdaptiveGenerator(float[] xBar, float[] xMin, float[] xMax, float[] theta, float[] thetaMin, float[] thetaMax)
+        {
+            if (xBar.Length != xMin.Length || xBar.Length != xMax.Length || theta.Length != xBar.Length || theta.Length != thetaMin.Length || theta.Length != thetaMax.Length)
+                throw new System.ArgumentOutOfRangeException("The length of the parameters does not match.");
+
+            channelSize = xBar.Length;
+            this.xBar = xBar;
+            this.xMin = xMin;
+            this.xMax = xMax;
+            parameterChannelSize = theta.Length;
+            this.theta = theta;
+            this.thetaMin = thetaMin;
+            this.thetaMax = thetaMax;
+            generatorType = ReferenceGeneratorType.LinearKinematicSynergy;
+        }
 
         /// <summary>
         /// Updates the reference for the given channel to be tracked by a controller or device.
@@ -162,7 +186,7 @@ namespace VRProEP.ProsthesisCore
             if (!IsChannelValid(channel,ChannelType.Parameter))
                 throw new System.ArgumentOutOfRangeException("The requested channel number is invalid.");
 
-            return theta[channel];
+            return theta[channel - 1];
         }
 
         /// <summary>

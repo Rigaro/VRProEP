@@ -1,4 +1,5 @@
 ﻿//======= Copyright (c) Melbourne Robotics Lab, All rights reserved. ===============
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace VRProEP.ProsthesisCore
@@ -9,9 +10,9 @@ namespace VRProEP.ProsthesisCore
     /// </summary>
     public class IntegratorReferenceGenerator : ReferenceGenerator {
 
-        private float[] gains;
+        private List<float> gains = new List<float>();
 
-        public float[] Gains
+        public List<float> Gains
         {
             get
             {
@@ -44,9 +45,9 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <param name="xBar">The initial condition for the references.</param>
         /// <param name="gains">The desired integrator gain for each reference.</param>
-        public IntegratorReferenceGenerator(float[] xBar, float[] gains)
+        public IntegratorReferenceGenerator(float[] xBar, List<float> gains)
         {
-            if (xBar.Length != gains.Length)
+            if (xBar.Length != gains.Count)
                 throw new System.ArgumentOutOfRangeException("The length of the parameters does not match.");
 
             channelSize = xBar.Length;
@@ -67,7 +68,7 @@ namespace VRProEP.ProsthesisCore
         {
             if (xBar.Length != xMin.Length || xBar.Length != xMax.Length)
                 throw new System.ArgumentOutOfRangeException("The length of the parameters does not match.");
-
+            
             channelSize = xBar.Length;
             this.xBar = xBar;
             this.xMin = xMin;
@@ -85,9 +86,9 @@ namespace VRProEP.ProsthesisCore
         /// <param name="xMin">The lower limits for the references.</param>
         /// <param name="xMax">The upper limits for the references.</param>
         /// <param name="gains">The desired integrator gain for each reference.</param>
-        public IntegratorReferenceGenerator(float[] xBar, float[] xMin, float[] xMax, float[] gains)
+        public IntegratorReferenceGenerator(float[] xBar, float[] xMin, float[] xMax, List<float> gains)
         {
-            if (xBar.Length != xMin.Length || xBar.Length != xMax.Length || xBar.Length != gains.Length)
+            if (xBar.Length != xMin.Length || xBar.Length != xMax.Length || xBar.Length != gains.Count)
                 throw new System.ArgumentOutOfRangeException("The length of the parameters does not match.");
 
             channelSize = xBar.Length;
@@ -112,7 +113,7 @@ namespace VRProEP.ProsthesisCore
                 throw new System.ArgumentOutOfRangeException("The requested channel number is invalid.");
 
             // Check validity of the provided input
-            if (xBar.Length != Gains.Length)
+            if (xBar.Length != gains.Count)
                 throw new System.ArgumentOutOfRangeException("The length of the parameters does not match.");
 
             // Integrate
@@ -151,10 +152,10 @@ namespace VRProEP.ProsthesisCore
         /// Sets the gains to the default 1.0f.
         /// </summary>
         private void SetDefaultGains()
-        {
+        {;
             for (int i = 0; i < xBar.Length; i++)
             {
-                Gains[i] = 1.0f;
+                gains.Add(1.0f);
             }
         }
     }
