@@ -1,5 +1,6 @@
 ﻿//======= Copyright (c) Melbourne Robotics Lab, All rights reserved. ===============
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace VRProEP.ProsthesisCore
 {
@@ -16,6 +17,7 @@ namespace VRProEP.ProsthesisCore
         public const string CMD_ADD_SENSOR = "CMD_ADD_SENSOR";
         public const string CMD_ADD_REFGEN = "CMD_ADD_REFGEN";
         public const string VAL_SENSOR_VIVETRACKER = "VAL_SENSOR_VIVETRACKER";
+        public const string VAL_SENSOR_VIVECONTROLLER = "VAL_SENSOR_VIVECONTROLLER";
         public const string VAL_SENSOR_OCULUSTOUCH = "VAL_SENSOR_OCULUSTOUCH";
         public const string VAL_REFGEN_LINKINSYN = "VAL_REFGEN_LINKINSYN";
         public const string VAL_REFGEN_INTEGRATOR = "VAL_REFGEN_INTEGRATOR";
@@ -150,6 +152,9 @@ namespace VRProEP.ProsthesisCore
                             break;
                         case VAL_SENSOR_VIVETRACKER:
                             SetActiveSensor(SensorType.VIVETracker);
+                            break;
+                        case VAL_SENSOR_VIVECONTROLLER:
+                            SetActiveSensor(SensorType.VIVEController);
                             break;
                         default:
                             throw new System.ArgumentException("Invalid value provided.");

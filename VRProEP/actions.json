@@ -64,8 +64,8 @@
       "type": "boolean"
     },
     {
-      "name": "/actions/vrproep/in/wheel",
-      "type": "vector1",
+      "name": "/actions/vrproep/in/trackpad",
+      "type": "vector2",
       "requirement": "mandatory"
     }
   ],

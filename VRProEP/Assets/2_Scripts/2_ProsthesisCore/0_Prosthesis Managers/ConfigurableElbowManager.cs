@@ -53,6 +53,9 @@ namespace VRProEP.ProsthesisCore
             LinearKinematicSynergy linSyn = new LinearKinematicSynergy(xBar, xMin, xMax, theta, thetaMin, thetaMax);
             inputManager.Configure("CMD_ADD_REFGEN", linSyn);
 
+            // Add VIVE controller as sensor to manually move.
+            VIVEControllerManager controllerManager = new VIVEControllerManager();
+            inputManager.Configure("CMD_ADD_SENSOR", controllerManager);
 
             // Enable
             isConfigured = true;
@@ -65,6 +68,7 @@ namespace VRProEP.ProsthesisCore
             {
                 // Update references
                 elbowState = inputManager.GenerateReference(1);
+                Debug.Log(elbowState);
                 // Update device state
                 elbowManager.UpdateState(1, elbowState);
             }

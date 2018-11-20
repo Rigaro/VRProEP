@@ -15,10 +15,12 @@ MonoBehaviour:
   - _default
   - platformer
   - buggy
+  - vrproep
   actionSetObjects:
   - {fileID: 11400000, guid: 5bec18aa272c4cc4693785fa9ffc0c29, type: 2}
   - {fileID: 11400000, guid: d072ff83004cad143866c27c286d99a9, type: 2}
   - {fileID: 11400000, guid: ee9094d03b84228449a5ace0e2502fbc, type: 2}
+  - {fileID: 11400000, guid: 3e6e8f2264ea3614ebe53278b0274024, type: 2}
   actionNames:
   - __actions_default_in_InteractUI
   - __actions_default_in_Teleport
@@ -35,6 +37,7 @@ MonoBehaviour:
   - __actions_buggy_in_Throttle
   - __actions_buggy_in_Brake
   - __actions_buggy_in_Reset
+  - __actions_vrproep_in_trackpad
   actionObjects:
   - {fileID: 11400000, guid: 4864c2e366023ef48b73bf0f8e312501, type: 2}
   - {fileID: 11400000, guid: 5f07906f38fc9c54c8c47f2334f0d246, type: 2}
@@ -51,3 +54,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 085b78dfa6427124ab1b407abfbdb0da, type: 2}
   - {fileID: 11400000, guid: 99fbab011655d5f4aa73f40d718c8af0, type: 2}
   - {fileID: 11400000, guid: de964f0f0f60ddb4aaa57bad0aa96416, type: 2}
+  - {fileID: 11400000, guid: 15af09149ea71534d9c4630972020f46, type: 2}

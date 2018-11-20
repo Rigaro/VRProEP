@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9ac3f27fc793dd418f7f9c1ea43831d, type: 3}
+  m_Name: SteamVR_Input_ActionSet_vrproep_In
+  m_EditorClassIdentifier: 
+  actionSet: {fileID: 0}
+  listDirection: 0
+  actions:
+  - {fileID: 11400000, guid: 15af09149ea71534d9c4630972020f46, type: 2}
+  trackpad: {fileID: 11400000, guid: 15af09149ea71534d9c4630972020f46, type: 2}

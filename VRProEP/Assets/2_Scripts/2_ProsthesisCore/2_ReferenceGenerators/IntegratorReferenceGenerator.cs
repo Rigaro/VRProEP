@@ -117,14 +117,14 @@ namespace VRProEP.ProsthesisCore
                 throw new System.ArgumentOutOfRangeException("The length of the parameters does not match.");
 
             // Integrate
-            float tempXBar = xBar[channel - 1] + Gains[channel - 1] * input[channel - 1] * Time.fixedDeltaTime;
+            float tempXBar = xBar[channel - 1] + ( Gains[channel - 1] * input[channel - 1] * Time.fixedDeltaTime );
             // Saturate reference
             if (tempXBar > xMax[channel - 1])
                 tempXBar = xMax[channel - 1];
             else if (tempXBar < xMin[channel - 1])
                 tempXBar = xMin[channel - 1];
 
-            xBar[channel - 1] = (float)System.Math.Round(tempXBar, 2);
+            xBar[channel - 1] = (float)System.Math.Round(tempXBar, 3);
             return xBar[channel - 1];
 
         }

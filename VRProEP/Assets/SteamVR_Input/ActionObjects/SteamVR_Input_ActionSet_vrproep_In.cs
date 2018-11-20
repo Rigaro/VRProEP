@@ -17,6 +17,6 @@ namespace Valve.VR
     public class SteamVR_Input_ActionSet_vrproep_In : Valve.VR.SteamVR_Action_List
     {
         
-        public Valve.VR.SteamVR_Action_Single wheel;
+        public Valve.VR.SteamVR_Action_Vector2 trackpad;
     }
 }
