@@ -32,7 +32,7 @@ namespace VRProEP.GameEngineCore
             LoadSocket(avatarData.socketType);
             LoadElbow(avatarData.elbowType, userData.upperArmLength);
             LoadForearm(avatarData.forearmType, userData.upperArmLength, userData.forearmLength);
-            // LoadHand
+            LoadHand(avatarData.handType, userData.upperArmLength, userData.forearmLength, userData.handLength);
         }
 
         /// <summary>
@@ -206,9 +206,7 @@ namespace VRProEP.GameEngineCore
 
             // Instantiate with prosthesis manager as parent.
             GameObject forearmGO = Object.Instantiate(forearmPrefab, new Vector3(0.0f, -(upperArmLength + lowerArmLength - (activeForearmData.dimensions.x / 2.0f)), 0.0f), Quaternion.identity, prosthesisManagerGO.transform);
-            //GameObject forearmGO = Object.Instantiate(forearmPrefab, new Vector3(0.0f, -1.0f, 0.0f), Quaternion.identity, prosthesisManagerGO.transform);
-            // Debug.Log( "ua: " + upperArmLength + ", la: " + lowerArmLength + ", fa: " + (activeForearmData.dimensions.x));
-
+            
             // Attach the socket to the residual limb through a fixed joint.
             FixedJoint forearmFixedJoint = forearmGO.GetComponent<FixedJoint>();
             // If no fixed joint was found, then add it.
@@ -216,6 +214,52 @@ namespace VRProEP.GameEngineCore
                 forearmFixedJoint = forearmGO.AddComponent<FixedJoint>();
             // Connect
             forearmFixedJoint.connectedBody = elbowLowerRB;
+            return forearmGO;
+        }
+
+
+        /// <summary>
+        /// Loads and instantiates a hand avatar prefab from Resources/Avatars/Hands.
+        /// The prefab must include the tag "Forearm". Loads by name.
+        /// </summary>
+        /// <param name="handType">The name of the prefab forearm avatar to be loaded.</param>
+        /// <returns>The instantiated forearm GameObject.</returns>
+        private GameObject LoadHand(string handType, float upperArmLength, float lowerArmLength, float handLength)
+        {
+            // Need to attach to Forearm, so find that first and get its Rigidbody.
+            GameObject forearmGO = GameObject.FindGameObjectWithTag("Forearm");
+            Rigidbody forearmRB = forearmGO.GetComponent<Rigidbody>();
+
+            // Load hand from avatar folder and check whether successfully loaded.
+            GameObject handPrefab = Resources.Load<GameObject>("Avatars/Hands/" + handType);
+            if (handPrefab == null)
+                throw new System.Exception("The requested hand prefab was not found.");
+
+            // Get parent prosthesis manager
+            GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+
+            // Load hand object info
+            string objectPath = resourcesDataPath + "/Hands/" + handType + ".json";
+            string objectDataAsJson = File.ReadAllText(objectPath);
+            activeHandData = JsonUtility.FromJson<AvatarObjectData>(objectDataAsJson);
+            if (activeHandData == null)
+                throw new System.Exception("The requested hand information was not found.");
+
+            // Instantiate with prosthesis manager as parent.
+            GameObject handGO = Object.Instantiate(handPrefab, new Vector3(-0.0f, -(upperArmLength + lowerArmLength + (activeHandData.dimensions.x / 2.0f)), 0.0f), handPrefab.transform.localRotation, prosthesisManagerGO.transform);
+
+            // Scale hand to fit user's hand
+            float scaleFactor = handLength / activeHandData.dimensions.x;
+            handGO.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+
+            // Attach the socket to the residual limb through a fixed joint.
+            FixedJoint handFixedJoint = handGO.GetComponent<FixedJoint>();
+            // If no fixed joint was found, then add it.
+            if (handFixedJoint == null)
+                handFixedJoint = forearmGO.AddComponent<FixedJoint>();
+            // Connect
+            handFixedJoint.connectedBody = forearmRB;
+            
             return forearmGO;
         }
     }

@@ -16,6 +16,7 @@ TagManager:
   - UpperArmCollider
   - Forearm
   - ElbowLocation
+  - Hand
   layers:
   - Default
   - TransparentFX

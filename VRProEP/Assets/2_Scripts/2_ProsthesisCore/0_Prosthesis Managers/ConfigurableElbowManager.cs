@@ -68,7 +68,6 @@ namespace VRProEP.ProsthesisCore
             {
                 // Update references
                 elbowState = inputManager.GenerateReference(1);
-                Debug.Log(elbowState);
                 // Update device state
                 elbowManager.UpdateState(1, elbowState);
             }

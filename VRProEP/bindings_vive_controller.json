@@ -1,5 +1,5 @@
 {
-   "app_key" : "application.generated.unity.steamvr.exe",
+   "app_key" : "application.generated.unity.vrproep.exe",
    "bindings" : {
       "/actions/buggy" : {
          "sources" : [
@@ -248,9 +248,31 @@
                "path" : "/user/hand/right/input/trackpad"
             }
          ]
+      },
+      "/actions/vrproep" : {
+         "sources" : [
+            {
+               "inputs" : {
+                  "position" : {
+                     "output" : "/actions/vrproep/in/trackpad"
+                  }
+               },
+               "mode" : "trackpad",
+               "path" : "/user/hand/left/input/trackpad"
+            },
+            {
+               "inputs" : {
+                  "position" : {
+                     "output" : "/actions/vrproep/in/trackpad"
+                  }
+               },
+               "mode" : "trackpad",
+               "path" : "/user/hand/right/input/trackpad"
+            }
+         ]
       }
    },
    "controller_type" : "vive_controller",
-   "description" : "",
-   "name" : "vive_controller"
+   "description" : "VIVE Controller binding for VRProEP application.",
+   "name" : "VRProEP VIVE Controller Binding"
 }

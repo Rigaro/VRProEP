@@ -106,7 +106,6 @@ namespace VRProEP.ProsthesisCore
             {
                 SteamVR_Input._default.Deactivate();
                 SteamVR_Input.vrproep.ActivatePrimary();
-                Debug.Log("Activate vrproep ActionSet.");
             }
 
             if (channel == 1)
