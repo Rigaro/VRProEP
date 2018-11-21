@@ -17,7 +17,7 @@ namespace VRProEP.GameEngineCore
         private AvatarObjectData activeForearmData;
         private AvatarObjectData activeHandData;
 
-        private const float objectGap = 0.0f; // Helps with the gap between certain objects to avoid overlapping issues.
+        //private const float objectGap = 0.0f; // Helps with the gap between certain objects to avoid overlapping issues.
 
         private readonly string resourcesDataPath = Application.dataPath + "/Resources/Avatars";
 
@@ -112,7 +112,7 @@ namespace VRProEP.GameEngineCore
                 throw new System.Exception("The requested socket information was not found.");
 
             // Instantiate with prosthesis manager as parent.
-            GameObject socketGO = Object.Instantiate(socketPrefab, new Vector3(0.0f, -(activeResidualLimbData.dimensions.x + (activeSocketData.dimensions.x/2.0f) + objectGap), 0.0f), Quaternion.identity, prosthesisManagerGO.transform);
+            GameObject socketGO = Object.Instantiate(socketPrefab, new Vector3(socketPrefab.transform.localPosition.x, -(activeResidualLimbData.dimensions.x + (activeSocketData.dimensions.x/2.0f)), socketPrefab.transform.localPosition.z), socketPrefab.transform.localRotation, prosthesisManagerGO.transform);
             
             // Attach the socket to the residual limb through a fixed joint.
             FixedJoint socketFixedJoint = socketGO.GetComponent<FixedJoint>();
@@ -159,7 +159,7 @@ namespace VRProEP.GameEngineCore
                 throw new System.Exception("The requested elbow information was not found.");
 
             // Instantiate with prosthesis manager as parent.
-            GameObject elbowGO = Object.Instantiate(elbowPrefab, new Vector3(0.0f, -(upperArmLength - (1.5f*activeElbowData_Upper.dimensions.x)), 0.0f), Quaternion.identity, prosthesisManagerGO.transform);
+            GameObject elbowGO = Object.Instantiate(elbowPrefab, new Vector3(elbowPrefab.transform.localPosition.x, -(upperArmLength + (activeElbowData_Upper.dimensions.x / 2.0f)), elbowPrefab.transform.localPosition.z), elbowPrefab.transform.localRotation, prosthesisManagerGO.transform);
                        
             // Attach the socket to thre residual limb through a fixed joint.
             // Get the elbow upper part that needs to be attached to the socket
@@ -205,7 +205,7 @@ namespace VRProEP.GameEngineCore
                 throw new System.Exception("The requested forearm information was not found.");
 
             // Instantiate with prosthesis manager as parent.
-            GameObject forearmGO = Object.Instantiate(forearmPrefab, new Vector3(0.0f, -(upperArmLength + lowerArmLength - (activeForearmData.dimensions.x / 2.0f)), 0.0f), Quaternion.identity, prosthesisManagerGO.transform);
+            GameObject forearmGO = Object.Instantiate(forearmPrefab, new Vector3(forearmPrefab.transform.localPosition.x, -(upperArmLength + lowerArmLength - (activeForearmData.dimensions.x / 2.0f)), forearmPrefab.transform.localPosition.z), forearmPrefab.transform.localRotation, prosthesisManagerGO.transform);
             
             // Attach the socket to the residual limb through a fixed joint.
             FixedJoint forearmFixedJoint = forearmGO.GetComponent<FixedJoint>();
@@ -246,7 +246,7 @@ namespace VRProEP.GameEngineCore
                 throw new System.Exception("The requested hand information was not found.");
 
             // Instantiate with prosthesis manager as parent.
-            GameObject handGO = Object.Instantiate(handPrefab, new Vector3(-0.0f, -(upperArmLength + lowerArmLength + (activeHandData.dimensions.x / 2.0f)), 0.0f), handPrefab.transform.localRotation, prosthesisManagerGO.transform);
+            GameObject handGO = Object.Instantiate(handPrefab, new Vector3(handPrefab.transform.localPosition.x, -(upperArmLength + lowerArmLength + (activeHandData.dimensions.x / 2.0f)), handPrefab.transform.localPosition.z), handPrefab.transform.localRotation, prosthesisManagerGO.transform);
 
             // Scale hand to fit user's hand
             float scaleFactor = handLength / activeHandData.dimensions.x;
