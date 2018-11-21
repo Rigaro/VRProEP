@@ -28,11 +28,28 @@ namespace VRProEP.GameEngineCore
         /// <param name="avatarData">The user's avatar configuration data.</param>
         public void SpawnTranshumeralAvatar(UserData userData, AvatarData avatarData)
         {
+            // Load the different parts of the avatar
             LoadResidualLimb(avatarData.residualLimbType);
             LoadSocket(avatarData.socketType);
             LoadElbow(avatarData.elbowType, userData.upperArmLength);
             LoadForearm(avatarData.forearmType, userData.upperArmLength, userData.forearmLength);
             LoadHand(avatarData.handType, userData.upperArmLength, userData.forearmLength, userData.handLength);
+
+            // Deactivate rendering of the markers
+            // First get the objects
+            GameObject shoulderMarkerGO = GameObject.Find("ShoulderJointMarker");
+            GameObject elbowMarkerGO = GameObject.Find("ElbowJointMarker");
+            GameObject trackerModelGO = GameObject.Find("TrackerModel");
+            if (elbowMarkerGO == null || shoulderMarkerGO == null || trackerModelGO == null)
+                throw new System.Exception("The joint markers were not found.");
+
+            // Get their mesh renderer
+            MeshRenderer shoulderMarkerMR = shoulderMarkerGO.GetComponent<MeshRenderer>();
+            MeshRenderer elbowMarkerMR = elbowMarkerGO.GetComponent<MeshRenderer>();
+            // Deactivate
+            shoulderMarkerMR.enabled = false;
+            elbowMarkerMR.enabled = false;
+            trackerModelGO.SetActive(false);
         }
 
         /// <summary>
