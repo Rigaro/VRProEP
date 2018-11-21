@@ -82,8 +82,8 @@ public class SaveSystemTester : MonoBehaviour {
         ConfigurableElbowManager elbowManager = prosthesisManagerGO.AddComponent<ConfigurableElbowManager>();
         elbowManager.InitializeProsthesis();
 
-        elbowManager.ChangeSensor("VAL_SENSOR_VIVECONTROLLER");
-        //elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
+        //elbowManager.ChangeSensor("VAL_SENSOR_VIVECONTROLLER");
+        elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
     }
 
     // Update is called once per frame
