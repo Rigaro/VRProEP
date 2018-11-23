@@ -64,9 +64,18 @@
       "type": "boolean"
     },
     {
-      "name": "/actions/vrproep/in/trackpad",
+      "name": "/actions/vrproep/in/Trackpad",
       "type": "vector2",
       "requirement": "mandatory"
+    },
+    {
+      "name": "/actions/vrproep/in/Button",
+      "type": "boolean",
+      "requirement": "mandatory"
+    },
+    {
+      "name": "/actions/vrproep/in/Teleport",
+      "type": "boolean"
     }
   ],
   "action_sets": [

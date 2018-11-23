@@ -231,6 +231,7 @@ namespace VRProEP.GameEngineCore
                 forearmFixedJoint = forearmGO.AddComponent<FixedJoint>();
             // Connect
             forearmFixedJoint.connectedBody = elbowLowerRB;
+            
             return forearmGO;
         }
 
@@ -276,7 +277,7 @@ namespace VRProEP.GameEngineCore
                 handFixedJoint = forearmGO.AddComponent<FixedJoint>();
             // Connect
             handFixedJoint.connectedBody = forearmRB;
-            
+
             return forearmGO;
         }
     }

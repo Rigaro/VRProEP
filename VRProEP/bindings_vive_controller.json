@@ -191,6 +191,9 @@
             },
             {
                "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/button"
+                  },
                   "pull" : {
                      "output" : "/actions/default/in/squeeze"
                   }
@@ -200,12 +203,33 @@
             },
             {
                "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/button"
+                  },
                   "pull" : {
                      "output" : "/actions/default/in/squeeze"
                   }
                },
                "mode" : "trigger",
                "path" : "/user/hand/right/input/trigger"
+            },
+            {
+               "inputs" : {
+                  "position" : {
+                     "output" : "/actions/default/in/trackpad"
+                  }
+               },
+               "mode" : "trackpad",
+               "path" : "/user/hand/left/input/trackpad"
+            },
+            {
+               "inputs" : {
+                  "position" : {
+                     "output" : "/actions/default/in/trackpad"
+                  }
+               },
+               "mode" : "trackpad",
+               "path" : "/user/hand/right/input/trackpad"
             }
          ]
       },
@@ -253,6 +277,9 @@
          "sources" : [
             {
                "inputs" : {
+                  "click" : {
+                     "output" : "/actions/vrproep/in/button"
+                  },
                   "position" : {
                      "output" : "/actions/vrproep/in/trackpad"
                   }
@@ -262,12 +289,33 @@
             },
             {
                "inputs" : {
+                  "click" : {
+                     "output" : "/actions/vrproep/in/button"
+                  },
                   "position" : {
                      "output" : "/actions/vrproep/in/trackpad"
                   }
                },
                "mode" : "trackpad",
                "path" : "/user/hand/right/input/trackpad"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/vrproep/in/teleport"
+                  }
+               },
+               "mode" : "trigger",
+               "path" : "/user/hand/left/input/trigger"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/vrproep/in/teleport"
+                  }
+               },
+               "mode" : "trigger",
+               "path" : "/user/hand/right/input/trigger"
             }
          ]
       }

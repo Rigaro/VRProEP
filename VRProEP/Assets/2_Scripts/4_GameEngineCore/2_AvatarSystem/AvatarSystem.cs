@@ -154,5 +154,22 @@ namespace VRProEP.GameEngineCore
                 throw new System.NotImplementedException("Transradial avatars not yet implemented.");
             }
         }
+
+        /// <summary>
+        /// Enables forearm and hand colliders
+        /// </summary>
+        public void EnableAvatarColliders()
+        {
+            // Enable Forearm and hand colliders
+            // Enable forearm collider
+            GameObject forearmGO = GameObject.FindGameObjectWithTag("Forearm");
+            forearmGO.GetComponent<Collider>().enabled = true;
+
+            // Enable hand colliders
+            GameObject handGO = GameObject.FindGameObjectWithTag("Hand");
+            Transform handColliders = handGO.transform.GetChild(0);
+            handColliders.gameObject.SetActive(true);
+
+        }
     }
 }

@@ -11,7 +11,8 @@ namespace VRProEP.ProsthesisCore
     {
         // Channel size given by the number of actions implemented.
         // Curently implemented actions:
-        private SteamVR_Action_Vector2 trackpadAction = SteamVR_Input.__actions_vrproep_in_trackpad;
+
+        private SteamVR_Action_Vector2 trackpadAction = SteamVR_Input.vrproep.inActions.Trackpad;
 
         public VIVEControllerManager() : base(1, SensorType.VIVEController)
         {
@@ -33,9 +34,13 @@ namespace VRProEP.ProsthesisCore
                 throw new System.ArgumentOutOfRangeException("The channel number starts from 1.");
 
             // Check that the action set is active.
-            if( !SteamVR_Input.vrproep.IsActive() )
+            /*
+            if (!SteamVR_Input.vrproep.IsActive())
+            {
+                SteamVR_Input._default.Deactivate();
                 SteamVR_Input.vrproep.ActivatePrimary();
-
+            }
+            */
             if (channel == 1)
             {
                 Vector2 trackpadValue = trackpadAction.GetAxis(SteamVR_Input_Sources.Any);
@@ -60,7 +65,10 @@ namespace VRProEP.ProsthesisCore
             {
                 // Check that the action set is active.
                 if (!SteamVR_Input.vrproep.IsActive())
+                {
+                    SteamVR_Input._default.Deactivate();
                     SteamVR_Input.vrproep.ActivatePrimary();
+                }
 
                 Vector2 trackpadValue = trackpadAction.GetAxis(SteamVR_Input_Sources.Any);
                 return trackpadValue.x;
@@ -80,7 +88,10 @@ namespace VRProEP.ProsthesisCore
         {
             // Check that the action set is active.
             if (!SteamVR_Input.vrproep.IsActive())
+            {
+                SteamVR_Input._default.Deactivate();
                 SteamVR_Input.vrproep.ActivatePrimary();
+            }
 
             Vector2 trackpadValue = trackpadAction.GetAxis(SteamVR_Input_Sources.Any);
             float[] data = { trackpadValue.x };
@@ -130,7 +141,10 @@ namespace VRProEP.ProsthesisCore
             {
                 // Check that the action set is active.
                 if (!SteamVR_Input.vrproep.IsActive())
+                {
+                    SteamVR_Input._default.Deactivate();
                     SteamVR_Input.vrproep.ActivatePrimary();
+                }
 
                 Vector2 trackpadValue = trackpadAction.GetAxis(SteamVR_Input_Sources.Any);
                 return trackpadValue.x;
@@ -149,7 +163,10 @@ namespace VRProEP.ProsthesisCore
         {
             // Check that the action set is active.
             if (!SteamVR_Input.vrproep.IsActive())
+            {
+                SteamVR_Input._default.Deactivate();
                 SteamVR_Input.vrproep.ActivatePrimary();
+            }
 
             Vector2 trackpadValue = trackpadAction.GetAxis(SteamVR_Input_Sources.Any);
             float[] data = { trackpadValue.x };

@@ -17,6 +17,9 @@ TagManager:
   - Forearm
   - ElbowLocation
   - Hand
+  - FxTemporaire
+  - Fire
+  - projectile
   layers:
   - Default
   - TransparentFX
@@ -27,7 +30,7 @@ TagManager:
   - 
   - 
   - PostProcessing
-  - 
+  - Teleport
   - 
   - 
   - 

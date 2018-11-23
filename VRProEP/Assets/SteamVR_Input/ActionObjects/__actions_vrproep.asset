@@ -13,8 +13,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   allActions:
   - {fileID: 11400000, guid: 15af09149ea71534d9c4630972020f46, type: 2}
+  - {fileID: 11400000, guid: 5917f85366277f84c9d6648084636e85, type: 2}
+  - {fileID: 11400000, guid: 3121beca5c0bf7641a648c26a8e039d0, type: 2}
   nonVisualInActions:
   - {fileID: 11400000, guid: 15af09149ea71534d9c4630972020f46, type: 2}
+  - {fileID: 11400000, guid: 5917f85366277f84c9d6648084636e85, type: 2}
+  - {fileID: 11400000, guid: 3121beca5c0bf7641a648c26a8e039d0, type: 2}
   visualActions: []
   poseActions: []
   skeletonActions: []

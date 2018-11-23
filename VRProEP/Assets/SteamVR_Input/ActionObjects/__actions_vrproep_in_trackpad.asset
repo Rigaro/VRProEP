@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Name: __actions_vrproep_in_trackpad
   m_EditorClassIdentifier: 
   changeTolerance: 0.000001
-  fullPath: /actions/vrproep/in/trackpad
+  fullPath: /actions/vrproep/in/Trackpad
   actionSet: {fileID: 11400000, guid: 3e6e8f2264ea3614ebe53278b0274024, type: 2}
   direction: 0
