@@ -313,8 +313,8 @@ HingeJoint:
     freeSpin: 0
   m_UseLimits: 1
   m_Limits:
-    min: -91.257965
-    max: 90.20272
+    min: -180
+    max: 0
     bounciness: 0
     bounceMinVelocity: 0.2
     contactDistance: 0
@@ -347,8 +347,8 @@ HingeJoint:
     freeSpin: 0
   m_UseLimits: 1
   m_Limits:
-    min: -90.042534
-    max: 90.47194
+    min: 0
+    max: 180
     bounciness: 0
     bounceMinVelocity: 0.2
     contactDistance: 0
@@ -392,8 +392,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.021793842, y: 0.19798923, z: 0.036}
-  m_Center: {x: 0.24221635, y: -0.19675803, z: 0.011500001}
+  m_Size: {x: 0.021793842, y: 0.19798923, z: 0.013867371}
+  m_Center: {x: 0.24221635, y: -0.19675803, z: 0.022566315}
 --- !u!65 &65141177503438746
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -452,8 +452,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.019949913, y: 0.20235384, z: 0.036}
-  m_Center: {x: -0.24223232, y: -0.19769531, z: 0.011599999}
+  m_Size: {x: 0.019949913, y: 0.20235384, z: 0.013197277}
+  m_Center: {x: -0.24223232, y: -0.19769531, z: 0.02300136}
 --- !u!65 &65696782663686208
 BoxCollider:
   m_ObjectHideFlags: 1

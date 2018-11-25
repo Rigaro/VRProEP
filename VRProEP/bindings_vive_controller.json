@@ -302,7 +302,7 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/vrproep/in/teleport"
+                     "output" : "/actions/vrproep/in/walkenable"
                   }
                },
                "mode" : "trigger",
@@ -311,7 +311,7 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/vrproep/in/teleport"
+                     "output" : "/actions/vrproep/in/walkenable"
                   }
                },
                "mode" : "trigger",

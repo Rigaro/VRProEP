@@ -17,9 +17,8 @@ TagManager:
   - Forearm
   - ElbowLocation
   - Hand
-  - FxTemporaire
-  - Fire
-  - projectile
+  - Head
+  - Graspable
   layers:
   - Default
   - TransparentFX

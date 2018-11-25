@@ -39,7 +39,7 @@ MonoBehaviour:
   - __actions_buggy_in_Reset
   - __actions_vrproep_in_trackpad
   - __actions_vrproep_in_button
-  - __actions_vrproep_in_Teleport
+  - __actions_vrproep_in_WalkEnable
   actionObjects:
   - {fileID: 11400000, guid: 4864c2e366023ef48b73bf0f8e312501, type: 2}
   - {fileID: 11400000, guid: 5f07906f38fc9c54c8c47f2334f0d246, type: 2}
@@ -58,4 +58,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: de964f0f0f60ddb4aaa57bad0aa96416, type: 2}
   - {fileID: 11400000, guid: 15af09149ea71534d9c4630972020f46, type: 2}
   - {fileID: 11400000, guid: 5917f85366277f84c9d6648084636e85, type: 2}
-  - {fileID: 11400000, guid: 3121beca5c0bf7641a648c26a8e039d0, type: 2}
+  - {fileID: 11400000, guid: d02f07eeae1536149a22c4ac5e3a0bfd, type: 2}

@@ -24,17 +24,11 @@ public class SaveSystemTester : MonoBehaviour {
 
     private AvatarSystem avatarSystem;
 
-    public Transform player;
+    private bool collidersEnabled = false;
 
     // Use this for initialization
     void Start ()
     {
-        // Check that the action set is active.
-        if (!SteamVR_Input.vrproep.IsActive())
-        {
-            SteamVR_Input._default.Deactivate();
-            SteamVR_Input.vrproep.ActivatePrimary();
-        }
         // Start XR Tracking
         //XRSettings.enabled = true;
 
@@ -93,24 +87,17 @@ public class SaveSystemTester : MonoBehaviour {
 
         //elbowManager.ChangeSensor("VAL_SENSOR_VIVECONTROLLER");
         elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
+
     }
 
     // Update is called once per frame
     void Update () {
-        if (SteamVR_Input.vrproep.inActions.Button.GetStateDown(SteamVR_Input_Sources.Any))
+        if (SteamVR_Input.vrproep.inActions.Button.GetStateDown(SteamVR_Input_Sources.Any) && !collidersEnabled)
         {
             avatarSystem.EnableAvatarColliders();
+            collidersEnabled = true;
         }
 	}
-
-    void FixedUpdate()
-    {
-        if (SteamVR_Input.vrproep.inActions.Teleport.GetState(SteamVR_Input_Sources.Any))
-        {
-            Vector2 trackpad = SteamVR_Input.vrproep.inActions.Trackpad.GetAxis(SteamVR_Input_Sources.Any);
-            player.position += new Vector3(trackpad.x * Time.fixedDeltaTime, 0.0f, trackpad.y * Time.fixedDeltaTime);
-        }
-    }
 
     private void OnApplicationQuit()
     {

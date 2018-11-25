@@ -21,6 +21,6 @@ namespace Valve.VR
         
         public Valve.VR.SteamVR_Action_Boolean Button;
         
-        public Valve.VR.SteamVR_Action_Boolean Teleport;
+        public Valve.VR.SteamVR_Action_Boolean WalkEnable;
     }
 }

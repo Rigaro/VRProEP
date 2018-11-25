@@ -68,9 +68,9 @@ GameObject:
   - component: {fileID: 33839358484246924}
   - component: {fileID: 23685863931893922}
   - component: {fileID: 65380859155256106}
-  - component: {fileID: 65889810521761784}
   - component: {fileID: 54465578178562388}
   - component: {fileID: 59283690471853998}
+  - component: {fileID: 65253725852047904}
   m_Layer: 0
   m_Name: RFAIP_Kitchen_Cabinet_Door_Down_Left
   m_TagString: Untagged
@@ -394,6 +394,18 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.5998, y: 0.04375738, z: 0.625}
   m_Center: {x: 0, y: 0.02187869, z: 0}
+--- !u!65 &65253725852047904
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1929805337268060}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.01801786, y: 0.19992667, z: 0.013609547}
+  m_Center: {x: -0.24213748, y: 0.23043543, z: 0.024695227}
 --- !u!65 &65380859155256106
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -454,18 +466,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.009298047, y: 0.8581, z: 0.625}
   m_Center: {x: 0.29525086, y: 0.42905, z: 0}
---- !u!65 &65889810521761784
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1929805337268060}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.018017875, y: 0.19992667, z: 0.036}
-  m_Center: {x: -0.24213748, y: 0.23043543, z: 0.013500001}
 --- !u!65 &65918070767449208
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -488,5 +488,5 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.018534223, y: 0.19698802, z: 0.0357}
-  m_Center: {x: 0.242266, y: 0.22942583, z: 0.01285}
+  m_Size: {x: 0.018534232, y: 0.19698802, z: 0.013387948}
+  m_Center: {x: 0.242266, y: 0.22942583, z: 0.024006024}

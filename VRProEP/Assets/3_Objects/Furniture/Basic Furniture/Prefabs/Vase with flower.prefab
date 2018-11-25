@@ -59,7 +59,7 @@ GameObject:
   - component: {fileID: 136730847624857126}
   m_Layer: 0
   m_Name: flower01
-  m_TagString: Untagged
+  m_TagString: Graspable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -943,8 +943,8 @@ FixedJoint:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1194033281372934}
   m_ConnectedBody: {fileID: 54430044287914746}
-  m_BreakForce: 5
-  m_BreakTorque: 5
+  m_BreakForce: 1
+  m_BreakTorque: 1
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
   m_MassScale: 1

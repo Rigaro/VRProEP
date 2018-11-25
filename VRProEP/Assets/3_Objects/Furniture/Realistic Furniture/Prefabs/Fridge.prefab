@@ -68,7 +68,7 @@ GameObject:
   - component: {fileID: 54741379992756304}
   - component: {fileID: 65009378302235068}
   - component: {fileID: 59771124887674402}
-  - component: {fileID: 65699144652265082}
+  - component: {fileID: 65645099684289162}
   m_Layer: 0
   m_Name: RFAIP_Fridge_Door_Up
   m_TagString: Untagged
@@ -87,9 +87,9 @@ GameObject:
   - component: {fileID: 33751857152212022}
   - component: {fileID: 23277043820140878}
   - component: {fileID: 54733064440544914}
-  - component: {fileID: 65745189337036280}
   - component: {fileID: 59652479408998268}
   - component: {fileID: 65709247848239054}
+  - component: {fileID: 65032149855456580}
   m_Layer: 0
   m_Name: RFAIP_Fridge_Door_Down
   m_TagString: Untagged
@@ -415,6 +415,18 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.54000014, y: 0.06436682, z: 0.55000013}
   m_Center: {x: -8.077936e-28, y: 1.7457166, z: 0.00000023841858}
+--- !u!65 &65032149855456580
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1969633466718956}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.026577944, y: 0.24680024, z: 0.011264947}
+  m_Center: {x: 0.52961123, y: 0.14415756, z: 0.08056791}
 --- !u!65 &65101535691021414
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -461,8 +473,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.54000014, y: 0.02427876, z: 0.55000013}
-  m_Center: {x: -8.077936e-28, y: 1.289134, z: 0.00000023841858}
+  m_Size: {x: 0.54000014, y: 0.01163125, z: 0.55000013}
+  m_Center: {x: -8.077936e-28, y: 1.2885016, z: 0.00000023841858}
 --- !u!65 &65401063362112592
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -485,9 +497,9 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.54000014, y: 0.02427876, z: 0.55000013}
-  m_Center: {x: -8.077936e-28, y: 1.105, z: 0.00000023841858}
---- !u!65 &65699144652265082
+  m_Size: {x: 0.54000014, y: 0.010338664, z: 0.55000013}
+  m_Center: {x: -8.077936e-28, y: 1.1063275, z: 0.00000023841858}
+--- !u!65 &65645099684289162
 BoxCollider:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -511,18 +523,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.54290015, y: 0.6198, z: 0.058905635}
   m_Center: {x: 0.27145007, y: 0, z: 0.029453168}
---- !u!65 &65745189337036280
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1969633466718956}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.026577944, y: 0.24680024, z: 0.011264947}
-  m_Center: {x: 0.52961123, y: 0.14415756, z: 0.08056791}
 --- !u!65 &65834043508384370
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -533,8 +533,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.54000014, y: 0.02427876, z: 0.55000013}
-  m_Center: {x: -8.077936e-28, y: 0.425, z: 0.00000023841858}
+  m_Size: {x: 0.54000014, y: 0.012117952, z: 0.55000013}
+  m_Center: {x: -8.077936e-28, y: 0.42317587, z: 0.00000023841858}
 --- !u!65 &65922301691848048
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -545,8 +545,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.54000014, y: 0.02427876, z: 0.55000013}
-  m_Center: {x: -8.077936e-28, y: 0.235, z: 0.00000023841858}
+  m_Size: {x: 0.54000014, y: 0.012117982, z: 0.55000013}
+  m_Center: {x: -8.077936e-28, y: 0.23439197, z: 0.00000023841858}
 --- !u!65 &65928291361584812
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -557,8 +557,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.54000014, y: 0.02427876, z: 0.55000013}
-  m_Center: {x: -8.077936e-28, y: 0.93, z: 0.00000023841858}
+  m_Size: {x: 0.54000014, y: 0.011322379, z: 0.55000013}
+  m_Center: {x: -8.077936e-28, y: 0.9311432, z: 0.00000023841858}
 --- !u!108 &108109020236456634
 Light:
   m_ObjectHideFlags: 1

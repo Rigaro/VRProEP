@@ -16,7 +16,7 @@ MonoBehaviour:
   actions:
   - {fileID: 11400000, guid: 15af09149ea71534d9c4630972020f46, type: 2}
   - {fileID: 11400000, guid: 5917f85366277f84c9d6648084636e85, type: 2}
-  - {fileID: 11400000, guid: 3121beca5c0bf7641a648c26a8e039d0, type: 2}
+  - {fileID: 11400000, guid: d02f07eeae1536149a22c4ac5e3a0bfd, type: 2}
   Trackpad: {fileID: 11400000, guid: 15af09149ea71534d9c4630972020f46, type: 2}
   Button: {fileID: 11400000, guid: 5917f85366277f84c9d6648084636e85, type: 2}
-  Teleport: {fileID: 11400000, guid: 3121beca5c0bf7641a648c26a8e039d0, type: 2}
+  WalkEnable: {fileID: 11400000, guid: d02f07eeae1536149a22c4ac5e3a0bfd, type: 2}

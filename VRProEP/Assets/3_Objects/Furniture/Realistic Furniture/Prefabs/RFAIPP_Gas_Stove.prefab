@@ -22,9 +22,9 @@ GameObject:
   - component: {fileID: 33802136233552534}
   - component: {fileID: 23105345823554206}
   - component: {fileID: 65367129838457218}
-  - component: {fileID: 65623157654804994}
   - component: {fileID: 54197532645685614}
   - component: {fileID: 59906502304188724}
+  - component: {fileID: 65047254027504992}
   m_Layer: 0
   m_Name: RFAIP_Gas-Stove_Door
   m_TagString: Untagged
@@ -231,6 +231,18 @@ HingeJoint:
   m_EnablePreprocessing: 1
   m_MassScale: 1
   m_ConnectedMassScale: 1
+--- !u!65 &65047254027504992
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1031543800445716}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.65, y: 0.030869097, z: 0.024755165}
+  m_Center: {x: 0, y: 0.4103195, z: 0.072822414}
 --- !u!65 &65319105657227230
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -279,18 +291,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.65, y: 0.2100234, z: 0.59907997}
   m_Center: {x: 0, y: 0.10541171, z: -0.03836006}
---- !u!65 &65623157654804994
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1031543800445716}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.65, y: 0.030869097, z: 0.024755165}
-  m_Center: {x: 0, y: 0.4103195, z: 0.072822414}
 --- !u!65 &65690909829398242
 BoxCollider:
   m_ObjectHideFlags: 1

@@ -31,7 +31,7 @@ namespace VRProEP.ProsthesisCore
             if (sensor == null)
                 throw new System.ArgumentNullException("The provided sensor object is empty.");
 
-            float[] gains = { 100.0f, 5.0f};
+            float[] gains = { 1000.0f, 80.0f };
             controller = new StateFeedbackController(2, gains);
             this.sensor = sensor;
         }
@@ -46,7 +46,7 @@ namespace VRProEP.ProsthesisCore
             if (sensor == null)
                 throw new System.ArgumentNullException("The provided sensor object is empty.");
 
-            float[] gains = { 150.0f, 5.0f };
+            float[] gains = { 1000.0f, 80.0f };
             controller = new StateFeedbackController(2, gains);
             this.sensor = sensor;
             SetElbowDevice(elbowRB);
