@@ -13,6 +13,7 @@ namespace VRProEP.ProsthesisCore
         // Curently implemented actions:
 
         private SteamVR_Action_Vector2 trackpadAction = SteamVR_Input.vrproep.inActions.Trackpad;
+        private SteamVR_Action_Boolean buttonAction = SteamVR_Input.vrproep.inActions.Button;
 
         public VIVEControllerManager() : base(1, SensorType.VIVEController)
         {
@@ -34,18 +35,23 @@ namespace VRProEP.ProsthesisCore
                 throw new System.ArgumentOutOfRangeException("The channel number starts from 1.");
 
             // Check that the action set is active.
-            /*
             if (!SteamVR_Input.vrproep.IsActive())
             {
                 SteamVR_Input._default.Deactivate();
                 SteamVR_Input.vrproep.ActivatePrimary();
             }
-            */
             if (channel == 1)
             {
                 Vector2 trackpadValue = trackpadAction.GetAxis(SteamVR_Input_Sources.Any);
                 return trackpadValue.x;
-
+            }
+            else if (channel == 2)
+            {
+                bool buttonState = buttonAction.GetState(SteamVR_Input_Sources.Any);
+                if (buttonState)
+                    return 1.0f;
+                else
+                    return 0.0f;
             }
             else
                 throw new System.Exception("Something went wrong, the provided channel is unavailable.");
@@ -61,7 +67,7 @@ namespace VRProEP.ProsthesisCore
         /// <returns>Raw sensor data for the given channel.</returns>
         public override float GetRawData(string channel)
         {
-            if (channel.Equals("WHEEL"))
+            if (channel.Equals("TRACKPAD"))
             {
                 // Check that the action set is active.
                 if (!SteamVR_Input.vrproep.IsActive())
@@ -72,6 +78,14 @@ namespace VRProEP.ProsthesisCore
 
                 Vector2 trackpadValue = trackpadAction.GetAxis(SteamVR_Input_Sources.Any);
                 return trackpadValue.x;
+            }
+            else if (channel.Equals("BUTTON"))
+            {
+                bool buttonValue = buttonAction.GetState(SteamVR_Input_Sources.Any);
+                if (buttonValue)
+                    return 1.0f;
+                else
+                    return 0.0f;
             }
             else
                 throw new System.Exception("The provided channel does not exist. See documentation for available channels.");
@@ -94,7 +108,15 @@ namespace VRProEP.ProsthesisCore
             }
 
             Vector2 trackpadValue = trackpadAction.GetAxis(SteamVR_Input_Sources.Any);
-            float[] data = { trackpadValue.x };
+
+            bool buttonState = buttonAction.GetState(SteamVR_Input_Sources.Any);
+            float buttonValue;
+            if (buttonState)
+                buttonValue = 1.0f;
+            else
+                buttonValue = 0.0f;
+
+            float[] data = { trackpadValue.x, buttonValue };
             return data;
         }
 
@@ -124,6 +146,14 @@ namespace VRProEP.ProsthesisCore
                 Vector2 trackpadValue = trackpadAction.GetAxis(SteamVR_Input_Sources.Any);
                 return trackpadValue.x;
             }
+            else if (channel == 2)
+            {
+                bool buttonState = buttonAction.GetState(SteamVR_Input_Sources.Any);
+                if (buttonState)
+                    return 1.0f;
+                else
+                    return 0.0f;
+            }
             else
                 throw new System.Exception("Something went wrong, the provided channel is unavailable.");
         }
@@ -137,7 +167,7 @@ namespace VRProEP.ProsthesisCore
         /// <returns>Pre-processed sensor data for the given channel.</returns>
         public override float GetProcessedData(string channel)
         {
-            if (channel.Equals("WHEEL"))
+            if (channel.Equals("TRACKPAD"))
             {
                 // Check that the action set is active.
                 if (!SteamVR_Input.vrproep.IsActive())
@@ -148,6 +178,14 @@ namespace VRProEP.ProsthesisCore
 
                 Vector2 trackpadValue = trackpadAction.GetAxis(SteamVR_Input_Sources.Any);
                 return trackpadValue.x;
+            }
+            else if (channel.Equals("BUTTON"))
+            {
+                bool buttonValue = buttonAction.GetState(SteamVR_Input_Sources.Any);
+                if (buttonValue)
+                    return 1.0f;
+                else
+                    return 0.0f;
             }
             else
                 throw new System.Exception("The provided channel does not exist. See documentation for available channels.");
@@ -169,7 +207,16 @@ namespace VRProEP.ProsthesisCore
             }
 
             Vector2 trackpadValue = trackpadAction.GetAxis(SteamVR_Input_Sources.Any);
-            float[] data = { trackpadValue.x };
+
+            bool buttonState = buttonAction.GetState(SteamVR_Input_Sources.Any);
+            float buttonValue;
+            if (buttonState)
+                buttonValue = 1.0f;
+            else
+                buttonValue = 0.0f;
+
+            float[] data = { trackpadValue.x, buttonValue };
+
             return data;
         }
 

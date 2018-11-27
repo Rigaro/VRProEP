@@ -18,7 +18,7 @@ namespace VRProEP.ProsthesisCore
         /// Initializes the Elbow prosthesis with basic functionality.
         /// Must be called only after the avatar is available.
         /// </summary>
-        public void InitializeProsthesis()
+        public void InitializeProsthesis(float upperArmLength, float lowerArmLength)
         {
             // ConfigurableInputManagar
             // Find ResdiualLimbTracker GameObject and extract its Transform.
@@ -53,9 +53,16 @@ namespace VRProEP.ProsthesisCore
             LinearKinematicSynergy linSyn = new LinearKinematicSynergy(xBar, xMin, xMax, theta, thetaMin, thetaMax);
             inputManager.Configure("CMD_ADD_REFGEN", linSyn);
 
+            // Add a Jacobian based synergy
+            JacobianSynergy jacSyn = new JacobianSynergy(xBar, xMin, xMax, upperArmLength, lowerArmLength);
+            inputManager.Configure("CMD_ADD_REFGEN", linSyn);
+
             // Add VIVE controller as sensor to manually move.
             VIVEControllerManager controllerManager = new VIVEControllerManager();
             inputManager.Configure("CMD_ADD_SENSOR", controllerManager);
+
+            // Add joint encoder as sensor for jacobian synergy
+            inputManager.Configure("CMD_ADD_SENSOR", virtualEncoder);
 
             // Enable
             isConfigured = true;
@@ -78,6 +85,7 @@ namespace VRProEP.ProsthesisCore
         /// Available sensors:
         /// - "VAL_SENSOR_VIVETRACKER";
         /// - "VAL_SENSOR_VIVECONTROLLER";
+        /// - "VAL_SENSOR_VIRTUALENCODER";
         /// </summary>
         /// <param name="sensorName"></param>
         public void ChangeSensor(string sensorName)
@@ -89,6 +97,7 @@ namespace VRProEP.ProsthesisCore
         /// Changes the active reference generator.
         /// Available reference generatprs:
         /// - Linear kinematic synergy: "VAL_REFGEN_LINKINSYN";
+        /// - Jacobian-based synergy: "VAL_REFGEN_JACOBIANSYN";
         /// - Integrator: "VAL_REFGEN_INTEGRATOR";
         /// - Gradient-to-point: "VAL_REFGEN_POINTGRAD";
         /// </summary>

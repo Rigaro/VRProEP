@@ -6,7 +6,8 @@ namespace VRProEP.ProsthesisCore
     {
         PointGradient,
         Integrator,
-        LinearKinematicSynergy
+        LinearKinematicSynergy,
+        JacobianSynergy
     }
     /// <summary>
     /// Abstract reference generator to add basic variables used across all generators.
@@ -105,7 +106,7 @@ namespace VRProEP.ProsthesisCore
         }
 
         /// <summary>
-        /// Checks the validity of the provedided output.
+        /// Checks the validity of the provided output.
         /// </summary>
         /// <param name="input">The input to be verified.</param>
         /// <returns>True if valid.</returns>
@@ -121,7 +122,7 @@ namespace VRProEP.ProsthesisCore
         }
 
         /// <summary>
-        /// Checks the validity of the provedided input.
+        /// Checks the validity of the provided input.
         /// </summary>
         /// <param name="input">The input to be verified.</param>
         /// <returns>True if valid.</returns>

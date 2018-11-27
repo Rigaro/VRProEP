@@ -83,10 +83,11 @@ public class SaveSystemTester : MonoBehaviour {
         // Initialize prosthesis
         GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
         ConfigurableElbowManager elbowManager = prosthesisManagerGO.AddComponent<ConfigurableElbowManager>();
-        elbowManager.InitializeProsthesis();
+        elbowManager.InitializeProsthesis(activeUserData.upperArmLength, (activeUserData.forearmLength + activeUserData.handLength));
 
         //elbowManager.ChangeSensor("VAL_SENSOR_VIVECONTROLLER");
-        elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
+        //elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
+        elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
 
     }
 
