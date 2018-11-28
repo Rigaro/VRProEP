@@ -26,7 +26,7 @@ namespace VRProEP.ProsthesisCore
             // Create a VIVETracker with the obtained transform
             VIVETrackerManager trackerManager = new VIVETrackerManager(residualLimbTrackerGO.transform);
             // Create a basic reference generator: Integrator.
-            float[] xBar = { Mathf.Deg2Rad * -90.0f };
+            float[] xBar = { Mathf.Deg2Rad * 0.0f };
             float[] xMin = { Mathf.Deg2Rad * -145.0f };
             float[] xMax = { Mathf.Deg2Rad * 0.0f };
             IntegratorReferenceGenerator integratorRG = new IntegratorReferenceGenerator(xBar, xMin, xMax);

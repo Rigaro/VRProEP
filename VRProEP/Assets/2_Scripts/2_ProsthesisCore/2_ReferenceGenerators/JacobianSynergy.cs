@@ -78,7 +78,12 @@ namespace VRProEP.ProsthesisCore
                 isEnabled = false;
             }
 
-            xBar[channel - 1] = SingleDOFJacobianSynergy(channel, qShoulder, qElbow, qDotShoulder);
+            // Only update when enabled, otherwise just use the same fixed reference.
+            if (isEnabled)
+            {
+                xBar[channel - 1] = SingleDOFJacobianSynergy(channel, qShoulder, qElbow, qDotShoulder);
+                Debug.Log("Jacobian synergy active.");
+            }
 
             return xBar[channel - 1];
 
@@ -150,7 +155,7 @@ namespace VRProEP.ProsthesisCore
             // Compute the desired elbow velocity
             float qDotElbow = (upperArmLength * Mathf.Cos(qShoulder_DOM) + lowerArmLength * Mathf.Cos(qShoulder_DOM + qElbow)) * qDotShoulder / (lowerArmLength * Mathf.Cos(qShoulder_DOM + qElbow));
             // Integrate.
-            float tempXBar = xBar[channel - 1] + ( qDotElbow * Time.fixedDeltaTime );
+            float tempXBar = xBar[channel - 1] - ( qDotElbow * Time.fixedDeltaTime );
             // Saturate reference
             if (tempXBar > xMax[channel - 1])
                 tempXBar = xMax[channel - 1];
