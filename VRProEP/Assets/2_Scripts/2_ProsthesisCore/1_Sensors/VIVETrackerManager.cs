@@ -86,6 +86,31 @@ namespace VRProEP.ProsthesisCore
         }
 
         /// <summary>
+        /// Uses Unity's XR API to extract angular position information from the tracker.
+        /// </summary>
+        /// <param name="localAngPos">The Vector3 refernece to store data.</param>
+        /// <returns>True if sucessful.</returns>
+        private bool TryGetTrackerPosition(out Quaternion localAngPos)
+        {
+            // Get node information
+            InputTracking.GetNodeStates(xrNodes);
+            // Look for Hardware trackers
+            int currentTracker = 1;
+            foreach (XRNodeState ns in xrNodes)
+            {
+                if (ns.nodeType == XRNode.HardwareTracker && currentTracker == trackerNumber)
+                {
+                    if (ns.TryGetRotation(out localAngPos))
+                        return true;
+                }
+                else if (ns.nodeType == XRNode.HardwareTracker)
+                    currentTracker++;
+            }
+            // If no tracker was found return error
+            throw new System.Exception("No VIVE Tracker was found");
+        }
+
+        /// <summary>
         /// Returns raw tracking information for the selected channel.
         /// See VIVETrackerChannels for channel information. 
         /// Angular velocity given radians per second, world coordinates.
@@ -181,11 +206,32 @@ namespace VRProEP.ProsthesisCore
             else if (channel == 3)
                 return localAngVel.x;
             else if (channel == 4)
-                return trackerTransform.localEulerAngles.x;
+            {
+                float offsetAngle = (-trackerTransform.localRotation.eulerAngles.x + 270.0f);
+                if (offsetAngle > 180.0f)
+                {
+                    offsetAngle -= 360;
+                }
+                return Mathf.Deg2Rad * offsetAngle;
+            }
             else if (channel == 5)
-                return trackerTransform.localEulerAngles.y;
+            {
+                float offsetAngle = (-trackerTransform.localRotation.eulerAngles.y + 270.0f);
+                if (offsetAngle > 180.0f)
+                {
+                    offsetAngle -= 360;
+                }
+                return Mathf.Deg2Rad * offsetAngle;
+            }
             else
-                return trackerTransform.localEulerAngles.z;
+            {
+                float offsetAngle = (-trackerTransform.localRotation.eulerAngles.z + 270.0f);
+                if (offsetAngle > 180.0f)
+                {
+                    offsetAngle -= 360;
+                }
+                return Mathf.Deg2Rad * offsetAngle;
+            }
         }
 
         /// <summary>

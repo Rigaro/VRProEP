@@ -15,7 +15,7 @@ namespace VRProEP.ProsthesisCore
         private SteamVR_Action_Vector2 trackpadAction = SteamVR_Input.vrproep.inActions.Trackpad;
         private SteamVR_Action_Boolean buttonAction = SteamVR_Input.vrproep.inActions.Button;
 
-        public VIVEControllerManager() : base(1, SensorType.VIVEController)
+        public VIVEControllerManager() : base(2, SensorType.VIVEController)
         {
 
         }
@@ -33,7 +33,7 @@ namespace VRProEP.ProsthesisCore
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels. The number of available channels is: " + ChannelSize + ".");
             else if (channel <= 0)
                 throw new System.ArgumentOutOfRangeException("The channel number starts from 1.");
-
+            
             // Check that the action set is active.
             if (!SteamVR_Input.vrproep.IsActive())
             {
