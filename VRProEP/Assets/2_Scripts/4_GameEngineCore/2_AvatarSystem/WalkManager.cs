@@ -8,6 +8,9 @@ public class WalkManager : MonoBehaviour {
     public Transform player;
     private Transform headTransform;
 
+    public SteamVR_Action_Boolean walkEnable;
+    public SteamVR_Input_Sources inputSource;
+
     // Use this for initialization
     void Start ()
     {
@@ -28,7 +31,7 @@ public class WalkManager : MonoBehaviour {
 	// Update walking with physics
 	void FixedUpdate ()
     {
-        if (SteamVR_Input.vrproep.inActions.WalkEnable.GetState(SteamVR_Input_Sources.Any))
+        if (walkEnable.GetState(inputSource))
         {
             Vector2 trackpad = SteamVR_Input.vrproep.inActions.Trackpad.GetAxis(SteamVR_Input_Sources.Any);
             Vector3 walkingMotion = new Vector3(trackpad.x * Time.fixedDeltaTime, 0.0f, trackpad.y * Time.fixedDeltaTime);

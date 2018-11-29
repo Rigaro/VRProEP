@@ -96,8 +96,8 @@ namespace VRProEP.ProsthesisCore
                 float enableValue = activeSensor.GetProcessedData(2);
 
                 // Combine input
-                float[] input = { qShoulder, qElbow, qDotShoulder, enableValue };
-                Debug.Log("The input is: qs = " + Mathf.Rad2Deg * input[0] + ", qe = " + Mathf.Rad2Deg * input[1] + ", qDotS = " + input[2] + ", enable = " + input[3]);
+                float[] input = { qShoulder, -qElbow, 2.0f * qDotShoulder, enableValue };
+                //Debug.Log("The input is: qs = " + Mathf.Rad2Deg * input[0] + ", qe = " + Mathf.Rad2Deg * input[1] + ", qDotS = " + input[2] + ", enable = " + input[3]);
 
                 // Go back to previously active sensor
                 Configure("CMD_SET_ACTIVE_SENSOR", prevSensorType);

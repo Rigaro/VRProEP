@@ -19,8 +19,8 @@ namespace Valve.VR
         
         public Valve.VR.SteamVR_Action_Vector2 Trackpad;
         
-        public Valve.VR.SteamVR_Action_Boolean Button;
+        public Valve.VR.SteamVR_Action_Boolean InterfaceEnableButton;
         
-        public Valve.VR.SteamVR_Action_Boolean WalkEnable;
+        public Valve.VR.SteamVR_Action_Boolean ObjectInteractButton;
     }
 }

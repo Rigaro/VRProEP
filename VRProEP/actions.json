@@ -69,13 +69,14 @@
       "requirement": "mandatory"
     },
     {
-      "name": "/actions/vrproep/in/Button",
+      "name": "/actions/vrproep/in/InterfaceEnableButton",
       "type": "boolean",
       "requirement": "mandatory"
     },
     {
-      "name": "/actions/vrproep/in/WalkEnable",
-      "type": "boolean"
+      "name": "/actions/vrproep/in/ObjectInteractButton",
+      "type": "boolean",
+      "requirement": "mandatory"
     }
   ],
   "action_sets": [

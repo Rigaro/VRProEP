@@ -38,8 +38,8 @@ MonoBehaviour:
   - __actions_buggy_in_Brake
   - __actions_buggy_in_Reset
   - __actions_vrproep_in_trackpad
-  - __actions_vrproep_in_button
-  - __actions_vrproep_in_WalkEnable
+  - __actions_vrproep_in_InterfaceEnableButton
+  - __actions_vrproep_in_ObjectInteractButton
   actionObjects:
   - {fileID: 11400000, guid: 4864c2e366023ef48b73bf0f8e312501, type: 2}
   - {fileID: 11400000, guid: 5f07906f38fc9c54c8c47f2334f0d246, type: 2}
@@ -57,5 +57,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 99fbab011655d5f4aa73f40d718c8af0, type: 2}
   - {fileID: 11400000, guid: de964f0f0f60ddb4aaa57bad0aa96416, type: 2}
   - {fileID: 11400000, guid: 15af09149ea71534d9c4630972020f46, type: 2}
-  - {fileID: 11400000, guid: 5917f85366277f84c9d6648084636e85, type: 2}
-  - {fileID: 11400000, guid: d02f07eeae1536149a22c4ac5e3a0bfd, type: 2}
+  - {fileID: 11400000, guid: c10c1d48ce0b0584b83b96f875da8d81, type: 2}
+  - {fileID: 11400000, guid: f1c6636f39c840445b3bb8f4e29f4409, type: 2}

@@ -35,7 +35,7 @@ namespace VRProEP.GameEngineCore
             LoadForearm(avatarData.forearmType, userData.upperArmLength, userData.forearmLength);
             LoadHand(avatarData.handType, userData.upperArmLength, userData.forearmLength, userData.handLength);
 
-            /*
+            
             // Deactivate rendering of the markers
             // First get the objects
             GameObject shoulderMarkerGO = GameObject.Find("ShoulderJointMarker");
@@ -51,7 +51,7 @@ namespace VRProEP.GameEngineCore
             shoulderMarkerMR.enabled = false;
             elbowMarkerMR.enabled = false;
             trackerModelGO.SetActive(false);
-            */
+            
         }
 
         /// <summary>

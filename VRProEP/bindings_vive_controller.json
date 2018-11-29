@@ -279,7 +279,7 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/vrproep/in/button"
+                     "output" : "/actions/vrproep/in/interfaceenablebutton"
                   },
                   "position" : {
                      "output" : "/actions/vrproep/in/trackpad"
@@ -291,7 +291,7 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/vrproep/in/button"
+                     "output" : "/actions/vrproep/in/interfaceenablebutton"
                   },
                   "position" : {
                      "output" : "/actions/vrproep/in/trackpad"
@@ -303,7 +303,7 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/vrproep/in/walkenable"
+                     "output" : "/actions/vrproep/in/objectinteractbutton"
                   }
                },
                "mode" : "trigger",
@@ -312,7 +312,7 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/vrproep/in/walkenable"
+                     "output" : "/actions/vrproep/in/objectinteractbutton"
                   }
                },
                "mode" : "trigger",

@@ -9,7 +9,8 @@ public class GraspManager : MonoBehaviour {
     public Transform attachmentPoint;
 
     private GameObject objectInHand = null;
-    private FixedJoint objectInHandFJ = null;
+    // private FixedJoint objectInHandFJ = null;
+    private ObjectHandTracking oIHHandTracker = null;
 
     // When another object comes in contact with the hand grasp
     private void OnTriggerEnter (Collider other) {
@@ -21,20 +22,36 @@ public class GraspManager : MonoBehaviour {
         if (!other.CompareTag("Graspable"))
             return;
 
-        // Attach object to hand with a fixed joint
+        // Attach object to hand with hand Tracking script
         objectInHand = other.gameObject;
-        objectInHandFJ = objectInHand.AddComponent<FixedJoint>();
-        objectInHandFJ.connectedBody = handRB;
-        //objectInHandFJ.anchor = attachmentPoint.position;
-	}
+        oIHHandTracker = objectInHand.AddComponent<ObjectHandTracking>();
+        oIHHandTracker.handTransform = attachmentPoint;
+    }
 
+    /* Debug 
     private void FixedUpdate()
     {
         // Release when button pressed.
-        if (SteamVR_Input.vrproep.inActions.Button.GetStateDown(SteamVR_Input_Sources.Any) && objectInHand != null)
+        if (SteamVR_Input.vrproep.inActions.ObjectInteractButton.GetStateDown(SteamVR_Input_Sources.Any) && objectInHand != null)
         {
-            Destroy(objectInHandFJ);
-            objectInHand = null;
+            Destroy(oIHHandTracker);
+            oIHHandTracker = null;
+            StartCoroutine(EnableObjectGraspability());
         }
+    }*/
+
+    private IEnumerator EnableObjectGraspability()
+    {
+        yield return new WaitForSecondsRealtime(2.0f);
+        objectInHand.tag = "Graspable";
+        objectInHand = null;
+    }
+
+    /* Debug */
+    private void OnApplicationQuit()
+    {
+        Destroy(oIHHandTracker);
+        oIHHandTracker = null;
+        StartCoroutine(EnableObjectGraspability());
     }
 }

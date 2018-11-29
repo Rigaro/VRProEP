@@ -83,7 +83,7 @@ public class SaveSystemTester : MonoBehaviour {
         // Initialize prosthesis
         GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
         ConfigurableElbowManager elbowManager = prosthesisManagerGO.AddComponent<ConfigurableElbowManager>();
-        elbowManager.InitializeProsthesis(activeUserData.upperArmLength, (activeUserData.forearmLength + activeUserData.handLength));
+        elbowManager.InitializeProsthesis(activeUserData.upperArmLength, (activeUserData.forearmLength + activeUserData.handLength/2.0f));
 
         //elbowManager.ChangeSensor("VAL_SENSOR_VIVECONTROLLER");
         //elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
@@ -93,7 +93,7 @@ public class SaveSystemTester : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-        if (SteamVR_Input.vrproep.inActions.Button.GetStateDown(SteamVR_Input_Sources.Any) && !collidersEnabled)
+        if (SteamVR_Input.vrproep.inActions.InterfaceEnableButton.GetStateDown(SteamVR_Input_Sources.Any) && !collidersEnabled)
         {
             avatarSystem.EnableAvatarColliders();
             collidersEnabled = true;

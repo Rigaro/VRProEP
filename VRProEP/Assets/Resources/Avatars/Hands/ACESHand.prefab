@@ -136,6 +136,9 @@ GameObject:
   - component: {fileID: 4450412258094322}
   - component: {fileID: 136120513222122106}
   - component: {fileID: 114420207846201496}
+  - component: {fileID: 135557139448756552}
+  - component: {fileID: 135081369098783736}
+  - component: {fileID: 135236878774665802}
   m_Layer: 0
   m_Name: GraspManager
   m_TagString: Untagged
@@ -168,7 +171,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4498788391298080}
   m_Layer: 0
-  m_Name: AttachmentPoint
+  m_Name: PowerGraspAttachmentPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -310,7 +313,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1884424841194380}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.0075, y: 0.00832, z: -0.02134}
+  m_LocalPosition: {x: -0.0104, y: -0.0122, z: -0.0213}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4230033028485634}
@@ -424,6 +427,42 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   handRB: {fileID: 54988436631265482}
   attachmentPoint: {fileID: 4498788391298080}
+--- !u!135 &135081369098783736
+SphereCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1694282568216230}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.008259638
+  m_Center: {x: 0.00031691528, y: -0.066451825, z: 0.042029675}
+--- !u!135 &135236878774665802
+SphereCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1694282568216230}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.008002578
+  m_Center: {x: 0.0022055642, y: -0.076073006, z: 0.017376283}
+--- !u!135 &135557139448756552
+SphereCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1694282568216230}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.009531838
+  m_Center: {x: -0.022295764, y: -0.026673883, z: 0.049607668}
 --- !u!136 &136013151397463328
 CapsuleCollider:
   m_ObjectHideFlags: 1

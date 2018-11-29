@@ -13,7 +13,7 @@ namespace VRProEP.ProsthesisCore
         // Curently implemented actions:
 
         private SteamVR_Action_Vector2 trackpadAction = SteamVR_Input.vrproep.inActions.Trackpad;
-        private SteamVR_Action_Boolean buttonAction = SteamVR_Input.vrproep.inActions.Button;
+        private SteamVR_Action_Boolean buttonAction = SteamVR_Input.vrproep.inActions.InterfaceEnableButton;
 
         public VIVEControllerManager() : base(2, SensorType.VIVEController)
         {

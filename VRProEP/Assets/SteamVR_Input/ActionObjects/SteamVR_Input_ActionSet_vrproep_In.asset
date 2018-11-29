@@ -15,8 +15,10 @@ MonoBehaviour:
   listDirection: 0
   actions:
   - {fileID: 11400000, guid: 15af09149ea71534d9c4630972020f46, type: 2}
-  - {fileID: 11400000, guid: 5917f85366277f84c9d6648084636e85, type: 2}
-  - {fileID: 11400000, guid: d02f07eeae1536149a22c4ac5e3a0bfd, type: 2}
+  - {fileID: 11400000, guid: c10c1d48ce0b0584b83b96f875da8d81, type: 2}
+  - {fileID: 11400000, guid: f1c6636f39c840445b3bb8f4e29f4409, type: 2}
   Trackpad: {fileID: 11400000, guid: 15af09149ea71534d9c4630972020f46, type: 2}
-  Button: {fileID: 11400000, guid: 5917f85366277f84c9d6648084636e85, type: 2}
-  WalkEnable: {fileID: 11400000, guid: d02f07eeae1536149a22c4ac5e3a0bfd, type: 2}
+  InterfaceEnableButton: {fileID: 11400000, guid: c10c1d48ce0b0584b83b96f875da8d81,
+    type: 2}
+  ObjectInteractButton: {fileID: 11400000, guid: f1c6636f39c840445b3bb8f4e29f4409,
+    type: 2}

@@ -66,6 +66,8 @@ namespace VRProEP.ProsthesisCore
                 enableRequested = true;
                 // Get new reference frame
                 SetDirectionOfMotionFrameOffset(qShoulder, qElbow);
+                isEnabled = true;
+                Debug.Log("Direction of motion frame set.");
             }
             else if (!enable && enableRequested) // Released button
             {
@@ -73,6 +75,7 @@ namespace VRProEP.ProsthesisCore
             }
             else if (enable && !enableRequested && isEnabled)
             {
+                Debug.Log("Jacobian synergy disabled.");
                 // Requested to disable, get button down
                 enableRequested = true;
                 isEnabled = false;
@@ -82,7 +85,7 @@ namespace VRProEP.ProsthesisCore
             if (isEnabled)
             {
                 xBar[channel - 1] = SingleDOFJacobianSynergy(channel, qShoulder, qElbow, qDotShoulder);
-                Debug.Log("Jacobian synergy active.");
+                Debug.Log(Mathf.Rad2Deg * xBar[channel - 1]);
             }
 
             return xBar[channel - 1];
@@ -123,24 +126,13 @@ namespace VRProEP.ProsthesisCore
         {
             // Compute the unity vector from the shoulder joint to the hand grasp point.
             Vector2 dShoulderToHand = new Vector2(upperArmLength * Mathf.Cos(qShoulder) + lowerArmLength * Mathf.Cos(qShoulder + qElbow), upperArmLength * Mathf.Sin(qShoulder) + lowerArmLength * Mathf.Sin(qShoulder + qElbow));
-            Vector2 uS2H = dShoulderToHand / (dShoulderToHand.magnitude);
+             Vector2 uS2H = dShoulderToHand / (dShoulderToHand.magnitude);
             // Compute the raw rotation
             alpha = Mathf.Acos(uS2H.x);
+            if (dShoulderToHand.y < 0)
+                alpha = -alpha;
         }
-
-        /// <summary>
-        /// Rotates the given shoulder angle to the current direction of motion frame.
-        /// </summary>
-        /// <param name="qShoulder">The given shoulder angle in radians.</param>
-        /// <returns>The rotated shoulder angle in radians.</returns>
-        private float RotateShoulderAngleToDOMFrame(float qShoulder)
-        {
-            if (qShoulder >= 0)
-                return alpha - qShoulder;
-            else
-                return qShoulder - alpha;
-        }
-
+        
         /// <summary>
         /// Computes de desired elbow joint angle using an arm jacobian-based synergy.
         /// </summary>
@@ -151,11 +143,11 @@ namespace VRProEP.ProsthesisCore
         /// <returns></returns>
         private float SingleDOFJacobianSynergy(int channel, float qShoulder, float qElbow, float qDotShoulder)
         {
-            float qShoulder_DOM = RotateShoulderAngleToDOMFrame(qShoulder);
+            float qShoulder_DOM = qShoulder - alpha;
             // Compute the desired elbow velocity
             float qDotElbow = (upperArmLength * Mathf.Cos(qShoulder_DOM) + lowerArmLength * Mathf.Cos(qShoulder_DOM + qElbow)) * qDotShoulder / (lowerArmLength * Mathf.Cos(qShoulder_DOM + qElbow));
             // Integrate.
-            float tempXBar = xBar[channel - 1] + ( qDotElbow * Time.fixedDeltaTime );
+            float tempXBar = xBar[channel - 1] - ( qDotElbow * Time.fixedDeltaTime );
             // Saturate reference
             if (tempXBar > xMax[channel - 1])
                 tempXBar = xMax[channel - 1];
