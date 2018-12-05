@@ -1,16 +1,30 @@
-﻿using System.Collections;
+﻿//======= Copyright (c) Melbourne Robotics Lab, All rights reserved. ===============
+//#define DEBUG
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR;
 
+/// <summary>
+/// Manages object grasping behavior for VRProEP platform.
+/// </summary>
 public class GraspManager : MonoBehaviour {
 
-    public Rigidbody handRB;
     public Transform attachmentPoint;
 
     private GameObject objectInHand = null;
-    // private FixedJoint objectInHandFJ = null;
     private ObjectHandTracking oIHHandTracker = null;
+
+    private void Start()
+    {
+        // Check that the action set is active.
+        if (!SteamVR_Input.vrproep.IsActive())
+        {
+            SteamVR_Input._default.Deactivate();
+            SteamVR_Input.vrproep.ActivatePrimary();
+        }
+    }
 
     // When another object comes in contact with the hand grasp
     private void OnTriggerEnter (Collider other) {
@@ -28,30 +42,37 @@ public class GraspManager : MonoBehaviour {
         oIHHandTracker.handTransform = attachmentPoint;
     }
 
-    /* Debug 
     private void FixedUpdate()
     {
-        // Release when button pressed.
+        // Releases object when the object interaction button is pressed and there is an object in hand.
         if (SteamVR_Input.vrproep.inActions.ObjectInteractButton.GetStateDown(SteamVR_Input_Sources.Any) && objectInHand != null)
         {
             Destroy(oIHHandTracker);
             oIHHandTracker = null;
-            StartCoroutine(EnableObjectGraspability());
+            StartCoroutine(EnableObjectGraspability(2.0f));
         }
-    }*/
-
-    private IEnumerator EnableObjectGraspability()
-    {
-        yield return new WaitForSecondsRealtime(2.0f);
-        objectInHand.tag = "Graspable";
-        objectInHand = null;
     }
 
-    /* Debug */
+    /// <summary>
+    /// Re-enables the object's graspability after the given time.
+    /// </summary>
+    /// <param name="time">The time in seconds.</param>
+    /// <returns>Coroutine IEnumerator</returns>
+    private IEnumerator EnableObjectGraspability(float time)
+    {
+        yield return new WaitForSecondsRealtime(time);
+        objectInHand.tag = "Graspable"; // Make the object graspable again.
+        objectInHand = null; // Allow grasping again.
+    }
+
+    // Clear object from hand and return to normal state if quitting application
     private void OnApplicationQuit()
     {
-        Destroy(oIHHandTracker);
-        oIHHandTracker = null;
-        StartCoroutine(EnableObjectGraspability());
+        if(objectInHand != null)
+        {
+            Destroy(oIHHandTracker);
+            oIHHandTracker = null;
+            StartCoroutine(EnableObjectGraspability(2.0f));
+        }
     }
 }

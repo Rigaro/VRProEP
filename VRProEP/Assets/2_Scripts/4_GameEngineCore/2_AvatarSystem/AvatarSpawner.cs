@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.IO;
 using UnityEngine;
+using Valve.VR;
 
 namespace VRProEP.GameEngineCore
 {
@@ -64,6 +65,46 @@ namespace VRProEP.GameEngineCore
             // Load
             // Customize
             throw new System.NotImplementedException("Transradial avatars not yet implemented.");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userData"></param>
+        /// <param name="avatarData"></param>
+        public static void SpawnAbleBodiedAvatar(UserData userData, AvatarData avatarData)
+        {
+            LoadAbleHand(userData.lefty);
+        }
+
+        /// <summary>
+        /// Loads an able-bodied hand avatar compatible with the VRProEP interaction system.
+        /// </summary>
+        /// <param name="lefty">True if left handed.</param>
+        /// <returns>The instantiated hand GameObject.</returns>
+        private static GameObject LoadAbleHand(bool lefty)
+        {
+            GameObject playerGO = GameObject.Find("Player");
+
+            if (playerGO == null)
+                throw new System.Exception("The player GameObject was not found.");
+
+            string side = "R";
+            if (lefty)
+                side = "L";
+
+            // Load able bodied hand from avatar folder and check whether successfully loaded.
+            GameObject handPrefab = Resources.Load<GameObject>("Avatars/Hands/ACESAble" + side);
+            if (handPrefab == null)
+                throw new System.Exception("The requested hand prefab was not found.");
+
+            // Load Avatar object to set as parent.
+            GameObject avatarGO = GameObject.FindGameObjectWithTag("Avatar");
+            // Instantiate and set reference frame;
+            GameObject handGO = Object.Instantiate(handPrefab, handPrefab.transform.position, handPrefab.transform.rotation, avatarGO.transform);
+            handGO.GetComponent<SteamVR_TrackedObject>().origin = playerGO.transform;
+
+            return handGO;
         }
 
         /// <summary>

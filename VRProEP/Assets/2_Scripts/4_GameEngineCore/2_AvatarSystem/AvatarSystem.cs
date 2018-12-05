@@ -53,7 +53,7 @@ namespace VRProEP.GameEngineCore
 
             return avatarData;
         }
-        
+
         /// <summary>
         /// Loads the data used for avatar customization for the given user.
         /// </summary>
@@ -77,7 +77,7 @@ namespace VRProEP.GameEngineCore
 
             // Set as active user
             activeAvatarData = loadedAvatarData;
-            
+
             return loadedAvatarData;
         }
 
@@ -108,8 +108,10 @@ namespace VRProEP.GameEngineCore
         /// <param name="avatarType">The type of avatar to load.</param>
         public static void LoadAvatar(UserData userData, AvatarType avatarType)
         {
-            // Get avatar data for user
+            // Get avatar data for user and load the tracking frame
             activeAvatarData = LoadAvatarCustomizationData(userData.id);
+            LoadTrackerFrame(avatarType);
+
             // Select avatar type, customize tracking frame and spawn avatar.
             if (avatarType == AvatarType.Transhumeral)
             {
@@ -120,6 +122,10 @@ namespace VRProEP.GameEngineCore
             {
                 CustomizeTrackingFrame(userData, avatarType);
                 AvatarSpawner.SpawnTransradialAvatar(userData, activeAvatarData);
+            }
+            else if (avatarType == AvatarType.AbleBodied)
+            {
+                AvatarSpawner.SpawnAbleBodiedAvatar(userData, activeAvatarData);
             }
 
             isAvatarAvaiable = true;
@@ -145,7 +151,7 @@ namespace VRProEP.GameEngineCore
                 // Modify position of shoulder marker
                 shoulderMarker.transform.position = new Vector3(shoulderMarker.transform.position.x, userData.upperArmLength + elbowLocation.transform.localPosition.y, shoulderMarker.transform.position.z);
                 // Change size and position of collider
-                upperArmCollider.transform.localScale = new Vector3(upperArmCollider.transform.localScale.x, userData.upperArmLength/2.0f, upperArmCollider.transform.localScale.z);
+                upperArmCollider.transform.localScale = new Vector3(upperArmCollider.transform.localScale.x, userData.upperArmLength / 2.0f, upperArmCollider.transform.localScale.z);
                 upperArmCollider.transform.localPosition = new Vector3(upperArmCollider.transform.localPosition.x, -userData.upperArmLength / 2.0f, upperArmCollider.transform.localPosition.z);
             }
             else if (avatarType == AvatarType.Transradial)
@@ -169,6 +175,28 @@ namespace VRProEP.GameEngineCore
             Transform handColliders = handGO.transform.GetChild(0);
             handColliders.gameObject.SetActive(true);
 
+        }
+
+        /// <summary>
+        /// Loads the tracking frame for a given avatar type and attaches it to the residual limb tracker.
+        /// </summary>
+        /// <param name="avatarType"></param>
+        private static void LoadTrackerFrame(AvatarType avatarType)
+        {
+            GameObject trackerGO = GameObject.FindGameObjectWithTag("ResidualLimbTracker");
+
+            if (trackerGO == null)
+                throw new System.Exception("The player GameObject was not found.");
+
+            if (avatarType == AvatarType.Transhumeral)
+            {
+                // Load residual limb from avatar folder and check whether successfully loaded.
+                GameObject ableBodiedTHFramePrefab = Resources.Load<GameObject>("TrackingFrames/AbleBodiedFrameTH");
+                if (ableBodiedTHFramePrefab == null)
+                    throw new System.Exception("The requested tracker frame prefab was not found.");
+
+                GameObject residualLimbGO = Object.Instantiate(ableBodiedTHFramePrefab, trackerGO.transform, false);
+            }
         }
     }
 }
