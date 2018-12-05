@@ -8,15 +8,14 @@ namespace VRProEP.GameEngineCore
     /// <summary>
     /// Handles avatar data management and spawning.
     /// </summary>
-    public class AvatarSystem
+    public static class AvatarSystem
     {
-        private readonly string dataFolder = Application.dataPath + "/UserData/";
-        private AvatarData activeAvatarData;
-        private AvatarSpawner avatarSpawner = new AvatarSpawner();
+        private static readonly string dataFolder = Application.dataPath + "/UserData/";
+        private static AvatarData activeAvatarData;
 
-        private bool isAvatarAvaiable = false;
+        private static bool isAvatarAvaiable = false;
 
-        public bool IsAvatarAvaiable
+        public static bool IsAvatarAvaiable
         {
             get
             {
@@ -36,7 +35,7 @@ namespace VRProEP.GameEngineCore
         /// <param name="handType">The type of hand.</param>
         /// <param name="avatarType">The type of avatar.</param>
         /// <returns></returns>
-        public AvatarData CreateAvatarCustomizationData(string userID, string residualLimbType, string socketType, string elbowType, string forearmType, string handType, AvatarType avatarType)
+        public static AvatarData CreateAvatarCustomizationData(string userID, string residualLimbType, string socketType, string elbowType, string forearmType, string handType, AvatarType avatarType)
         {
             // Create avatar data object.
             AvatarData avatarData = new AvatarData();
@@ -60,7 +59,7 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         /// <param name="userID">The user id of the user whose avatar wants to be loaded.</param>
         /// <returns>The loaded avatar customization data.</returns>
-        public AvatarData LoadAvatarCustomizationData(string userID)
+        public static AvatarData LoadAvatarCustomizationData(string userID)
         {
             AvatarData loadedAvatarData;
             string loadFilePath = dataFolder + userID + "/avatarInfo.json";
@@ -87,7 +86,7 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         /// <param name="userID">The user id of the user whose avatar wants to be loaded.</param>
         /// <param name="avatarData">The avatar customization data to save.</param>
-        public void SaveAvatarCustomizationData(string userID, AvatarData avatarData)
+        public static void SaveAvatarCustomizationData(string userID, AvatarData avatarData)
         {
             string saveFolder = dataFolder + userID;
 
@@ -107,7 +106,7 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         /// <param name="userData">The user's data to be used for avatar loading.</param>
         /// <param name="avatarType">The type of avatar to load.</param>
-        public void LoadAvatar(UserData userData, AvatarType avatarType)
+        public static void LoadAvatar(UserData userData, AvatarType avatarType)
         {
             // Get avatar data for user
             activeAvatarData = LoadAvatarCustomizationData(userData.id);
@@ -115,12 +114,12 @@ namespace VRProEP.GameEngineCore
             if (avatarType == AvatarType.Transhumeral)
             {
                 CustomizeTrackingFrame(userData, avatarType);
-                avatarSpawner.SpawnTranshumeralAvatar(userData, activeAvatarData);
+                AvatarSpawner.SpawnTranshumeralAvatar(userData, activeAvatarData);
             }
             else if (avatarType == AvatarType.Transradial)
             {
                 CustomizeTrackingFrame(userData, avatarType);
-                avatarSpawner.SpawnTransradialAvatar(userData, activeAvatarData);
+                AvatarSpawner.SpawnTransradialAvatar(userData, activeAvatarData);
             }
 
             isAvatarAvaiable = true;
@@ -131,7 +130,7 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         /// <param name="userData">The user's data to use for customization.</param>
         /// <param name="avatarType">The type of avatar to customize.</param>
-        public void CustomizeTrackingFrame(UserData userData, AvatarType avatarType)
+        public static void CustomizeTrackingFrame(UserData userData, AvatarType avatarType)
         {
             if (avatarType == AvatarType.Transhumeral)
             {
@@ -158,7 +157,7 @@ namespace VRProEP.GameEngineCore
         /// <summary>
         /// Enables forearm and hand colliders
         /// </summary>
-        public void EnableAvatarColliders()
+        public static void EnableAvatarColliders()
         {
             // Enable Forearm and hand colliders
             // Enable forearm collider

@@ -11,6 +11,7 @@ namespace VRProEP.GameEngineCore
     {
         Transhumeral,
         Transradial,
+        AbleBodied
     }
 
     /// <summary>

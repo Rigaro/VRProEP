@@ -9,21 +9,21 @@ namespace VRProEP.GameEngineCore
     /// <summary>
     /// Save system for VRProEP platform. Handles user and experimental data.
     /// </summary>
-    public class SaveSystem
+    public static class SaveSystem
     {
-        private UserData activeUser;
-        private string activeSaveFolder;
-        private List<IExperimentLogger> activeLoggers = new List<IExperimentLogger>();
+        private static UserData activeUser;
+        private static string activeSaveFolder;
+        private static List<IExperimentLogger> activeLoggers = new List<IExperimentLogger>();
 
         // Encapsulation
-        public UserData ActiveUser
+        public static UserData ActiveUser
         {
             get
             {
                 return activeUser;
             }
         }
-        public string ActiveSaveFolder
+        public static string ActiveSaveFolder
         {
             get
             {
@@ -44,7 +44,7 @@ namespace VRProEP.GameEngineCore
         /// <param name="handL">The user's hand length.</param>
         /// <param name="userType">The user type according to the enum UserType.</param>
         /// <returns>The created UserData.</returns>
-        public UserData CreateNewUser(string name, string familyName, int yob, float uArmL, float uArmW, float fArmL, float fArmW, float handL, UserType userType)
+        public static UserData CreateNewUser(string name, string familyName, int yob, float uArmL, float uArmW, float fArmL, float fArmW, float handL, UserType userType)
         {
             // Generate user ID
             string userID = name.ToCharArray()[0].ToString() + familyName.ToCharArray()[0] + yob.ToString();
@@ -69,7 +69,7 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         /// <param name="newUser">The user data to save.</param>
         /// <returns>The UserData.</returns>
-        public UserData CreateNewUser(UserData newUser)
+        public static UserData CreateNewUser(UserData newUser)
         {
             // Create new folder for user or throw exception if it already exists.
             try
@@ -94,7 +94,7 @@ namespace VRProEP.GameEngineCore
         /// Creates a folder for the given user data.
         /// </summary>
         /// <param name="userData">The given user data.</param>
-        private void CreateNewUserFolder(UserData userData)
+        private static void CreateNewUserFolder(UserData userData)
         {
             string userFolder = "/UserData/" + userData.id.ToString();
             string userPath = Application.dataPath + userFolder;
@@ -109,7 +109,7 @@ namespace VRProEP.GameEngineCore
         /// Saves the provided user data. If data exists, it is overwritten.
         /// </summary>
         /// <param name="userData">The user data to be saved.</param>
-        public void SaveUserData(UserData userData)
+        public static void SaveUserData(UserData userData)
         {
             string userFolder = "/UserData/" + userData.id.ToString();
             string userPath = Application.dataPath + userFolder;
@@ -127,7 +127,7 @@ namespace VRProEP.GameEngineCore
         /// <summary>
         /// Saves the data of the current active user.
         /// </summary>
-        public void SaveActiveUserData()
+        public static void SaveActiveUserData()
         {
             // Set file, format data as JSON, and save.
             string saveFilePath = activeSaveFolder + "/" + "userInfo.json";
@@ -140,7 +140,7 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         /// <param name="userID">The ID of the user to load the data for.</param>
         /// <returns>The UserData for the requested user.</returns>
-        public UserData LoadUserData(string userID)
+        public static UserData LoadUserData(string userID)
         {
             UserData loadedUserData;
             // Get the folder for the given user ID
@@ -172,7 +172,7 @@ namespace VRProEP.GameEngineCore
         /// Initializes and adds an experiment logger to the save system.
         /// </summary>
         /// <param name="logger">The logger to be initialized and added.</param>
-        public void AddExperimentLogger(IExperimentLogger logger)
+        public static void AddExperimentLogger(IExperimentLogger logger)
         {
             if (logger == null)
                 throw new System.ArgumentNullException("The provided logger is empty.");
@@ -186,7 +186,7 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         /// <param name="index">The logger index.</param>
         /// <returns>The requested logger.</returns>
-        public IExperimentLogger GetActiveLogger(int index)
+        public static IExperimentLogger GetActiveLogger(int index)
         {
             if (index < 0 || index >= activeLoggers.Count)
                 throw new System.IndexOutOfRangeException("The provided index does exceeds the number of experiment loggers available.");
@@ -197,7 +197,7 @@ namespace VRProEP.GameEngineCore
         /// <summary>
         /// Closes all active loggers that have been added to the save system.
         /// </summary>
-        public void CloseAllExperimentLoggers()
+        public static void CloseAllExperimentLoggers()
         {
             foreach (IExperimentLogger logger in activeLoggers)
             {

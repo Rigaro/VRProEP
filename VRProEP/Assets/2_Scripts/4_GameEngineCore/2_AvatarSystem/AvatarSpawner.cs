@@ -8,25 +8,25 @@ namespace VRProEP.GameEngineCore
     /// Handles avatar loading and spawning into game scene.
     /// Avatar objects should be placed within: /Resources/Avatars/
     /// </summary>
-    public class AvatarSpawner
+    public static class AvatarSpawner
     {
-        private AvatarObjectData activeResidualLimbData;
-        private AvatarObjectData activeSocketData;
-        private AvatarObjectData activeElbowData_Upper;
-        private AvatarObjectData activeElbowData_Lower;
-        private AvatarObjectData activeForearmData;
-        private AvatarObjectData activeHandData;
+        private static AvatarObjectData activeResidualLimbData;
+        private static AvatarObjectData activeSocketData;
+        private static AvatarObjectData activeElbowData_Upper;
+        private static AvatarObjectData activeElbowData_Lower;
+        private static AvatarObjectData activeForearmData;
+        private static AvatarObjectData activeHandData;
 
         //private const float objectGap = 0.0f; // Helps with the gap between certain objects to avoid overlapping issues.
 
-        private readonly string resourcesDataPath = Application.dataPath + "/Resources/Avatars";
+        private static readonly string resourcesDataPath = Application.dataPath + "/Resources/Avatars";
 
         /// <summary>
         /// Spawns a transradial avatar for the given user.
         /// </summary>
         /// <param name="userData">The user's physical data.</param>
         /// <param name="avatarData">The user's avatar configuration data.</param>
-        public void SpawnTranshumeralAvatar(UserData userData, AvatarData avatarData)
+        public static void SpawnTranshumeralAvatar(UserData userData, AvatarData avatarData)
         {
             // Load the different parts of the avatar
             LoadResidualLimb(avatarData.residualLimbType);
@@ -59,7 +59,7 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         /// <param name="userData">The user's physical data.</param>
         /// <param name="avatarData">The user's avatar configuration data.</param>
-        public void SpawnTransradialAvatar(UserData userData, AvatarData avatarData)
+        public static void SpawnTransradialAvatar(UserData userData, AvatarData avatarData)
         {
             // Load
             // Customize
@@ -72,7 +72,7 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         /// <param name="rlType">The name of the prefab residual limb avatar to be loaded.</param>
         /// <returns>The instantiated residual limb GameObject.</returns>
-        private GameObject LoadResidualLimb(string rlType)
+        private static GameObject LoadResidualLimb(string rlType)
         {
             // Load Avatar object to set as parent.
             GameObject avatarGO = GameObject.FindGameObjectWithTag("Avatar");
@@ -109,7 +109,7 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         /// <param name="socketType">The name of the prefab socket avatar to be loaded.</param>
         /// <returns>The instantiated socket GameObject.</returns>
-        private GameObject LoadSocket(string socketType)
+        private static GameObject LoadSocket(string socketType)
         {
             // Need to attach to ResidualLimbAvatar, so find that first and get its Rigidbody.
             GameObject residualLimbGO = GameObject.FindGameObjectWithTag("ResidualLimbAvatar");
@@ -152,7 +152,7 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         /// <param name="elbowType">The name of the prefab socket avatar to be loaded.</param>
         /// <returns>The instantiated socket GameObject.</returns>
-        private GameObject LoadElbow(string elbowType, float upperArmLength)
+        private static GameObject LoadElbow(string elbowType, float upperArmLength)
         {
             // Need to attach to Socket, so find that first and get its Rigidbody.
             GameObject socketGO = GameObject.FindGameObjectWithTag("Socket");
@@ -203,7 +203,7 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         /// <param name="forearmType">The name of the prefab forearm avatar to be loaded.</param>
         /// <returns>The instantiated forearm GameObject.</returns>
-        private GameObject LoadForearm(string forearmType, float upperArmLength, float lowerArmLength)
+        private static GameObject LoadForearm(string forearmType, float upperArmLength, float lowerArmLength)
         {
             // Need to attach to Elbow_Lower, so find that first and get its Rigidbody.
             GameObject elbowLowerGO = GameObject.FindGameObjectWithTag("Elbow_Lower");
@@ -246,7 +246,7 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         /// <param name="handType">The name of the prefab forearm avatar to be loaded.</param>
         /// <returns>The instantiated forearm GameObject.</returns>
-        private GameObject LoadHand(string handType, float upperArmLength, float lowerArmLength, float handLength)
+        private static GameObject LoadHand(string handType, float upperArmLength, float lowerArmLength, float handLength)
         {
             // Need to attach to Forearm, so find that first and get its Rigidbody.
             GameObject forearmGO = GameObject.FindGameObjectWithTag("Forearm");

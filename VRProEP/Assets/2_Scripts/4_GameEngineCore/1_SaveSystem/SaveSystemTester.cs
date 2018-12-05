@@ -20,10 +20,7 @@ public class SaveSystemTester : MonoBehaviour {
     public UserType type = UserType.AbleBodied;
 
     private UserData activeUserData;
-    private SaveSystem saveSystem;
-
-    private AvatarSystem avatarSystem;
-
+    
     private bool collidersEnabled = false;
 
     // Use this for initialization
@@ -32,13 +29,11 @@ public class SaveSystemTester : MonoBehaviour {
         // Start XR Tracking
         //XRSettings.enabled = true;
 
-        saveSystem = new SaveSystem();
-        avatarSystem = new AvatarSystem();
         //saveSystem.CreateNewUser(userName, familyName, yob, upperArmLength, upperArmWidth, foreArmLength, foreArmWidth, handLength, type);
         //Debug.Log("The loaded user is: " + saveSystem.ActiveUser.name + " " + saveSystem.ActiveUser.familyName);
-        activeUserData = saveSystem.LoadUserData("RG1988");
-        Debug.Log("The loaded user is: " + saveSystem.ActiveUser.name + " " + saveSystem.ActiveUser.familyName);
-        Debug.Log("The user's hand length is " + saveSystem.ActiveUser.handLength);
+        activeUserData = SaveSystem.LoadUserData("RG1988");
+        Debug.Log("The loaded user is: " + SaveSystem.ActiveUser.name + " " + SaveSystem.ActiveUser.familyName);
+        Debug.Log("The user's hand length is " + SaveSystem.ActiveUser.handLength);
         /*
         UserData newUser = new UserData();
         string userID = userName.ToCharArray()[0].ToString() + familyName.ToCharArray()[0] + yob.ToString();
@@ -60,11 +55,11 @@ public class SaveSystemTester : MonoBehaviour {
         Debug.Log(logger.IsConfigured);
         Debug.Log(logger.GetActiveExperiment() + " " + logger.GetActiveLogType());
 
-        saveSystem.AddExperimentLogger(logger);
+        SaveSystem.AddExperimentLogger(logger);
 
         Debug.Log(logger.IsConfigured);
 
-        IExperimentLogger tempLogger = saveSystem.GetActiveLogger(0);
+        IExperimentLogger tempLogger = SaveSystem.GetActiveLogger(0);
 
         logger.ConfigureLogger("Test", "Score");
         Debug.Log(tempLogger.GetActiveExperiment() + " " + tempLogger.GetActiveLogType());
@@ -74,11 +69,11 @@ public class SaveSystemTester : MonoBehaviour {
         logger.AppendData("it, is, fucking, working, yeah");
         logger.SaveLog();
         logger.AddNewLogFile(1, 2, "did, it, overwrite, the, data");
-        saveSystem.GetActiveLogger(0).CloseLog();
+        SaveSystem.GetActiveLogger(0).CloseLog();
 
         // Create avatar configuration for user
         //avatarSystem.CreateAvatarCustomizationData(saveSystem.ActiveUser.id, "ResidualLimbUpperDefault", "SocketDefault", "ElbowDefault", "ForearmDefault", "HandDefault", AvatarType.Transhumeral);
-        avatarSystem.LoadAvatar(saveSystem.ActiveUser, AvatarType.Transhumeral);
+        AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
 
         // Initialize prosthesis
         GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
@@ -95,13 +90,13 @@ public class SaveSystemTester : MonoBehaviour {
     void Update () {
         if (SteamVR_Input.vrproep.inActions.InterfaceEnableButton.GetStateDown(SteamVR_Input_Sources.Any) && !collidersEnabled)
         {
-            avatarSystem.EnableAvatarColliders();
+            AvatarSystem.EnableAvatarColliders();
             collidersEnabled = true;
         }
 	}
 
     private void OnApplicationQuit()
     {
-        saveSystem.GetActiveLogger(0).CloseLog();
+        SaveSystem.GetActiveLogger(0).CloseLog();
     }
 }
