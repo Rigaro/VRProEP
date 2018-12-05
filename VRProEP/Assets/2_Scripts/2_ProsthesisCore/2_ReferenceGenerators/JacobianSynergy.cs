@@ -3,6 +3,10 @@ using UnityEngine;
 
 namespace VRProEP.ProsthesisCore
 {
+    /// <summary>
+    /// Jacobian-based synergistic prosthesis reference generator.
+    /// Provides position reference for prosthesis joints through a Jacobian-based kinematic synergy.
+    /// </summary>
     public class JacobianSynergy : ReferenceGenerator
     {
         private float upperArmLength;
@@ -10,7 +14,16 @@ namespace VRProEP.ProsthesisCore
         private float alpha;
         private bool isEnabled = false;
         private bool enableRequested = false;
-        
+
+        /// <summary>
+        /// Jacobian-based synergistic prosthesis reference generator.
+        /// Provides position reference for prosthesis joints through a Jacobian-based kinematic synergy.
+        /// </summary>
+        /// <param name="xBar">The initial references.</param>
+        /// <param name="xMin">The lower limit for the references.</param>
+        /// <param name="xMax">The upper limit for the references.</param>
+        /// <param name="upperArmLength">The user's upper arm length.</param>
+        /// <param name="lowerArmLength">The user's lower arm length (elbow to grasp location, i.e. palm).</param>
         public JacobianSynergy(float[] xBar, float[] xMin, float[] xMax, float upperArmLength, float lowerArmLength)
         {
             if (xBar.Length != xMin.Length || xBar.Length != xMax.Length)
