@@ -35,7 +35,7 @@ namespace VRProEP.GameEngineCore
         /// <param name="handType">The type of hand.</param>
         /// <param name="avatarType">The type of avatar.</param>
         /// <returns></returns>
-        public static AvatarData CreateAvatarCustomizationData(string userID, string residualLimbType, string socketType, string elbowType, string forearmType, string handType, AvatarType avatarType)
+        public static AvatarData CreateAvatarCustomizationData(string userID, string residualLimbType, string socketType, string elbowType, string forearmType, string handType)
         {
             // Create avatar data object.
             AvatarData avatarData = new AvatarData();

@@ -27,8 +27,8 @@ namespace VRProEP.GameEngineCore
         public float forearmLength;
         public float forearmWidth;
         public float handLength;
-        public UserType type;
-        public bool lefty;
+        public UserType type = UserType.AbleBodied;
+        public bool lefty = false;
     }
 
 }

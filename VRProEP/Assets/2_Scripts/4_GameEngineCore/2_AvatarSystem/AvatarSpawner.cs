@@ -68,7 +68,7 @@ namespace VRProEP.GameEngineCore
         }
 
         /// <summary>
-        /// 
+        /// Spawns an able bodied (hand) avatar.
         /// </summary>
         /// <param name="userData"></param>
         /// <param name="avatarData"></param>

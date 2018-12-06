@@ -47,7 +47,7 @@ namespace VRProEP.GameEngineCore
         public static UserData CreateNewUser(string name, string familyName, int yob, float uArmL, float uArmW, float fArmL, float fArmW, float handL, UserType userType, bool lefty = false)
         {
             // Generate user ID
-            string userID = name.ToCharArray()[0].ToString() + familyName.ToCharArray()[0] + yob.ToString();
+            string userID = name.ToCharArray()[0].ToString() + familyName.ToCharArray()[0].ToString() + yob.ToString();
             // Create new UserData
             UserData newUser = new UserData();
             newUser.name = name;
@@ -79,7 +79,7 @@ namespace VRProEP.GameEngineCore
             }
             catch
             {
-                throw new System.Exception("The provided user data already exists in the user file directory.");
+                throw new System.Exception("The provided user data already exists.");
             }
 
             // If successfully created then we can proceed to make it the active user.
