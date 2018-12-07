@@ -11,7 +11,12 @@ ModelImporter:
     2300000: polySurface1
     3300000: polySurface1
     4300000: polySurface1
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: ACESHand
+    second: {fileID: 2100000, guid: 104de9a4b81f52d41a855559bc65fdcc, type: 2}
   materials:
     importMaterials: 1
     materialName: 0

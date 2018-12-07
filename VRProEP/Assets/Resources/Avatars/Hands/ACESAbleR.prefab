@@ -412,6 +412,7 @@ GameObject:
   - component: {fileID: 4681440395941584}
   - component: {fileID: 33516092714040376}
   - component: {fileID: 23041882445308998}
+  - component: {fileID: 54922492410151556}
   m_Layer: 0
   m_Name: ACESHandAbleR
   m_TagString: Hand
@@ -1346,7 +1347,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: 9ed7c8b06ffb42545a2d1d67b9e75b58, type: 3}
+  - {fileID: 2100000, guid: c98e9094c74d1ab49b1368076ec60a57, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1373,6 +1374,21 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1580022087565684}
   m_Mesh: {fileID: 4300000, guid: 9ed7c8b06ffb42545a2d1d67b9e75b58, type: 3}
+--- !u!54 &54922492410151556
+Rigidbody:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1580022087565684}
+  serializedVersion: 2
+  m_Mass: 0.0000001
+  m_Drag: 0
+  m_AngularDrag: 0
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 2
 --- !u!65 &65005777504044650
 BoxCollider:
   m_ObjectHideFlags: 1

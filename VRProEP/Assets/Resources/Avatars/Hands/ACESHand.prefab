@@ -360,7 +360,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: 9ed7c8b06ffb42545a2d1d67b9e75b58, type: 3}
+  - {fileID: 2100000, guid: c98e9094c74d1ab49b1368076ec60a57, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -425,7 +425,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed8ba5b50bca7d64ab2cd0e14b3824b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  handRB: {fileID: 54988436631265482}
   attachmentPoint: {fileID: 4498788391298080}
 --- !u!135 &135081369098783736
 SphereCollider:

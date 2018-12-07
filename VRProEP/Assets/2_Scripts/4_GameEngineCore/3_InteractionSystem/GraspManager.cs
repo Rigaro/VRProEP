@@ -12,7 +12,9 @@ using Valve.VR;
 public class GraspManager : MonoBehaviour {
 
     public Transform attachmentPoint;
+    public float throwMultiplier = 1.0f;
 
+    private Rigidbody handRB;
     private GameObject objectInHand = null;
     private ObjectHandTracking oIHHandTracker = null;
 
@@ -24,6 +26,12 @@ public class GraspManager : MonoBehaviour {
             SteamVR_Input._default.Deactivate();
             SteamVR_Input.vrproep.ActivatePrimary();
         }
+        // Get hand rigid body
+        GameObject handGO = GameObject.FindGameObjectWithTag("Hand");
+        handRB = handGO.GetComponent<Rigidbody>();
+
+        if (handRB == null)
+            throw new System.Exception("Hand Rigidbody not found.");
     }
 
     // When another object comes in contact with the hand grasp
@@ -49,7 +57,11 @@ public class GraspManager : MonoBehaviour {
         {
             Destroy(oIHHandTracker);
             oIHHandTracker = null;
-            StartCoroutine(EnableObjectGraspability(2.0f));
+            StartCoroutine(EnableObjectGraspability(1.0f));
+
+            // Set object in hand velocity to that of the hand.
+            //objectInHand.GetComponent<Rigidbody>().velocity = throwMultiplier * handRB.velocity;
+            //objectInHand.GetComponent<Rigidbody>().angularVelocity = throwMultiplier * handRB.angularVelocity;
         }
     }
 
@@ -72,7 +84,7 @@ public class GraspManager : MonoBehaviour {
         {
             Destroy(oIHHandTracker);
             oIHHandTracker = null;
-            StartCoroutine(EnableObjectGraspability(2.0f));
+            StartCoroutine(EnableObjectGraspability(1.0f));
         }
     }
 }

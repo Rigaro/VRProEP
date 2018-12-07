@@ -15,7 +15,7 @@ public class ObjectHandTracking : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         attachOffset = transform.GetChild(0).transform; // Set the offset from the object's child attachment position object.
-        GetComponent<Collider>().enabled = false; // Disable collisions
+        GetComponent<Collider>().isTrigger = true; // Disable collisions, only act as trigger.
         GetComponent<Rigidbody>().useGravity = false; // Disable gravity and physics.
         GetComponent<Rigidbody>().isKinematic = true;
         tag = "Untagged"; // Make the object un-graspable.
@@ -34,7 +34,7 @@ public class ObjectHandTracking : MonoBehaviour {
     private void OnDestroy()
     {
         // Re-enable physics and collisions
-        GetComponent<Collider>().enabled = true;
+        GetComponent<Collider>().isTrigger = false;
         GetComponent<Rigidbody>().useGravity = true;
         GetComponent<Rigidbody>().isKinematic = false;
     }

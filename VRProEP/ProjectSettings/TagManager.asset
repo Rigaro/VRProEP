@@ -19,6 +19,7 @@ TagManager:
   - Hand
   - Head
   - Graspable
+  - DropOff
   layers:
   - Default
   - TransparentFX
