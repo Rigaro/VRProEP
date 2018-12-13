@@ -6,7 +6,7 @@ using TMPro;
 public class GraspTimeManager : MonoBehaviour {
 
     public TaskTimer timer;
-    public TextMeshPro topConsole;
+    public TextMeshPro topConsole; // Debug
     private float lastTime;
     private bool inDropOff;
 

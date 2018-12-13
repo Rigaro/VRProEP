@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Times the performance of a task deterministically using Unity's physics engine.
+/// </summary>
 public class TaskTimer : MonoBehaviour {
 
     private bool enable = false;
@@ -15,6 +18,13 @@ public class TaskTimer : MonoBehaviour {
         }
     }
 
+    // Deterministic update
+    void FixedUpdate()
+    {
+        if (enable)
+            timer += Time.fixedDeltaTime;
+    }
+
     /// <summary>
     /// Resets the timer to 0.
     /// </summary>
@@ -22,12 +32,6 @@ public class TaskTimer : MonoBehaviour {
         timer = 0.0f;
     }
 	
-	// Deterministic update
-	void FixedUpdate () {
-        if (enable)
-            timer += Time.fixedDeltaTime;
-	}
-
     /// <summary>
     /// Resets and starts timer.
     /// </summary>
