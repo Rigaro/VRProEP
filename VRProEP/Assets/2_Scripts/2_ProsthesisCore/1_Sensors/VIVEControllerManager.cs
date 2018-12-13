@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿//======= Copyright (c) Melbourne Robotics Lab, All rights reserved. ===============
+
+using UnityEngine;
 using Valve.VR;
 
 namespace VRProEP.ProsthesisCore

@@ -8,7 +8,8 @@ namespace VRProEP.ProsthesisCore
         OculusSensor,
         VIVEController,
         VIVETracker,
-        VirtualEncoder
+        VirtualEncoder,
+        WiFiSensor
     }
     /// <summary>
     /// Interface for sensor hardware the will provide input to the prosthesis system.
