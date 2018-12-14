@@ -7,7 +7,8 @@ namespace VRProEP.ProsthesisCore
         PointGradient,
         Integrator,
         LinearKinematicSynergy,
-        JacobianSynergy
+        JacobianSynergy,
+        EMGInterface
     }
     /// <summary>
     /// Abstract reference generator to add basic variables used across all generators.

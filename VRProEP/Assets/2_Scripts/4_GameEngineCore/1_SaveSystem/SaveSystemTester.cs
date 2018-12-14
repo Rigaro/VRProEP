@@ -73,10 +73,10 @@ public class SaveSystemTester : MonoBehaviour {
 
         // Create avatar configuration for user
         //avatarSystem.CreateAvatarCustomizationData(saveSystem.ActiveUser.id, "ResidualLimbUpperDefault", "SocketDefault", "ElbowDefault", "ForearmDefault", "HandDefault", AvatarType.Transhumeral);
-        //AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
-        AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
+        AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
+        //AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
 
-        /*
+        
         // Initialize prosthesis
         GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
         ConfigurableElbowManager elbowManager = prosthesisManagerGO.AddComponent<ConfigurableElbowManager>();
@@ -85,7 +85,7 @@ public class SaveSystemTester : MonoBehaviour {
         //elbowManager.ChangeSensor("VAL_SENSOR_VIVECONTROLLER");
         //elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
         elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
-        */
+        
 
     }
 
