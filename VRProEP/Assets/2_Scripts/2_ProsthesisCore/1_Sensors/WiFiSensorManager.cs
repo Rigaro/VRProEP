@@ -13,12 +13,15 @@ using System.Threading;
 
 namespace VRProEP.ProsthesisCore
 {
-    public enum WiFiSensorType
+    public enum UDPType
     {
         UDP_Async,
         UDP_Sync
     }
 
+    /// <summary>
+    /// Manager for WiFi sensors implemented with UDP protocol.
+    /// </summary>
     public abstract class WiFiSensorManager : ISensor, IConfigurable
     {
         // Generic sensor info
@@ -28,8 +31,7 @@ namespace VRProEP.ProsthesisCore
         // WiFi sensor info
         private IPAddress ip;
         private int port;
-        private WiFiSensorType wifiType;
-        private string command = "1";
+        private UDPType udpType;
 
         // UDP data
         private struct UdpState
@@ -41,16 +43,24 @@ namespace VRProEP.ProsthesisCore
 
         // Threading data
         private Thread thread;
+        private bool runThread = true;
 
         // Sensor data
         protected List<float> sensorValues;
 
+        // Commands and acknowledges
+        private string command = CONFIGURE;
+        private const string CONFIGURE = "config";
+        private const string READ = "read";
+        private const string ACKNOWLEDGE_CONFIGURE = "ack_config";
+        private const string ACKNOWLEDGE_CHANNEL = "ack_chan";
+
         /// <summary>
-        /// 
+        /// Manager for WiFi sensors implemented with UDP protocol.
         /// </summary>
-        /// <param name="ipAddress"></param>
-        /// <param name="port"></param>
-        /// <param name="sensorType"></param>
+        /// <param name="ipAddress">The IP address of the sensor to connect to.</param>
+        /// <param name="port">The UDP port to use for data transfer.</param>
+        /// <param name="sensorType">The type of sensor.</param>
         public WiFiSensorManager(string ipAddress, int port, SensorType sensorType)
         {
             if (channelSize <= 0)
@@ -59,7 +69,7 @@ namespace VRProEP.ProsthesisCore
             this.sensorType = sensorType;
 
             // Set WiFi data
-            wifiType = WiFiSensorType.UDP_Async;
+            udpType = UDPType.UDP_Async;
             ip = IPAddress.Parse(ipAddress);
             this.port = port;
             sensorValues = new List<float>(1);
@@ -73,14 +83,14 @@ namespace VRProEP.ProsthesisCore
         }
 
         /// <summary>
-        /// 
+        /// Manager for WiFi sensors implemented with UDP protocol.
         /// </summary>
-        /// <param name="ipAddress"></param>
-        /// <param name="port"></param>
-        /// <param name="channelSize"></param>
-        /// <param name="sensorType"></param>
-        /// <param name="wifiType"></param>
-        public WiFiSensorManager(string ipAddress, int port, int channelSize, SensorType sensorType, WiFiSensorType wifiType)
+        /// <param name="ipAddress">The IP address of the sensor to connect to.</param>
+        /// <param name="port">The UDP port to use for data transfer.</param>
+        /// <param name="channelSize">The number of sensor channels available.</param>
+        /// <param name="sensorType">The type of sensor.</param>
+        /// <param name="udpType">The type of UDP connection to use (Asynchronous or Synchronous).</param>
+        public WiFiSensorManager(string ipAddress, int port, int channelSize, SensorType sensorType, UDPType udpType)
         {
             // Set sensor data
             if (channelSize <= 0)
@@ -89,7 +99,7 @@ namespace VRProEP.ProsthesisCore
             this.sensorType = sensorType;
 
             // Set WiFi data
-            this.wifiType = wifiType;
+            this.udpType = udpType;
             ip = IPAddress.Parse(ipAddress);
             this.port = port;
             sensorValues = new List<float>(channelSize);
@@ -100,6 +110,15 @@ namespace VRProEP.ProsthesisCore
             // Create and start communication thread
             thread = new Thread(new ThreadStart(GetDataFromSensor));
             thread.Start();
+        }
+
+        /// <summary>
+        /// Stop the thread when destroying and close the UDP port.
+        /// </summary>
+        ~WiFiSensorManager()
+        {
+            runThread = false;
+            udpState.u.Close();
         }
 
         /// <summary>
@@ -127,25 +146,31 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         private void GetDataFromSensor()
         {
-            // Send a request for data to sensor.
-            Byte[] sendBytes = Encoding.ASCII.GetBytes(command);
-            udpState.u.Send(sendBytes, sendBytes.Length);
-
-            // Get data from sensor when available
-            if (udpState.u.Available > 0)
+            // Continuously read from sensor while active.
+            while(runThread)
             {
-                // Asynchronous type
-                if (wifiType == WiFiSensorType.UDP_Async)
-                {
-                    udpState.u.BeginReceive(new AsyncCallback(ReceiveDataCallback), udpState);
+                // Send a request for data to sensor.
+                Byte[] sendBytes = Encoding.ASCII.GetBytes(command);
+                udpState.u.Send(sendBytes, sendBytes.Length);
 
-                }
-                // Synchronous type (can block)
-                else
+                // Get data from sensor when available
+                if (udpState.u.Available > 0)
                 {
-                    Byte[] receivedBytes = udpState.u.Receive(ref udpState.e);
-                    ProcessDataReceived(receivedBytes);
+                    // Asynchronous type
+                    if (udpType == UDPType.UDP_Async)
+                    {
+                        udpState.u.BeginReceive(new AsyncCallback(ReceiveDataCallback), udpState);
+
+                    }
+                    // Synchronous type (can block)
+                    else
+                    {
+                        Byte[] receivedBytes = udpState.u.Receive(ref udpState.e);
+                        ProcessReceivedData(receivedBytes);
+                    }
                 }
+                // Sleep for 50ms.
+                Thread.Sleep(50);
             }
         }
 
@@ -157,49 +182,55 @@ namespace VRProEP.ProsthesisCore
         {
             // Receive and process data string.
             Byte[] receivedBytes = udpState.u.EndReceive(result, ref udpState.e);
-            ProcessDataReceived(receivedBytes);
+            ProcessReceivedData(receivedBytes);
         }
 
         /// <summary>
         /// Function that processes the received data.
         /// </summary>
         /// <param name="result">The received byte.</param>
-        private void ProcessDataReceived(Byte[] receivedBytes)
+        private void ProcessReceivedData(Byte[] receivedBytes)
         {
             // Decode data string.
-            string valuesString = Encoding.ASCII.GetString(receivedBytes);
+            string receivedString = Encoding.ASCII.GetString(receivedBytes);
 
-            // Split the multiple channels.
-            string[] values = valuesString.Split('%');
-            if (values.Length != ChannelSize)
-                throw new System.Exception("Channel splitting failed. The received data is: " + valuesString);
-
-            // Update the sensor values
-            int i = 0;
-            foreach (string value in values)
+            // Wait for configure acknowledgement
+            if (command == CONFIGURE && receivedString == ACKNOWLEDGE_CONFIGURE)
             {
-                sensorValues[i] = float.Parse(value);
-                i++;
+                command = channelSize.ToString(); // Set channel size;
             }
-        }
+            // When channel has been set, start reading
+            else if (receivedString.Equals(ACKNOWLEDGE_CHANNEL))
+            {
+                command = READ; // Start reading
+            }
+            else if (command.Equals(READ))
+            {
+                // Split the multiple channels.
+                string[] values = receivedString.Split('%');
+                if (values.Length != channelSize)
+                    throw new System.Exception("Channel splitting failed. The received data is: " + receivedString);
 
-        /// <summary>
-        /// Sets the command to be sent to the sensor.
-        /// </summary>
-        /// <param name="command">The command string to be sent to the sensor.</param>
-        protected void SetCommand(string command)
-        {
-            this.command = command;
-        }
+                // Update the sensor values and parse as float.
+                int i = 0;
+                foreach (string value in values)
+                {
+                    sensorValues[i] = float.Parse(value);
+                    i++;
+                }
+            }
 
+
+        }
+        
         /// <summary>
-        /// Gets the current sensor values.
+        /// Returns the current sensor values.
         /// </summary>
         /// <returns>The list with the sensor values.</returns>
-        protected List<float> GetCurrentSensorValues()
+        protected float[] GetCurrentSensorValues()
         {
             List<float> returnValues = new List<float>(sensorValues); // Avoid leakage
-            return returnValues;
+            return returnValues.ToArray();
         }
                
         /// <summary>
