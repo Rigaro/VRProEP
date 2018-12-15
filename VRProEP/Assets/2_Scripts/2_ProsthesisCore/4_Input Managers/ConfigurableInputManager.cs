@@ -44,6 +44,41 @@ namespace VRProEP.ProsthesisCore
         }
 
         /// <summary>
+        /// Input manager that allows for dynamic customization of sensors and reference generators.
+        /// </summary>
+        /// <param name="sensor">A sensor to initialize the manager with.</param>
+        /// <param name="referenceGenerator">A reference generator to initialize the manager with.</param>
+        public ConfigurableInputManager(List<ISensor> sensorList, List<IReferenceGenerator> referenceGeneratorList)
+        {
+            if (sensorList == null)
+                throw new System.ArgumentNullException("The provided sensor object is empty.");
+            if (referenceGeneratorList == null)
+                throw new System.ArgumentNullException("The provided reference generator object is empty.");
+
+            // Add all sensors in list.
+            foreach (ISensor sensor in sensorList)
+            {
+                if (sensor == null)
+                    throw new System.ArgumentNullException("The provided sensor object is empty.");
+
+                AddSensor(sensor);
+            }
+            // Set the first sensor as active
+            activeSensor = sensorList[0];
+
+            // Add all ref gens in list.
+            foreach (IReferenceGenerator refGen in referenceGeneratorList)
+            {
+                if (refGen == null)
+                    throw new System.ArgumentNullException("The provided reference generator object is empty.");
+
+                AddReferenceGenerator(refGen);
+            }
+            // Set the first ref gen as active
+            activeGenerator = referenceGeneratorList[0];
+        }
+
+        /// <summary>
         /// Sets the active sensor from the list of available sensors.
         /// </summary>
         /// <param name="sensorType">The sensor type to set as active.</param>

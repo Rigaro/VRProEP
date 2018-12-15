@@ -8,13 +8,15 @@ namespace VRProEP.ProsthesisCore
     public class EMGWiFiManager : WiFiSensorManager
     {
         private List<float> gains = new List<float>();
+        private List<float> lowerLimits = new List<float>();
 
         public EMGWiFiManager(string ipAddress, int port, int channelSize) : base(ipAddress, port, channelSize, SensorType.EMGWiFi, UDPType.UDP_Async)
         {
             // Set the default gains
             for (int i = 0; i < channelSize; i++)
             {
-                gains.Add(100.0f * 1023.0f);
+                gains.Add(100.0f / 1023.0f);
+                lowerLimits.Add(100.0f);
             }
         }
 
@@ -22,8 +24,9 @@ namespace VRProEP.ProsthesisCore
         /// Sets the gain for the given channel number and maximum sensor value achieved by the subject.
         /// </summary>
         /// <param name="channel">The channel number.</param>
-        /// <param name="maxValue">The maximum raw sensor value achieved by the subject.</param>
-        public void SetGain(int channel, int maxValue)
+        /// <param name="upperLimit">The maximum raw sensor value achieved by the subject.</param>
+        /// <param name="lowerLimit">The minimum raw sensor value achieved by the subject.</param>
+        public void ConfigureLimits(int channel, int upperLimit, int lowerLimit)
         {
             if (channel > ChannelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels. The number of available channels is: " + ChannelSize + ".");
@@ -31,12 +34,11 @@ namespace VRProEP.ProsthesisCore
                 throw new System.ArgumentOutOfRangeException("The channel number starts from 1.");            
 
 
-            if (maxValue <= 0)
-                throw new System.ArgumentOutOfRangeException("The maximum value should be between 1-1023. Can't divide by zero! And should have positive gains.");
-            else if (maxValue > 1023)
-                throw new System.ArgumentOutOfRangeException("The maximum value should be between 1-1023.");
+            if (upperLimit <= 0 || upperLimit > 1023 || lowerLimit < 0 || lowerLimit >= 1023 || lowerLimit == upperLimit)
+                throw new System.ArgumentOutOfRangeException("The limits should be between 0-1023 and cannot be equal.");
 
-            gains[channel] = 100.0f/maxValue;
+            gains[channel - 1] = 100.0f/(upperLimit - lowerLimit);
+            lowerLimits[channel - 1] = lowerLimit;
         }
 
         /// <summary>
@@ -110,7 +112,7 @@ namespace VRProEP.ProsthesisCore
             // Transform to 0-100 value.
             for (int i = 0; i < sensorValues.Length; i++)
             {
-                sensorValues[i] = gains[i] * sensorValues[i];
+                sensorValues[i] = gains[i] * (sensorValues[i] - lowerLimits[i]);
             }
             return sensorValues;
         }

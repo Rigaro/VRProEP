@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using VRProEP.GameEngineCore;
 
-public class LoadUser : MonoBehaviour {
+public class LoadUserMenu : MonoBehaviour {
 
     public GameObject mainMenu;
     public Dropdown availableUserDropdown;
@@ -14,6 +14,7 @@ public class LoadUser : MonoBehaviour {
     private int selectedUser = 0;
     private string userDataFolder;
 
+    // Get list of available users when enabling menu.
     private void OnEnable()
     {
         // Get the data folder
@@ -23,6 +24,8 @@ public class LoadUser : MonoBehaviour {
 
         // Get all available user IDs
         string[] availableUsers = Directory.GetDirectories(userDataFolder);
+        // Clear list
+        userList.Clear();
         // Add an empty one as default to force selection.
         userList.Add(string.Empty);
 
@@ -57,6 +60,8 @@ public class LoadUser : MonoBehaviour {
 
     public void ReturnToMainMenu()
     {
+        // Clear dropdown
+        availableUserDropdown.ClearOptions();
         // Return to main menu
         mainMenu.SetActive(true);
         gameObject.SetActive(false);

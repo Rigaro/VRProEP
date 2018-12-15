@@ -1,5 +1,4 @@
 ﻿//======= Copyright (c) Melbourne Robotics Lab, All rights reserved. ===============
-
 using System.Collections.Generic;
 
 // WiFi UDP includes
@@ -46,7 +45,7 @@ namespace VRProEP.ProsthesisCore
         private bool runThread = true;
 
         // Sensor data
-        protected List<float> sensorValues;
+        private List<float> sensorValues;
 
         // Commands and acknowledges
         private string command = CONFIGURE;
@@ -63,8 +62,6 @@ namespace VRProEP.ProsthesisCore
         /// <param name="sensorType">The type of sensor.</param>
         public WiFiSensorManager(string ipAddress, int port, SensorType sensorType)
         {
-            if (channelSize <= 0)
-                throw new System.ArgumentException("The given channel size is invalid. It should be greater than zero.");
             channelSize = 1;
             this.sensorType = sensorType;
 
@@ -72,7 +69,8 @@ namespace VRProEP.ProsthesisCore
             udpType = UDPType.UDP_Async;
             ip = IPAddress.Parse(ipAddress);
             this.port = port;
-            sensorValues = new List<float>(1);
+            sensorValues = new List<float>(channelSize);
+            sensorValues.Add(0.0f);
 
             // Connect
             EstablishConnection();
@@ -104,6 +102,12 @@ namespace VRProEP.ProsthesisCore
             this.port = port;
             sensorValues = new List<float>(channelSize);
 
+            // init sensor values
+            for (int i = 0; i< channelSize; i++)
+            {
+                sensorValues.Add(0.0f);
+            }
+
             // Connect
             EstablishConnection();
 
@@ -130,7 +134,7 @@ namespace VRProEP.ProsthesisCore
             IPEndPoint remoteIpEndPoint = new IPEndPoint(ip, port);
             // Create a UDP client with sensor configuration.
             UdpClient udpClient = new UdpClient(port);
-
+            
             // IPEndPoint object will allow us to read datagrams sent from any source.
 
             udpState = new UdpState();
@@ -193,7 +197,7 @@ namespace VRProEP.ProsthesisCore
         {
             // Decode data string.
             string receivedString = Encoding.ASCII.GetString(receivedBytes);
-
+            
             // Wait for configure acknowledgement
             if (command == CONFIGURE && receivedString == ACKNOWLEDGE_CONFIGURE)
             {
@@ -209,7 +213,7 @@ namespace VRProEP.ProsthesisCore
                 // Split the multiple channels.
                 string[] values = receivedString.Split('%');
                 if (values.Length != channelSize)
-                    throw new System.Exception("Channel splitting failed. The received data is: " + receivedString);
+                    throw new Exception("Channel splitting failed. The received data is: " + receivedString);
 
                 // Update the sensor values and parse as float.
                 int i = 0;
@@ -219,8 +223,6 @@ namespace VRProEP.ProsthesisCore
                     i++;
                 }
             }
-
-
         }
         
         /// <summary>
@@ -229,8 +231,30 @@ namespace VRProEP.ProsthesisCore
         /// <returns>The list with the sensor values.</returns>
         protected float[] GetCurrentSensorValues()
         {
-            List<float> returnValues = new List<float>(sensorValues); // Avoid leakage
+            List<float> returnValues = new List<float>(sensorValues);
             return returnValues.ToArray();
+        }
+
+        /// <summary>
+        /// Re-starts sensor readings if previously stopped.
+        /// </summary>
+        public void StartSensorReading()
+        {
+            if (runThread == false)
+            {
+                runThread = true;
+                thread.Start();
+            }
+            else
+                throw new Exception("The sensor is already running.");
+        }
+
+        /// <summary>
+        /// Terminates the sensor reading thread. Should be called when not using sensor anymore.
+        /// </summary>
+        public void StopSensorReading()
+        {
+            runThread = false;
         }
                
         /// <summary>

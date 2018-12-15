@@ -4,7 +4,7 @@ using TMPro;
 using VRProEP.GameEngineCore;
 using System;
 
-public class CreateNewUser : MonoBehaviour {
+public class CreateNewUserMenu : MonoBehaviour {
 
     public GameObject mainMenu;
 

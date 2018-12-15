@@ -67,7 +67,7 @@ namespace VRProEP.ProsthesisCore
             // Enable
             isConfigured = true;
         }
-
+        
         // Update the prosthesis state deterministically
         public void FixedUpdate()
         {
@@ -105,6 +105,24 @@ namespace VRProEP.ProsthesisCore
         public void ChangeReferenceGenerator(string rgName)
         {
             inputManager.Configure("CMD_SET_ACTIVE_REFGEN", rgName);
+        }
+
+        /// <summary>
+        /// Adds the given sensor to the elbow.
+        /// </summary>
+        /// <param name="sensors">The sensor.</param>
+        public void AddSensor(ISensor sensor)
+        {
+            inputManager.Configure("CMD_ADD_SENSOR", sensor);
+        }
+
+        /// <summary>
+        /// Adds the given reference generator to the elbow.
+        /// </summary>
+        /// <param name="refGens">The reference generator.</param>
+        public void AddRefGen(IReferenceGenerator refGen)
+        {
+            inputManager.Configure("CMD_ADD_REFGEN", refGen);
         }
     }
 }
