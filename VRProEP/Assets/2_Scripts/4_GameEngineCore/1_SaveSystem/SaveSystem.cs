@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using VRProEP.ExperimentCore;
+using VRProEP.ProsthesisCore;
 
 namespace VRProEP.GameEngineCore
 {
@@ -13,7 +14,6 @@ namespace VRProEP.GameEngineCore
     {
         private static UserData activeUser;
         private static string activeSaveFolder;
-        private static List<IExperimentLogger> activeLoggers = new List<IExperimentLogger>();
 
         // Encapsulation
         public static UserData ActiveUser
@@ -163,49 +163,12 @@ namespace VRProEP.GameEngineCore
             activeSaveFolder = userPath;
 
             // Re-initialize the experiment logger for the new active user.
-            foreach (IExperimentLogger logger in activeLoggers)
+            foreach (IExperimentLogger logger in ExperimentSystem.GetActiveLoggers())
                 logger.InitializeLog(activeSaveFolder);
             
             return loadedUserData;
         }
 
-        /// <summary>
-        /// Initializes and adds an experiment logger to the save system.
-        /// </summary>
-        /// <param name="logger">The logger to be initialized and added.</param>
-        public static void AddExperimentLogger(IExperimentLogger logger)
-        {
-            if (logger == null)
-                throw new System.ArgumentNullException("The provided logger is empty.");
-
-            logger.InitializeLog(activeSaveFolder);
-            activeLoggers.Add(logger);
-        }
-
-        /// <summary>
-        /// Gets an experiment logger by index from the list of active loggers.
-        /// </summary>
-        /// <param name="index">The logger index.</param>
-        /// <returns>The requested logger.</returns>
-        public static IExperimentLogger GetActiveLogger(int index)
-        {
-            if (index < 0 || index >= activeLoggers.Count)
-                throw new System.IndexOutOfRangeException("The provided index does exceeds the number of experiment loggers available.");
-
-            return activeLoggers[index];
-        }
-
-        /// <summary>
-        /// Closes all active loggers that have been added to the save system.
-        /// </summary>
-        public static void CloseAllExperimentLoggers()
-        {
-            foreach (IExperimentLogger logger in activeLoggers)
-            {
-                logger.SaveLog(); // Save data just in case it was not saved.
-                logger.CloseLog();
-            }
-        }
     }
 
 }
