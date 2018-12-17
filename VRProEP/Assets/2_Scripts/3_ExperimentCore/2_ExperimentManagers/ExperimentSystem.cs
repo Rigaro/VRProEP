@@ -8,8 +8,25 @@ namespace VRProEP.ExperimentCore
 {
     public static class ExperimentSystem
     {
+        private static string activeExperimentID;
         private static List<IExperimentLogger> activeLoggers = new List<IExperimentLogger>();
         private static List<ISensor> experimentSensors = new List<ISensor>();
+
+        public static string ActiveExperimentID
+        {
+            get
+            {
+                return activeExperimentID;
+            }
+        }
+
+        public static void SetActiveExperimentID(string id)
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("The provided experiment ID is empty.");
+
+            activeExperimentID = id;
+        }
 
         /// <summary>
         /// Initializes and adds an experiment logger to the save system.
@@ -32,7 +49,7 @@ namespace VRProEP.ExperimentCore
         public static IExperimentLogger GetActiveLogger(int index)
         {
             if (index < 0 || index >= activeLoggers.Count)
-                throw new System.IndexOutOfRangeException("The provided index does exceeds the number of experiment loggers available.");
+                throw new System.IndexOutOfRangeException("The provided index exceeds the number of experiment loggers available.");
 
             return activeLoggers[index];
         }
@@ -49,10 +66,49 @@ namespace VRProEP.ExperimentCore
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public static List<IExperimentLogger> GetActiveLoggers()
         {
             return activeLoggers;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static List<ISensor> GetActiveSensors()
+        {
+            return experimentSensors;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sensor"></param>
+        public static void AddSensor(ISensor sensor)
+        {
+            if (sensor == null)
+                throw new System.ArgumentNullException("The provided sensor is empty.");
+
+            experimentSensors.Add(sensor);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static ISensor GetActiveSensor(int index)
+        {
+            if (index < 0 || index >= experimentSensors.Count)
+                throw new System.IndexOutOfRangeException("The provided index exceeds the number of experiment sensors available.");
+
+            return experimentSensors[index];
+        }
+
     }
 
 }

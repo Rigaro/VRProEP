@@ -51,15 +51,16 @@ public class SaveSystemTester : MonoBehaviour {
         */
 
         // Create a data stream logger
-        DataStreamLogger logger = new DataStreamLogger("FSF", "Motion");
+        ExperimentSystem.SetActiveExperimentID("FSF");
+        DataStreamLogger logger = new DataStreamLogger("Motion");
         Debug.Log(logger.IsConfigured);
         Debug.Log(logger.GetActiveExperiment() + " " + logger.GetActiveLogType());
 
-        SaveSystem.AddExperimentLogger(logger);
+        ExperimentSystem.AddExperimentLogger(logger);
 
         Debug.Log(logger.IsConfigured);
 
-        IExperimentLogger tempLogger = SaveSystem.GetActiveLogger(0);
+        IExperimentLogger tempLogger = ExperimentSystem.GetActiveLogger(0);
 
         logger.ConfigureLogger("Test", "Score");
         Debug.Log(tempLogger.GetActiveExperiment() + " " + tempLogger.GetActiveLogType());
@@ -69,7 +70,7 @@ public class SaveSystemTester : MonoBehaviour {
         logger.AppendData("it, is, fucking, working, yeah");
         logger.SaveLog();
         logger.AddNewLogFile(1, 2, "did, it, overwrite, the, data");
-        SaveSystem.GetActiveLogger(0).CloseLog();
+        ExperimentSystem.GetActiveLogger(0).CloseLog();
 
         // Create avatar configuration for user
         //avatarSystem.CreateAvatarCustomizationData(saveSystem.ActiveUser.id, "ResidualLimbUpperDefault", "SocketDefault", "ElbowDefault", "ForearmDefault", "HandDefault", AvatarType.Transhumeral);
@@ -100,6 +101,6 @@ public class SaveSystemTester : MonoBehaviour {
 
     private void OnApplicationQuit()
     {
-        SaveSystem.GetActiveLogger(0).CloseLog();
+        ExperimentSystem.GetActiveLogger(0).CloseLog();
     }
 }

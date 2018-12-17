@@ -38,12 +38,13 @@ namespace VRProEP.ExperimentCore
 
         /// <summary>
         /// Experiment logger that handles data streams in text format.
+        /// Uses the active experiment ID from ExperimentSystem. This must be set beforehand.
         /// </summary>
         /// <param name="experimentID">The experiment identifier.</param>
         /// <param name="dataLogTypeID">The log type identifier.</param>
-        public DataStreamLogger(string experimentID, string dataLogTypeID)
+        public DataStreamLogger(string dataLogTypeID)
         {
-            activeExperimentID = experimentID;
+            activeExperimentID = ExperimentSystem.ActiveExperimentID;
             activeDataLogTypeID = dataLogTypeID;
         }
 
