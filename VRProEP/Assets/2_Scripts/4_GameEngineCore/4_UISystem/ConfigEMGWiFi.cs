@@ -9,6 +9,7 @@ public class ConfigEMGWiFi : MonoBehaviour
 {
 
     public GameObject sliderPrefab;
+    public TextMeshProUGUI logTMP;
 
     private EMGWiFiManager sensor;
     private List<GameObject> sliders = new List<GameObject>();
@@ -23,6 +24,15 @@ public class ConfigEMGWiFi : MonoBehaviour
     /// <param name="sensor">The EMG WiFi sensor to be configured.</param>
     public void SetSensorToConfigure(EMGWiFiManager sensor)
     {
+        // Clear sliders and values first.
+        foreach (GameObject slider in sliders)
+            Destroy(slider);
+
+        sliders.Clear();
+        maxValues.Clear();
+        minValues.Clear();
+        
+        // Create new sliders and attach sensor.
         for (int i = 0; i < sensor.ChannelSize; i++)
         {
             // Create sliders and initialize configuration parameters
@@ -74,6 +84,7 @@ public class ConfigEMGWiFi : MonoBehaviour
             {
                 sensor.ConfigureLimits(i + 1, (int)maxValues[i], (int)minValues[i]);
             }
+            StartCoroutine(DisplayInformationOnLog(2.0f, "Configured sensor."));
         }
     }
 
@@ -105,5 +116,13 @@ public class ConfigEMGWiFi : MonoBehaviour
             }
 
         }
+    }
+
+    public IEnumerator DisplayInformationOnLog(float time, string info)
+    {
+        string defaultText = logTMP.text;
+        logTMP.text += info;
+        yield return new WaitForSecondsRealtime(time);
+        logTMP.text = defaultText;
     }
 }

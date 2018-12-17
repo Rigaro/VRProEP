@@ -107,10 +107,10 @@ namespace VRProEP.ProsthesisCore
             if (!IsChannelValid(channel,ChannelType.Reference))
                 throw new System.ArgumentOutOfRangeException("The requested channel number is invalid.");
 
-            if (value > xMax[channel - 1] || value < xMin[channel - 1])
+            if (value > xMax[channel] || value < xMin[channel])
                 throw new System.ArgumentOutOfRangeException("The provided parameter exceeds the limits.");
 
-            xBar[channel - 1] = value;
+            xBar[channel] = value;
         }
 
         /// <summary>
@@ -124,10 +124,10 @@ namespace VRProEP.ProsthesisCore
                 throw new System.ArgumentOutOfRangeException("The length of the parameters does not match the number of reference channels.");
 
             // Check limits
-            int channel = 1;
+            int channel = 0;
             foreach (float value in refs)
             {
-                if (value > xMax[channel - 1] || value < xMin[channel - 1])
+                if (value > xMax[channel] || value < xMin[channel])
                     throw new System.ArgumentOutOfRangeException("A provided parameter exceeds the limits.");
 
                 channel++;
@@ -147,10 +147,10 @@ namespace VRProEP.ProsthesisCore
             if (!IsChannelValid(channel,ChannelType.Parameter))
                 throw new System.ArgumentOutOfRangeException("The requested channel number is invalid.");
 
-            if (parameter > thetaMax[channel - 1] || parameter < thetaMin[channel - 1])
+            if (parameter > thetaMax[channel] || parameter < thetaMin[channel])
                 throw new System.ArgumentOutOfRangeException("The provided parameter exceeds the limits.");
 
-            theta[channel - 1] = parameter;
+            theta[channel] = parameter;
         }
 
         /// <summary>
@@ -163,10 +163,10 @@ namespace VRProEP.ProsthesisCore
                 throw new System.ArgumentOutOfRangeException("The length of the parameters does not match.");
 
             // Check limits
-            int channel = 1;
+            int channel = 0;
             foreach (float value in parameters)
             {
-                if (value > thetaMax[channel - 1] || value < thetaMin[channel - 1])
+                if (value > thetaMax[channel] || value < thetaMin[channel])
                     throw new System.ArgumentOutOfRangeException("A provided parameter exceeds the limits.");
 
                 channel++;
@@ -186,7 +186,7 @@ namespace VRProEP.ProsthesisCore
             if (!IsChannelValid(channel,ChannelType.Parameter))
                 throw new System.ArgumentOutOfRangeException("The requested channel number is invalid.");
 
-            return theta[channel - 1];
+            return theta[channel];
         }
 
         /// <summary>
@@ -205,17 +205,17 @@ namespace VRProEP.ProsthesisCore
         /// <returns>True if valid.</returns>
         protected bool IsChannelValid(int channel, ChannelType type)
         {
-            if (channel <= 0)
+            if (channel < 0)
                 return false;
             // Check validity of the provided channel
             if (type == ChannelType.Reference)
             {
-                if (channel > channelSize)
+                if (channel >= channelSize)
                     return false;
             }
             else
             {
-                if (channel > parameterChannelSize)
+                if (channel >= parameterChannelSize)
                     return false;
             }
             return true;

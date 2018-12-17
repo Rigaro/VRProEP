@@ -30,15 +30,15 @@ namespace VRProEP.ProsthesisCore
         {
             if (channel > ChannelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels. The number of available channels is: " + ChannelSize + ".");
-            else if (channel <= 0)
-                throw new System.ArgumentOutOfRangeException("The channel number starts from 1.");            
+            else if (channel < 0)
+                throw new System.ArgumentOutOfRangeException("The channel number starts from 0.");            
 
 
             if (upperLimit <= 0 || upperLimit > 1023 || lowerLimit < 0 || lowerLimit >= 1023 || lowerLimit == upperLimit)
                 throw new System.ArgumentOutOfRangeException("The limits should be between 0-1023 and cannot be equal.");
 
-            gains[channel - 1] = 100.0f/(upperLimit - lowerLimit);
-            lowerLimits[channel - 1] = lowerLimit;
+            gains[channel] = 100.0f/(upperLimit - lowerLimit);
+            lowerLimits[channel] = lowerLimit;
         }
 
         /// <summary>
@@ -50,10 +50,10 @@ namespace VRProEP.ProsthesisCore
         {
             if (channel > ChannelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels. The number of available channels is: " + ChannelSize + ".");
-            else if (channel <= 0)
-                throw new System.ArgumentOutOfRangeException("The channel number starts from 1.");
+            else if (channel < 0)
+                throw new System.ArgumentOutOfRangeException("The channel number starts from 0.");
 
-            return GetAllRawData()[channel - 1];
+            return GetAllRawData()[channel];
         }
 
         /// <summary>
@@ -85,10 +85,10 @@ namespace VRProEP.ProsthesisCore
         {
             if (channel > ChannelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels. The number of available channels is: " + ChannelSize + ".");
-            else if (channel <= 0)
-                throw new System.ArgumentOutOfRangeException("The channel number starts from 1.");
+            else if (channel < 0)
+                throw new System.ArgumentOutOfRangeException("The channel number starts from 0.");
 
-            return GetAllProcessedData()[channel - 1];
+            return GetAllProcessedData()[channel];
         }
 
         /// <summary>

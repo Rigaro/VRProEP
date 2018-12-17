@@ -1,6 +1,8 @@
 ﻿//======= Copyright (c) Melbourne Robotics Lab, All rights reserved. ===============
 using System.IO;
+using System.Collections.Generic;
 using UnityEngine;
+using VRProEP.ProsthesisCore;
 
 
 namespace VRProEP.GameEngineCore
@@ -12,6 +14,7 @@ namespace VRProEP.GameEngineCore
     {
         private static readonly string dataFolder = Application.dataPath + "/UserData/";
         private static AvatarData activeAvatarData;
+        private static List<ISensor> availableSensors = new List<ISensor>();
 
         private static bool isAvatarAvaiable = false;
 
@@ -195,8 +198,30 @@ namespace VRProEP.GameEngineCore
                 if (ableBodiedTHFramePrefab == null)
                     throw new System.Exception("The requested tracker frame prefab was not found.");
 
-                GameObject residualLimbGO = Object.Instantiate(ableBodiedTHFramePrefab, trackerGO.transform, false);
+                //GameObject residualLimbGO = Object.Instantiate(ableBodiedTHFramePrefab, trackerGO.transform, false);
+                Object.Instantiate(ableBodiedTHFramePrefab, trackerGO.transform, false);
             }
+        }
+
+        /// <summary>
+        /// Adds a sensors to the list of available sensors.
+        /// </summary>
+        /// <param name="sensor">The given sensors.</param>
+        public static void AddAvailableSensor(ISensor sensor)
+        {
+            if (sensor == null)
+                throw new System.ArgumentNullException("The provided sensor is empty.");
+
+            availableSensors.Add(sensor);
+        }
+
+        /// <summary>
+        /// Returns a list with the available sensors.
+        /// </summary>
+        /// <returns>The list of sensors.</returns>
+        public static List<ISensor> GetAvailableSensors()
+        {
+            return availableSensors;
         }
     }
 }

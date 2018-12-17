@@ -16,10 +16,7 @@ public class MainMenu : MonoBehaviour {
     public TextMeshProUGUI sensorTMP;
     public bool createdUser = false;
     public bool loadedUser = false;
-
-    public List<ISensor> sensorList = new List<ISensor>();
-
-
+       
     public void OnEnable()
     {
         if (createdUser)
@@ -39,10 +36,10 @@ public class MainMenu : MonoBehaviour {
             activeUserTMP.text = "Active User: " + SaveSystem.ActiveUser.name + " " + SaveSystem.ActiveUser.familyName;
 
         // Display available sensors name.
-        if (sensorList.Count > 0)
+        if (AvatarSystem.GetAvailableSensors().Count > 0)
         {
             sensorTMP.text = "Sensors: \n";
-            foreach (ISensor sensor in sensorList)
+            foreach (ISensor sensor in AvatarSystem.GetAvailableSensors())
             {
                 sensorTMP.text = sensorTMP.text + sensor.GetSensorType().ToString() + "\n";
             }
@@ -53,7 +50,7 @@ public class MainMenu : MonoBehaviour {
 
     public void OnDestroy()
     {
-        foreach (ISensor sensor in sensorList)
+        foreach (ISensor sensor in AvatarSystem.GetAvailableSensors())
         {
             // Stop all wifi sensors
             if (sensor.GetSensorType() == SensorType.EMGWiFi)

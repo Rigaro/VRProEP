@@ -113,15 +113,15 @@ namespace VRProEP.ProsthesisCore
                 throw new System.ArgumentOutOfRangeException("The requested channel number is invalid.");
             
             // Integrate
-            float tempXBar = xBar[channel - 1] + ( Gains[channel - 1] * input[channel - 1] * Time.fixedDeltaTime );
+            float tempXBar = xBar[channel] + ( Gains[channel] * input[channel] * Time.fixedDeltaTime );
             // Saturate reference
-            if (tempXBar > xMax[channel - 1])
-                tempXBar = xMax[channel - 1];
-            else if (tempXBar < xMin[channel - 1])
-                tempXBar = xMin[channel - 1];
+            if (tempXBar > xMax[channel])
+                tempXBar = xMax[channel];
+            else if (tempXBar < xMin[channel])
+                tempXBar = xMin[channel];
 
-            xBar[channel - 1] = (float)System.Math.Round(tempXBar, 3);
-            return xBar[channel - 1];
+            xBar[channel] = (float)System.Math.Round(tempXBar, 3);
+            return xBar[channel];
 
         }
 
@@ -137,7 +137,7 @@ namespace VRProEP.ProsthesisCore
             if (!IsInputValid(input))
                 throw new System.ArgumentOutOfRangeException("The length of the parameters does not match the number of reference channels.");
 
-            for (int i = 1; i <= channelSize; i++)
+            for (int i = 0; i < channelSize; i++)
             {
                 UpdateReference(i, input);
             }

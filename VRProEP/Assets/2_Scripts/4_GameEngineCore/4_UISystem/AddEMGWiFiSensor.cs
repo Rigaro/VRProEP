@@ -5,6 +5,7 @@ using TMPro;
 using System.Net.Sockets;
 
 using VRProEP.ProsthesisCore;
+using VRProEP.GameEngineCore;
 
 public class AddEMGWiFiSensor : MonoBehaviour {
 
@@ -43,7 +44,7 @@ public class AddEMGWiFiSensor : MonoBehaviour {
         {
             // Create and add sensor
             EMGWiFiManager emgSensor = new EMGWiFiManager(ip, port, channelSize);
-            mainMenu.sensorList.Add(emgSensor);
+            AvatarSystem.AddAvailableSensor(emgSensor);
 
             // Return to settings menu.
             addSensorMenu.ReturnToSettingsMenu();

@@ -126,21 +126,21 @@ namespace VRProEP.ProsthesisCore
             // Generate and integrate reference.
             if (interfaceType == EMGInterfaceType.singleSiteProportional)
             {
-                tempXBar = xBar[channel - 1] + (Gains[channel - 1] * input[0] * Time.fixedDeltaTime);
+                tempXBar = xBar[channel] + (Gains[channel] * input[0] * Time.fixedDeltaTime);
             }
             else if (interfaceType == EMGInterfaceType.dualSiteProportional)
             {
-                tempXBar = xBar[channel - 1] + (Gains[channel - 1] * (input[0] - input[1]) * Time.fixedDeltaTime);
+                tempXBar = xBar[channel] + (Gains[channel] * (input[0] - input[1]) * Time.fixedDeltaTime);
             }
 
             // Saturate reference
-            if (tempXBar > xMax[channel - 1])
-                tempXBar = xMax[channel - 1];
-            else if (tempXBar < xMin[channel - 1])
-                tempXBar = xMin[channel - 1];
+            if (tempXBar > xMax[channel])
+                tempXBar = xMax[channel];
+            else if (tempXBar < xMin[channel])
+                tempXBar = xMin[channel];
 
-            xBar[channel - 1] = (float)System.Math.Round(tempXBar, 3);
-            return xBar[channel - 1];
+            xBar[channel] = (float)System.Math.Round(tempXBar, 3);
+            return xBar[channel];
 
         }
 
@@ -156,7 +156,7 @@ namespace VRProEP.ProsthesisCore
             if (!(input.Length == channelSize || input.Length/2 == channelSize))
                 throw new System.ArgumentOutOfRangeException("The length of the parameters does not match the number of reference channels.");
 
-            for (int i = 1; i <= channelSize; i++)
+            for (int i = 0; i < channelSize; i++)
             {
                 // Update each channel depending on type.
                 if (interfaceType == EMGInterfaceType.singleSiteProportional)
@@ -165,7 +165,7 @@ namespace VRProEP.ProsthesisCore
                 }
                 else if (interfaceType == EMGInterfaceType.dualSiteProportional)
                 {
-                    float[] tempIn = { input[2*i - 1], input[2*i] }; // Select the correct pair.
+                    float[] tempIn = { input[2*i], input[2*i + 1] }; // Select the correct pair.
                     UpdateReference(i, tempIn);
                 }
             }

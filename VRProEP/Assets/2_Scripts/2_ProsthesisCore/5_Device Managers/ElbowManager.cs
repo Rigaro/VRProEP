@@ -96,8 +96,8 @@ namespace VRProEP.ProsthesisCore
         /// <param name="reference">The reference for the device to track.</param>
         public override void UpdateState(int channel, float reference)
         {
-            if (channel != 1)
-                throw new System.ArgumentException("Only channel 1 available since 1DOF.");
+            if (channel != 0)
+                throw new System.ArgumentException("Only channel 0 available since 1DOF.");
 
             // Get sensor data
             float[] x = sensor.GetAllProcessedData();

@@ -97,11 +97,11 @@ namespace VRProEP.ProsthesisCore
             // Only update when enabled, otherwise just use the same fixed reference.
             if (isEnabled)
             {
-                xBar[channel - 1] = SingleDOFJacobianSynergy(channel, qShoulder, qElbow, qDotShoulder);
-                Debug.Log(Mathf.Rad2Deg * xBar[channel - 1]);
+                xBar[channel] = SingleDOFJacobianSynergy(channel, qShoulder, qElbow, qDotShoulder);
+                Debug.Log(Mathf.Rad2Deg * xBar[channel]);
             }
 
-            return xBar[channel - 1];
+            return xBar[channel];
 
         }
 
@@ -125,7 +125,7 @@ namespace VRProEP.ProsthesisCore
             for (int i = 1; i <= channelSize; i++)
             {
                 float[] newInput = { input[4 * i - 4], input[4 * i - 3], input[4 * i - 2], input[4 * i - 1] };
-                UpdateReference(i, newInput);
+                UpdateReference(i - 1, newInput);
             }
             return xBar;
         }
@@ -160,12 +160,12 @@ namespace VRProEP.ProsthesisCore
             // Compute the desired elbow velocity
             float qDotElbow = (upperArmLength * Mathf.Cos(qShoulder_DOM) + lowerArmLength * Mathf.Cos(qShoulder_DOM + qElbow)) * qDotShoulder / (lowerArmLength * Mathf.Cos(qShoulder_DOM + qElbow));
             // Integrate.
-            float tempXBar = xBar[channel - 1] - ( qDotElbow * Time.fixedDeltaTime );
+            float tempXBar = xBar[channel] - ( qDotElbow * Time.fixedDeltaTime );
             // Saturate reference
-            if (tempXBar > xMax[channel - 1])
-                tempXBar = xMax[channel - 1];
-            else if (tempXBar < xMin[channel - 1])
-                tempXBar = xMin[channel - 1];
+            if (tempXBar > xMax[channel])
+                tempXBar = xMax[channel];
+            else if (tempXBar < xMin[channel])
+                tempXBar = xMin[channel];
 
             return tempXBar;
         }

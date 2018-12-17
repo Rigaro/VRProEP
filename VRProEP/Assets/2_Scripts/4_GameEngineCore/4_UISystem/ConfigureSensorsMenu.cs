@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using VRProEP.ProsthesisCore;
+using VRProEP.GameEngineCore;
 
 public class ConfigureSensorsMenu : MonoBehaviour {
 
@@ -10,6 +12,7 @@ public class ConfigureSensorsMenu : MonoBehaviour {
     public GameObject settingsMenu;
     public Dropdown sensorDropdown;
     public GameObject EMGWiFiConfig;
+    public TextMeshProUGUI logTMP;
 
     private int selectedSensor = 0;
     private List<string> sensorList = new List<string>();
@@ -22,26 +25,39 @@ public class ConfigureSensorsMenu : MonoBehaviour {
         sensorList.Add(string.Empty);
 
         // Display available sensors name.
-        foreach (ISensor sensor in mainMenu.sensorList)
+        foreach (ISensor sensor in AvatarSystem.GetAvailableSensors())
         {
             sensorList.Add(sensor.GetSensorType().ToString());
         }
         // Add the options to the dropdown
         sensorDropdown.AddOptions(sensorList);
+        // And select the last choice.
+        UpdatedSelectedSensor(selectedSensor);
     }
 
+    /// <summary>
+    /// Handles when the sensor selection has been updated.
+    /// </summary>
+    /// <param name="selectedSensor"></param>
     public void UpdatedSelectedSensor(int selectedSensor)
     {
         this.selectedSensor = selectedSensor;
-
-        if (mainMenu.sensorList[selectedSensor - 1].GetSensorType() == SensorType.EMGWiFi)
-        {
-            EMGWiFiConfig.SetActive(true);
-            EMGWiFiConfig.GetComponent<ConfigEMGWiFi>().SetSensorToConfigure((EMGWiFiManager)mainMenu.sensorList[selectedSensor - 1]);
-        }
+        ISensor sensor;
+        // If selected a sensor extract it.
+        if (selectedSensor > 0)
+            sensor = AvatarSystem.GetAvailableSensors()[selectedSensor - 1];
         else
         {
+            // Deactivate all
             EMGWiFiConfig.SetActive(false);
+            return;
+        }
+
+        // Select the sensor config menu.
+        if (sensor.GetSensorType() == SensorType.EMGWiFi)
+        {
+            EMGWiFiConfig.SetActive(true);
+            EMGWiFiConfig.GetComponent<ConfigEMGWiFi>().SetSensorToConfigure((EMGWiFiManager)sensor);
         }
     }
 
@@ -49,6 +65,8 @@ public class ConfigureSensorsMenu : MonoBehaviour {
     {
         // Clear dropdown
         sensorDropdown.ClearOptions();
+        // Clear log
+        logTMP.text = "Log: ";
         // Return to main menu
         settingsMenu.SetActive(true);
         gameObject.SetActive(false);

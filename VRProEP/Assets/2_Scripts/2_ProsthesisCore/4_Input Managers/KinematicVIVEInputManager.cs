@@ -73,7 +73,7 @@ namespace VRProEP.ProsthesisCore
         {
             List<float> references = new List<float>(referenceGenerator.ChannelSize());
             // Generate all refereces
-            for (int i = 1; i <= referenceGenerator.ChannelSize(); i++)
+            for (int i = 0; i < referenceGenerator.ChannelSize(); i++)
             {
                 references.Add(GenerateReference(i));
             }

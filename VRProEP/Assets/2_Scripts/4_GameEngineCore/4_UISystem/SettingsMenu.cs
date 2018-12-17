@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using VRProEP.ProsthesisCore;
+using VRProEP.GameEngineCore;
 
 public class SettingsMenu : MonoBehaviour {
 
@@ -12,18 +13,16 @@ public class SettingsMenu : MonoBehaviour {
 
     public TextMeshProUGUI sensorTMP;
 
-    private ISensor sensorDebug;
+    //private ISensor sensorDebug;
 
     public void OnEnable()
     {
-        MainMenu mainMenuBehavior = mainMenu.GetComponent<MainMenu>();
         // Display available sensors name.
-        if (mainMenuBehavior.sensorList.Count > 0)
+        if (AvatarSystem.GetAvailableSensors().Count > 0)
         {
             sensorTMP.text = "Sensors: \n";
-            foreach (ISensor sensor in mainMenuBehavior.sensorList)
+            foreach (ISensor sensor in AvatarSystem.GetAvailableSensors())
             {
-                sensorDebug = sensor;
                 sensorTMP.text = sensorTMP.text + sensor.GetSensorType().ToString() + "\n";
             }
 

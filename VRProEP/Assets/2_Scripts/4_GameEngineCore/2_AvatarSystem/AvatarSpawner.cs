@@ -213,13 +213,13 @@ namespace VRProEP.GameEngineCore
             string objectDataAsJson_Upper = File.ReadAllText(objectPath_Upper);
             string objectDataAsJson_Lower = File.ReadAllText(objectPath_Lower);
             activeElbowData_Upper = JsonUtility.FromJson<AvatarObjectData>(objectDataAsJson_Upper);
-            activeElbowData_Lower = JsonUtility.FromJson<AvatarObjectData>(objectDataAsJson_Upper);
+            activeElbowData_Lower = JsonUtility.FromJson<AvatarObjectData>(objectDataAsJson_Lower);
 
             if (activeElbowData_Upper == null || activeElbowData_Lower == null)
                 throw new System.Exception("The requested elbow information was not found.");
 
             // Instantiate with prosthesis manager as parent.
-            float elbowOffset = (upperArmLength - (activeElbowData_Upper.dimensions.x / 2.0f));
+            //float elbowOffset = (upperArmLength - (activeElbowData_Upper.dimensions.x / 2.0f));
             GameObject elbowGO = Object.Instantiate(elbowPrefab, new Vector3(elbowPrefab.transform.localPosition.x, -upperArmLength, elbowPrefab.transform.localPosition.z), elbowPrefab.transform.localRotation, prosthesisManagerGO.transform);
                        
             // Attach the socket to thre residual limb through a fixed joint.

@@ -27,8 +27,8 @@ namespace VRProEP.GameEngineCore
             {
                 throw new System.NotImplementedException("Transradial avatars not yet implemented");
                 // Get the shoulder location object and initialize
-                GameObject residualLimbTracker = GameObject.FindGameObjectWithTag("ElbowLocation");
-                trackerTransform = residualLimbTracker.transform;
+                //GameObject residualLimbTracker = GameObject.FindGameObjectWithTag("ElbowLocation");
+                //trackerTransform = residualLimbTracker.transform;
             }
             //offset = new Vector3(0.0f, -transform.localScale.y, 0.0f);
         }

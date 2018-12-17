@@ -37,13 +37,13 @@ namespace VRProEP.ProsthesisCore
         public override float UpdateReference(int channel, float[] input)
         {
             // Check validity of the provided channel
-            if (channel > channelSize)
+            if (channel >= channelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels.");
-            else if (channel <= 0)
-                throw new System.ArgumentOutOfRangeException("The channel number should be greater than 0.");
+            else if (channel < 0)
+                throw new System.ArgumentOutOfRangeException("The channel number should be greater or equal to 0.");
 
-            xBar[channel - 1] = SingleDOFLinearSynergy(channel, input[channel - 1]);
-            return xBar[channel - 1];
+            xBar[channel] = SingleDOFLinearSynergy(channel, input[channel]);
+            return xBar[channel];
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace VRProEP.ProsthesisCore
             if (!IsInputValid(input))
                 throw new System.ArgumentOutOfRangeException("The length of the parameters does not match the number of reference channels.");
 
-            for (int i = 1; i <= channelSize; i++)
+            for (int i = 0; i < channelSize; i++)
             {
                 UpdateReference(i, input);
             }
@@ -75,12 +75,12 @@ namespace VRProEP.ProsthesisCore
         private float SingleDOFLinearSynergy(int channel, float input)
         {
             // Calculate reference from 1D synergy.
-            float tempXBar = xBar[channel - 1] + GetParameter(channel) * input * Time.fixedDeltaTime;
+            float tempXBar = xBar[channel] + GetParameter(channel) * input * Time.fixedDeltaTime;
             // Saturate reference
-            if (tempXBar > xMax[channel - 1])
-                tempXBar = xMax[channel - 1];
-            else if (tempXBar < xMin[channel - 1])
-                tempXBar = xMin[channel - 1];
+            if (tempXBar > xMax[channel])
+                tempXBar = xMax[channel];
+            else if (tempXBar < xMin[channel])
+                tempXBar = xMin[channel];
 
             return tempXBar;
         }

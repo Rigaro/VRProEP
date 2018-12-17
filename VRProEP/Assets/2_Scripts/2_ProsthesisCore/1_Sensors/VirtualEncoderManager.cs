@@ -56,10 +56,10 @@ namespace VRProEP.ProsthesisCore
         {
             if (channel > ChannelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels.");
-            else if (channel <= 0)
-                throw new System.ArgumentOutOfRangeException("The channel number should be greater than 0.");
+            else if (channel < 0)
+                throw new System.ArgumentOutOfRangeException("The channel number starts from 0.");
 
-            return GetAllRawData()[channel - 1];
+            return GetAllRawData()[channel];
 
         }
 
@@ -104,10 +104,10 @@ namespace VRProEP.ProsthesisCore
         {
             if (channel > ChannelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels.");
-            else if (channel <= 0)
-                throw new System.ArgumentOutOfRangeException("The channel number should be greater than 0.");
+            else if (channel < 0)
+                throw new System.ArgumentOutOfRangeException("The channel number starts from 0.");
 
-            return GetAllProcessedData()[channel - 1];
+            return GetAllProcessedData()[channel];
         }
 
         /// <summary>

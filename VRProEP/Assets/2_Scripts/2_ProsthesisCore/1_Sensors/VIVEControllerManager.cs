@@ -33,8 +33,8 @@ namespace VRProEP.ProsthesisCore
         {
             if (channel > ChannelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels. The number of available channels is: " + ChannelSize + ".");
-            else if (channel <= 0)
-                throw new System.ArgumentOutOfRangeException("The channel number starts from 1.");
+            else if (channel < 0)
+                throw new System.ArgumentOutOfRangeException("The channel number starts from 0.");
             
             // Check that the action set is active.
             if (!SteamVR_Input.vrproep.IsActive())
@@ -42,12 +42,12 @@ namespace VRProEP.ProsthesisCore
                 SteamVR_Input._default.Deactivate();
                 SteamVR_Input.vrproep.ActivatePrimary();
             }
-            if (channel == 1)
+            if (channel == 0)
             {
                 Vector2 trackpadValue = trackpadAction.GetAxis(SteamVR_Input_Sources.Any);
                 return trackpadValue.x;
             }
-            else if (channel == 2)
+            else if (channel == 1)
             {
                 bool buttonState = buttonAction.GetState(SteamVR_Input_Sources.Any);
                 if (buttonState)
@@ -133,8 +133,8 @@ namespace VRProEP.ProsthesisCore
         {
             if (channel > ChannelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels. The number of available channels is: " + ChannelSize + ".");
-            else if (channel <= 0)
-                throw new System.ArgumentOutOfRangeException("The channel number starts from 1.");
+            else if (channel < 0)
+                throw new System.ArgumentOutOfRangeException("The channel number starts from 0.");
 
             // Check that the action set is active.
             if (!SteamVR_Input.vrproep.IsActive())
@@ -143,12 +143,12 @@ namespace VRProEP.ProsthesisCore
                 SteamVR_Input.vrproep.ActivatePrimary();
             }
 
-            if (channel == 1)
+            if (channel == 0)
             {
                 Vector2 trackpadValue = trackpadAction.GetAxis(SteamVR_Input_Sources.Any);
                 return trackpadValue.x;
             }
-            else if (channel == 2)
+            else if (channel == 1)
             {
                 bool buttonState = buttonAction.GetState(SteamVR_Input_Sources.Any);
                 if (buttonState)

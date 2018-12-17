@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using VRProEP.ProsthesisCore;
 
 public class AddSensorMenu : MonoBehaviour {
@@ -10,6 +11,7 @@ public class AddSensorMenu : MonoBehaviour {
     public GameObject settingsMenu;
     public Dropdown sensorDropdown;
     public GameObject EMGWiFiMenu;
+    public TextMeshProUGUI logTMP;
 
     private List<string> sensorList = new List<string>();
     private int selectedSensor = 0;
@@ -31,6 +33,8 @@ public class AddSensorMenu : MonoBehaviour {
         }
         // Add the options to the dropdown
         sensorDropdown.AddOptions(sensorList);
+        // And select the last choice.
+        UpdatedSelectedSensor(selectedSensor);
     }
 
     public void UpdatedSelectedSensor(int selectedSensor)
@@ -50,6 +54,8 @@ public class AddSensorMenu : MonoBehaviour {
     {
         // Clear dropdown
         sensorDropdown.ClearOptions();
+        // Clear log
+        logTMP.text = "Log: ";
         // Return to main menu
         settingsMenu.SetActive(true);
         gameObject.SetActive(false);

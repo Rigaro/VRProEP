@@ -48,14 +48,14 @@ namespace VRProEP.ProsthesisCore
         {
             if (channel > ChannelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels.");
-            else if (channel <= 0)
-                throw new System.ArgumentOutOfRangeException("The channel range is 1-3.");
+            else if (channel < 0)
+                throw new System.ArgumentOutOfRangeException("The channel range is 0-2.");
 
             // Get the 3-axis angular velocity
             Vector3 angVel = OVRInput.GetLocalControllerAngularVelocity(controller);
 
             // Select channel to return.
-            return angVel[channel-1];
+            return angVel[channel];
         }
 
         /// <summary>
