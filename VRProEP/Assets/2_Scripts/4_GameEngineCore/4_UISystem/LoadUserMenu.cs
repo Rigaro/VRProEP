@@ -8,6 +8,7 @@ using VRProEP.GameEngineCore;
 public class LoadUserMenu : MonoBehaviour {
 
     public GameObject mainMenu;
+    public GameObject userOptionsMenu;
     public Dropdown availableUserDropdown;
 
     private List<string> userList = new List<string>();
@@ -48,6 +49,7 @@ public class LoadUserMenu : MonoBehaviour {
     {
         if (selectedUser != 0)
         {
+            // Load data
             SaveSystem.LoadUserData(userList[selectedUser]);
 
             // Return to main menu
@@ -56,6 +58,12 @@ public class LoadUserMenu : MonoBehaviour {
         }
         else
             StartCoroutine(mainMenu.GetComponent<MainMenu>().DisplayInformationOnLog(3.0f, "Select a valid user."));
+    }
+
+    public void ReturnToUserOptionsMenu()
+    {
+        userOptionsMenu.SetActive(true);
+        gameObject.SetActive(false);
     }
 
     public void ReturnToMainMenu()

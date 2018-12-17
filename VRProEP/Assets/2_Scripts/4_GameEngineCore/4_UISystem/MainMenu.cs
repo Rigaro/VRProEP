@@ -4,19 +4,37 @@ using TMPro;
 using UnityEngine;
 using VRProEP.GameEngineCore;
 using VRProEP.ProsthesisCore;
+using VRProEP.ExperimentCore;
 using Valve.VR;
 
 public class MainMenu : MonoBehaviour {
 
-    public GameObject createNewUserMenu;
-    public GameObject loadUserMenu;
-    public GameObject settingsMenu;
+    public GameObject userOptionsMenu;
+    public GameObject avatarOptionsButton;
+    public GameObject avatarOptionsMenu;
+    public GameObject sensorOptionsButton;
+    public GameObject sensorOptionsMenu;
+    public GameObject sceneSelectionButton;
+    public GameObject sceneSelectionMenu;
     public TextMeshProUGUI logTMP;
     public TextMeshProUGUI activeUserTMP;
     public TextMeshProUGUI sensorTMP;
+    public TextMeshProUGUI experimentSensorsTMP;
     public bool createdUser = false;
     public bool loadedUser = false;
-       
+
+    /*
+    public GameObject playerAblePrefab;
+    public GameObject playerAbleTHPrefab;
+    public GameObject playerAbleTRPrefab;
+    public GameObject playerTHPrefab;
+    public GameObject playerTRPrefab;
+    public GameObject avatarObject;
+    */
+    private bool userAvailable = false;
+    private bool avatarAvailable = false;
+    private GameObject playerGO;
+    
     public void OnEnable()
     {
         if (createdUser)
@@ -33,24 +51,50 @@ public class MainMenu : MonoBehaviour {
 
         // Display active user name.
         if (SaveSystem.ActiveUser != null)
-            activeUserTMP.text = "Active User: " + SaveSystem.ActiveUser.name + " " + SaveSystem.ActiveUser.familyName;
+        {
+            activeUserTMP.text = "Active User: \n" + SaveSystem.ActiveUser.name + " " + SaveSystem.ActiveUser.familyName;
+            userAvailable = true;
+        }
 
-        // Display available sensors name.
-        if (AvatarSystem.GetAvailableSensors().Count > 0)
+        // Display available user sensors name.
+        if (AvatarSystem.GetActiveSensors().Count > 0)
         {
             sensorTMP.text = "Sensors: \n";
-            foreach (ISensor sensor in AvatarSystem.GetAvailableSensors())
+            foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
             {
                 sensorTMP.text = sensorTMP.text + sensor.GetSensorType().ToString() + "\n";
             }
 
         }
 
+        // Display available experiment sensors name.
+        if (ExperimentSystem.GetActiveSensors().Count > 0)
+        {
+            experimentSensorsTMP.text = "Experiment Sensors: \n";
+            foreach (ISensor sensor in ExperimentSystem.GetActiveSensors())
+            {
+                experimentSensorsTMP.text = experimentSensorsTMP.text + sensor.GetSensorType().ToString() + "\n";
+            }
+
+        }
+
+        // Conditional menus
+        // Show avatar menu when there is an available user.
+        if (userAvailable)
+            avatarOptionsButton.SetActive(true);
+
+        // Show sensors menu when there is an available avatar.
+        if (avatarAvailable)
+        {
+            sensorOptionsButton.SetActive(true);
+            sceneSelectionButton.SetActive(true);
+        }
+
     }
 
     public void OnDestroy()
     {
-        foreach (ISensor sensor in AvatarSystem.GetAvailableSensors())
+        foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
         {
             // Stop all wifi sensors
             if (sensor.GetSensorType() == SensorType.EMGWiFi)
@@ -61,32 +105,33 @@ public class MainMenu : MonoBehaviour {
         }
     }
 
-    public void CreateNewUser()
+    public void LoadUserOptionsMenu()
     {
         // Clear log
         StopAllCoroutines();
-        logTMP.text = "Log: ";
+        logTMP.text = "Log: \n";
         // Switch
-        createNewUserMenu.SetActive(true);
+        userOptionsMenu.SetActive(true);
         gameObject.SetActive(false);
     }
 
-    public void LoadUser()
+    public void LoadAvatarOptionsMenu()
     {
         // Clear log
         StopAllCoroutines();
-        logTMP.text = "Log: ";
+        logTMP.text = "Log: \n";
         // Switch
-        loadUserMenu.SetActive(true);
+        avatarOptionsMenu.SetActive(true);
         gameObject.SetActive(false);
     }
+
     public void SettingsMenu()
     {
         // Clear log
         StopAllCoroutines();
-        logTMP.text = "Log: ";
+        logTMP.text = "Log: \n";
         // Switch
-        settingsMenu.SetActive(true);
+        sensorOptionsMenu.SetActive(true);
         gameObject.SetActive(false);
     }
 

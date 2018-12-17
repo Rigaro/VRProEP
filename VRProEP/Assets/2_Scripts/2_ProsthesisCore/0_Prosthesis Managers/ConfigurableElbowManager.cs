@@ -48,8 +48,8 @@ namespace VRProEP.ProsthesisCore
             elbowManager.Axis = elbowJoint.axis;
 
             // Add the created sensors to the list of available sensors.
-            AvatarSystem.AddAvailableSensor(trackerManager);
-            AvatarSystem.AddAvailableSensor(virtualEncoder);
+            AvatarSystem.AddActiveSensor(trackerManager);
+            AvatarSystem.AddActiveSensor(virtualEncoder);
 
             // Add a LKS to the prosthesis
             float[] theta = { -2.5f };

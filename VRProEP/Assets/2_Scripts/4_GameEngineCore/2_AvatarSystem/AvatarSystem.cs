@@ -14,8 +14,9 @@ namespace VRProEP.GameEngineCore
     {
         private static readonly string dataFolder = Application.dataPath + "/UserData/";
         private static AvatarData activeAvatarData;
-        private static List<ISensor> availableSensors = new List<ISensor>();
+        private static List<ISensor> activeSensors = new List<ISensor>();
 
+        private static bool isPlayerAvailable = false;
         private static bool isAvatarAvaiable = false;
 
         public static bool IsAvatarAvaiable
@@ -23,6 +24,14 @@ namespace VRProEP.GameEngineCore
             get
             {
                 return isAvatarAvaiable;
+            }
+        }
+
+        public static bool IsPlayerAvailable
+        {
+            get
+            {
+                return isPlayerAvailable;
             }
         }
 
@@ -111,18 +120,37 @@ namespace VRProEP.GameEngineCore
         /// <param name="avatarType">The type of avatar to load.</param>
         public static void LoadAvatar(UserData userData, AvatarType avatarType)
         {
-            // Get avatar data for user and load the tracking frame
+            if (!IsPlayerAvailable)
+                throw new System.Exception("Player object has not been loaded. First load the player object.");
+
+            // Destroy avatar gameobject if already available.
+            GameObject avatarGO = GameObject.FindGameObjectWithTag("Avatar");
+            if (avatarGO != null)
+            {
+                GameObject.DestroyImmediate(avatarGO);
+                isAvatarAvaiable = false;
+            }
+
+            // Get avatar data for user
             activeAvatarData = LoadAvatarCustomizationData(userData.id);
-            LoadTrackerFrame(avatarType);
+
+            // Load avatar holder object prefab and check validity
+            GameObject avatarPrefab = Resources.Load<GameObject>("Avatars/Avatar");
+            if (avatarPrefab == null)
+                throw new System.Exception("The avatar prefab was not found.");
+            // Instantiate
+            Object.Instantiate(avatarPrefab);
 
             // Select avatar type, customize tracking frame and spawn avatar.
             if (avatarType == AvatarType.Transhumeral)
             {
+                LoadTrackerFrame(userData.type, avatarType);
                 CustomizeTrackingFrame(userData, avatarType);
                 AvatarSpawner.SpawnTranshumeralAvatar(userData, activeAvatarData);
             }
             else if (avatarType == AvatarType.Transradial)
             {
+                LoadTrackerFrame(userData.type, avatarType);
                 CustomizeTrackingFrame(userData, avatarType);
                 AvatarSpawner.SpawnTransradialAvatar(userData, activeAvatarData);
             }
@@ -181,20 +209,73 @@ namespace VRProEP.GameEngineCore
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userType"></param>
+        /// <param name="avatarType"></param>
+        public static void LoadPlayer(UserType userType, AvatarType avatarType)
+        {
+            // Destroy player gameobject if already available.
+            GameObject playerGO = GameObject.FindGameObjectWithTag("Player");
+            if (playerGO != null)
+            {
+                Object.DestroyImmediate(playerGO);
+                isPlayerAvailable = false;
+            }
+
+            switch (userType)
+            {
+                case UserType.AbleBodied:
+                    switch (avatarType)
+                    {
+                        case AvatarType.AbleBodied:
+                            // Load prefab and check validity
+                            GameObject playerAblePrefab = Resources.Load<GameObject>("Players/PlayerAble");
+                            if (playerAblePrefab == null)
+                                throw new System.Exception("The requested player prefab was not found.");
+
+                            // Instantiate
+                            Object.Instantiate(playerAblePrefab);
+                            isPlayerAvailable = true;
+                            break;
+                        case AvatarType.Transhumeral:
+                            // Load prefab and check validity
+                            GameObject playerAbleTHPrefab = Resources.Load<GameObject>("Players/PlayerAbleTH");
+                            if (playerAbleTHPrefab == null)
+                                throw new System.Exception("The requested player prefab was not found.");
+
+                            // Instantiate
+                            Object.Instantiate(playerAbleTHPrefab);
+                            isPlayerAvailable = true;
+                            break;
+                        default:
+                            throw new System.Exception("The given user and avatar type combination is not available.");
+                    }
+                    break;
+                case UserType.Transhumeral:
+                    break;
+                case UserType.Transradial:
+                    break;
+                default:
+                    throw new System.Exception("The given user type is not available.");
+            }
+        }
+
+        /// <summary>
         /// Loads the tracking frame for a given avatar type and attaches it to the residual limb tracker.
         /// </summary>
         /// <param name="avatarType"></param>
-        private static void LoadTrackerFrame(AvatarType avatarType)
+        private static void LoadTrackerFrame(UserType userType, AvatarType avatarType)
         {
             GameObject trackerGO = GameObject.FindGameObjectWithTag("ResidualLimbTracker");
 
             if (trackerGO == null)
-                throw new System.Exception("The player GameObject was not found.");
+                throw new System.Exception("The residual limb traker GameObject was not found.");
 
-            if (avatarType == AvatarType.Transhumeral)
+            if (userType == UserType.AbleBodied && avatarType == AvatarType.Transhumeral)
             {
                 // Load residual limb from avatar folder and check whether successfully loaded.
-                GameObject ableBodiedTHFramePrefab = Resources.Load<GameObject>("TrackingFrames/AbleBodiedFrameTH");
+                GameObject ableBodiedTHFramePrefab = Resources.Load<GameObject>("Frames/AbleBodiedFrameTH");
                 if (ableBodiedTHFramePrefab == null)
                     throw new System.Exception("The requested tracker frame prefab was not found.");
 
@@ -202,26 +283,26 @@ namespace VRProEP.GameEngineCore
                 Object.Instantiate(ableBodiedTHFramePrefab, trackerGO.transform, false);
             }
         }
-
+        
         /// <summary>
         /// Adds a sensors to the list of available sensors.
         /// </summary>
         /// <param name="sensor">The given sensors.</param>
-        public static void AddAvailableSensor(ISensor sensor)
+        public static void AddActiveSensor(ISensor sensor)
         {
             if (sensor == null)
                 throw new System.ArgumentNullException("The provided sensor is empty.");
 
-            availableSensors.Add(sensor);
+            activeSensors.Add(sensor);
         }
 
         /// <summary>
         /// Returns a list with the available sensors.
         /// </summary>
         /// <returns>The list of sensors.</returns>
-        public static List<ISensor> GetAvailableSensors()
+        public static List<ISensor> GetActiveSensors()
         {
-            return availableSensors;
+            return activeSensors;
         }
     }
 }

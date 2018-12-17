@@ -13,7 +13,6 @@ public class AddEMGWiFiSensor : MonoBehaviour {
     private int port = 0;
     private int channelSize = 0;
 
-    public MainMenu mainMenu;
     public TextMeshProUGUI logTMP;
     public AddSensorMenu addSensorMenu;
 
@@ -44,7 +43,7 @@ public class AddEMGWiFiSensor : MonoBehaviour {
         {
             // Create and add sensor
             EMGWiFiManager emgSensor = new EMGWiFiManager(ip, port, channelSize);
-            AvatarSystem.AddAvailableSensor(emgSensor);
+            AvatarSystem.AddActiveSensor(emgSensor);
 
             // Return to settings menu.
             addSensorMenu.ReturnToSettingsMenu();

@@ -135,13 +135,14 @@ GameObject:
   m_Component:
   - component: {fileID: 4835920975817602}
   - component: {fileID: 114398958539666124}
+  - component: {fileID: 114501819747063714}
   m_Layer: 0
   m_Name: ResidualLimbTracker
   m_TagString: ResidualLimbTracker
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1267968812902990
 GameObject:
   m_ObjectHideFlags: 1
@@ -584,8 +585,8 @@ GameObject:
   - component: {fileID: 4434616526954014}
   - component: {fileID: 114353868214007736}
   m_Layer: 0
-  m_Name: Player
-  m_TagString: Untagged
+  m_Name: PlayerAble
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -819,7 +820,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1931194108074812}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.711, y: 0, z: -3.461}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4636045217247218}
@@ -1718,6 +1719,18 @@ MonoBehaviour:
   disableAllOtherActionSets: 0
   activateOnStart: 1
   deactivateOnDestroy: 1
+--- !u!114 &114501819747063714
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1246640003275454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3c1afeda5e545e0b19add5373896d2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AnchorPosition: 1
 --- !u!114 &114586941247518220
 MonoBehaviour:
   m_ObjectHideFlags: 1

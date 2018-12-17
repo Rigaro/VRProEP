@@ -25,7 +25,7 @@ public class ConfigureSensorsMenu : MonoBehaviour {
         sensorList.Add(string.Empty);
 
         // Display available sensors name.
-        foreach (ISensor sensor in AvatarSystem.GetAvailableSensors())
+        foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
         {
             sensorList.Add(sensor.GetSensorType().ToString());
         }
@@ -45,7 +45,7 @@ public class ConfigureSensorsMenu : MonoBehaviour {
         ISensor sensor;
         // If selected a sensor extract it.
         if (selectedSensor > 0)
-            sensor = AvatarSystem.GetAvailableSensors()[selectedSensor - 1];
+            sensor = AvatarSystem.GetActiveSensors()[selectedSensor - 1];
         else
         {
             // Deactivate all

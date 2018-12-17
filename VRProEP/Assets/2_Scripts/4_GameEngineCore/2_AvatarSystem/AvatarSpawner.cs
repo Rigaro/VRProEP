@@ -84,7 +84,7 @@ namespace VRProEP.GameEngineCore
         /// <returns>The instantiated hand GameObject.</returns>
         private static GameObject LoadAbleHand(bool lefty)
         {
-            GameObject playerGO = GameObject.Find("Player");
+            GameObject playerGO = GameObject.FindGameObjectWithTag("Player");
 
             if (playerGO == null)
                 throw new System.Exception("The player GameObject was not found.");

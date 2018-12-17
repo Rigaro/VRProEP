@@ -7,6 +7,7 @@ using System;
 public class CreateNewUserMenu : MonoBehaviour {
 
     public GameObject mainMenu;
+    public GameObject userOptionsMenu;
 
     private UserData userData = new UserData();
     private int dataSet = 0;
@@ -111,6 +112,12 @@ public class CreateNewUserMenu : MonoBehaviour {
                 StartCoroutine(mainMenu.GetComponent<MainMenu>().DisplayInformationOnLog(3.0f, e.Message));                
             }
         }
+    }
+
+    public void ReturnToUserOptionsMenu()
+    {
+        userOptionsMenu.SetActive(true);
+        gameObject.SetActive(false);
     }
 
     public void ReturnToMainMenu()

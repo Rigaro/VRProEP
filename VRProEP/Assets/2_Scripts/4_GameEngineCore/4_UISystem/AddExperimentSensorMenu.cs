@@ -5,12 +5,11 @@ using UnityEngine.UI;
 using TMPro;
 using VRProEP.ProsthesisCore;
 
-public class AddSensorMenu : MonoBehaviour {
-
-
+public class AddExperimentSensorMenu : MonoBehaviour {
+    
     public GameObject settingsMenu;
     public Dropdown sensorDropdown;
-    public GameObject EMGWiFiMenu;
+    public GameObject VIVETrackerMenu;
     public TextMeshProUGUI logTMP;
 
     private List<string> sensorList = new List<string>();
@@ -37,23 +36,19 @@ public class AddSensorMenu : MonoBehaviour {
         UpdatedSelectedSensor(selectedSensor);
     }
 
-    /// <summary>
-    /// Updates the selected sensor and enables menu.
-    /// </summary>
-    /// <param name="selectedSensor"></param>
     public void UpdatedSelectedSensor(int selectedSensor)
     {
         this.selectedSensor = selectedSensor;
 
-        if (selectedSensor == ((int)SensorType.EMGWiFi + 1))
-            EMGWiFiMenu.SetActive(true);
+        if (selectedSensor == ((int)SensorType.VIVETracker + 1))
+            VIVETrackerMenu.SetActive(true);
         else
         {
-            EMGWiFiMenu.SetActive(false);
+            VIVETrackerMenu.SetActive(false);
         }
     }
-    
-    
+
+
     public void ReturnToSettingsMenu()
     {
         // Clear dropdown
