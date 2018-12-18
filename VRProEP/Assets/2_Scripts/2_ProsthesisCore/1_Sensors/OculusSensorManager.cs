@@ -46,7 +46,7 @@ namespace VRProEP.ProsthesisCore
         /// <returns>Raw sensor data for the given channel.</returns>
         public override float GetRawData(int channel)
         {
-            if (channel > ChannelSize)
+            if (channel >= ChannelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels.");
             else if (channel < 0)
                 throw new System.ArgumentOutOfRangeException("The channel range is 0-2.");

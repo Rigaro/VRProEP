@@ -28,7 +28,7 @@ namespace VRProEP.ProsthesisCore
         /// <param name="lowerLimit">The minimum raw sensor value achieved by the subject.</param>
         public void ConfigureLimits(int channel, int upperLimit, int lowerLimit)
         {
-            if (channel > ChannelSize)
+            if (channel >= ChannelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels. The number of available channels is: " + ChannelSize + ".");
             else if (channel < 0)
                 throw new System.ArgumentOutOfRangeException("The channel number starts from 0.");            
@@ -48,7 +48,7 @@ namespace VRProEP.ProsthesisCore
         /// <returns>EMG amplitude data for the given channel.</returns>
         public override float GetRawData(int channel)
         {
-            if (channel > ChannelSize)
+            if (channel >= ChannelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels. The number of available channels is: " + ChannelSize + ".");
             else if (channel < 0)
                 throw new System.ArgumentOutOfRangeException("The channel number starts from 0.");
@@ -83,7 +83,7 @@ namespace VRProEP.ProsthesisCore
         /// <returns>EMG amplitude data for the given channel.</returns>
         public override float GetProcessedData(int channel)
         {
-            if (channel > ChannelSize)
+            if (channel >= ChannelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels. The number of available channels is: " + ChannelSize + ".");
             else if (channel < 0)
                 throw new System.ArgumentOutOfRangeException("The channel number starts from 0.");

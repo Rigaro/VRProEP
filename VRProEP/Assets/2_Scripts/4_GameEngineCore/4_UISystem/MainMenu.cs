@@ -14,8 +14,8 @@ public class MainMenu : MonoBehaviour {
     public GameObject avatarOptionsMenu;
     public GameObject sensorOptionsButton;
     public GameObject sensorOptionsMenu;
-    public GameObject sceneSelectionButton;
-    public GameObject sceneSelectionMenu;
+    public GameObject modeSelectionButton;
+    public GameObject modeSelectionMenu;
     public TextMeshProUGUI logTMP;
     public TextMeshProUGUI activeUserTMP;
     public TextMeshProUGUI sensorTMP;
@@ -31,8 +31,6 @@ public class MainMenu : MonoBehaviour {
     public GameObject playerTRPrefab;
     public GameObject avatarObject;
     */
-    private bool userAvailable = false;
-    private bool avatarAvailable = false;
     private GameObject playerGO;
     
     public void OnEnable()
@@ -50,10 +48,9 @@ public class MainMenu : MonoBehaviour {
         }
 
         // Display active user name.
-        if (SaveSystem.ActiveUser != null)
+        if (SaveSystem.IsUserAvailable)
         {
             activeUserTMP.text = "Active User: \n" + SaveSystem.ActiveUser.name + " " + SaveSystem.ActiveUser.familyName;
-            userAvailable = true;
         }
 
         // Display available user sensors name.
@@ -80,14 +77,14 @@ public class MainMenu : MonoBehaviour {
 
         // Conditional menus
         // Show avatar menu when there is an available user.
-        if (userAvailable)
+        if (SaveSystem.IsUserAvailable)
             avatarOptionsButton.SetActive(true);
 
         // Show sensors menu when there is an available avatar.
-        if (avatarAvailable)
+        if (AvatarSystem.IsPlayerAvailable && AvatarSystem.IsAvatarAvaiable)
         {
             sensorOptionsButton.SetActive(true);
-            sceneSelectionButton.SetActive(true);
+            modeSelectionButton.SetActive(true);
         }
 
     }
@@ -125,7 +122,7 @@ public class MainMenu : MonoBehaviour {
         gameObject.SetActive(false);
     }
 
-    public void SettingsMenu()
+    public void LoadSensorOptionsMenu()
     {
         // Clear log
         StopAllCoroutines();
@@ -135,11 +132,16 @@ public class MainMenu : MonoBehaviour {
         gameObject.SetActive(false);
     }
 
-    public void LoadPlayground()
+    public void LoadModeSelectionMenu()
     {
-        SteamVR_LoadLevel.Begin("DemoPlayground");
+        // Clear log
+        StopAllCoroutines();
+        logTMP.text = "Log: \n";
+        // Switch
+        modeSelectionMenu.SetActive(true);
+        gameObject.SetActive(false);
     }
-    
+
     public IEnumerator DisplayInformationOnLog(float time, string info)
     {
         string defaultText = logTMP.text;

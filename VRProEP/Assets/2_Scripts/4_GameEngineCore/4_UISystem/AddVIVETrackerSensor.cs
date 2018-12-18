@@ -51,7 +51,7 @@ public class AddVIVETrackerSensor : MonoBehaviour {
 
     public void AddVIVETracker()
     {
-        if ((int)selectedDevice > 5)
+        if ((int)selectedDevice > 4)
         {
             // Instantiate a new VIVETracker with Player as parent.
             GameObject playerGO = GameObject.FindGameObjectWithTag("Player");

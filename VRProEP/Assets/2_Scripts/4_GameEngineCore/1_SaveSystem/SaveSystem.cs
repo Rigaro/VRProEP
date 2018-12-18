@@ -14,6 +14,7 @@ namespace VRProEP.GameEngineCore
     {
         private static UserData activeUser;
         private static string activeSaveFolder;
+        private static bool isUserAvailable;
 
         // Encapsulation
         public static UserData ActiveUser
@@ -30,7 +31,14 @@ namespace VRProEP.GameEngineCore
                 return activeSaveFolder;
             }
         }
-        
+        public static bool IsUserAvailable
+        {
+            get
+            {
+                return isUserAvailable;
+            }
+        }
+
         /// <summary>
         /// Creates a new user data object with the given data, creates a folder for its data, saves the data in a file, and sets as the active user
         /// </summary>
@@ -87,6 +95,8 @@ namespace VRProEP.GameEngineCore
             activeSaveFolder = Application.dataPath + "/UserData/" + activeUser.id.ToString();
             // And save its data
             SaveActiveUserData();
+
+            isUserAvailable = true;
 
             return activeUser;
         }
@@ -165,7 +175,9 @@ namespace VRProEP.GameEngineCore
             // Re-initialize the experiment logger for the new active user.
             foreach (IExperimentLogger logger in ExperimentSystem.GetActiveLoggers())
                 logger.InitializeLog(activeSaveFolder);
-            
+
+            isUserAvailable = true;
+
             return loadedUserData;
         }
 

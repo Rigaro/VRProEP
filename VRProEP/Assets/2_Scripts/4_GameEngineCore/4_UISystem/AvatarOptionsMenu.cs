@@ -23,7 +23,14 @@ public class AvatarOptionsMenu : MonoBehaviour {
         AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.Transhumeral);
         AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
 
-        StartCoroutine(DisplayInformationAndReturn(3.0f, "Successfully loaded able-bodied avatar."));
+        StartCoroutine(DisplayInformationAndReturn(2.0f, "Successfully loaded able-bodied avatar."));
+
+        // Initialize prosthesis
+        GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+        ConfigurableElbowManager elbowManager = prosthesisManagerGO.AddComponent<ConfigurableElbowManager>();
+        elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + SaveSystem.ActiveUser.handLength / 2.0f));
+        // Set the reference generator to jacobian-based.
+        elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
     }
 
     public IEnumerator DisplayInformationAndReturn(float time, string info)

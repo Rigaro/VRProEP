@@ -56,7 +56,7 @@ public class ConfigEMGWiFi : MonoBehaviour
                 // If raw data, update max and min values.
                 if (raw)
                 {
-                    sensorData = sensor.GetRawData(i + 1);
+                    sensorData = sensor.GetRawData(i);
 
                     if (sensorData > maxValues[i])
                         maxValues[i] = sensorData;
@@ -64,7 +64,7 @@ public class ConfigEMGWiFi : MonoBehaviour
                         minValues[i] = sensorData;
                 }
                 else
-                    sensorData = Mathf.Round(sensor.GetProcessedData(i + 1));
+                    sensorData = Mathf.Round(sensor.GetProcessedData(i));
 
                 sliders[i].GetComponent<Slider>().value = sensorData;
 
@@ -82,7 +82,7 @@ public class ConfigEMGWiFi : MonoBehaviour
             // Configure all sensor channels
             for (int i = 0; i < sensor.ChannelSize; i++)
             {
-                sensor.ConfigureLimits(i + 1, (int)maxValues[i], (int)minValues[i]);
+                sensor.ConfigureLimits(i, (int)maxValues[i], (int)minValues[i]);
             }
             StartCoroutine(DisplayInformationOnLog(2.0f, "Configured sensor."));
         }

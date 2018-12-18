@@ -80,7 +80,7 @@ namespace VRProEP.ProsthesisCore
                 // Get new reference frame
                 SetDirectionOfMotionFrameOffset(qShoulder, qElbow);
                 isEnabled = true;
-                Debug.Log("Direction of motion frame set.");
+                //Debug.Log("Direction of motion frame set.");
             }
             else if (!enable && enableRequested) // Released button
             {
@@ -88,7 +88,7 @@ namespace VRProEP.ProsthesisCore
             }
             else if (enable && !enableRequested && isEnabled)
             {
-                Debug.Log("Jacobian synergy disabled.");
+                //Debug.Log("Jacobian synergy disabled.");
                 // Requested to disable, get button down
                 enableRequested = true;
                 isEnabled = false;
@@ -98,7 +98,7 @@ namespace VRProEP.ProsthesisCore
             if (isEnabled)
             {
                 xBar[channel] = SingleDOFJacobianSynergy(channel, qShoulder, qElbow, qDotShoulder);
-                Debug.Log(Mathf.Rad2Deg * xBar[channel]);
+                //Debug.Log(Mathf.Rad2Deg * xBar[channel]);
             }
 
             return xBar[channel];

@@ -121,14 +121,14 @@ namespace VRProEP.ProsthesisCore
                 SensorType prevSensorType = activeSensor.GetSensorType();
                 // Get shoulder position and velocity
                 Configure("CMD_SET_ACTIVE_SENSOR", SensorType.VIVETracker);
-                float qShoulder = activeSensor.GetProcessedData(6);
-                float qDotShoulder = activeSensor.GetProcessedData(1);
+                float qShoulder = activeSensor.GetProcessedData(5);
+                float qDotShoulder = activeSensor.GetProcessedData(0);
                 // Get elbow position
                 Configure("CMD_SET_ACTIVE_SENSOR", SensorType.VirtualEncoder);
-                float qElbow = activeSensor.GetProcessedData(1);
+                float qElbow = activeSensor.GetProcessedData(0);
                 // Get enable
                 Configure("CMD_SET_ACTIVE_SENSOR", SensorType.VIVEController);
-                float enableValue = activeSensor.GetProcessedData(2);
+                float enableValue = activeSensor.GetProcessedData(1);
 
                 // Combine input
                 float[] input = { qShoulder, -qElbow, 2.0f * qDotShoulder, enableValue };
