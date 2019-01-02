@@ -9,7 +9,8 @@ namespace VRProEP.ProsthesisCore
         VIVEController,
         VIVETracker,
         VirtualEncoder,
-        EMGWiFi
+        EMGWiFi,
+        VirtualPositionTracker
     }
     /// <summary>
     /// Interface for sensor hardware the will provide input to the prosthesis system.

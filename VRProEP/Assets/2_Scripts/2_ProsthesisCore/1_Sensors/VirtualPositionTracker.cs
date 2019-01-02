@@ -1,53 +1,44 @@
 ﻿//======= Copyright (c) Melbourne Robotics Lab, All rights reserved. ===============
 using UnityEngine;
+using System.Collections;
 
 namespace VRProEP.ProsthesisCore
 {
-    /// <summary>
-    /// Virtual encoder to provide angular position and velocity for a Unity HingeJoint.
-    /// </summary>
-    public class VirtualEncoderManager : SensorManager
+    public class VirtualPositionTracker : SensorManager
     {
-        private HingeJoint virtualJoint;
-
-        public enum VirtualEncoderChannels
-        {
-            ANG_POS,
-            ANG_VEL
-        }
+        private Transform trackingTransform;
 
         /// <summary>
-        /// Virtual encoder to provide angular position and velocity for a Unity HingeJoint.
+        /// Virtual position tracker that measures the position of a Unity GameObject.
         /// </summary>
-        public VirtualEncoderManager() : base(2, SensorType.VirtualEncoder)
+        public VirtualPositionTracker() : base(6, SensorType.VirtualPositionTracker)
         {
+
         }
 
         /// <summary>
-        /// Virtual encoder to provide angular position and velocity for a Unity HingeJoint.
+        /// Virtual position tracker that measures the position of a Unity GameObject.
         /// </summary>
-        /// <param name="virtualJoint">The HingeJoint to assign to the sensor.</param>
-        public VirtualEncoderManager(HingeJoint virtualJoint) : base(2, SensorType.VirtualEncoder)
+        /// <param name="trackingTransform">The Transform of the object to be tracked.</param>
+        public VirtualPositionTracker(Transform trackingTransform) : base(6, SensorType.VirtualPositionTracker)
         {
-            SetVirtualJoint(virtualJoint);
+            SetTrackingTransform(trackingTransform);
         }
 
         /// <summary>
-        /// Assigns the given HingeJoint to the sensor.
+        /// Assigns the object transform to be tracked.
         /// </summary>
-        /// <param name="virtualJoint">The HingeJoint to assign to the sensor.</param>
-        public void SetVirtualJoint(HingeJoint virtualJoint)
+        /// <param name="trackingTransform">The Transform of the object to be tracked.</param>
+        public void SetTrackingTransform(Transform trackingTransform)
         {
-            if (virtualJoint == null)
-                throw new System.ArgumentNullException();
 
-            this.virtualJoint = virtualJoint;
+            this.trackingTransform = trackingTransform ?? throw new System.ArgumentNullException("The provided transform is empty.");
         }
 
         /// <summary>
-        /// Returns raw tracking information for the selected channel.
-        /// 0: Angular displacement given in degrees.
-        /// 1: Angular velocity given in degrees per second.
+        /// Returns requested object position data.
+        /// 0-2: Position given in meters.
+        /// 3-5: Angular position given locally in Euler Angles in degrees.
         /// </summary>
         /// <param name="channel">The channel number.</param>
         /// <returns>Raw tracking data for the given channel.</returns>
@@ -63,43 +54,43 @@ namespace VRProEP.ProsthesisCore
         }
 
         /// <summary>
-        /// Returns raw tracking information for the selected channel identifier.
-        /// ANG_POS: Angular displacement given in degrees.
-        /// ANG_VEL: Angular velocity given in degrees per second.
+        /// Not implemented, use index version of method.
         /// </summary>
         /// <param name="channel">The channel/data identifier.</param>
         /// <returns>Raw tracking data for the given channel.</returns>
         public override float GetRawData(string channel)
         {
-            int channelNum = (int)System.Enum.Parse(typeof(VirtualEncoderChannels), channel);
-
-            return GetRawData(channelNum);
+            throw new System.NotImplementedException("Use index version of method.");
         }
 
         /// <summary>
-        /// Returns all raw joint data in an array.
-        /// Angular displacement given in degrees.
-        /// Angular velocity given in degrees per second.
+        /// Returns all raw object position data in an array as provided by Unity Transform.
+        /// Position given in meters.
+        /// Angular position given locally in degrees.
         /// </summary>
-        /// <returns>The array with raw angular position and velocity data.</returns>
+        /// <returns>The array with raw position and angular position data.</returns>
         public override float[] GetAllRawData()
         {
-            // Get current prosthesis angle
-            float[] x = new float[2]
+            // Get object position
+            float[] x = new float[6]
             {
-            virtualJoint.angle,
-            virtualJoint.velocity
+            trackingTransform.position.x,
+            trackingTransform.position.y,
+            trackingTransform.position.z,
+            trackingTransform.localEulerAngles.x,
+            trackingTransform.localEulerAngles.y,
+            trackingTransform.localEulerAngles.z,
             };
             return x;
         }
 
         /// <summary>
-        /// Gives data in radians instead of degrees.
-        /// 0: Angular displacement given in radians.
-        /// 1: Angular velocity given in radians per second.
+        /// Returns requested object position data.
+        /// 0-2: Position given in meters.
+        /// 3-5: Angular position given locally in Euler Angles in radians.
         /// </summary>
         /// <param name="channel">The channel number.</param>
-        /// <returns>Pre-processed sensor data for the given channel.</returns>
+        /// <returns>Position data for the given channel.</returns>
         public override float GetProcessedData(int channel)
         {
             if (channel >= ChannelSize)
@@ -111,32 +102,32 @@ namespace VRProEP.ProsthesisCore
         }
 
         /// <summary>
-        /// Returns pre-process tracking information for the selected channel identifier.
-        /// ANG_POS: Angular displacement given in radians.
-        /// ANG_VEL: Angular velocity given in radians per second.
+        /// Not implemented, performs GetRawData.
         /// </summary>
         /// <param name="channel">The channel/data identifier.</param>
         /// <returns>Pre-processed sensor data for the given channel.</returns>
         public override float GetProcessedData(string channel)
         {
-            int channelNum = (int)System.Enum.Parse(typeof(VirtualEncoderChannels), channel);
-
-            return GetProcessedData(channelNum);
+            throw new System.NotImplementedException("Use index version of method.");
         }
 
         /// <summary>
-        /// Returns all pre-processed joint data in an array.
-        /// 0: Angular displacement given in radians.
-        /// 1: Angular velocity given in radians per second.
+        /// Returns all object position data in an array as provided by Unity Transform.
+        /// Position given in meters.
+        /// Angular position given locally in radians.
         /// </summary>
         /// <returns>The array with pre-processed angular position and velocity data.</returns>
         public override float[] GetAllProcessedData()
         {
-            // Get current prosthesis angle
-            float[] x = new float[2]
+            // Get object position
+            float[] x = new float[6]
             {
-            virtualJoint.angle * (Mathf.PI / 180.0f),
-            virtualJoint.velocity * (Mathf.PI / 180.0f)
+            trackingTransform.position.x,
+            trackingTransform.position.y,
+            trackingTransform.position.z,
+            Mathf.Deg2Rad * trackingTransform.localEulerAngles.x,
+            Mathf.Deg2Rad * trackingTransform.localEulerAngles.y,
+            Mathf.Deg2Rad * trackingTransform.localEulerAngles.z,
             };
             return x;
         }
@@ -164,4 +155,5 @@ namespace VRProEP.ProsthesisCore
             throw new System.NotImplementedException();
         }
     }
+
 }
