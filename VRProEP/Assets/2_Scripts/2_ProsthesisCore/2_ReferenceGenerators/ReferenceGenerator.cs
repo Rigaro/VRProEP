@@ -6,7 +6,9 @@ namespace VRProEP.ProsthesisCore
     {
         PointGradient,
         Integrator,
-        LinearKinematicSynergy
+        LinearKinematicSynergy,
+        JacobianSynergy,
+        EMGInterface
     }
     /// <summary>
     /// Abstract reference generator to add basic variables used across all generators.
@@ -75,10 +77,10 @@ namespace VRProEP.ProsthesisCore
             if (!IsChannelValid(channel))
                 throw new System.ArgumentOutOfRangeException("The requested channel number is invalid.");            
 
-            if (value > xMax[channel - 1] || value < xMin[channel - 1])
+            if (value > xMax[channel] || value < xMin[channel])
                 throw new System.ArgumentOutOfRangeException("The provided parameter exceeds the limits.");
 
-            xBar[channel - 1] = value;
+            xBar[channel] = value;
         }
 
         /// <summary>
@@ -92,10 +94,10 @@ namespace VRProEP.ProsthesisCore
                 throw new System.ArgumentOutOfRangeException("The length of the parameters does not match the number of reference channels.");
 
             // Check limits
-            int channel = 1;
+            int channel = 0;
             foreach (float value in refs)
             {
-                if (value > xMax[channel - 1] || value < xMin[channel - 1])
+                if (value > xMax[channel] || value < xMin[channel])
                     throw new System.ArgumentOutOfRangeException("The provided parameter for channel #" + channel  + " exceeds the limits.");
 
                 channel++;
@@ -105,23 +107,23 @@ namespace VRProEP.ProsthesisCore
         }
 
         /// <summary>
-        /// Checks the validity of the provedided output.
+        /// Checks the validity of the provided output.
         /// </summary>
         /// <param name="input">The input to be verified.</param>
         /// <returns>True if valid.</returns>
         protected bool IsChannelValid(int channel)
         {
             // Check validity of the provided channel
-            if (channel > channelSize)
+            if (channel >= channelSize)
                 return false;
-            else if (channel <= 0)
+            else if (channel < 0)
                 return false;
             else
                 return true;
         }
 
         /// <summary>
-        /// Checks the validity of the provedided input.
+        /// Checks the validity of the provided input.
         /// </summary>
         /// <param name="input">The input to be verified.</param>
         /// <returns>True if valid.</returns>

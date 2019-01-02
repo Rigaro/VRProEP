@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using VRProEP.GameEngineCore;
 
 namespace VRProEP.ProsthesisCore
 {
@@ -18,7 +19,7 @@ namespace VRProEP.ProsthesisCore
         /// Initializes the Elbow prosthesis with basic functionality.
         /// Must be called only after the avatar is available.
         /// </summary>
-        public void InitializeProsthesis()
+        public void InitializeProsthesis(float upperArmLength, float lowerArmLength)
         {
             // ConfigurableInputManagar
             // Find ResdiualLimbTracker GameObject and extract its Transform.
@@ -46,6 +47,10 @@ namespace VRProEP.ProsthesisCore
             elbowManager = new ElbowManager(virtualEncoder, elbowRB);
             elbowManager.Axis = elbowJoint.axis;
 
+            // Add the created sensors to the list of available sensors.
+            AvatarSystem.AddActiveSensor(trackerManager);
+            AvatarSystem.AddActiveSensor(virtualEncoder);
+
             // Add a LKS to the prosthesis
             float[] theta = { -2.5f };
             float[] thetaMin = { -1.0f };
@@ -53,10 +58,21 @@ namespace VRProEP.ProsthesisCore
             LinearKinematicSynergy linSyn = new LinearKinematicSynergy(xBar, xMin, xMax, theta, thetaMin, thetaMax);
             inputManager.Configure("CMD_ADD_REFGEN", linSyn);
 
+            // Add a Jacobian based synergy
+            JacobianSynergy jacSyn = new JacobianSynergy(xBar, xMin, xMax, upperArmLength, lowerArmLength);
+            inputManager.Configure("CMD_ADD_REFGEN", jacSyn);
+            
+            // Add VIVE controller as sensor to manually move.
+            VIVEControllerManager controllerManager = new VIVEControllerManager();
+            inputManager.Configure("CMD_ADD_SENSOR", controllerManager);
+
+            // Add joint encoder as sensor for jacobian synergy
+            inputManager.Configure("CMD_ADD_SENSOR", virtualEncoder);
 
             // Enable
             isConfigured = true;
         }
+
 
         // Update the prosthesis state deterministically
         public void FixedUpdate()
@@ -64,9 +80,9 @@ namespace VRProEP.ProsthesisCore
             if (isConfigured)
             {
                 // Update references
-                elbowState = inputManager.GenerateReference(1);
+                elbowState = inputManager.GenerateReference(0);
                 // Update device state
-                elbowManager.UpdateState(1, elbowState);
+                elbowManager.UpdateState(0, elbowState);
             }
         }
 
@@ -75,6 +91,7 @@ namespace VRProEP.ProsthesisCore
         /// Available sensors:
         /// - "VAL_SENSOR_VIVETRACKER";
         /// - "VAL_SENSOR_VIVECONTROLLER";
+        /// - "VAL_SENSOR_VIRTUALENCODER";
         /// </summary>
         /// <param name="sensorName"></param>
         public void ChangeSensor(string sensorName)
@@ -86,6 +103,7 @@ namespace VRProEP.ProsthesisCore
         /// Changes the active reference generator.
         /// Available reference generatprs:
         /// - Linear kinematic synergy: "VAL_REFGEN_LINKINSYN";
+        /// - Jacobian-based synergy: "VAL_REFGEN_JACOBIANSYN";
         /// - Integrator: "VAL_REFGEN_INTEGRATOR";
         /// - Gradient-to-point: "VAL_REFGEN_POINTGRAD";
         /// </summary>
@@ -93,6 +111,24 @@ namespace VRProEP.ProsthesisCore
         public void ChangeReferenceGenerator(string rgName)
         {
             inputManager.Configure("CMD_SET_ACTIVE_REFGEN", rgName);
+        }
+
+        /// <summary>
+        /// Adds the given sensor to the elbow.
+        /// </summary>
+        /// <param name="sensors">The sensor.</param>
+        public void AddSensor(ISensor sensor)
+        {
+            inputManager.Configure("CMD_ADD_SENSOR", sensor);
+        }
+
+        /// <summary>
+        /// Adds the given reference generator to the elbow.
+        /// </summary>
+        /// <param name="refGens">The reference generator.</param>
+        public void AddRefGen(IReferenceGenerator refGen)
+        {
+            inputManager.Configure("CMD_ADD_REFGEN", refGen);
         }
     }
 }

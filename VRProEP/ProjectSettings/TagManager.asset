@@ -16,6 +16,10 @@ TagManager:
   - UpperArmCollider
   - Forearm
   - ElbowLocation
+  - Hand
+  - Head
+  - Graspable
+  - DropOff
   layers:
   - Default
   - TransparentFX
@@ -26,7 +30,7 @@ TagManager:
   - 
   - 
   - PostProcessing
-  - 
+  - Teleport
   - 
   - 
   - 

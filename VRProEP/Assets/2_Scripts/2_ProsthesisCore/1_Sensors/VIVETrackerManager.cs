@@ -86,6 +86,31 @@ namespace VRProEP.ProsthesisCore
         }
 
         /// <summary>
+        /// Uses Unity's XR API to extract angular position information from the tracker.
+        /// </summary>
+        /// <param name="localAngPos">The Vector3 refernece to store data.</param>
+        /// <returns>True if sucessful.</returns>
+        private bool TryGetTrackerPosition(out Quaternion localAngPos)
+        {
+            // Get node information
+            InputTracking.GetNodeStates(xrNodes);
+            // Look for Hardware trackers
+            int currentTracker = 1;
+            foreach (XRNodeState ns in xrNodes)
+            {
+                if (ns.nodeType == XRNode.HardwareTracker && currentTracker == trackerNumber)
+                {
+                    if (ns.TryGetRotation(out localAngPos))
+                        return true;
+                }
+                else if (ns.nodeType == XRNode.HardwareTracker)
+                    currentTracker++;
+            }
+            // If no tracker was found return error
+            throw new System.Exception("No VIVE Tracker was found");
+        }
+
+        /// <summary>
         /// Returns raw tracking information for the selected channel.
         /// See VIVETrackerChannels for channel information. 
         /// Angular velocity given radians per second, world coordinates.
@@ -95,24 +120,24 @@ namespace VRProEP.ProsthesisCore
         /// <returns>Raw tracking data for the given channel.</returns>
         public override float GetRawData(int channel)
         {
-            if (channel > ChannelSize)
+            if (channel >= ChannelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels.");
-            else if (channel <= 0)
-                throw new System.ArgumentOutOfRangeException("The channel range is 1-6.");
+            else if (channel < 0)
+                throw new System.ArgumentOutOfRangeException("The channel range is 0-5.");
             else if (trackerTransform == null)
                 throw new System.Exception("The tracker transform has not been set.");
 
             // Angular velocity requested
-            if (channel <=3)
+            if (channel <=2)
             {
                 Vector3 angVel;
                 TryGetTrackerAngularVelocity(out angVel);
-                return angVel[channel - 1];
+                return angVel[channel];
             }
             // Angular position requested
-            else if(channel > 3)
+            else if(channel > 2)
             {
-                int chan = channel - 4;
+                int chan = channel - 3;
                 Vector3 angPos = trackerTransform.eulerAngles;
                 return angPos[chan];
             }
@@ -164,28 +189,49 @@ namespace VRProEP.ProsthesisCore
         /// <returns>Pre-processed sensor data for the given channel.</returns>
         public override float GetProcessedData(int channel)
         {
-            if (channel > ChannelSize)
+            if (channel >= ChannelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels.");
-            else if (channel <= 0)
-                throw new System.ArgumentOutOfRangeException("The channel range is 1-6.");
+            else if (channel < 0)
+                throw new System.ArgumentOutOfRangeException("The channel range is 0-5.");
             else if (trackerTransform == null)
                 throw new System.Exception("The tracker transform has not been set.");
 
             Vector3 angVel;
             TryGetTrackerAngularVelocity(out angVel);
             Vector3 localAngVel = trackerTransform.InverseTransformVector(angVel);
-            if (channel == 1)
+            if (channel == 0)
                 return localAngVel.z;
-            else if (channel == 2)
+            else if (channel == 1)
                 return localAngVel.y;
-            else if (channel == 3)
+            else if (channel == 2)
                 return localAngVel.x;
+            else if (channel == 3)
+            {
+                float offsetAngle = (-trackerTransform.localRotation.eulerAngles.x + 270.0f);
+                if (offsetAngle > 180.0f)
+                {
+                    offsetAngle -= 360;
+                }
+                return Mathf.Deg2Rad * offsetAngle;
+            }
             else if (channel == 4)
-                return trackerTransform.localEulerAngles.x;
-            else if (channel == 5)
-                return trackerTransform.localEulerAngles.y;
+            {
+                float offsetAngle = (-trackerTransform.localRotation.eulerAngles.y + 270.0f);
+                if (offsetAngle > 180.0f)
+                {
+                    offsetAngle -= 360;
+                }
+                return Mathf.Deg2Rad * offsetAngle;
+            }
             else
-                return trackerTransform.localEulerAngles.z;
+            {
+                float offsetAngle = (-trackerTransform.localRotation.eulerAngles.z + 270.0f);
+                if (offsetAngle > 180.0f)
+                {
+                    offsetAngle -= 360;
+                }
+                return Mathf.Deg2Rad * offsetAngle;
+            }
         }
 
         /// <summary>
@@ -212,8 +258,7 @@ namespace VRProEP.ProsthesisCore
             Vector3 angVel;
             TryGetTrackerAngularVelocity(out angVel);
             Vector3 localAngVel = trackerTransform.InverseTransformVector(angVel);
-            Vector3 localAngPos = trackerTransform.eulerAngles;
-            float[] data = { localAngVel.z, localAngVel.y, localAngVel.x, localAngPos.x, localAngPos.y, localAngPos.z };
+            float[] data = { localAngVel.z, localAngVel.y, localAngVel.x, GetProcessedData(3), GetProcessedData(4), GetProcessedData(5) };
             return data;
         }
 

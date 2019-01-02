@@ -103,8 +103,8 @@ namespace VRProEP.ProsthesisCore
             if (input.Length != 2*channelSize)
                 throw new System.ArgumentOutOfRangeException("The input array length should be = 2*channelSize. Hand tracking error [0] and joint tracking error [1].");
 
-            float trackingError = input[2*channel - 2];
-            float jointError = input[2*channel - 1];
+            float trackingError = input[2*channel];
+            float jointError = input[2*channel + 1];
             float sign = 1.0f;
 
             // When the joint is further from target than hand, move in negative direction
@@ -113,16 +113,16 @@ namespace VRProEP.ProsthesisCore
             else
                 sign = 1.0f;
 
-            float tempXBar = xBar[channel - 1] + gains[channel - 1] * sign * trackingError * Time.fixedDeltaTime;
+            float tempXBar = xBar[channel] + gains[channel] * sign * trackingError * Time.fixedDeltaTime;
             // Saturate reference
-            if (tempXBar > xMax[channel - 1])
-                tempXBar = xMax[channel - 1];
-            else if (tempXBar < xMin[channel - 1])
-                tempXBar = xMin[channel - 1];
+            if (tempXBar > xMax[channel])
+                tempXBar = xMax[channel];
+            else if (tempXBar < xMin[channel])
+                tempXBar = xMin[channel];
 
-            xBar[channel - 1] = (float)System.Math.Round(tempXBar, 2);
+            xBar[channel] = (float)System.Math.Round(tempXBar, 2);
             // Return in array
-            return xBar[channel - 1];
+            return xBar[channel];
 
         }
 
@@ -134,7 +134,7 @@ namespace VRProEP.ProsthesisCore
         /// <returns>The updated set of references.</returns>
         public override float[] UpdateAllReferences(float[] input)
         {
-            for (int i = 1; i <= channelSize; i++)
+            for (int i = 0; i < channelSize; i++)
             {
                 UpdateReference(i, input);
             }

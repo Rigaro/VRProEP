@@ -1,5 +1,6 @@
 {
-   "app_key" : "application.generated.unity.steamvr.exe",
+   "alias_info" : {},
+   "app_key" : "application.generated.unity.vrproep.exe",
    "bindings" : {
       "/actions/buggy" : {
          "sources" : [
@@ -191,6 +192,9 @@
             },
             {
                "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/button"
+                  },
                   "pull" : {
                      "output" : "/actions/default/in/squeeze"
                   }
@@ -200,12 +204,33 @@
             },
             {
                "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/button"
+                  },
                   "pull" : {
                      "output" : "/actions/default/in/squeeze"
                   }
                },
                "mode" : "trigger",
                "path" : "/user/hand/right/input/trigger"
+            },
+            {
+               "inputs" : {
+                  "position" : {
+                     "output" : "/actions/default/in/trackpad"
+                  }
+               },
+               "mode" : "trackpad",
+               "path" : "/user/hand/left/input/trackpad"
+            },
+            {
+               "inputs" : {
+                  "position" : {
+                     "output" : "/actions/default/in/trackpad"
+                  }
+               },
+               "mode" : "trackpad",
+               "path" : "/user/hand/right/input/trackpad"
             }
          ]
       },
@@ -248,9 +273,57 @@
                "path" : "/user/hand/right/input/trackpad"
             }
          ]
+      },
+      "/actions/vrproep" : {
+         "sources" : [
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/vrproep/in/interfaceenablebutton"
+                  },
+                  "position" : {
+                     "output" : "/actions/vrproep/in/trackpad"
+                  }
+               },
+               "mode" : "trackpad",
+               "path" : "/user/hand/left/input/trackpad"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/vrproep/in/interfaceenablebutton"
+                  },
+                  "position" : {
+                     "output" : "/actions/vrproep/in/trackpad"
+                  }
+               },
+               "mode" : "trackpad",
+               "path" : "/user/hand/right/input/trackpad"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/vrproep/in/objectinteractbutton"
+                  }
+               },
+               "mode" : "trigger",
+               "path" : "/user/hand/left/input/trigger"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/vrproep/in/objectinteractbutton"
+                  }
+               },
+               "mode" : "trigger",
+               "path" : "/user/hand/right/input/trigger"
+            }
+         ]
       }
    },
    "controller_type" : "vive_controller",
-   "description" : "",
-   "name" : "vive_controller"
+   "description" : "VIVE Controller binding for VRProEP application.",
+   "name" : "VRProEP VIVE Controller Binding",
+   "options" : {},
+   "simulated_actions" : []
 }

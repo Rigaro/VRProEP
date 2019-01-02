@@ -62,6 +62,21 @@
     {
       "name": "/actions/buggy/in/Reset",
       "type": "boolean"
+    },
+    {
+      "name": "/actions/vrproep/in/Trackpad",
+      "type": "vector2",
+      "requirement": "mandatory"
+    },
+    {
+      "name": "/actions/vrproep/in/InterfaceEnableButton",
+      "type": "boolean",
+      "requirement": "mandatory"
+    },
+    {
+      "name": "/actions/vrproep/in/ObjectInteractButton",
+      "type": "boolean",
+      "requirement": "mandatory"
     }
   ],
   "action_sets": [
@@ -75,6 +90,10 @@
     },
     {
       "name": "/actions/buggy",
+      "usage": "single"
+    },
+    {
+      "name": "/actions/vrproep",
       "usage": "single"
     }
   ],

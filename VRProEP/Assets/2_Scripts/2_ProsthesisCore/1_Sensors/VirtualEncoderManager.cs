@@ -46,28 +46,26 @@ namespace VRProEP.ProsthesisCore
 
         /// <summary>
         /// Returns raw tracking information for the selected channel.
-        /// See VirtualEncoderChannels for channel information. 
-        /// Angular velocity given radians per second.
-        /// Angular displacement given in Euler angles.
+        /// 0: Angular displacement given in degrees.
+        /// 1: Angular velocity given in degrees per second.
         /// </summary>
         /// <param name="channel">The channel number.</param>
         /// <returns>Raw tracking data for the given channel.</returns>
         public override float GetRawData(int channel)
         {
-            if (channel > ChannelSize)
+            if (channel >= ChannelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels.");
-            else if (channel <= 0)
-                throw new System.ArgumentOutOfRangeException("The channel number should be greater than 0.");
+            else if (channel < 0)
+                throw new System.ArgumentOutOfRangeException("The channel number starts from 0.");
 
-            return GetAllRawData()[channel - 1];
+            return GetAllRawData()[channel];
 
         }
 
         /// <summary>
         /// Returns raw tracking information for the selected channel identifier.
-        /// See VIVETrackerChannels for channel information.
-        /// Angular velocity given radians per second.
-        /// Angular displacement given in Euler angles.
+        /// ANG_POS: Angular displacement given in degrees.
+        /// ANG_VEL: Angular velocity given in degrees per second.
         /// </summary>
         /// <param name="channel">The channel/data identifier.</param>
         /// <returns>Raw tracking data for the given channel.</returns>
@@ -79,9 +77,9 @@ namespace VRProEP.ProsthesisCore
         }
 
         /// <summary>
-        /// Returns all raw joint data in an array as provided by Unity.
+        /// Returns all raw joint data in an array.
         /// Angular displacement given in degrees.
-        /// Angular velocity given degrees per second.
+        /// Angular velocity given in degrees per second.
         /// </summary>
         /// <returns>The array with raw angular position and velocity data.</returns>
         public override float[] GetAllRawData()
@@ -97,21 +95,25 @@ namespace VRProEP.ProsthesisCore
 
         /// <summary>
         /// Gives data in radians instead of degrees.
+        /// 0: Angular displacement given in radians.
+        /// 1: Angular velocity given in radians per second.
         /// </summary>
         /// <param name="channel">The channel number.</param>
         /// <returns>Pre-processed sensor data for the given channel.</returns>
         public override float GetProcessedData(int channel)
         {
-            if (channel > ChannelSize)
+            if (channel >= ChannelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels.");
-            else if (channel <= 0)
-                throw new System.ArgumentOutOfRangeException("The channel number should be greater than 0.");
+            else if (channel < 0)
+                throw new System.ArgumentOutOfRangeException("The channel number starts from 0.");
 
-            return GetAllProcessedData()[channel - 1];
+            return GetAllProcessedData()[channel];
         }
 
         /// <summary>
-        /// Not implemented, performs GetRawData.
+        /// Returns pre-process tracking information for the selected channel identifier.
+        /// ANG_POS: Angular displacement given in radians.
+        /// ANG_VEL: Angular velocity given in radians per second.
         /// </summary>
         /// <param name="channel">The channel/data identifier.</param>
         /// <returns>Pre-processed sensor data for the given channel.</returns>
@@ -124,8 +126,8 @@ namespace VRProEP.ProsthesisCore
 
         /// <summary>
         /// Returns all pre-processed joint data in an array.
-        /// Angular displacement given in radians.
-        /// Angular velocity given radians per second.
+        /// 0: Angular displacement given in radians.
+        /// 1: Angular velocity given in radians per second.
         /// </summary>
         /// <returns>The array with pre-processed angular position and velocity data.</returns>
         public override float[] GetAllProcessedData()
