@@ -67,27 +67,27 @@ namespace VRProEP.ExperimentCore
         }
 
         /// <summary>
-        /// 
+        /// Returns all the available loggers.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The list of loggers.</returns>
         public static List<IExperimentLogger> GetActiveLoggers()
         {
             return activeLoggers;
         }
 
         /// <summary>
-        /// 
+        /// Returns all the available sensors.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The list of sensors.</returns>
         public static List<ISensor> GetActiveSensors()
         {
             return experimentSensors;
         }
 
         /// <summary>
-        /// 
+        /// Adds a given sensor to the list of available experiment sensors.
         /// </summary>
-        /// <param name="sensor"></param>
+        /// <param name="sensor">The sensor to be added.</param>
         public static void AddSensor(ISensor sensor)
         {
             if (sensor == null)
@@ -97,10 +97,10 @@ namespace VRProEP.ExperimentCore
         }
 
         /// <summary>
-        /// 
+        /// Returns the sensor given by the index.
         /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
+        /// <param name="index">The index of the sensor to be retreived.</param>
+        /// <returns>The requested sensor.</returns>
         public static ISensor GetActiveSensor(int index)
         {
             if (index < 0 || index >= experimentSensors.Count)

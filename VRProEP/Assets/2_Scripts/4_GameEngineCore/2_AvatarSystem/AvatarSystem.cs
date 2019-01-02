@@ -199,20 +199,24 @@ namespace VRProEP.GameEngineCore
             // Enable Forearm and hand colliders
             // Enable forearm collider
             GameObject forearmGO = GameObject.FindGameObjectWithTag("Forearm");
-            forearmGO.GetComponent<Collider>().enabled = true;
+            if (forearmGO != null)
+                forearmGO.GetComponent<Collider>().enabled = true;
 
             // Enable hand colliders
             GameObject handGO = GameObject.FindGameObjectWithTag("Hand");
-            Transform handColliders = handGO.transform.GetChild(0);
-            handColliders.gameObject.SetActive(true);
+            if (handGO != null)
+            {
+                Transform handColliders = handGO.transform.GetChild(0);
+                handColliders.gameObject.SetActive(true);
+            }
 
         }
 
         /// <summary>
-        /// 
+        /// Loads a VR Player object and assigns a tracking frame to it.
         /// </summary>
-        /// <param name="userType"></param>
-        /// <param name="avatarType"></param>
+        /// <param name="userType">The type of player to load: able-bodied, TR, TH.</param>
+        /// <param name="avatarType">The type of avatar to load: able-bodied, TR, TH.</param>
         public static void LoadPlayer(UserType userType, AvatarType avatarType)
         {
             // Destroy player gameobject if already available.
