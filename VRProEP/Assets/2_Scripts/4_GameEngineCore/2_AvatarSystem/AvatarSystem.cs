@@ -16,24 +16,13 @@ namespace VRProEP.GameEngineCore
         private static AvatarData activeAvatarData;
         private static List<ISensor> activeSensors = new List<ISensor>();
 
+        private static AvatarType avatarType;
         private static bool isPlayerAvailable = false;
         private static bool isAvatarAvaiable = false;
 
-        public static bool IsAvatarAvaiable
-        {
-            get
-            {
-                return isAvatarAvaiable;
-            }
-        }
-
-        public static bool IsPlayerAvailable
-        {
-            get
-            {
-                return isPlayerAvailable;
-            }
-        }
+        public static bool IsAvatarAvaiable { get => isAvatarAvaiable; }
+        public static bool IsPlayerAvailable { get => isPlayerAvailable; }
+        public static AvatarType AvatarType { get => avatarType; }
 
         /// <summary>
         /// Creates an avatar configuration file.
@@ -147,16 +136,19 @@ namespace VRProEP.GameEngineCore
                 LoadTrackerFrame(userData.type, avatarType);
                 CustomizeTrackingFrame(userData, avatarType);
                 AvatarSpawner.SpawnTranshumeralAvatar(userData, activeAvatarData);
+                avatarType = AvatarType.Transhumeral;
             }
             else if (avatarType == AvatarType.Transradial)
             {
                 LoadTrackerFrame(userData.type, avatarType);
                 CustomizeTrackingFrame(userData, avatarType);
                 AvatarSpawner.SpawnTransradialAvatar(userData, activeAvatarData);
+                avatarType = AvatarType.Transradial;
             }
             else if (avatarType == AvatarType.AbleBodied)
             {
                 AvatarSpawner.SpawnAbleBodiedAvatar(userData, activeAvatarData);
+                avatarType = AvatarType.AbleBodied;
             }
 
             isAvatarAvaiable = true;

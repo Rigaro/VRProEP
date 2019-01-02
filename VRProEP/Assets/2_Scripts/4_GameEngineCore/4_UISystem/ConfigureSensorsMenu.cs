@@ -12,7 +12,6 @@ public class ConfigureSensorsMenu : MonoBehaviour {
     public GameObject settingsMenu;
     public Dropdown sensorDropdown;
     public GameObject EMGWiFiConfig;
-    public TextMeshProUGUI logTMP;
 
     private int selectedSensor = 0;
     private List<string> sensorList = new List<string>();
@@ -65,8 +64,6 @@ public class ConfigureSensorsMenu : MonoBehaviour {
     {
         // Clear dropdown
         sensorDropdown.ClearOptions();
-        // Clear log
-        logTMP.text = "Log: ";
         // Return to main menu
         settingsMenu.SetActive(true);
         gameObject.SetActive(false);

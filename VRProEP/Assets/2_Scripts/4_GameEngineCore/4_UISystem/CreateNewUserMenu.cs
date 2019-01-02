@@ -8,6 +8,7 @@ public class CreateNewUserMenu : MonoBehaviour {
 
     public GameObject mainMenu;
     public GameObject userOptionsMenu;
+    public LogManager logManager;
 
     private UserData userData = new UserData();
     private int dataSet = 0;
@@ -87,9 +88,9 @@ public class CreateNewUserMenu : MonoBehaviour {
     {
         // Check that all data has been set.
         if (dataSet < 8)
-            StartCoroutine(mainMenu.GetComponent<MainMenu>().DisplayInformationOnLog(3.0f, "Not all user information has been set."));
+            logManager.DisplayInformationOnLog(3.0f, "Not all user information has been set.");
         else if (!userTypeSet)
-            StartCoroutine(mainMenu.GetComponent<MainMenu>().DisplayInformationOnLog(3.0f, "Choose a valid user type."));
+            logManager.DisplayInformationOnLog(3.0f, "Choose a valid user type.");
         else
         {
             // Generate user ID
@@ -109,7 +110,7 @@ public class CreateNewUserMenu : MonoBehaviour {
             }
             catch (Exception e)
             {
-                StartCoroutine(mainMenu.GetComponent<MainMenu>().DisplayInformationOnLog(3.0f, e.Message));                
+                logManager.DisplayInformationOnLog(3.0f, e.Message);                
             }
         }
     }

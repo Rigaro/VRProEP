@@ -1,11 +1,9 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using VRProEP.GameEngineCore;
 using VRProEP.ProsthesisCore;
 using VRProEP.ExperimentCore;
-using Valve.VR;
 
 public class MainMenu : MonoBehaviour {
 
@@ -16,10 +14,10 @@ public class MainMenu : MonoBehaviour {
     public GameObject sensorOptionsMenu;
     public GameObject modeSelectionButton;
     public GameObject modeSelectionMenu;
-    public TextMeshProUGUI logTMP;
     public TextMeshProUGUI activeUserTMP;
     public TextMeshProUGUI sensorTMP;
     public TextMeshProUGUI experimentSensorsTMP;
+    public LogManager logManager;
     public bool createdUser = false;
     public bool loadedUser = false;
 
@@ -37,13 +35,13 @@ public class MainMenu : MonoBehaviour {
     {
         if (createdUser)
         {
-            StartCoroutine(DisplayInformationOnLog(3.0f, "Created new user with ID " + SaveSystem.ActiveUser.id));
+            logManager.DisplayInformationOnLog(3.0f, "Created new user with ID " + SaveSystem.ActiveUser.id);
             createdUser = false;
         }
 
         if (loadedUser)
         {
-            StartCoroutine(DisplayInformationOnLog(3.0f, "Loaded user with ID " + SaveSystem.ActiveUser.id));
+            logManager.DisplayInformationOnLog(3.0f, "Loaded user with ID " + SaveSystem.ActiveUser.id);
             createdUser = false;
         }
 
@@ -105,8 +103,7 @@ public class MainMenu : MonoBehaviour {
     public void LoadUserOptionsMenu()
     {
         // Clear log
-        StopAllCoroutines();
-        logTMP.text = "Log: \n";
+        logManager.ClearLog();
         // Switch
         userOptionsMenu.SetActive(true);
         gameObject.SetActive(false);
@@ -115,8 +112,7 @@ public class MainMenu : MonoBehaviour {
     public void LoadAvatarOptionsMenu()
     {
         // Clear log
-        StopAllCoroutines();
-        logTMP.text = "Log: \n";
+        logManager.ClearLog();
         // Switch
         avatarOptionsMenu.SetActive(true);
         gameObject.SetActive(false);
@@ -125,8 +121,7 @@ public class MainMenu : MonoBehaviour {
     public void LoadSensorOptionsMenu()
     {
         // Clear log
-        StopAllCoroutines();
-        logTMP.text = "Log: \n";
+        logManager.ClearLog();
         // Switch
         sensorOptionsMenu.SetActive(true);
         gameObject.SetActive(false);
@@ -135,18 +130,9 @@ public class MainMenu : MonoBehaviour {
     public void LoadModeSelectionMenu()
     {
         // Clear log
-        StopAllCoroutines();
-        logTMP.text = "Log: \n";
+        logManager.ClearLog();
         // Switch
         modeSelectionMenu.SetActive(true);
         gameObject.SetActive(false);
-    }
-
-    public IEnumerator DisplayInformationOnLog(float time, string info)
-    {
-        string defaultText = logTMP.text;
-        logTMP.text += info;
-        yield return new WaitForSecondsRealtime(time);
-        logTMP.text = defaultText;
     }
 }

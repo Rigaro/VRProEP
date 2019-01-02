@@ -10,6 +10,7 @@ public class LoadUserMenu : MonoBehaviour {
     public GameObject mainMenu;
     public GameObject userOptionsMenu;
     public Dropdown availableUserDropdown;
+    public LogManager logManager;
 
     private List<string> userList = new List<string>();
     private int selectedUser = 0;
@@ -57,7 +58,7 @@ public class LoadUserMenu : MonoBehaviour {
             ReturnToMainMenu();
         }
         else
-            StartCoroutine(mainMenu.GetComponent<MainMenu>().DisplayInformationOnLog(3.0f, "Select a valid user."));
+            logManager.DisplayInformationOnLog(3.0f, "Select a valid user.");
     }
 
     public void ReturnToUserOptionsMenu()

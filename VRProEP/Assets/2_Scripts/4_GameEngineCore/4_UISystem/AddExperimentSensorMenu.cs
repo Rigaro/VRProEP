@@ -10,7 +10,6 @@ public class AddExperimentSensorMenu : MonoBehaviour {
     public GameObject settingsMenu;
     public Dropdown sensorDropdown;
     public GameObject VIVETrackerMenu;
-    public TextMeshProUGUI logTMP;
 
     private List<string> sensorList = new List<string>();
     private int selectedSensor = 0;
@@ -53,8 +52,6 @@ public class AddExperimentSensorMenu : MonoBehaviour {
     {
         // Clear dropdown
         sensorDropdown.ClearOptions();
-        // Clear log
-        logTMP.text = "Log: ";
         // Return to main menu
         settingsMenu.SetActive(true);
         gameObject.SetActive(false);
