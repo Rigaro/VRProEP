@@ -15,7 +15,7 @@ public class AvatarOptionsMenu : MonoBehaviour {
 
         KeepPlayerGameObjects();
 
-        StartCoroutine(DisplayInformationAndReturn(3.0f, "Successfully loaded able-bodied avatar."));
+        StartCoroutine(DisplayInformationAndReturn(2.0f, "Successfully loaded able-bodied avatar."));
     }
 
     public void LoadTranshumeralAvatar()

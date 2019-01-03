@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using VRProEP.GameEngineCore;
 using VRProEP.ProsthesisCore;
 using Valve.VR;
+using System;
 
 public class ExperimentSelectionMenu : MonoBehaviour
 {
@@ -103,6 +104,8 @@ public class ExperimentSelectionMenu : MonoBehaviour
                 // Load experiment.
                 SteamVR_LoadLevel.Begin("JacobianSynergyExperiment");
             }
+            else
+                logManager.DisplayInformationOnLog(3.0f, "Please configure the " + optionList[optionNumber] + " avatar.");
         }
     }
 
