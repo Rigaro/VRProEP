@@ -120,7 +120,6 @@ public class GraspManager : MonoBehaviour {
 
     private void FixedUpdate()
     {
-        Debug.Log(handVelocity);
         if (inGrasp && objectInHand == null)
             HandleGrasp();
         else if ((inDropOff || managerMode == GraspManagerMode.Open) && objectInHand != null)

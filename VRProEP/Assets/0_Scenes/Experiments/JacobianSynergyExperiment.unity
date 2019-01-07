@@ -1256,13 +1256,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 531695145}
+  - component: {fileID: 531695146}
   m_Layer: 0
   m_Name: GameMaster
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &531695145
 Transform:
   m_ObjectHideFlags: 0
@@ -1277,6 +1278,24 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &531695146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 531695144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a45575bbe8ec7641ba9e463960bf03b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableStart: 0
+  demoMode: 0
+  restTime: 60
+  skipInstructions: 0
+  debug: 0
+  debugText: {fileID: 0}
 --- !u!1 &568604224
 GameObject:
   m_ObjectHideFlags: 0
@@ -3346,10 +3365,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1538553089}
     m_Modifications:
-    - target: {fileID: 1931194108074812, guid: 5a2c98b89a9bd47428ac616265f8c213, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4434616526954014, guid: 5a2c98b89a9bd47428ac616265f8c213, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -3380,6 +3395,21 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4434616526954014, guid: 5a2c98b89a9bd47428ac616265f8c213, type: 3}
       propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2820520523764792097, guid: 5a2c98b89a9bd47428ac616265f8c213,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6786136064016626140, guid: 5a2c98b89a9bd47428ac616265f8c213,
+        type: 3}
+      propertyPath: m_havePropertiesChanged
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6786136064016626140, guid: 5a2c98b89a9bd47428ac616265f8c213,
+        type: 3}
+      propertyPath: m_isInputParsingRequired
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
