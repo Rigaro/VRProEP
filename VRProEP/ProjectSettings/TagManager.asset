@@ -21,6 +21,9 @@ TagManager:
   - Graspable
   - DropOff
   - GraspManager
+  - HUD
+  - Console
+  - Monitor
   layers:
   - Default
   - TransparentFX
