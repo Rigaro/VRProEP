@@ -119,6 +119,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 329824084}
     m_Modifications:
+    - target: {fileID: 1056419134542794, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_Name
+      value: Holographic Battery BL
+      objectReference: {fileID: 0}
     - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
       propertyPath: m_LocalPosition.x
       value: -3.1999998
@@ -165,6 +169,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: be77503495d973e4d9af45c305447932, type: 3}
+--- !u!1 &56289262 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1056419134542794, guid: be77503495d973e4d9af45c305447932,
+    type: 3}
+  m_PrefabInstance: {fileID: 56289261}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &77598703
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -241,11 +251,11 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 471270303}
   - {fileID: 662748839}
+  - {fileID: 1370607352}
   - {fileID: 201515181}
   - {fileID: 329824084}
-  - {fileID: 471270303}
-  - {fileID: 1370607352}
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -256,6 +266,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 329824084}
     m_Modifications:
+    - target: {fileID: 1056419134542794, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_Name
+      value: Holographic Battery TL
+      objectReference: {fileID: 0}
     - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
       propertyPath: m_LocalPosition.x
       value: -3.1999998
@@ -302,6 +316,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: be77503495d973e4d9af45c305447932, type: 3}
+--- !u!1 &112394527 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1056419134542794, guid: be77503495d973e4d9af45c305447932,
+    type: 3}
+  m_PrefabInstance: {fileID: 112394526}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &118307921
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -676,7 +696,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 166c46565a20cbd48b376b1082b8376b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.011
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 166c46565a20cbd48b376b1082b8376b, type: 3}
       propertyPath: m_LocalPosition.y
@@ -704,7 +724,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 166c46565a20cbd48b376b1082b8376b, type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 166c46565a20cbd48b376b1082b8376b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -982,7 +1002,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 78793367}
-  m_RootOrder: 3
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1172,7 +1192,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1932980026907142, guid: c622dec2ce6b68844af10dbd72511efb, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4514973823729426, guid: c622dec2ce6b68844af10dbd72511efb, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1263,7 +1283,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &531695145
 Transform:
   m_ObjectHideFlags: 0
@@ -1296,6 +1316,13 @@ MonoBehaviour:
   skipInstructions: 0
   debug: 0
   debugText: {fileID: 0}
+  graspTaskObject: {fileID: 662748840}
+  dropOffLocations:
+  - {fileID: 1370133396}
+  - {fileID: 56289262}
+  - {fileID: 1454447661}
+  - {fileID: 112394527}
+  iterationsPerDropOff: 1
 --- !u!1 &568604224
 GameObject:
   m_ObjectHideFlags: 0
@@ -1342,7 +1369,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4022783038091252, guid: 2d97d3d3e09692f408770af0c2e4b795, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.011
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4022783038091252, guid: 2d97d3d3e09692f408770af0c2e4b795, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1370,7 +1397,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4022783038091252, guid: 2d97d3d3e09692f408770af0c2e4b795, type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 54564276714475312, guid: 2d97d3d3e09692f408770af0c2e4b795,
         type: 3}
@@ -1405,7 +1432,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timer: {fileID: 662748842}
   startTransform: {fileID: 1370607352}
-  respawnEnabled: 1
+  enableFlag: 1
   topConsole: {fileID: 1068763263}
 --- !u!114 &662748842
 MonoBehaviour:
@@ -1991,7 +2018,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4082328016998264, guid: ff03722ea277db145aa6029333c07279, type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 33285205865093002, guid: ff03722ea277db145aa6029333c07279,
         type: 3}
@@ -2001,12 +2028,12 @@ PrefabInstance:
     - target: {fileID: 114348196208480234, guid: ff03722ea277db145aa6029333c07279,
         type: 3}
       propertyPath: m_havePropertiesChanged
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114348196208480234, guid: ff03722ea277db145aa6029333c07279,
         type: 3}
       propertyPath: m_isInputParsingRequired
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ff03722ea277db145aa6029333c07279, type: 3}
@@ -2113,6 +2140,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1538553089}
     m_Modifications:
+    - target: {fileID: 1655462904313244, guid: bd8bcb4b3a795ea4fa543f4a53fbbc77, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4693515837493512, guid: bd8bcb4b3a795ea4fa543f4a53fbbc77, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -2153,12 +2184,12 @@ PrefabInstance:
     - target: {fileID: 114922601162491082, guid: bd8bcb4b3a795ea4fa543f4a53fbbc77,
         type: 3}
       propertyPath: managerType
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114922601162491082, guid: bd8bcb4b3a795ea4fa543f4a53fbbc77,
         type: 3}
       propertyPath: managerMode
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bd8bcb4b3a795ea4fa543f4a53fbbc77, type: 3}
@@ -2334,6 +2365,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 329824084}
     m_Modifications:
+    - target: {fileID: 1056419134542794, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_Name
+      value: Holographic Battery BR
+      objectReference: {fileID: 0}
     - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
       propertyPath: m_LocalPosition.x
       value: -3.2
@@ -2368,6 +2403,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: be77503495d973e4d9af45c305447932, type: 3}
+--- !u!1 &1370133396 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1056419134542794, guid: be77503495d973e4d9af45c305447932,
+    type: 3}
+  m_PrefabInstance: {fileID: 1370133395}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1370607351
 GameObject:
   m_ObjectHideFlags: 0
@@ -2393,11 +2434,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1370607351}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.011, y: 1.0526, z: 0.7894}
+  m_LocalPosition: {x: 0, y: 1.0526, z: 0.7894}
   m_LocalScale: {x: 0.04, y: 0.04, z: 0.04}
   m_Children: []
   m_Father: {fileID: 78793367}
-  m_RootOrder: 4
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1370607353
 BoxCollider:
@@ -2419,6 +2460,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 329824084}
     m_Modifications:
+    - target: {fileID: 1056419134542794, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_Name
+      value: Holographic Battery TR
+      objectReference: {fileID: 0}
     - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
       propertyPath: m_LocalPosition.x
       value: -3.1999998
@@ -2465,6 +2510,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: be77503495d973e4d9af45c305447932, type: 3}
+--- !u!1 &1454447661 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1056419134542794, guid: be77503495d973e4d9af45c305447932,
+    type: 3}
+  m_PrefabInstance: {fileID: 1454447660}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1456512692
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2722,7 +2773,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1538553089
 Transform:
   m_ObjectHideFlags: 0
@@ -2891,7 +2942,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 468542, guid: 861fea087c7148246939515a3d957d2e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.02
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 468542, guid: 861fea087c7148246939515a3d957d2e, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2971,7 +3022,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1601226806}
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 1.062}
+  m_LocalPosition: {x: 0, y: 0, z: 1.061}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1977776702}
@@ -2979,7 +3030,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 1.204}
+  m_AnchoredPosition: {x: 0.005, y: 1.204}
   m_SizeDelta: {x: 0.5, y: 0.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1601226808
@@ -3365,6 +3416,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1538553089}
     m_Modifications:
+    - target: {fileID: 1931194108074812, guid: 5a2c98b89a9bd47428ac616265f8c213, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4434616526954014, guid: 5a2c98b89a9bd47428ac616265f8c213, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

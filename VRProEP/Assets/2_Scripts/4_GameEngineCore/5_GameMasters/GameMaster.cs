@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+
+// GameMaster includes
+using VRProEP.ExperimentCore;
 using VRProEP.GameEngineCore;
 
 public abstract class GameMaster : MonoBehaviour
@@ -30,6 +33,17 @@ public abstract class GameMaster : MonoBehaviour
         TypeThree,
         TypeFour
     }
+    protected SubjectGroup subjectGroup;
+
+    // Experiment type management
+    public enum ExperimentType
+    {
+        TypeOne,
+        TypeTwo,
+        TypeThree,
+        TypeFour
+    }
+    protected ExperimentType experimentType;
 
     #region Flow control variables
 
@@ -58,19 +72,25 @@ public abstract class GameMaster : MonoBehaviour
 
     // Waiting for start management variables
     protected WaitState waitState = WaitState.Waiting;
-    protected bool counting = false;
-    protected bool countdownDone = false;
     protected enum WaitState
     {
         Waiting,
         Countdown
     }
+    protected bool counting = false;
+    protected bool countdownDone = false;
     private bool waitFlag = false;
-    public bool WaitFlag { get => waitFlag; set => waitFlag = value; }
+    protected bool WaitFlag { get => waitFlag; set => waitFlag = value; }
 
     #endregion
 
     #region Abstract methods to be implemented
+
+    /// <summary>
+    /// Initializes the ExperimentSystem and its components.
+    /// Verifies that all components needed for the experiment are available.
+    /// </summary>
+    protected abstract void InitExperimentSystem();
 
     /// <summary>
     /// Checks whether the task has be successfully completed or not.
@@ -89,6 +109,12 @@ public abstract class GameMaster : MonoBehaviour
     /// </summary>
     /// <returns>True if the condition for changing sessions has been reached.</returns>
     public abstract bool CheckNextSessionCondition();
+
+    /// <summary>
+    /// Checks if the condition for ending the experiment has been reached.
+    /// </summary>
+    /// <returns>True if the condition for ending the experiment has been reached.</returns>
+    public abstract bool CheckEndCondition();
 
     /// <summary>
     /// Launches the next session. Performs all the required preparations.
@@ -140,6 +166,9 @@ public abstract class GameMaster : MonoBehaviour
         hudManager = hudGO.GetComponent<HUDManager>();
         if (hudManager == null)
             monitorManager.DisplayError(2, "HUD Manager not found.");
+
+        // Clear HUD
+        hudManager.DisplayText("...", 1.0f);
     }
 
     /// <summary>

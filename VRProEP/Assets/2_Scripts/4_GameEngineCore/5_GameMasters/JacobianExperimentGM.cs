@@ -4,13 +4,71 @@ using UnityEngine;
 
 // GameMaster includes
 using VRProEP.ExperimentCore;
+using VRProEP.GameEngineCore;
+using VRProEP.ProsthesisCore;
 
 public class JacobianExperimentGM : GameMaster
 {
+    [Header("Jacobian Synergy Experiment")]
+    [Tooltip("The GameObject used for the experiment task.")]
+    public GameObject graspTaskObject;
+    public List<GameObject> dropOffLocations = new List<GameObject>();
+    public int iterationsPerDropOff = 20;
+
+    private GraspTaskManager taskManager;
+    private GameObject activeDropOff;
+    private int activeDropOffNumber;
+    private List<int> remainingDropOffIterations;
+    private int iterationLimit;
+
+    // Data logging:
+    private DataStreamLogger motionLogger;
+    private const string motionDataFormat = "t,xHand,yHand,zHand,aHand,bHand,gHand";
+    private float taskTime = 0.0f;
+
     // Start is called before the first frame update
     void Start()
     {
+        if (debug)
+        {
+            SaveSystem.LoadUserData("RG1988");
+            AvatarSystem.LoadPlayer(UserType.AbleBodied, AvatarType.AbleBodied);
+            AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
+        }
+        // Initialize ExperimentSystem
+        InitExperimentSystem();
+        
+        // Initialize UI.
         InitializeUI();
+
+        // Check that drop-off locations have been set.
+        if (dropOffLocations.Count <= 0)
+            throw new System.Exception("Drop-off locations not set.");
+
+        // Get the task manager from object.
+        taskManager = graspTaskObject.GetComponent<GraspTaskManager>();    
+        taskManager.SetObjectEnable(false); // Disable and hide object.
+
+        // Initialize iteration management.
+        remainingDropOffIterations = new List<int>(dropOffLocations.Count);
+        for (int i = 0; i < dropOffLocations.Count; i++)
+            remainingDropOffIterations.Add(iterationsPerDropOff);
+        iterationLimit = iterationsPerDropOff * dropOffLocations.Count;
+
+        // Hide all drop-offs.
+        foreach (GameObject dropOff in dropOffLocations)
+            dropOff.SetActive(false);
+
+        // Configure the grasp manager
+        GameObject graspManagerGO = GameObject.FindGameObjectWithTag("GraspManager");
+        if (graspManagerGO == null)
+            throw new System.Exception("Grasp Manager not found.");
+        GraspManager graspManager = graspManagerGO.GetComponent<GraspManager>();
+        graspManager.managerType = GraspManager.GraspManagerType.Assisted;
+        graspManager.managerMode = GraspManager.GraspManagerMode.Restriced;
+
+        //
+        SetWaitFlag(5.0f);
     }
 
     // Update is called once per frame
@@ -25,6 +83,15 @@ public class JacobianExperimentGM : GameMaster
              */
             // Welcome subject to the virtual world.
             case ExperimentState.HelloWorld:
+                if (WaitFlag)
+                {
+                    hudManager.ClearText();
+                    experimentState = ExperimentState.InitializingApplication;
+                }
+                else
+                {
+                    hudManager.DisplayText("Welcome!");
+                }
                 break;
             /*
              *************************************************
@@ -36,10 +103,13 @@ public class JacobianExperimentGM : GameMaster
                 //
                 // Perform experiment initialization procedures
                 //
+                // Set the initial drop-off.
+                SetNextDropOff();
 
                 //
                 // Initialize data logs
                 //
+                motionLogger.AddNewLogFile(1, iterationNumber, motionDataFormat);
 
                 //
                 // Go to training
@@ -71,8 +141,10 @@ public class JacobianExperimentGM : GameMaster
                 // Skip instructions when repeating sessions
                 if (skipInstructions)
                 {
-                    hudManager.DisplayText("Move to start", 2.0f);
-                    // Turn targets clear
+                    hudManager.DisplayText("Start!", 2.0f);
+                    // Enable task object, drop-off and start
+                    taskManager.SetObjectEnable(true);
+                    activeDropOff.SetActive(true);
                     experimentState = ExperimentState.WaitingForStart;
                     break;
                 }
@@ -84,10 +156,11 @@ public class JacobianExperimentGM : GameMaster
                 //
                 // Go to waiting for start
                 //
-                hudManager.DisplayText("Move to start", 2.0f);
-                // Turn targets clear
+                hudManager.DisplayText("Start!", 2.0f);
+                // Enable task object, drop-off and start
+                taskManager.SetObjectEnable(true);
+                activeDropOff.SetActive(true);
                 experimentState = ExperimentState.WaitingForStart;
-
                 break;
             /*
              *************************************************
@@ -100,38 +173,13 @@ public class JacobianExperimentGM : GameMaster
                 UpdatePause();
                 switch (waitState)
                 {
-                    // Waiting for subject to get to start position.
+                    // Waiting for subject to grab the object.
                     case WaitState.Waiting:
-                        break;
-                    // HUD countdown for reaching action.
-                    case WaitState.Countdown:
-                        // If hand goes out of target reset countdown and wait for position
-                        if (!startEnable && !countdownDone)
+                        if (taskManager.RunFlag)
                         {
-                            counting = false;
-                            countdownDone = false;
-                            // Indicate to move back
-                            hudManager.DisplayText("Move to start", 2.0f);
-                            waitState = WaitState.Waiting;
-                            break;
-                        }
-                        // If all is good and haven't started counting, start.
-                        if (!counting && !countdownDone)
-                        {
-                            StopAllCoroutines();
-                            counting = true;
-                            HUDCountDown(3);
-                        }
-                        // If all is good and the countdownDone flag is raised, switch to reaching.
-                        if (countdownDone)
-                        {
-                            // Reset flags
-                            counting = false;
-                            countdownDone = false;
-                            // Continue
+                            hudManager.ClearText();
+                            taskTime = 0.0f;
                             experimentState = ExperimentState.PerformingTask;
-                            waitState = WaitState.Waiting;
-                            break;
                         }
                         break;
                     default:
@@ -152,30 +200,43 @@ public class JacobianExperimentGM : GameMaster
              *************************************************
              */
             case ExperimentState.AnalizingResults:
+                hudManager.DisplayText("Good job!", 2.0f);
                 // Allow 3 seconds after task end to do calculations
                 SetWaitFlag(3.0f);
+                // Disable drop-off location.
+                activeDropOff.SetActive(false);
 
                 //
                 // Data analysis and calculations
                 //
 
                 //
-                // System update
+                // Adaptive system update (when available)
                 //
 
                 // 
-                // Data logging
+                // Data logging and log management
                 //
+                motionLogger.CloseLog();
 
                 //
                 // Flow managment
                 //
-
-                // Rest for some time when required, otherwise continue with experiment
+                remainingDropOffIterations[activeDropOffNumber]--;
+                // Rest for some time when required
                 if (CheckRestCondition())
                 {
                     SetWaitFlag(restTime);
                     experimentState = ExperimentState.Resting;
+                }
+                // Check whether the new session condition is met
+                else if (CheckNextSessionCondition())
+                {
+                    experimentState = ExperimentState.InitializingNextSession;
+                }
+                else if (CheckEndCondition())
+                {
+                    experimentState = ExperimentState.End;
                 }
                 else
                     experimentState = ExperimentState.UpdatingApplication;
@@ -191,14 +252,26 @@ public class JacobianExperimentGM : GameMaster
                     //
                     // Update iterations and flow control
                     //
+                    iterationNumber++;
+
+                    //
+                    // Update experiment object
+                    //
+                    // Enable new drop-off location.
+                    SetNextDropOff();
 
                     // 
                     // Update log requirements
                     //
+                    motionLogger.AddNewLogFile(1, iterationNumber, motionDataFormat);
 
                     //
-                    //
                     // Go to start of next iteration
+                    //
+                    hudManager.DisplayText("Start!", 2.0f);
+                    // Enable task object, drop-off and start
+                    taskManager.SetObjectEnable(true);
+                    activeDropOff.SetActive(true);
                     experimentState = ExperimentState.WaitingForStart;
                 }
                 break;
@@ -209,29 +282,21 @@ public class JacobianExperimentGM : GameMaster
              */
             case ExperimentState.InitializingNextSession:
                 //
-                // Check whether a new session is requested
+                // Perform session closure procedures
                 //
-                if (CheckNextSessionCondition())
-                {
-                    //
-                    // Perform session closure procedures
-                    //
 
-                    //
-                    // Initialize new session variables and flow control
-                    //
-                    iterationNumber = 1;
-                    sessionNumber++;
-                    skipInstructions = true;
+                //
+                // Initialize new session variables and flow control
+                //
+                iterationNumber = 1;
+                sessionNumber++;
+                skipInstructions = true;
 
-                    //
-                    // Initialize data logging
-                    //
-                    ExperimentSystem.GetActiveLogger(1).AddNewLogFile(sessionNumber, iterationNumber, "Data format");
+                //
+                // Initialize data logging
+                //
 
-                    experimentState = ExperimentState.InitializingApplication; // Initialize next session
-                    break;
-                }
+                experimentState = ExperimentState.InitializingApplication; // Initialize next session
                 break;
             /*
              *************************************************
@@ -257,7 +322,7 @@ public class JacobianExperimentGM : GameMaster
                 //
                 if (WaitFlag)
                 {
-                    hudManager.DisplayText("Get ready to restart!", 3.0f);
+                    hudManager.DisplayText("Get ready!", 3.0f);
                     SetWaitFlag(5.0f);
                     experimentState = ExperimentState.UpdatingApplication;
                     break;
@@ -310,9 +375,18 @@ public class JacobianExperimentGM : GameMaster
         //
         if (debug)
         {
-            debugText.text = experimentState.ToString() + "\n";
+            string debugText = experimentState.ToString() + ".\n";
             if (experimentState == ExperimentState.WaitingForStart)
-                debugText.text += waitState.ToString() + "\n";
+                debugText += waitState.ToString() + ".\n";
+            debugText += "Iteration: " + iterationNumber + "/" + iterationLimit + ".\n";
+            debugText += "Active drop-off: " + activeDropOffNumber + ".\n";
+            int j = 0;
+            foreach (int remainingIterations in remainingDropOffIterations)
+            {
+                debugText += "Remaining drop-off #" + j + ": " + remainingIterations + ".\n";
+                j++;
+            }
+            instructionManager.DisplayText(debugText);
         }
     }
 
@@ -328,16 +402,25 @@ public class JacobianExperimentGM : GameMaster
                 //
                 // Gather data while experiment is in progress
                 //
+                string logData = taskTime.ToString();
+                // Read from all experiment sensors
+                foreach (ISensor sensor in ExperimentSystem.GetActiveSensors())
+                {
+                    float[] sensorData = sensor.GetAllProcessedData();
+                    foreach (float element in sensorData)
+                        logData += "," + element.ToString();
+                }
 
                 //
-                // Append data to lists
+                // Update data and append
                 //
+                taskTime += Time.fixedDeltaTime;
+
 
                 //
                 // Log current data
                 //
-                string data = "Some experiment data.";
-                ExperimentSystem.GetActiveLogger(1).AppendData(data);
+                motionLogger.AppendData(logData);
 
                 //
                 // Save log and reset flags when successfully compeleted task
@@ -351,7 +434,7 @@ public class JacobianExperimentGM : GameMaster
                     //
                     // Save logger for current experiment and change to data analysis
                     //
-                    ExperimentSystem.GetActiveLogger(1).CloseLog();
+                    //ExperimentSystem.GetActiveLogger(1).CloseLog();
 
                     //
                     // Clear data management buffers
@@ -378,6 +461,61 @@ public class JacobianExperimentGM : GameMaster
         ExperimentSystem.CloseAllExperimentLoggers();
     }
 
+    #region Inherited methods overrides
+
+    /// <summary>
+    /// Initializes the ExperimentSystem and its components.
+    /// Verifies that all components needed for the experiment are available.
+    /// </summary>
+    protected override void InitExperimentSystem()
+    {
+        //
+        // Set the experiment type and ID
+        //
+        if (AvatarSystem.AvatarType == AvatarType.AbleBodied)
+        {
+            experimentType = ExperimentType.TypeOne;
+            ExperimentSystem.SetActiveExperimentID("Jacobian/Able");
+        }
+        else if (AvatarSystem.AvatarType == AvatarType.Transhumeral)
+        {
+            // Check if EMG is available
+            bool EMGAvailable = false;
+            foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
+            {
+                if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
+                    EMGAvailable = true;
+            }
+            // Set whether emg or synergy based
+            if (EMGAvailable)
+            {
+                experimentType = ExperimentType.TypeTwo;
+                ExperimentSystem.SetActiveExperimentID("Jacobian/EMG");
+            }
+            else
+            {
+                experimentType = ExperimentType.TypeThree;
+                ExperimentSystem.SetActiveExperimentID("Jacobian/Syn");
+            }
+        }
+        else
+            throw new System.NotImplementedException();
+
+        //
+        // Create data loggers
+        //
+        motionLogger = new DataStreamLogger("Motion");
+        ExperimentSystem.AddExperimentLogger(motionLogger);
+
+        //
+        // Check and add experiment sensors
+        //
+        // Hand tracking sensor
+        GameObject handGO = GameObject.FindGameObjectWithTag("Hand");
+        VirtualPositionTracker handTracker = new VirtualPositionTracker(handGO.transform);
+        ExperimentSystem.AddSensor(handTracker);
+    }
+
     /// <summary>
     /// Checks whether the task has be successfully completed or not.
     /// </summary>
@@ -387,7 +525,7 @@ public class JacobianExperimentGM : GameMaster
         //
         // Perform some condition testing
         //
-        if (true)
+        if (taskManager.SuccessFlag)
         {
             return true;
         }
@@ -403,7 +541,7 @@ public class JacobianExperimentGM : GameMaster
     /// <returns>True if the rest condition has been reached.</returns>
     public override bool CheckRestCondition()
     {
-        throw new System.NotImplementedException();
+        return false;
     }
 
     /// <summary>
@@ -412,7 +550,19 @@ public class JacobianExperimentGM : GameMaster
     /// <returns>True if the condition for changing sessions has been reached.</returns>
     public override bool CheckNextSessionCondition()
     {
-        throw new System.NotImplementedException();
+        return false;
+    }
+
+    /// <summary>
+    /// Checks if the condition for ending the experiment has been reached.
+    /// </summary>
+    /// <returns>True if the condition for ending the experiment has been reached.</returns>
+    public override bool CheckEndCondition()
+    {
+        if (iterationNumber >= iterationLimit)
+            return true;
+        else
+            return false;
     }
 
     /// <summary>
@@ -430,4 +580,24 @@ public class JacobianExperimentGM : GameMaster
     {
         throw new System.NotImplementedException();
     }
+
+    /// <summary>
+    /// Determines the next drop-off location.
+    /// </summary>
+    private void SetNextDropOff()
+    {
+        // Get the drop-off numbers that are still available.
+        List<int> dropOffNumList = new List<int>();
+        for (int i = 0; i < dropOffLocations.Count; i++)
+        {
+            if (remainingDropOffIterations[i] > 0)
+                dropOffNumList.Add(i);
+        }
+        // Select one randomly.
+        activeDropOffNumber = dropOffNumList[Random.Range(0, dropOffNumList.Count)];
+        // Set as active.
+        activeDropOff = dropOffLocations[activeDropOffNumber];
+    }
+
+    #endregion
 }

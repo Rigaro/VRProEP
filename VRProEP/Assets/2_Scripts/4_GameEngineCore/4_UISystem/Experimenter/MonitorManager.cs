@@ -2,20 +2,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using VRProEP.GameEngineCore;
 
-public class MonitorManager : ConsoleManager
+namespace VRProEP.GameEngineCore
 {
-    public TextMeshPro generalArea;
-    public TextMeshPro errorArea;
-
-    public override void DisplayText(string text, float time)
+    public class MonitorManager : ConsoleManager
     {
-        StartCoroutine(DisplayTextCoroutine(generalArea, text, time));
-    }
+        public TextMeshPro generalArea;
+        public TextMeshPro errorArea;
 
-    public override void DisplayError(int errorCode, string text)
-    {
-        StartCoroutine(DisplayTextCoroutine(errorArea, "Error # " + errorCode + ": " + text, 3.0f));
+        public override void DisplayText(string text)
+        {
+            generalArea.text = text;
+        }
+
+        public override void DisplayText(string text, float time)
+        {
+            StartCoroutine(DisplayTextCoroutine(generalArea, text, time));
+        }
+
+        public override void DisplayError(int errorCode, string text)
+        {
+            StartCoroutine(DisplayTextCoroutine(errorArea, "Error # " + errorCode + ": " + text, 3.0f));
+        }
     }
 }

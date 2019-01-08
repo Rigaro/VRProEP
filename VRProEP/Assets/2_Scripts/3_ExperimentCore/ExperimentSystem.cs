@@ -61,7 +61,6 @@ namespace VRProEP.ExperimentCore
         {
             foreach (IExperimentLogger logger in activeLoggers)
             {
-                logger.SaveLog(); // Save data just in case it was not saved.
                 logger.CloseLog();
             }
         }

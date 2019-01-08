@@ -8,6 +8,7 @@ namespace VRProEP.GameEngineCore
     public abstract class ConsoleManager : MonoBehaviour
     {
         public abstract void DisplayText(string text, float time);
+        public abstract void DisplayText(string text);
         public abstract void DisplayError(int errorCode, string text);
 
         protected IEnumerator DisplayTextCoroutine(TextMeshPro textArea, string text, float time)

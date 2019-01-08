@@ -10,6 +10,7 @@ public class GameMasterTemplate : GameMaster
     // Start is called before the first frame update
     void Start()
     {
+        InitExperimentSystem();
         InitializeUI();
     }
 
@@ -170,12 +171,21 @@ public class GameMasterTemplate : GameMaster
                 //
                 // Flow managment
                 //
-
-                // Rest for some time when required, otherwise continue with experiment
+                // Rest for some time when required
                 if (CheckRestCondition())
                 {
                     SetWaitFlag(restTime);
                     experimentState = ExperimentState.Resting;
+                }
+                // Check whether the new session condition is met
+                else if (CheckNextSessionCondition())
+                {
+                    experimentState = ExperimentState.InitializingNextSession;
+                }
+                // Check whether the experiment end condition is met
+                else if (CheckEndCondition())
+                {
+                    experimentState = ExperimentState.End;
                 }
                 else
                     experimentState = ExperimentState.UpdatingApplication;
@@ -209,29 +219,22 @@ public class GameMasterTemplate : GameMaster
              */
             case ExperimentState.InitializingNextSession:
                 //
-                // Check whether a new session is requested
+                // Perform session closure procedures
                 //
-                if (CheckNextSessionCondition())
-                {
-                    //
-                    // Perform session closure procedures
-                    //
 
-                    //
-                    // Initialize new session variables and flow control
-                    //
-                    iterationNumber = 1;
-                    sessionNumber++;
-                    skipInstructions = true;
+                //
+                // Initialize new session variables and flow control
+                //
+                iterationNumber = 1;
+                sessionNumber++;
+                skipInstructions = true;
 
-                    //
-                    // Initialize data logging
-                    //
-                    ExperimentSystem.GetActiveLogger(1).AddNewLogFile(sessionNumber, iterationNumber, "Data format");
+                //
+                // Initialize data logging
+                //
+                ExperimentSystem.GetActiveLogger(1).AddNewLogFile(sessionNumber, iterationNumber, "Data format");
 
-                    experimentState = ExperimentState.InitializingApplication; // Initialize next session
-                    break;
-                }
+                experimentState = ExperimentState.InitializingApplication; // Initialize next session
                 break;
             /*
              *************************************************
@@ -377,7 +380,27 @@ public class GameMasterTemplate : GameMaster
         //
         ExperimentSystem.CloseAllExperimentLoggers();
     }
-    
+
+    #region Inherited methods overrides
+
+    /// <summary>
+    /// Initializes the ExperimentSystem and its components.
+    /// Verifies that all components needed for the experiment are available.
+    /// </summary>
+    protected override void InitExperimentSystem()
+    {
+        //
+        // Set the experiment type and ID
+        //
+        experimentType = ExperimentType.TypeOne;
+        ExperimentSystem.SetActiveExperimentID("template");
+
+        //
+        // Create data loggers
+        //
+
+    }
+
     /// <summary>
     /// Checks whether the task has be successfully completed or not.
     /// </summary>
@@ -416,6 +439,15 @@ public class GameMasterTemplate : GameMaster
     }
 
     /// <summary>
+    /// Checks if the condition for ending the experiment has been reached.
+    /// </summary>
+    /// <returns>True if the condition for ending the experiment has been reached.</returns>
+    public override bool CheckEndCondition()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    /// <summary>
     /// Launches the next session. Performs all the required preparations.
     /// </summary>
     public override void LaunchNextSession()
@@ -430,4 +462,6 @@ public class GameMasterTemplate : GameMaster
     {
         throw new System.NotImplementedException();
     }
+
+    #endregion
 }

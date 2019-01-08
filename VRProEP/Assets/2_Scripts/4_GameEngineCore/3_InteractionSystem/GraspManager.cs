@@ -210,6 +210,7 @@ public class GraspManager : MonoBehaviour {
                 }
             }
             // Start release and cool-off period.
+            inDropOff = false;
             releasing = true;
             StartCoroutine(EnableObjectGraspability(2.0f));
         }

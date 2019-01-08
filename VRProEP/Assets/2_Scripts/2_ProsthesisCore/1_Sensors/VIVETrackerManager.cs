@@ -196,9 +196,12 @@ namespace VRProEP.ProsthesisCore
             else if (trackerTransform == null)
                 throw new System.Exception("The tracker transform has not been set.");
 
+            // Convert to local coordinates
             Vector3 angVel;
             TryGetTrackerAngularVelocity(out angVel);
             Vector3 localAngVel = trackerTransform.InverseTransformVector(angVel);
+
+            // Select requested data
             if (channel == 0)
                 return localAngVel.z;
             else if (channel == 1)
