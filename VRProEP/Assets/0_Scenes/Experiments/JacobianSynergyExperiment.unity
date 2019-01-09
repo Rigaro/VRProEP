@@ -1322,7 +1322,7 @@ MonoBehaviour:
   - {fileID: 56289262}
   - {fileID: 1454447661}
   - {fileID: 112394527}
-  iterationsPerDropOff: 1
+  iterationsPerDropOff: 10
 --- !u!1 &568604224
 GameObject:
   m_ObjectHideFlags: 0
@@ -1433,7 +1433,6 @@ MonoBehaviour:
   timer: {fileID: 662748842}
   startTransform: {fileID: 1370607352}
   enableFlag: 1
-  topConsole: {fileID: 1068763263}
 --- !u!114 &662748842
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2037,18 +2036,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ff03722ea277db145aa6029333c07279, type: 3}
---- !u!114 &1068763263 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 114348196208480234, guid: ff03722ea277db145aa6029333c07279,
-    type: 3}
-  m_PrefabInstance: {fileID: 1068763262}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1096783564
 GameObject:
   m_ObjectHideFlags: 0
@@ -3418,7 +3405,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1931194108074812, guid: 5a2c98b89a9bd47428ac616265f8c213, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4434616526954014, guid: 5a2c98b89a9bd47428ac616265f8c213, type: 3}
       propertyPath: m_LocalPosition.x

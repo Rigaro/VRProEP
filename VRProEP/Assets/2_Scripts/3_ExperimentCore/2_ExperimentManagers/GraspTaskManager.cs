@@ -12,8 +12,8 @@ public class GraspTaskManager : MonoBehaviour {
     [Tooltip("Enables respawning of the object after task completion.")]
     public bool enableFlag = true;
 
-    [Header("Debug")]
-    public TextMeshPro topConsole; // Debug
+    //[Header("Debug")]
+    //public TextMeshPro topConsole; // Debug
 
     private bool runFlag = false;
     private bool successFlag = false;
@@ -62,7 +62,7 @@ public class GraspTaskManager : MonoBehaviour {
         else if (GetComponent<ObjectHandTracking>() == null && timer.IsEnabled() && inDropOff)
         {
             lastTime = timer.StopTimer();
-            topConsole.text = "Task time: " + lastTime.ToString();
+            //topConsole.text = "Task time: " + lastTime.ToString();
             // Successfull end flag.
             runFlag = false;
             successFlag = true;

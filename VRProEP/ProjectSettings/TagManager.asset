@@ -24,6 +24,7 @@ TagManager:
   - HUD
   - Console
   - Monitor
+  - MotionTracker
   layers:
   - Default
   - TransparentFX

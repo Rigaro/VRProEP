@@ -7,6 +7,7 @@ public class AvatarOptionsMenu : MonoBehaviour {
 
     public GameObject mainMenu;
     public LogManager logManager;
+    public Camera mainCamera;
 
     public void LoadAbleBodiedAvatar()
     {
@@ -15,6 +16,7 @@ public class AvatarOptionsMenu : MonoBehaviour {
 
         KeepPlayerGameObjects();
 
+        StartCoroutine(ResetCamera());
         StartCoroutine(DisplayInformationAndReturn(2.0f, "Successfully loaded able-bodied avatar."));
     }
 
@@ -23,8 +25,10 @@ public class AvatarOptionsMenu : MonoBehaviour {
         AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.Transhumeral);
         AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
 
+        mainCamera.fieldOfView = 60;
         KeepPlayerGameObjects();
 
+        StartCoroutine(ResetCamera());
         StartCoroutine(DisplayInformationAndReturn(2.0f, "Successfully loaded able-bodied avatar."));
 
         // Initialize prosthesis
@@ -33,6 +37,14 @@ public class AvatarOptionsMenu : MonoBehaviour {
         elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + SaveSystem.ActiveUser.handLength / 2.0f));
         // Set the reference generator to jacobian-based.
         elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
+    }
+
+    public IEnumerator ResetCamera()
+    {
+        mainCamera.enabled = false;
+        yield return new WaitForSeconds(0.01f);
+        mainCamera.enabled = true;
+
     }
 
     public IEnumerator DisplayInformationAndReturn(float time, string info)

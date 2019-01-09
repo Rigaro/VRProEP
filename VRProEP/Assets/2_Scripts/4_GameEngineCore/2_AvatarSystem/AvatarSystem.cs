@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
+
 using VRProEP.ProsthesisCore;
 
 
@@ -23,6 +24,8 @@ namespace VRProEP.GameEngineCore
         public static bool IsAvatarAvaiable { get => isAvatarAvaiable; }
         public static bool IsPlayerAvailable { get => isPlayerAvailable; }
         public static AvatarType AvatarType { get => activeAvatarType; }
+
+
 
         /// <summary>
         /// Creates an avatar configuration file.
@@ -299,6 +302,18 @@ namespace VRProEP.GameEngineCore
         public static List<ISensor> GetActiveSensors()
         {
             return activeSensors;
+        }
+
+        /// <summary>
+        /// Adds a motion tracker to the avatar using VIVE Trackers.
+        /// </summary>
+        /// <returns></returns>
+        public static GameObject AddMotionTracker()
+        {
+            if (!IsPlayerAvailable)
+                throw new System.Exception("Player object has not been loaded. First load the player object.");
+
+            return AvatarSpawner.SpawnMotionTracker();
         }
     }
 }

@@ -416,7 +416,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4835920975817602}
   - component: {fileID: 114398958539666124}
-  - component: {fileID: 114501819747063714}
   m_Layer: 0
   m_Name: ResidualLimbTracker
   m_TagString: ResidualLimbTracker
@@ -453,19 +452,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   index: 4
   origin: {fileID: 0}
---- !u!114 &114501819747063714
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1246640003275454}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c3c1afeda5e545e0b19add5373896d2e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  AnchorPosition: 1
 --- !u!1 &1267968812902990
 GameObject:
   m_ObjectHideFlags: 0

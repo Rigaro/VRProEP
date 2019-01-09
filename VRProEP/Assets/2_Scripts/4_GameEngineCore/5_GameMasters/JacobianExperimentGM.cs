@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Valve.VR;
 
 // GameMaster includes
 using VRProEP.ExperimentCore;
@@ -23,7 +24,10 @@ public class JacobianExperimentGM : GameMaster
 
     // Data logging:
     private DataStreamLogger motionLogger;
-    private const string motionDataFormat = "t,xHand,yHand,zHand,aHand,bHand,gHand";
+    private const string motionDataAbleFormat = "loc,t,aDotS,bDotS,gDotS,aS,bS,gS,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xHand,yHand,zHand,aHand,bHand,gHand";
+    private const string motionDataEMGFormat = "loc,t,aDotS,bDotS,gDotS,aS,bS,gS,qE,qDotE,emg,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xHand,yHand,zHand,aHand,bHand,gHand";
+    private const string motionDataSynFormat = "loc,t,aDotS,bDotS,gDotS,aS,bS,gS,qE,qDotE,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xHand,yHand,zHand,aHand,bHand,gHand";
+    private string motionDataFormat;
     private float taskTime = 0.0f;
 
     // Start is called before the first frame update
@@ -72,7 +76,7 @@ public class JacobianExperimentGM : GameMaster
     }
 
     // Update is called once per frame
-    void Update()
+    void Update() 
     {
         switch (experimentState)
         {
@@ -105,6 +109,8 @@ public class JacobianExperimentGM : GameMaster
                 //
                 // Set the initial drop-off.
                 SetNextDropOff();
+                // Enable colliders
+                AvatarSystem.EnableAvatarColliders();
 
                 //
                 // Initialize data logs
@@ -373,7 +379,7 @@ public class JacobianExperimentGM : GameMaster
         //
         // Update information displayed for debugging purposes
         //
-        if (debug)
+        if (true)
         {
             string debugText = experimentState.ToString() + ".\n";
             if (experimentState == ExperimentState.WaitingForStart)
@@ -402,7 +408,15 @@ public class JacobianExperimentGM : GameMaster
                 //
                 // Gather data while experiment is in progress
                 //
-                string logData = taskTime.ToString();
+                string logData = activeDropOffNumber.ToString();
+                logData += "," + taskTime.ToString();
+                // Read from all user sensors
+                foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
+                {
+                    float[] sensorData = sensor.GetAllProcessedData();
+                    foreach (float element in sensorData)
+                        logData += "," + element.ToString();
+                }
                 // Read from all experiment sensors
                 foreach (ISensor sensor in ExperimentSystem.GetActiveSensors())
                 {
@@ -476,6 +490,7 @@ public class JacobianExperimentGM : GameMaster
         {
             experimentType = ExperimentType.TypeOne;
             ExperimentSystem.SetActiveExperimentID("Jacobian/Able");
+            motionDataFormat = motionDataAbleFormat;
         }
         else if (AvatarSystem.AvatarType == AvatarType.Transhumeral)
         {
@@ -491,11 +506,13 @@ public class JacobianExperimentGM : GameMaster
             {
                 experimentType = ExperimentType.TypeTwo;
                 ExperimentSystem.SetActiveExperimentID("Jacobian/EMG");
+                motionDataFormat = motionDataEMGFormat;
             }
             else
             {
                 experimentType = ExperimentType.TypeThree;
                 ExperimentSystem.SetActiveExperimentID("Jacobian/Syn");
+                motionDataFormat = motionDataSynFormat;
             }
         }
         else
@@ -510,7 +527,27 @@ public class JacobianExperimentGM : GameMaster
         //
         // Check and add experiment sensors
         //
+        //
+        // Add VIVE Trackers.
+        //
+        if (experimentType == ExperimentType.TypeOne) // Additional tracker for upper arm when able-bodied type
+        {
+            GameObject motionTrackerGO = AvatarSystem.AddMotionTracker();
+            VIVETrackerManager upperArmTracker = new VIVETrackerManager(motionTrackerGO.transform);
+            ExperimentSystem.AddSensor(upperArmTracker);
+        }
+        // Shoulder acromium head tracker
+        GameObject motionTrackerGO1 = AvatarSystem.AddMotionTracker();
+        VIVETrackerManager shoulderTracker = new VIVETrackerManager(motionTrackerGO1.transform);
+        ExperimentSystem.AddSensor(shoulderTracker);
+        // C7 tracker
+        GameObject motionTrackerGO2 = AvatarSystem.AddMotionTracker();
+        VIVETrackerManager c7Tracker = new VIVETrackerManager(motionTrackerGO2.transform);
+        ExperimentSystem.AddSensor(c7Tracker);
+
+        //
         // Hand tracking sensor
+        //
         GameObject handGO = GameObject.FindGameObjectWithTag("Hand");
         VirtualPositionTracker handTracker = new VirtualPositionTracker(handGO.transform);
         ExperimentSystem.AddSensor(handTracker);

@@ -398,7 +398,7 @@ GameObject:
   - component: {fileID: 135236878774665802}
   m_Layer: 0
   m_Name: GraspManager
-  m_TagString: Untagged
+  m_TagString: GraspManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -447,9 +447,9 @@ MonoBehaviour:
   attachmentPoint: {fileID: 4498788391298080}
   managerType: 0
   managerMode: 0
+  dropOffVelocityThreshold: 0.02
   throwEnable: 0
   throwMultiplier: 1
-  dropOffVelocityThreshold: 0.02
 --- !u!135 &135557139448756552
 SphereCollider:
   m_ObjectHideFlags: 0

@@ -62,7 +62,7 @@ namespace VRProEP.ProsthesisCore
             JacobianSynergy jacSyn = new JacobianSynergy(xBar, xMin, xMax, upperArmLength, lowerArmLength);
             inputManager.Configure("CMD_ADD_REFGEN", jacSyn);
             
-            // Add VIVE controller as sensor to manually move.
+            // Add VIVE controller as sensor to enable manually move.
             VIVEControllerManager controllerManager = new VIVEControllerManager();
             inputManager.Configure("CMD_ADD_SENSOR", controllerManager);
 

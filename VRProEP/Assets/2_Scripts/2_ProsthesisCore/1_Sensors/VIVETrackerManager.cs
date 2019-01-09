@@ -22,7 +22,8 @@ namespace VRProEP.ProsthesisCore
         }
 
         // Configuration variables.
-        private static int trackerNumber = 0; // Sets tracker number for when there are multiple ones.
+        private static int totalTrackerNumber = 0; // Sets tracker number for when there are multiple ones.
+        private int trackerNumber = 0;
 
         // Transform to get position information
         private Transform trackerTransform;
@@ -37,7 +38,8 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         public VIVETrackerManager() : base (6, SensorType.VIVETracker)
         {
-            trackerNumber++;
+            totalTrackerNumber++;
+            trackerNumber = totalTrackerNumber;
         }
 
         /// <summary>
@@ -48,7 +50,8 @@ namespace VRProEP.ProsthesisCore
         public VIVETrackerManager(Transform trackerTransform) : base(6, SensorType.VIVETracker)
         {
             SetTrackerTransform(trackerTransform);
-            trackerNumber++;
+            totalTrackerNumber++;
+            trackerNumber = totalTrackerNumber;
         }
 
         public void SetTrackerTransform(Transform trackerTransform)
@@ -65,14 +68,23 @@ namespace VRProEP.ProsthesisCore
         /// <returns>True if sucessful.</returns>
         private bool TryGetTrackerAngularVelocity(out Vector3 localAngVel)
         {
-            // Get node information
+            // Get VR tracking nodes states
             InputTracking.GetNodeStates(xrNodes);
+            //
             // Look for Hardware trackers
+            //
+            // Generate a list with tracker indexes
+            List<float> trackerIndexes = new List<float>(totalTrackerNumber);
+            for (int i = 1; i <= totalTrackerNumber; i++)
+                trackerIndexes.Add(i);
+            // Look for trackers
             int currentTracker = 1;
             foreach (XRNodeState ns in xrNodes)
             {
-                if (ns.nodeType == XRNode.HardwareTracker && currentTracker == trackerNumber)
+                // If a hardware tracker is found, and matches index.
+                if (ns.nodeType == XRNode.HardwareTracker && currentTracker == trackerIndexes[trackerNumber - 1])
                 {
+                    //Debug.Log(currentTracker.ToString());
                     if (ns.TryGetAngularVelocity(out localAngVel))
                         return true;
                     else
@@ -100,6 +112,7 @@ namespace VRProEP.ProsthesisCore
             {
                 if (ns.nodeType == XRNode.HardwareTracker && currentTracker == trackerNumber)
                 {
+                    Debug.Log(currentTracker.ToString());
                     if (ns.TryGetRotation(out localAngPos))
                         return true;
                 }
