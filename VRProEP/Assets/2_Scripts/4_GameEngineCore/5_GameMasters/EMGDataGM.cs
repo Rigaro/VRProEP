@@ -1,21 +1,54 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Valve.VR;
 
 // GameMaster includes
 using VRProEP.ExperimentCore;
 using VRProEP.GameEngineCore;
 using VRProEP.ProsthesisCore;
 
-public class GameMasterTemplate : GameMaster
+public class EMGDataGM : GameMaster
 {
-    private float taskTime = 0.0f;
+    public int iterationsPerAngle = 20;
+    public List<int> startAngleList = new List<int>();
+    public List<int> endAngleList = new List<int>();
+    public List<float> movementTimeList = new List<float>();
+    public ArmGuideManager guideManager;
 
+    private int angleNumber = 1;
+    private int timeNumber = 1;
+    private int timeIterations = 1;
+    private int totalIterations = 1;
+    private int timeIterationLimit;
+    private int totalIterationLimit;
+
+    // Data logging:
+    private DataStreamLogger motionLogger;
+    private const string motionDataFormat = "ref,t,emg1,emg2,emg1raw,emg2raw,aDotS,bDotS,gDotS,aS,bS,gS";
+    private float taskTime = 0.0f;
+    
     // Start is called before the first frame update
     void Start()
     {
+        if (debug)
+        {
+            SaveSystem.LoadUserData("RG1988");
+            AvatarSystem.LoadPlayer(UserType.AbleBodied, AvatarType.AbleBodied);
+            AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
+        }
+        // Initialize ExperimentSystem
         InitExperimentSystem();
+        
+        // Initialize UI.
         InitializeUI();
+
+        // Initialize iteration management.
+        timeIterationLimit = iterationsPerAngle * startAngleList.Count;
+        totalIterationLimit = iterationsPerAngle * startAngleList.Count * movementTimeList.Count;
+
+        //
+        SetWaitFlag(5.0f);
     }
 
     // Update is called once per frame
@@ -30,7 +63,16 @@ public class GameMasterTemplate : GameMaster
              */
             // Welcome subject to the virtual world.
             case ExperimentState.HelloWorld:
-                break;            
+                if (WaitFlag)
+                {
+                    hudManager.ClearText();
+                    experimentState = ExperimentState.InitializingApplication;
+                }
+                else
+                {
+                    hudManager.DisplayText("Welcome!");
+                }
+                break;
             /*
              *************************************************
              *  InitializingApplication
@@ -41,10 +83,16 @@ public class GameMasterTemplate : GameMaster
                 //
                 // Perform experiment initialization procedures
                 //
-                
+                // Enable colliders
+                AvatarSystem.EnableAvatarColliders();
+                // Initialize arm guide
+                guideManager.Initialize(startAngleList[angleNumber - 1], endAngleList[angleNumber - 1], movementTimeList[timeNumber - 1]);
+                guideManager.GoToStart();
+
                 //
                 // Initialize data logs
                 //
+                motionLogger.AddNewLogFile(startAngleList[angleNumber - 1] + "_" + endAngleList[angleNumber - 1] + "_" + movementTimeList[timeNumber - 1], iterationNumber, motionDataFormat);
 
                 //
                 // Go to training
@@ -76,8 +124,7 @@ public class GameMasterTemplate : GameMaster
                 // Skip instructions when repeating sessions
                 if (skipInstructions)
                 {
-                    hudManager.DisplayText("Move to start", 2.0f);
-                    // Turn targets clear
+                    hudManager.DisplayText("Move to guide", 2.0f);
                     experimentState = ExperimentState.WaitingForStart;
                     break;
                 }
@@ -89,10 +136,8 @@ public class GameMasterTemplate : GameMaster
                 //
                 // Go to waiting for start
                 //
-                hudManager.DisplayText("Move to start", 2.0f);
-                // Turn targets clear
+                hudManager.DisplayText("Move to guide", 2.0f);
                 experimentState = ExperimentState.WaitingForStart;
-
                 break;
             /*
              *************************************************
@@ -105,38 +150,15 @@ public class GameMasterTemplate : GameMaster
                 UpdatePause();
                 switch (waitState)
                 {
-                    // Waiting for subject to get to start position.
+                    // Waiting for subject to grab the object.
                     case WaitState.Waiting:
-                        break;
-                    // HUD countdown for reaching action.
-                    case WaitState.Countdown:
-                        // If hand goes out of target reset countdown and wait for position
-                        if (!startEnable && !countdownDone)
-                        {
-                            counting = false;
-                            countdownDone = false;
-                            // Indicate to move back
-                            hudManager.DisplayText("Move to start", 2.0f);
-                            waitState = WaitState.Waiting;
-                            break;
-                        }
-                        // If all is good and haven't started counting, start.
-                        if (!counting && !countdownDone)
+                        if (guideManager.StartGuiding())
                         {
                             StopAllCoroutines();
-                            counting = true;
+                            hudManager.ClearText();
+                            taskTime = 0.0f;
                             HUDCountDown(3);
-                        }
-                        // If all is good and the countdownDone flag is raised, switch to reaching.
-                        if (countdownDone)
-                        {
-                            // Reset flags
-                            counting = false;
-                            countdownDone = false;
-                            // Continue
                             experimentState = ExperimentState.PerformingTask;
-                            waitState = WaitState.Waiting;
-                            break;
                         }
                         break;
                     default:
@@ -157,6 +179,7 @@ public class GameMasterTemplate : GameMaster
              *************************************************
              */
             case ExperimentState.AnalizingResults:
+                hudManager.DisplayText("Good job!", 2.0f);
                 // Allow 3 seconds after task end to do calculations
                 SetWaitFlag(3.0f);
 
@@ -165,16 +188,18 @@ public class GameMasterTemplate : GameMaster
                 //
 
                 //
-                // System update
+                // Adaptive system update (when available)
                 //
 
                 // 
-                // Data logging
+                // Data logging and log management
                 //
+                motionLogger.CloseLog();
 
                 //
                 // Flow managment
                 //
+
                 // Rest for some time when required
                 if (CheckRestCondition())
                 {
@@ -186,7 +211,6 @@ public class GameMasterTemplate : GameMaster
                 {
                     experimentState = ExperimentState.InitializingNextSession;
                 }
-                // Check whether the experiment end condition is met
                 else if (CheckEndCondition())
                 {
                     experimentState = ExperimentState.End;
@@ -205,14 +229,24 @@ public class GameMasterTemplate : GameMaster
                     //
                     // Update iterations and flow control
                     //
+                    iterationNumber++;
+                    timeIterations++;
+                    totalIterations++;
+
+                    //
+                    // Update experiment object
+                    //
+                    guideManager.GoToStart();
 
                     // 
                     // Update log requirements
                     //
+                    motionLogger.AddNewLogFile(startAngleList[angleNumber - 1] + "_" + endAngleList[angleNumber - 1] + "_" + movementTimeList[timeNumber - 1], iterationNumber, motionDataFormat);
 
                     //
-                    //
                     // Go to start of next iteration
+                    //
+                    hudManager.DisplayText("Move to guide", 2.0f);
                     experimentState = ExperimentState.WaitingForStart;
                 }
                 break;
@@ -230,13 +264,23 @@ public class GameMasterTemplate : GameMaster
                 // Initialize new session variables and flow control
                 //
                 iterationNumber = 1;
-                sessionNumber++;
-                skipInstructions = true;
+                // Still doing the angle repetitions for the same time
+                if (timeIterations < timeIterationLimit)
+                {
+                    angleNumber++;
+                    sessionNumber++;
+                }
+                // Done all the angle repetitions for the given time, reset and go to next time
+                else
+                {
+                    angleNumber = 1;
+                    timeIterations = 1;
+                    timeNumber++;
+                }
 
                 //
                 // Initialize data logging
                 //
-                ExperimentSystem.GetActiveLogger(1).AddNewLogFile(sessionNumber, iterationNumber, "Data format");
 
                 experimentState = ExperimentState.InitializingApplication; // Initialize next session
                 break;
@@ -264,7 +308,7 @@ public class GameMasterTemplate : GameMaster
                 //
                 if (WaitFlag)
                 {
-                    hudManager.DisplayText("Get ready to restart!", 3.0f);
+                    hudManager.DisplayText("Get ready!", 3.0f);
                     SetWaitFlag(5.0f);
                     experimentState = ExperimentState.UpdatingApplication;
                     break;
@@ -297,13 +341,13 @@ public class GameMasterTemplate : GameMaster
              *************************************************
              */
             case ExperimentState.End:
-                //
-                // Update log data and close logs.
-                //
+            //
+            // Update log data and close logs.
+            //
 
-                //
-                // Return to main menu
-                //
+            //
+            // Return to main menu
+            //
             default:
                 break;
         }
@@ -311,15 +355,24 @@ public class GameMasterTemplate : GameMaster
         //
         // Update information displayed on monitor
         //
+        string experimentInfoText = "Experiment info: \n";
+        experimentInfoText += "Iteration: " + iterationNumber + "/" + iterationsPerAngle + ".\n";
+        experimentInfoText += "Session: " + sessionNumber + "/" + startAngleList.Count * movementTimeList.Count + ".\n";
+        int j = 0;
+        instructionManager.DisplayText(experimentInfoText);
 
         //
         // Update information displayed for debugging purposes
         //
         if (debug)
         {
-            debugText.text = experimentState.ToString() + "\n";
+            string debugText = "Debug info: \n";
+            debugText += experimentState.ToString() + ".\n";
             if (experimentState == ExperimentState.WaitingForStart)
-                debugText.text += waitState.ToString() + "\n";
+                debugText += waitState.ToString() + ".\n";
+            debugText += "Angle number:" + angleNumber + ".\n";
+            debugText += "Time iterations:" + timeIterations + ".\n";
+            instructionManager.DisplayText(debugText + "\n" + experimentInfoText);
         }
     }
 
@@ -335,7 +388,8 @@ public class GameMasterTemplate : GameMaster
                 //
                 // Gather data while experiment is in progress
                 //
-                string logData = taskTime.ToString();
+                string logData = guideManager.CurrentAngle.ToString();
+                logData += "," + taskTime.ToString();
                 // Read from all user sensors
                 foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
                 {
@@ -352,14 +406,15 @@ public class GameMasterTemplate : GameMaster
                 }
 
                 //
-                // Append data to lists
+                // Update data and append
                 //
                 taskTime += Time.fixedDeltaTime;
+
 
                 //
                 // Log current data
                 //
-                ExperimentSystem.GetActiveLogger(1).AppendData(logData);
+                motionLogger.AppendData(logData);
 
                 //
                 // Save log and reset flags when successfully compeleted task
@@ -373,7 +428,7 @@ public class GameMasterTemplate : GameMaster
                     //
                     // Save logger for current experiment and change to data analysis
                     //
-                    ExperimentSystem.GetActiveLogger(1).CloseLog();
+                    //ExperimentSystem.GetActiveLogger(1).CloseLog();
 
                     //
                     // Clear data management buffers
@@ -408,16 +463,66 @@ public class GameMasterTemplate : GameMaster
     /// </summary>
     protected override void InitExperimentSystem()
     {
+        // Check the experiment parameters
+        if (startAngleList.Count <= 0 || endAngleList.Count <= 0 || movementTimeList.Count <= 0)
+            throw new System.Exception("An experiment configuration list is empty.");
+
+        if (startAngleList.Count != endAngleList.Count)
+            throw new System.Exception("The angle lists do not match in size.");
+
         //
         // Set the experiment type and ID
         //
-        experimentType = ExperimentType.TypeOne;
-        ExperimentSystem.SetActiveExperimentID("template");
+        if (AvatarSystem.AvatarType == AvatarType.AbleBodied)
+        {
+            // Check if EMG is available
+            bool EMGAvailable = false;
+            foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
+            {
+                if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
+                    EMGAvailable = true;
+            }
+            // Set whether emg or synergy based
+            if (EMGAvailable)
+            {
+                experimentType = ExperimentType.TypeTwo;
+                ExperimentSystem.SetActiveExperimentID("EMG_Data");
+            }
+            else
+            {
+                // DEBUG ONLY
+                experimentType = ExperimentType.TypeTwo;
+                ExperimentSystem.SetActiveExperimentID("EMG_Data");
+                // DEBUG ONLY
+
+                //throw new System.Exception("An EMG measurement device is required.");
+            }
+        }
+        else
+            throw new System.NotImplementedException();
 
         //
         // Create data loggers
         //
+        motionLogger = new DataStreamLogger("Motion");
+        ExperimentSystem.AddExperimentLogger(motionLogger);
 
+        //
+        // Check and add experiment sensors
+        //
+        //
+        // Add VIVE Trackers.
+        //
+        GameObject motionTrackerGO = AvatarSystem.AddMotionTracker();
+        VIVETrackerManager upperArmTracker = new VIVETrackerManager(motionTrackerGO.transform);
+        ExperimentSystem.AddSensor(upperArmTracker);
+        // Shoulder acromium head tracker
+        GameObject motionTrackerGO1 = AvatarSystem.AddMotionTracker();
+        VIVETrackerManager shoulderTracker = new VIVETrackerManager(motionTrackerGO1.transform);
+        ExperimentSystem.AddSensor(shoulderTracker);
+
+        // Set arm guide position tracking
+        guideManager.shoulderLocationTransform = motionTrackerGO1.transform;
     }
 
     /// <summary>
@@ -429,7 +534,7 @@ public class GameMasterTemplate : GameMaster
         //
         // Perform some condition testing
         //
-        if (true)
+        if (guideManager.Success)
         {
             return true;
         }
@@ -445,7 +550,7 @@ public class GameMasterTemplate : GameMaster
     /// <returns>True if the rest condition has been reached.</returns>
     public override bool CheckRestCondition()
     {
-        throw new System.NotImplementedException();
+        return false;
     }
 
     /// <summary>
@@ -454,7 +559,10 @@ public class GameMasterTemplate : GameMaster
     /// <returns>True if the condition for changing sessions has been reached.</returns>
     public override bool CheckNextSessionCondition()
     {
-        throw new System.NotImplementedException();
+        if (iterationNumber >= iterationsPerAngle)
+            return true;
+        else
+            return false;
     }
 
     /// <summary>
@@ -463,7 +571,10 @@ public class GameMasterTemplate : GameMaster
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
     public override bool CheckEndCondition()
     {
-        throw new System.NotImplementedException();
+        if (totalIterations >= totalIterationLimit)
+            return true;
+        else
+            return false;
     }
 
     /// <summary>
@@ -481,6 +592,7 @@ public class GameMasterTemplate : GameMaster
     {
         throw new System.NotImplementedException();
     }
+
 
     #endregion
 }
