@@ -10,6 +10,7 @@ using VRProEP.ProsthesisCore;
 
 public class EMGDataGM : GameMaster
 {
+    [Header("Experiment configuration:")]
     public int iterationsPerAngle = 20;
     public List<int> startAngleList = new List<int>();
     public List<int> endAngleList = new List<int>();
@@ -206,14 +207,21 @@ public class EMGDataGM : GameMaster
                     SetWaitFlag(restTime);
                     experimentState = ExperimentState.Resting;
                 }
-                // Check whether the new session condition is met
-                else if (CheckNextSessionCondition())
-                {
-                    experimentState = ExperimentState.InitializingNextSession;
-                }
                 else if (CheckEndCondition())
                 {
                     experimentState = ExperimentState.End;
+                }
+                // Check whether the new session condition is met
+                else if (CheckNextSessionCondition())
+                {
+                    //
+                    // Update iterations and flow control
+                    //
+                    iterationNumber++;
+                    timeIterations++;
+                    totalIterations++;
+                    // Go to next
+                    experimentState = ExperimentState.InitializingNextSession;
                 }
                 else
                     experimentState = ExperimentState.UpdatingApplication;
@@ -264,11 +272,11 @@ public class EMGDataGM : GameMaster
                 // Initialize new session variables and flow control
                 //
                 iterationNumber = 1;
+                sessionNumber++;
                 // Still doing the angle repetitions for the same time
                 if (timeIterations < timeIterationLimit)
                 {
                     angleNumber++;
-                    sessionNumber++;
                 }
                 // Done all the angle repetitions for the given time, reset and go to next time
                 else
@@ -341,13 +349,15 @@ public class EMGDataGM : GameMaster
              *************************************************
              */
             case ExperimentState.End:
-            //
-            // Update log data and close logs.
-            //
+                //
+                // Update log data and close logs.
+                //
 
-            //
-            // Return to main menu
-            //
+                hudManager.DisplayText("Experiment end, thanks!", 5.0f);
+                //
+                // Return to main menu
+                //
+                break;
             default:
                 break;
         }
@@ -490,12 +500,15 @@ public class EMGDataGM : GameMaster
             }
             else
             {
-                // DEBUG ONLY
-                experimentType = ExperimentType.TypeTwo;
-                ExperimentSystem.SetActiveExperimentID("EMG_Data");
-                // DEBUG ONLY
-
-                //throw new System.Exception("An EMG measurement device is required.");
+                if (debug)
+                {
+                    // DEBUG ONLY
+                    experimentType = ExperimentType.TypeTwo;
+                    ExperimentSystem.SetActiveExperimentID("EMG_Data");
+                    // DEBUG ONLY
+                }
+                else
+                    throw new System.Exception("An EMG measurement device is required.");
             }
         }
         else

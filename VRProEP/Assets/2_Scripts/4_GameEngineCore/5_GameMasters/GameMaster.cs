@@ -9,7 +9,7 @@ using VRProEP.GameEngineCore;
 
 public abstract class GameMaster : MonoBehaviour
 {
-    [Header("Control Variables")]
+    [Header("Control Variables:")]
     public bool enableStart = false;
     public bool demoMode = false;
     public float restTime = 60.0f;

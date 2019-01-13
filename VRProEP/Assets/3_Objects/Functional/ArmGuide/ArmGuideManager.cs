@@ -6,9 +6,9 @@ public class ArmGuideManager : MonoBehaviour
 {
     public Transform shoulderLocationTransform;
 
-    private float startAngle;
-    private float endAngle;
-    private float movementTime;
+    private float startAngle = 0;
+    private float endAngle = 90;
+    private float movementTime = 5;
 
     private bool isRunning = false;
     private bool startFlag = false;
@@ -101,7 +101,7 @@ public class ArmGuideManager : MonoBehaviour
     public void Initialize(float startAngle, float endAngle, float movementTime)
     {
         if (startAngle < 0 || startAngle > 180 || endAngle < 0 || endAngle > 180 || movementTime <= 0)
-            throw new System.ArgumentException("Invalid arm guide initialization argument.");
+            throw new System.ArgumentException("Invalid arm guide initialization argument. SA: " + startAngle + ". EA: " + endAngle + ". MT: " + movementTime + ".");
 
         this.startAngle = startAngle;
         this.endAngle = endAngle;

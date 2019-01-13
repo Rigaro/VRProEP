@@ -828,7 +828,7 @@ MonoBehaviour:
   demoMode: 0
   restTime: 60
   skipInstructions: 0
-  debug: 1
+  debug: 0
   debugText: {fileID: 0}
   iterationsPerAngle: 2
   startAngleList: 000000005a000000
