@@ -826,16 +826,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enableStart: 0
   demoMode: 0
-  restTime: 60
+  restTime: 5
   skipInstructions: 0
   debug: 0
   debugText: {fileID: 0}
   iterationsPerAngle: 2
-  startAngleList: 000000005a000000
-  endAngleList: 5a00000000000000
+  startAngleList: 00000000
+  endAngleList: 5a000000
   movementTimeList:
   - 5
-  - 3
   guideManager: {fileID: 534977617717406875}
 --- !u!4 &568604225 stripped
 Transform:

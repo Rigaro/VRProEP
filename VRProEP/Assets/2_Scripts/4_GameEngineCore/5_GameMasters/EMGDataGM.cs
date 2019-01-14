@@ -26,7 +26,7 @@ public class EMGDataGM : GameMaster
 
     // Data logging:
     private DataStreamLogger motionLogger;
-    private const string motionDataFormat = "ref,t,emg1,emg2,emg1raw,emg2raw,aDotS,bDotS,gDotS,aS,bS,gS";
+    private const string motionDataFormat = "ref,t,emg1,emg2,emg1raw,emg2raw,aDotS,bDotS,gDotS,aS,bS,gS,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH";
     private float taskTime = 0.0f;
     
     // Start is called before the first frame update
@@ -122,10 +122,11 @@ public class EMGDataGM : GameMaster
              *************************************************
              */
             case ExperimentState.GivingInstructions:
+                hudManager.DisplayText(movementTimeList[timeNumber - 1] + " sec. movement.", 2.0f);
                 // Skip instructions when repeating sessions
                 if (skipInstructions)
                 {
-                    hudManager.DisplayText("Move to guide", 2.0f);
+                    //hudManager.DisplayText("Move to guide", 2.0f);
                     experimentState = ExperimentState.WaitingForStart;
                     break;
                 }
@@ -137,7 +138,6 @@ public class EMGDataGM : GameMaster
                 //
                 // Go to waiting for start
                 //
-                hudManager.DisplayText("Move to guide", 2.0f);
                 experimentState = ExperimentState.WaitingForStart;
                 break;
             /*
@@ -155,7 +155,7 @@ public class EMGDataGM : GameMaster
                     case WaitState.Waiting:
                         if (guideManager.StartGuiding())
                         {
-                            StopAllCoroutines();
+                            //StopAllCoroutines();
                             hudManager.ClearText();
                             taskTime = 0.0f;
                             HUDCountDown(3);
@@ -182,7 +182,7 @@ public class EMGDataGM : GameMaster
             case ExperimentState.AnalizingResults:
                 hudManager.DisplayText("Good job!", 2.0f);
                 // Allow 3 seconds after task end to do calculations
-                SetWaitFlag(3.0f);
+                // SetWaitFlag(3.0f);
 
                 //
                 // Data analysis and calculations
@@ -204,12 +204,16 @@ public class EMGDataGM : GameMaster
                 // Rest for some time when required
                 if (CheckRestCondition())
                 {
+                    StopAllCoroutines();
+                    hudManager.DisplayText("Rest your arm.", 2.0f);
                     SetWaitFlag(restTime);
                     experimentState = ExperimentState.Resting;
+                    break;
                 }
                 else if (CheckEndCondition())
                 {
                     experimentState = ExperimentState.End;
+                    break;
                 }
                 // Check whether the new session condition is met
                 else if (CheckNextSessionCondition())
@@ -222,9 +226,12 @@ public class EMGDataGM : GameMaster
                     totalIterations++;
                     // Go to next
                     experimentState = ExperimentState.InitializingNextSession;
+                    break;
                 }
                 else
+                {
                     experimentState = ExperimentState.UpdatingApplication;
+                }
                 break;
             /*
              *************************************************
@@ -287,6 +294,10 @@ public class EMGDataGM : GameMaster
                 }
 
                 //
+                // Update experiment object
+                //
+                guideManager.GoToStart();
+                //
                 // Initialize data logging
                 //
 
@@ -316,9 +327,30 @@ public class EMGDataGM : GameMaster
                 //
                 if (WaitFlag)
                 {
-                    hudManager.DisplayText("Get ready!", 3.0f);
-                    SetWaitFlag(5.0f);
-                    experimentState = ExperimentState.UpdatingApplication;
+                    if (CheckEndCondition())
+                    {
+                        experimentState = ExperimentState.End;
+                        break;
+                    }
+                    // Check whether the new session condition is met
+                    else if (CheckNextSessionCondition())
+                    {
+                        //
+                        // Update iterations and flow control
+                        //
+                        iterationNumber++;
+                        timeIterations++;
+                        totalIterations++;
+                        // Go to next
+                        experimentState = ExperimentState.InitializingNextSession;
+                        break;
+                    }
+                    else
+                    {
+                        hudManager.DisplayText("Get ready!", 3.0f);
+                        SetWaitFlag(3.0f);
+                        experimentState = ExperimentState.UpdatingApplication;
+                    }
                     break;
                 }
                 break;
@@ -403,7 +435,7 @@ public class EMGDataGM : GameMaster
                 // Read from all user sensors
                 foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
                 {
-                    float[] sensorData = sensor.GetAllProcessedData();
+                    float[] sensorData = sensor.GetAllRawData();
                     foreach (float element in sensorData)
                         logData += "," + element.ToString();
                 }
@@ -455,10 +487,15 @@ public class EMGDataGM : GameMaster
 
     private void OnApplicationQuit()
     {
-        //
-        // Handle application quit procedures.
-        //
-
+        // Check if WiFi sensors are available
+        foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
+        {
+            if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
+            {
+                WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
+                wifiSensor.StopSensorReading();
+            }
+        }
         //
         // Save and close all logs
         //
@@ -490,7 +527,12 @@ public class EMGDataGM : GameMaster
             foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
             {
                 if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
+                {
                     EMGAvailable = true;
+                    
+                    WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
+                    wifiSensor.StartSensorReading();
+                }
             }
             // Set whether emg or synergy based
             if (EMGAvailable)
@@ -563,7 +605,7 @@ public class EMGDataGM : GameMaster
     /// <returns>True if the rest condition has been reached.</returns>
     public override bool CheckRestCondition()
     {
-        return false;
+        return true;
     }
 
     /// <summary>

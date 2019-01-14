@@ -18,6 +18,7 @@ public class ExperimentSelectionMenu : MonoBehaviour
 
     private const int NONE = 0;
     private const int JACOBIAN_SYNERGY = 1;
+    private const int EMG_DATA = 2;
 
     private List<string> optionList = new List<string>();
 
@@ -55,14 +56,14 @@ public class ExperimentSelectionMenu : MonoBehaviour
     {
         this.optionNumber = optionNumber;
     }
-    
+
     /// <summary>
     /// Checks that all the required components have been loaded and starts experiment.
     /// </summary>
     public void LaunchExperiment()
     {
         // Check that a valid experiment has been selected
-        if (experimentNumber == NONE || optionNumber == NONE)
+        if (experimentNumber == NONE)
         {
             logManager.DisplayInformationOnLog(3.0f, "Please select a valid experiment.");
             return;
@@ -106,6 +107,25 @@ public class ExperimentSelectionMenu : MonoBehaviour
             }
             else
                 logManager.DisplayInformationOnLog(3.0f, "Please configure the " + optionList[optionNumber] + " avatar.");
+        }
+        else if (experimentNumber == EMG_DATA)
+        {
+            // Check that an EMG sensor is available
+            bool EMGAvailable = false;
+            foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
+            {
+                if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
+                    EMGAvailable = true;
+            }
+            // Load when EMG is available.
+            if (EMGAvailable)
+            {
+                KeepOnLoad();
+                // Load experiment.
+                SteamVR_LoadLevel.Begin("EMGShoulderData");
+            }
+            else
+                logManager.DisplayInformationOnLog(3.0f, "Please add and configure an EMG sensor.");
         }
     }
 

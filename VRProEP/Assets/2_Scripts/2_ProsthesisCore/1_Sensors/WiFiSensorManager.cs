@@ -10,6 +10,9 @@ using System.Net.Sockets;
 // Threading includes
 using System.Threading;
 
+// Debug
+using UnityEngine;
+
 namespace VRProEP.ProsthesisCore
 {
     public enum UDPType
@@ -77,7 +80,7 @@ namespace VRProEP.ProsthesisCore
 
             // Create and start communication thread
             thread = new Thread(new ThreadStart(GetDataFromSensor));
-            thread.Start();
+            thread.Start();            
         }
 
         /// <summary>
@@ -143,6 +146,7 @@ namespace VRProEP.ProsthesisCore
 
             // Connect to sensor
             udpState.u.Connect(ip, port);
+            Debug.Log( sensorType + " sensor connection established.");
         }
 
         /// <summary>
@@ -153,6 +157,7 @@ namespace VRProEP.ProsthesisCore
             // Continuously read from sensor while active.
             while(runThread)
             {
+                //Debug.Log(runThread.ToString());
                 // Send a request for data to sensor.
                 Byte[] sendBytes = Encoding.ASCII.GetBytes(command);
                 udpState.u.Send(sendBytes, sendBytes.Length);
@@ -222,6 +227,7 @@ namespace VRProEP.ProsthesisCore
                     sensorValues[i] = float.Parse(value);
                     i++;
                 }
+                // Debug.Log(sensorValues[1]);
             }
         }
         
@@ -242,8 +248,9 @@ namespace VRProEP.ProsthesisCore
         {
             if (runThread == false)
             {
+                Debug.Log( sensorType + " data gathering started.");
+                Debug.Log(ip + " " + port);
                 runThread = true;
-                thread.Start();
             }
             else
                 throw new Exception("The sensor is already running.");
@@ -322,6 +329,8 @@ namespace VRProEP.ProsthesisCore
                 return channelSize;
             }
         }
+
+        public bool RunThread { get => runThread; }
 
         public SensorType GetSensorType()
         {

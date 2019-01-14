@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/0_Scenes/Experiments/JacobianSynergyExperiment.unity
     guid: 109a4465252919148a52ace03703cb13
+  - enabled: 1
+    path: Assets/0_Scenes/Experiments/EMGShoulderData.unity
+    guid: 528d0eeccef45c74398d2eaf085fae7a
   m_configObjects: {}

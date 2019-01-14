@@ -59,7 +59,7 @@ public class ArmGuideManager : MonoBehaviour
         {
             isRunning = false;
             startFlag = false;
-            success = true;
+            StartCoroutine(SetSuccess(1.0f));
         }
     }
 
@@ -107,6 +107,9 @@ public class ArmGuideManager : MonoBehaviour
         this.endAngle = endAngle;
         currentAngle = startAngle;
         movementSpeed = (endAngle - startAngle) / movementTime;
+        isRunning = false;
+        startFlag = false;
+        success = false;
     }
 
     /// <summary>
@@ -120,4 +123,11 @@ public class ArmGuideManager : MonoBehaviour
             transform.localRotation = Quaternion.Euler(-startAngle, 0.0f, 0.0f);
         }
     }
+
+    private IEnumerator SetSuccess(float time)
+    {
+        yield return new WaitForSecondsRealtime(time);
+        success = true;
+    }
+
 }
