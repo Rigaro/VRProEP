@@ -55,7 +55,7 @@ public class ArmGuideManager : MonoBehaviour
             currentAngle += movementSpeed * Time.fixedDeltaTime;
             transform.Rotate(new Vector3(-movementSpeed * Time.fixedDeltaTime, 0.0f, 0.0f));
         }
-        else if ((Mathf.Sign(movementSpeed) > 0 && currentAngle > endAngle) || (Mathf.Sign(movementSpeed) < 0 && currentAngle < endAngle))
+        else if (isRunning && ((Mathf.Sign(movementSpeed) > 0 && currentAngle > endAngle) || (Mathf.Sign(movementSpeed) < 0 && currentAngle < endAngle)))
         {
             isRunning = false;
             startFlag = false;

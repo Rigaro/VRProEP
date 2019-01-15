@@ -124,7 +124,7 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         ~WiFiSensorManager()
         {
-            runThread = false;
+            StopSensorReading();
             udpState.u.Close();
         }
 
@@ -178,6 +178,7 @@ namespace VRProEP.ProsthesisCore
                         ProcessReceivedData(receivedBytes);
                     }
                 }
+
                 // Sleep for 50ms.
                 Thread.Sleep(50);
             }
@@ -227,7 +228,7 @@ namespace VRProEP.ProsthesisCore
                     sensorValues[i] = float.Parse(value);
                     i++;
                 }
-                // Debug.Log(sensorValues[1]);
+                //Debug.Log(sensorValues[0]);
             }
         }
         
@@ -249,11 +250,12 @@ namespace VRProEP.ProsthesisCore
             if (runThread == false)
             {
                 Debug.Log( sensorType + " data gathering started.");
-                Debug.Log(ip + " " + port);
+                //Debug.Log(ip + " " + port);
                 runThread = true;
+                // Create and start communication thread
+                thread = new Thread(new ThreadStart(GetDataFromSensor));
+                thread.Start();
             }
-            else
-                throw new Exception("The sensor is already running.");
         }
 
         /// <summary>

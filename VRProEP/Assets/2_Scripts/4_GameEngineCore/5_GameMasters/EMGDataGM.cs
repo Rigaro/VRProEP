@@ -180,9 +180,9 @@ public class EMGDataGM : GameMaster
              *************************************************
              */
             case ExperimentState.AnalizingResults:
-                hudManager.DisplayText("Good job!", 2.0f);
+                hudManager.DisplayText("Rest your arm.", 5.0f);
                 // Allow 3 seconds after task end to do calculations
-                // SetWaitFlag(3.0f);
+                SetWaitFlag(5.0f);
 
                 //
                 // Data analysis and calculations
@@ -204,7 +204,7 @@ public class EMGDataGM : GameMaster
                 // Rest for some time when required
                 if (CheckRestCondition())
                 {
-                    StopAllCoroutines();
+                    hudManager.ClearText();
                     hudManager.DisplayText("Rest your arm.", 2.0f);
                     SetWaitFlag(restTime);
                     experimentState = ExperimentState.Resting;
@@ -271,37 +271,40 @@ public class EMGDataGM : GameMaster
              *************************************************
              */
             case ExperimentState.InitializingNextSession:
-                //
-                // Perform session closure procedures
-                //
-
-                //
-                // Initialize new session variables and flow control
-                //
-                iterationNumber = 1;
-                sessionNumber++;
-                // Still doing the angle repetitions for the same time
-                if (timeIterations < timeIterationLimit)
+                if (WaitFlag)
                 {
-                    angleNumber++;
-                }
-                // Done all the angle repetitions for the given time, reset and go to next time
-                else
-                {
-                    angleNumber = 1;
-                    timeIterations = 1;
-                    timeNumber++;
-                }
+                    //
+                    // Perform session closure procedures
+                    //
 
-                //
-                // Update experiment object
-                //
-                guideManager.GoToStart();
-                //
-                // Initialize data logging
-                //
+                    //
+                    // Initialize new session variables and flow control
+                    //
+                    iterationNumber = 1;
+                    sessionNumber++;
+                    // Still doing the angle repetitions for the same time
+                    if (timeIterations < timeIterationLimit)
+                    {
+                        angleNumber++;
+                    }
+                    // Done all the angle repetitions for the given time, reset and go to next time
+                    else
+                    {
+                        angleNumber = 1;
+                        timeIterations = 1;
+                        timeNumber++;
+                    }
 
-                experimentState = ExperimentState.InitializingApplication; // Initialize next session
+                    //
+                    // Update experiment object
+                    //
+                    guideManager.GoToStart();
+                    //
+                    // Initialize data logging
+                    //
+
+                    experimentState = ExperimentState.InitializingApplication; // Initialize next session
+                }
                 break;
             /*
              *************************************************
@@ -531,7 +534,9 @@ public class EMGDataGM : GameMaster
                     EMGAvailable = true;
                     
                     WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
+                    //Debug.Log(wifiSensor.RunThread);
                     wifiSensor.StartSensorReading();
+                    //Debug.Log(wifiSensor.RunThread);
                 }
             }
             // Set whether emg or synergy based
@@ -568,16 +573,19 @@ public class EMGDataGM : GameMaster
         //
         // Add VIVE Trackers.
         //
-        GameObject motionTrackerGO = AvatarSystem.AddMotionTracker();
-        VIVETrackerManager upperArmTracker = new VIVETrackerManager(motionTrackerGO.transform);
-        ExperimentSystem.AddSensor(upperArmTracker);
-        // Shoulder acromium head tracker
-        GameObject motionTrackerGO1 = AvatarSystem.AddMotionTracker();
-        VIVETrackerManager shoulderTracker = new VIVETrackerManager(motionTrackerGO1.transform);
-        ExperimentSystem.AddSensor(shoulderTracker);
+        if (!debug)
+        {
+            GameObject motionTrackerGO = AvatarSystem.AddMotionTracker();
+            VIVETrackerManager upperArmTracker = new VIVETrackerManager(motionTrackerGO.transform);
+            ExperimentSystem.AddSensor(upperArmTracker);
+            // Shoulder acromium head tracker
+            GameObject motionTrackerGO1 = AvatarSystem.AddMotionTracker();
+            VIVETrackerManager shoulderTracker = new VIVETrackerManager(motionTrackerGO1.transform);
+            ExperimentSystem.AddSensor(shoulderTracker);
 
-        // Set arm guide position tracking
-        guideManager.shoulderLocationTransform = motionTrackerGO1.transform;
+            // Set arm guide position tracking
+            guideManager.shoulderLocationTransform = motionTrackerGO1.transform;
+        }
     }
 
     /// <summary>
@@ -605,7 +613,7 @@ public class EMGDataGM : GameMaster
     /// <returns>True if the rest condition has been reached.</returns>
     public override bool CheckRestCondition()
     {
-        return true;
+        return false;
     }
 
     /// <summary>
