@@ -1,55 +1,27 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Valve.VR;
 
 // GameMaster includes
 using VRProEP.ExperimentCore;
 using VRProEP.GameEngineCore;
 using VRProEP.ProsthesisCore;
 
-public class EMGDataGM : GameMaster
+public class TestGM : GameMaster
 {
-    [Header("Experiment configuration:")]
-    public int iterationsPerAngle = 20;
-    public List<int> startAngleList = new List<int>();
-    public List<int> endAngleList = new List<int>();
-    public List<float> movementTimeList = new List<float>();
-    public ArmGuideManager guideManager;
+    [Header("Test config. variables.")]
+    public AvatarType avatarType = AvatarType.AbleBodied;
 
-    private int angleNumber = 1;
-    private int timeNumber = 1;
-    private int timeIterations = 1;
-    private int totalIterations = 1;
-    private int timeIterationLimit;
-    private int totalIterationLimit;
-
-    // Data logging:
-    private DataStreamLogger motionLogger;
-    private const string motionDataFormat = "ref,t,emg1,emg2,emg1raw,emg2raw,aDotS,bDotS,gDotS,aS,bS,gS,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH";
     private float taskTime = 0.0f;
-    
+
     // Start is called before the first frame update
     void Start()
     {
-        if (debug)
-        {
-            SaveSystem.LoadUserData("MD1942");
-            AvatarSystem.LoadPlayer(UserType.AbleBodied, AvatarType.AbleBodied);
-            AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
-        }
-        // Initialize ExperimentSystem
+        // Load player
+        SaveSystem.LoadUserData("MD1942");
+        AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, avatarType);
         InitExperimentSystem();
-        
-        // Initialize UI.
         InitializeUI();
-
-        // Initialize iteration management.
-        timeIterationLimit = iterationsPerAngle * startAngleList.Count;
-        totalIterationLimit = iterationsPerAngle * startAngleList.Count * movementTimeList.Count;
-
-        //
-        SetWaitFlag(5.0f);
     }
 
     // Update is called once per frame
@@ -64,15 +36,25 @@ public class EMGDataGM : GameMaster
              */
             // Welcome subject to the virtual world.
             case ExperimentState.HelloWorld:
-                if (WaitFlag)
+                // Load avatar
+                if (avatarType == AvatarType.AbleBodied)
                 {
-                    hudManager.ClearText();
-                    experimentState = ExperimentState.InitializingApplication;
+                    AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
+
                 }
-                else
+                else if (avatarType == AvatarType.Transhumeral)
                 {
-                    hudManager.DisplayText("Welcome!");
+                    AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
+
+                    // Initialize prosthesis
+                    GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+                    ConfigurableElbowManager elbowManager = prosthesisManagerGO.AddComponent<ConfigurableElbowManager>();
+                    elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + SaveSystem.ActiveUser.handLength / 2.0f));
+                    // Set the reference generator to jacobian-based.
+                    elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
                 }
+
+                experimentState = ExperimentState.InitializingApplication;
                 break;
             /*
              *************************************************
@@ -84,16 +66,10 @@ public class EMGDataGM : GameMaster
                 //
                 // Perform experiment initialization procedures
                 //
-                // Enable colliders
-                AvatarSystem.EnableAvatarColliders();
-                // Initialize arm guide
-                guideManager.Initialize(startAngleList[angleNumber - 1], endAngleList[angleNumber - 1], movementTimeList[timeNumber - 1]);
-                guideManager.GoToStart();
 
                 //
                 // Initialize data logs
                 //
-                motionLogger.AddNewLogFile(startAngleList[angleNumber - 1] + "_" + endAngleList[angleNumber - 1] + "_" + movementTimeList[timeNumber - 1], iterationNumber, motionDataFormat);
 
                 //
                 // Go to training
@@ -122,11 +98,11 @@ public class EMGDataGM : GameMaster
              *************************************************
              */
             case ExperimentState.GivingInstructions:
-                hudManager.DisplayText(movementTimeList[timeNumber - 1] + " sec. movement.", 2.0f);
                 // Skip instructions when repeating sessions
                 if (skipInstructions)
                 {
-                    //hudManager.DisplayText("Move to guide", 2.0f);
+                    hudManager.DisplayText("Move to start", 2.0f);
+                    // Turn targets clear
                     experimentState = ExperimentState.WaitingForStart;
                     break;
                 }
@@ -138,7 +114,10 @@ public class EMGDataGM : GameMaster
                 //
                 // Go to waiting for start
                 //
+                hudManager.DisplayText("Move to start", 2.0f);
+                // Turn targets clear
                 experimentState = ExperimentState.WaitingForStart;
+
                 break;
             /*
              *************************************************
@@ -151,16 +130,14 @@ public class EMGDataGM : GameMaster
                 UpdatePause();
                 switch (waitState)
                 {
-                    // Waiting for subject to grab the object.
+                    // Waiting for subject to get to start position.
                     case WaitState.Waiting:
-                        if (guideManager.StartGuiding())
-                        {
-                            //StopAllCoroutines();
-                            hudManager.ClearText();
-                            taskTime = 0.0f;
-                            HUDCountDown(3);
+                        SetWaitFlag(3.0f);
+                        waitState = WaitState.Countdown;
+                        break;
+                    case WaitState.Countdown:
+                        if (WaitFlag)
                             experimentState = ExperimentState.PerformingTask;
-                        }
                         break;
                     default:
                         break;
@@ -180,58 +157,42 @@ public class EMGDataGM : GameMaster
              *************************************************
              */
             case ExperimentState.AnalizingResults:
-                hudManager.DisplayText("Rest your arm.", 5.0f);
                 // Allow 3 seconds after task end to do calculations
-                SetWaitFlag(5.0f);
+                SetWaitFlag(3.0f);
 
                 //
                 // Data analysis and calculations
                 //
 
                 //
-                // Adaptive system update (when available)
+                // System update
                 //
 
                 // 
-                // Data logging and log management
+                // Data logging
                 //
-                motionLogger.CloseLog();
 
                 //
                 // Flow managment
                 //
-
                 // Rest for some time when required
                 if (CheckRestCondition())
                 {
-                    hudManager.ClearText();
-                    hudManager.DisplayText("Rest your arm.", 2.0f);
                     SetWaitFlag(restTime);
                     experimentState = ExperimentState.Resting;
-                    break;
-                }
-                else if (CheckEndCondition())
-                {
-                    experimentState = ExperimentState.End;
-                    break;
                 }
                 // Check whether the new session condition is met
                 else if (CheckNextSessionCondition())
                 {
-                    //
-                    // Update iterations and flow control
-                    //
-                    iterationNumber++;
-                    timeIterations++;
-                    totalIterations++;
-                    // Go to next
                     experimentState = ExperimentState.InitializingNextSession;
-                    break;
+                }
+                // Check whether the experiment end condition is met
+                else if (CheckEndCondition())
+                {
+                    experimentState = ExperimentState.End;
                 }
                 else
-                {
                     experimentState = ExperimentState.UpdatingApplication;
-                }
                 break;
             /*
              *************************************************
@@ -244,24 +205,14 @@ public class EMGDataGM : GameMaster
                     //
                     // Update iterations and flow control
                     //
-                    iterationNumber++;
-                    timeIterations++;
-                    totalIterations++;
-
-                    //
-                    // Update experiment object
-                    //
-                    guideManager.GoToStart();
 
                     // 
                     // Update log requirements
                     //
-                    motionLogger.AddNewLogFile(startAngleList[angleNumber - 1] + "_" + endAngleList[angleNumber - 1] + "_" + movementTimeList[timeNumber - 1], iterationNumber, motionDataFormat);
 
                     //
-                    // Go to start of next iteration
                     //
-                    hudManager.DisplayText("Move to guide", 2.0f);
+                    // Go to start of next iteration
                     experimentState = ExperimentState.WaitingForStart;
                 }
                 break;
@@ -271,40 +222,23 @@ public class EMGDataGM : GameMaster
              *************************************************
              */
             case ExperimentState.InitializingNextSession:
-                if (WaitFlag)
-                {
-                    //
-                    // Perform session closure procedures
-                    //
+                //
+                // Perform session closure procedures
+                //
 
-                    //
-                    // Initialize new session variables and flow control
-                    //
-                    iterationNumber = 1;
-                    sessionNumber++;
-                    // Still doing the angle repetitions for the same time
-                    if (timeIterations < timeIterationLimit)
-                    {
-                        angleNumber++;
-                    }
-                    // Done all the angle repetitions for the given time, reset and go to next time
-                    else
-                    {
-                        angleNumber = 1;
-                        timeIterations = 1;
-                        timeNumber++;
-                    }
+                //
+                // Initialize new session variables and flow control
+                //
+                iterationNumber = 1;
+                sessionNumber++;
+                skipInstructions = true;
 
-                    //
-                    // Update experiment object
-                    //
-                    guideManager.GoToStart();
-                    //
-                    // Initialize data logging
-                    //
+                //
+                // Initialize data logging
+                //
+                //ExperimentSystem.GetActiveLogger(1).AddNewLogFile(sessionNumber, iterationNumber, "Data format");
 
-                    experimentState = ExperimentState.InitializingApplication; // Initialize next session
-                }
+                experimentState = ExperimentState.InitializingApplication; // Initialize next session
                 break;
             /*
              *************************************************
@@ -330,30 +264,9 @@ public class EMGDataGM : GameMaster
                 //
                 if (WaitFlag)
                 {
-                    if (CheckEndCondition())
-                    {
-                        experimentState = ExperimentState.End;
-                        break;
-                    }
-                    // Check whether the new session condition is met
-                    else if (CheckNextSessionCondition())
-                    {
-                        //
-                        // Update iterations and flow control
-                        //
-                        iterationNumber++;
-                        timeIterations++;
-                        totalIterations++;
-                        // Go to next
-                        experimentState = ExperimentState.InitializingNextSession;
-                        break;
-                    }
-                    else
-                    {
-                        hudManager.DisplayText("Get ready!", 3.0f);
-                        SetWaitFlag(3.0f);
-                        experimentState = ExperimentState.UpdatingApplication;
-                    }
+                    hudManager.DisplayText("Get ready to restart!", 3.0f);
+                    SetWaitFlag(5.0f);
+                    experimentState = ExperimentState.UpdatingApplication;
                     break;
                 }
                 break;
@@ -384,15 +297,13 @@ public class EMGDataGM : GameMaster
              *************************************************
              */
             case ExperimentState.End:
-                //
-                // Update log data and close logs.
-                //
+            //
+            // Update log data and close logs.
+            //
 
-                hudManager.DisplayText("Experiment end, thanks!", 5.0f);
-                //
-                // Return to main menu
-                //
-                break;
+            //
+            // Return to main menu
+            //
             default:
                 break;
         }
@@ -400,24 +311,15 @@ public class EMGDataGM : GameMaster
         //
         // Update information displayed on monitor
         //
-        string experimentInfoText = "Experiment info: \n";
-        experimentInfoText += "Iteration: " + iterationNumber + "/" + iterationsPerAngle + ".\n";
-        experimentInfoText += "Session: " + sessionNumber + "/" + startAngleList.Count * movementTimeList.Count + ".\n";
-        int j = 0;
-        instructionManager.DisplayText(experimentInfoText);
 
         //
         // Update information displayed for debugging purposes
         //
         if (debug)
         {
-            string debugText = "Debug info: \n";
-            debugText += experimentState.ToString() + ".\n";
+            debugText.text = experimentState.ToString() + "\n";
             if (experimentState == ExperimentState.WaitingForStart)
-                debugText += waitState.ToString() + ".\n";
-            debugText += "Angle number:" + angleNumber + ".\n";
-            debugText += "Time iterations:" + timeIterations + ".\n";
-            instructionManager.DisplayText(debugText + "\n" + experimentInfoText);
+                debugText.text += waitState.ToString() + "\n";
         }
     }
 
@@ -433,33 +335,34 @@ public class EMGDataGM : GameMaster
                 //
                 // Gather data while experiment is in progress
                 //
-                string logData = guideManager.CurrentAngle.ToString();
-                logData += "," + taskTime.ToString();
+                string logData = taskTime.ToString();
                 // Read from all user sensors
                 foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
                 {
-                    float[] sensorData = sensor.GetAllRawData();
+                    logData += "\n" + sensor.GetSensorType().ToString();
+                    float[] sensorData = sensor.GetAllProcessedData();
                     foreach (float element in sensorData)
-                        logData += "," + element.ToString();
+                        logData += "\n" + element.ToString();
                 }
                 // Read from all experiment sensors
                 foreach (ISensor sensor in ExperimentSystem.GetActiveSensors())
                 {
                     float[] sensorData = sensor.GetAllProcessedData();
                     foreach (float element in sensorData)
-                        logData += "," + element.ToString();
+                        logData += "\n" + element.ToString();
                 }
 
+                hudManager.DisplayText(logData);
+
                 //
-                // Update data and append
+                // Append data to lists
                 //
                 taskTime += Time.fixedDeltaTime;
-
 
                 //
                 // Log current data
                 //
-                motionLogger.AppendData(logData);
+                //ExperimentSystem.GetActiveLogger(1).AppendData(logData);
 
                 //
                 // Save log and reset flags when successfully compeleted task
@@ -490,15 +393,10 @@ public class EMGDataGM : GameMaster
 
     private void OnApplicationQuit()
     {
-        // Check if WiFi sensors are available
-        foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
-        {
-            if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
-            {
-                WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
-                wifiSensor.StopSensorReading();
-            }
-        }
+        //
+        // Handle application quit procedures.
+        //
+
         //
         // Save and close all logs
         //
@@ -513,79 +411,16 @@ public class EMGDataGM : GameMaster
     /// </summary>
     protected override void InitExperimentSystem()
     {
-        // Check the experiment parameters
-        if (startAngleList.Count <= 0 || endAngleList.Count <= 0 || movementTimeList.Count <= 0)
-            throw new System.Exception("An experiment configuration list is empty.");
-
-        if (startAngleList.Count != endAngleList.Count)
-            throw new System.Exception("The angle lists do not match in size.");
-
         //
         // Set the experiment type and ID
         //
-        if (AvatarSystem.AvatarType == AvatarType.AbleBodied)
-        {
-            // Check if EMG is available
-            bool EMGAvailable = false;
-            foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
-            {
-                if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
-                {
-                    EMGAvailable = true;
-                    
-                    WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
-                    //Debug.Log(wifiSensor.RunThread);
-                    wifiSensor.StartSensorReading();
-                    //Debug.Log(wifiSensor.RunThread);
-                }
-            }
-            // Set whether emg or synergy based
-            if (EMGAvailable)
-            {
-                experimentType = ExperimentType.TypeTwo;
-                ExperimentSystem.SetActiveExperimentID("EMG_Data");
-            }
-            else
-            {
-                if (debug)
-                {
-                    // DEBUG ONLY
-                    experimentType = ExperimentType.TypeTwo;
-                    ExperimentSystem.SetActiveExperimentID("EMG_Data");
-                    // DEBUG ONLY
-                }
-                else
-                    throw new System.Exception("An EMG measurement device is required.");
-            }
-        }
-        else
-            throw new System.NotImplementedException();
+        experimentType = ExperimentType.TypeOne;
+        ExperimentSystem.SetActiveExperimentID("Test");
 
         //
         // Create data loggers
         //
-        motionLogger = new DataStreamLogger("Motion");
-        ExperimentSystem.AddExperimentLogger(motionLogger);
 
-        //
-        // Check and add experiment sensors
-        //
-        //
-        // Add VIVE Trackers.
-        //
-        if (!debug)
-        {
-            GameObject motionTrackerGO = AvatarSystem.AddMotionTracker();
-            VIVETrackerManager upperArmTracker = new VIVETrackerManager(motionTrackerGO.transform);
-            ExperimentSystem.AddSensor(upperArmTracker);
-            // Shoulder acromium head tracker
-            GameObject motionTrackerGO1 = AvatarSystem.AddMotionTracker();
-            VIVETrackerManager shoulderTracker = new VIVETrackerManager(motionTrackerGO1.transform);
-            ExperimentSystem.AddSensor(shoulderTracker);
-
-            // Set arm guide position tracking
-            guideManager.shoulderLocationTransform = motionTrackerGO1.transform;
-        }
     }
 
     /// <summary>
@@ -597,7 +432,7 @@ public class EMGDataGM : GameMaster
         //
         // Perform some condition testing
         //
-        if (guideManager.Success)
+        if (false)
         {
             return true;
         }
@@ -613,7 +448,7 @@ public class EMGDataGM : GameMaster
     /// <returns>True if the rest condition has been reached.</returns>
     public override bool CheckRestCondition()
     {
-        return false;
+        throw new System.NotImplementedException();
     }
 
     /// <summary>
@@ -622,10 +457,7 @@ public class EMGDataGM : GameMaster
     /// <returns>True if the condition for changing sessions has been reached.</returns>
     public override bool CheckNextSessionCondition()
     {
-        if (iterationNumber >= iterationsPerAngle)
-            return true;
-        else
-            return false;
+        throw new System.NotImplementedException();
     }
 
     /// <summary>
@@ -634,10 +466,7 @@ public class EMGDataGM : GameMaster
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
     public override bool CheckEndCondition()
     {
-        if (totalIterations >= totalIterationLimit)
-            return true;
-        else
-            return false;
+        throw new System.NotImplementedException();
     }
 
     /// <summary>
@@ -655,7 +484,6 @@ public class EMGDataGM : GameMaster
     {
         throw new System.NotImplementedException();
     }
-
 
     #endregion
 }

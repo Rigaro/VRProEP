@@ -1,6 +1,11 @@
-﻿using UnityEngine;
+﻿// System
+using System;
 using System.Collections.Generic;
+// Unity
+using UnityEngine;
 using UnityEngine.XR;
+// VRProEP
+using VRProEP.Utilities;
 
 namespace VRProEP.ProsthesisCore
 {
@@ -31,7 +36,7 @@ namespace VRProEP.ProsthesisCore
         // Unity XR nodes for accessing VIVETracker data.
         private List<XRNodeState> xrNodes = new List<XRNodeState>();
         private XRNodeState trackerState;
-
+        
         /// <summary>
         /// Tracks a body part using a VIVE Tracker. Uses Unity's XR API to obtain tracking data.
         /// Requires reference to a the Tracker's object Transform.
@@ -82,7 +87,7 @@ namespace VRProEP.ProsthesisCore
             foreach (XRNodeState ns in xrNodes)
             {
                 // If a hardware tracker is found, and matches index.
-                //Debug.Log(ns.nodeType.ToString() + " " + currentTracker);
+                //Debug.Log(ns.nodeType.ToString() + " " + currentTracker + " " + trackerIndexes[trackerNumber - 1]);
                 if (ns.nodeType == XRNode.HardwareTracker && currentTracker == trackerIndexes[trackerNumber - 1])
                 {
                     //Debug.Log(currentTracker.ToString());
@@ -194,7 +199,8 @@ namespace VRProEP.ProsthesisCore
         }
 
         /// <summary>
-        /// Returns processed tracking data in .
+        /// Returns processed tracking data in radians.
+        /// Filters angular velocity data.
         /// Converts from world coordinates to local residual limb coordinates.
         /// Angular velocity given radians per second, world coordinates.
         /// Angular displacement given in Euler angles, world coordinates.
@@ -252,7 +258,6 @@ namespace VRProEP.ProsthesisCore
         }
 
         /// <summary>
-        /// Not implemented, performs GetRawData.
         /// </summary>
         /// <param name="channel">The channel/data identifier.</param>
         /// <returns>Pre-processed sensor data for the given channel.</returns>
@@ -264,7 +269,6 @@ namespace VRProEP.ProsthesisCore
         }
 
         /// <summary>
-        /// Not implemented, performs GetAllRawData.
         /// </summary>
         /// <returns>The array with all pre-processed sensor data.</returns>
         public override float[] GetAllProcessedData()
@@ -272,10 +276,13 @@ namespace VRProEP.ProsthesisCore
             if (trackerTransform == null)
                 throw new System.Exception("The tracker transform has not been set.");
 
+            /*
             Vector3 angVel;
             TryGetTrackerAngularVelocity(out angVel);
             Vector3 localAngVel = trackerTransform.InverseTransformVector(angVel);
             float[] data = { localAngVel.z, localAngVel.y, localAngVel.x, GetProcessedData(3), GetProcessedData(4), GetProcessedData(5) };
+            */
+            float[] data = { GetProcessedData(0), GetProcessedData(1), GetProcessedData(2), GetProcessedData(3), GetProcessedData(4), GetProcessedData(5) };
             return data;
         }
 
