@@ -828,14 +828,15 @@ MonoBehaviour:
   demoMode: 0
   restTime: 5
   skipInstructions: 0
-  debug: 1
+  debug: 0
   debugText: {fileID: 0}
-  iterationsPerAngle: 2
+  iterationsPerAngle: 10
   startAngleList: 000000005a000000
   endAngleList: 5a00000000000000
   movementTimeList:
   - 5
   - 3
+  - 1
   guideManager: {fileID: 534977617717406875}
 --- !u!4 &568604225 stripped
 Transform:

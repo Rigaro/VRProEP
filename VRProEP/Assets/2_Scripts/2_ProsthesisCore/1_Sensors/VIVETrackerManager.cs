@@ -82,6 +82,7 @@ namespace VRProEP.ProsthesisCore
             foreach (XRNodeState ns in xrNodes)
             {
                 // If a hardware tracker is found, and matches index.
+                //Debug.Log(ns.nodeType.ToString() + " " + currentTracker);
                 if (ns.nodeType == XRNode.HardwareTracker && currentTracker == trackerIndexes[trackerNumber - 1])
                 {
                     //Debug.Log(currentTracker.ToString());
