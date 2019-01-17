@@ -20,10 +20,12 @@ namespace VRProEP.ProsthesisCore
         public const string VAL_SENSOR_VIVECONTROLLER = "VAL_SENSOR_VIVECONTROLLER";
         public const string VAL_SENSOR_OCULUSTOUCH = "VAL_SENSOR_OCULUSTOUCH";
         public const string VAL_SENSOR_VIRTUALENCODER = "VAL_SENSOR_VIRTUALENCODER";
+        public const string VAL_SENSOR_SEMG = "VAL_SENSOR_SEMG";
         public const string VAL_REFGEN_LINKINSYN = "VAL_REFGEN_LINKINSYN";
         public const string VAL_REFGEN_JACOBIANSYN = "VAL_REFGEN_JACOBIANSYN";
         public const string VAL_REFGEN_INTEGRATOR = "VAL_REFGEN_INTEGRATOR";
         public const string VAL_REFGEN_POINTGRAD = "VAL_REFGEN_POINTGRAD";
+        public const string VAL_REFGEN_EMGPROP = "VAL_REFGEN_EMGPROP";
 
         /// <summary>
         /// Input manager that allows for dynamic customization of sensors and reference generators.
@@ -140,6 +142,30 @@ namespace VRProEP.ProsthesisCore
                 // Generate reference
                 return activeGenerator.UpdateReference(channel, input);
             }
+            else if (GetActiveReferenceGeneratorType() == ReferenceGeneratorType.EMGInterface)
+            {
+                // Save currently active sensor
+                SensorType prevSensorType = activeSensor.GetSensorType();
+                // Get EMG status
+                Configure("CMD_SET_ACTIVE_SENSOR", SensorType.EMGWiFi);
+                float[] emgStatus = activeSensor.GetAllProcessedData();
+                // Get enable
+                Configure("CMD_SET_ACTIVE_SENSOR", SensorType.VIVEController);
+                float enableValue = activeSensor.GetProcessedData(1);
+
+                // Combine input
+                List<float> input = new List<float>();
+                input.Add(enableValue);
+                foreach (float emgState in emgStatus)
+                    input.Add(emgState);
+
+                // Go back to previously active sensor
+                Configure("CMD_SET_ACTIVE_SENSOR", prevSensorType);
+
+                // Generate reference
+                return activeGenerator.UpdateReference(channel, input.ToArray());
+
+            }
             else
             {
                 // First read the angular velocity from sensor
@@ -237,6 +263,9 @@ namespace VRProEP.ProsthesisCore
                         case VAL_SENSOR_VIRTUALENCODER:
                             SetActiveSensor(SensorType.VirtualEncoder);
                             break;
+                        case VAL_SENSOR_SEMG:
+                            SetActiveSensor(SensorType.EMGWiFi);
+                            break;
                         default:
                             throw new System.ArgumentException("Invalid value provided.");
                     }
@@ -255,6 +284,9 @@ namespace VRProEP.ProsthesisCore
                             break;
                         case VAL_REFGEN_JACOBIANSYN:
                             SetActiveReferenceGenerator(ReferenceGeneratorType.JacobianSynergy);
+                            break;
+                        case VAL_REFGEN_EMGPROP:
+                            SetActiveReferenceGenerator(ReferenceGeneratorType.EMGInterface);
                             break;
                         default:
                             throw new System.ArgumentException("Invalid value provided.");

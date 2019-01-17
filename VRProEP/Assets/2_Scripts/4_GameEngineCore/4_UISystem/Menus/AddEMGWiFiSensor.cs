@@ -45,6 +45,11 @@ public class AddEMGWiFiSensor : MonoBehaviour {
             EMGWiFiManager emgSensor = new EMGWiFiManager(ip, port, channelSize);
             AvatarSystem.AddActiveSensor(emgSensor);
 
+            // Get prosthesis and add sensor
+            GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+            ConfigurableElbowManager elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
+            elbowManager.AddSensor(emgSensor);
+            
             // Return to settings menu.
             addSensorMenu.ReturnToSettingsMenu();
         }
@@ -59,6 +64,10 @@ public class AddEMGWiFiSensor : MonoBehaviour {
         {
             StartCoroutine(DisplayInformationOnLog(3.0f, "Port already in use."));
 
+        }
+        catch
+        {
+            StartCoroutine(DisplayInformationOnLog(3.0f, "An error occured while adding the sensor."));
         }
     }
 

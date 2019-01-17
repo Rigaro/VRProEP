@@ -536,6 +536,26 @@ public class JacobianExperimentGM : GameMaster
             VIVETrackerManager upperArmTracker = new VIVETrackerManager(motionTrackerGO.transform);
             ExperimentSystem.AddSensor(upperArmTracker);
         }
+        else if (experimentType == ExperimentType.TypeTwo) // EMG case
+        {
+            // Set EMG sensor and reference generator as active.
+            // Get prosthesis
+            GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+            ConfigurableElbowManager elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
+            // Set the reference generator to jacobian-based.
+            elbowManager.ChangeSensor("VAL_SENSOR_SEMG");
+            elbowManager.ChangeReferenceGenerator("VAL_REFGEN_EMGPROP");
+        }
+        else if (experimentType == ExperimentType.TypeThree) // Jacobian synergy case
+        {
+            // Set VIVE tracker and Jacobian synergy as active.
+            // Get prosthesis
+            GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+            ConfigurableElbowManager elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
+            // Set the reference generator to jacobian-based.
+            elbowManager.ChangeSensor("VAL_SENSOR_VIVETRACKER");
+            elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
+        }
         // Shoulder acromium head tracker
         GameObject motionTrackerGO1 = AvatarSystem.AddMotionTracker();
         VIVETrackerManager shoulderTracker = new VIVETrackerManager(motionTrackerGO1.transform);
