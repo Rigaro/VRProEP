@@ -12,6 +12,12 @@ public class TestGM : GameMaster
     [Header("Test config. variables.")]
     public AvatarType avatarType = AvatarType.AbleBodied;
 
+    [Header("EMG config")]
+    public bool emgEnable = false;
+    public string ip = "192.168.137.2";
+    public int port = 2390;
+    public int channelSize = 1;
+
     private float taskTime = 0.0f;
 
     // Start is called before the first frame update
@@ -52,6 +58,20 @@ public class TestGM : GameMaster
                     elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + SaveSystem.ActiveUser.handLength / 2.0f));
                     // Set the reference generator to jacobian-based.
                     elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
+
+                    // Enable & configure EMG
+                    if (emgEnable)
+                    {
+                        // Create and add sensor
+                        EMGWiFiManager emgSensor = new EMGWiFiManager(ip, port, channelSize);
+                        AvatarSystem.AddActiveSensor(emgSensor);
+                        elbowManager.AddSensor(emgSensor);
+                        emgSensor.StartSensorReading();
+                        
+                        // Set active sensor and reference generator to EMG.
+                        elbowManager.ChangeSensor("VAL_SENSOR_SEMG");
+                        elbowManager.ChangeReferenceGenerator("VAL_REFGEN_EMGPROP");
+                    }
                 }
 
                 experimentState = ExperimentState.InitializingApplication;
@@ -347,6 +367,7 @@ public class TestGM : GameMaster
                 // Read from all experiment sensors
                 foreach (ISensor sensor in ExperimentSystem.GetActiveSensors())
                 {
+                    logData += "\n" + sensor.GetSensorType().ToString();
                     float[] sensorData = sensor.GetAllProcessedData();
                     foreach (float element in sensorData)
                         logData += "\n" + element.ToString();
@@ -396,6 +417,15 @@ public class TestGM : GameMaster
         //
         // Handle application quit procedures.
         //
+        // Check if WiFi sensors are available
+        foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
+        {
+            if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
+            {
+                WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
+                wifiSensor.StopSensorReading();
+            }
+        }
 
         //
         // Save and close all logs

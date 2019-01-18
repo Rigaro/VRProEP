@@ -157,7 +157,10 @@ namespace VRProEP.ProsthesisCore
                 List<float> input = new List<float>();
                 input.Add(enableValue);
                 foreach (float emgState in emgStatus)
+                {
                     input.Add(emgState);
+                    //Debug.Log(emgState);
+                }
 
                 // Go back to previously active sensor
                 Configure("CMD_SET_ACTIVE_SENSOR", prevSensorType);

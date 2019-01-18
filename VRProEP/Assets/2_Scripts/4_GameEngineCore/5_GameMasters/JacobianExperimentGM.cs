@@ -468,6 +468,15 @@ public class JacobianExperimentGM : GameMaster
         //
         // Handle application quit procedures.
         //
+        // Check if WiFi sensors are available
+        foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
+        {
+            if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
+            {
+                WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
+                wifiSensor.StopSensorReading();
+            }
+        }
 
         //
         // Save and close all logs
@@ -499,7 +508,13 @@ public class JacobianExperimentGM : GameMaster
             foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
             {
                 if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
+                {
                     EMGAvailable = true;
+                    WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
+                    //Debug.Log(wifiSensor.RunThread);
+                    wifiSensor.StartSensorReading();
+                    //Debug.Log(wifiSensor.RunThread);
+                }
             }
             // Set whether emg or synergy based
             if (EMGAvailable)
@@ -542,7 +557,7 @@ public class JacobianExperimentGM : GameMaster
             // Get prosthesis
             GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
             ConfigurableElbowManager elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
-            // Set the reference generator to jacobian-based.
+            // Set active sensor and reference generator to EMG.
             elbowManager.ChangeSensor("VAL_SENSOR_SEMG");
             elbowManager.ChangeReferenceGenerator("VAL_REFGEN_EMGPROP");
         }

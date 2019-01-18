@@ -386,6 +386,10 @@ MonoBehaviour:
   debug: 0
   debugText: {fileID: 0}
   avatarType: 0
+  emgEnable: 1
+  ip: 192.168.137.254
+  port: 2390
+  channelSize: 1
 --- !u!4 &225556716
 Transform:
   m_ObjectHideFlags: 0

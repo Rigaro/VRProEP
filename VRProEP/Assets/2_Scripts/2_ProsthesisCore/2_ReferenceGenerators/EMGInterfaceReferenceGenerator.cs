@@ -140,7 +140,7 @@ namespace VRProEP.ProsthesisCore
             if (enable && !enableRequested && !isEnabled)
             {
                 // Requested to enable, get button down
-                Debug.Log("Enable requested.");
+                //Debug.Log("Enable requested.");
                 enableRequested = true;
                 isEnabled = true;
             }
@@ -150,7 +150,7 @@ namespace VRProEP.ProsthesisCore
             }
             else if (enable && !enableRequested && isEnabled)
             {
-                Debug.Log("Disable requested.");
+                //Debug.Log("Disable requested.");
                 // Requested to disable, get button down
                 enableRequested = true;
                 isEnabled = false;
@@ -175,7 +175,7 @@ namespace VRProEP.ProsthesisCore
                 tempXBar = xMin[channel];
 
             xBar[channel] = (float)System.Math.Round(tempXBar, 3);
-            Debug.Log(xBar[channel]);
+            //Debug.Log(isEnabled.ToString() + " " + xBar[channel] + " " + input[1]);
             return xBar[channel];
 
         }

@@ -393,6 +393,15 @@ public class GameMasterTemplate : GameMaster
         //
         // Handle application quit procedures.
         //
+        // Check if WiFi sensors are available
+        foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
+        {
+            if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
+            {
+                WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
+                wifiSensor.StopSensorReading();
+            }
+        }
 
         //
         // Save and close all logs

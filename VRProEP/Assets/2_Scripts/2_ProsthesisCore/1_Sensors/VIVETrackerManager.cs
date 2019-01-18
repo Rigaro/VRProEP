@@ -45,6 +45,12 @@ namespace VRProEP.ProsthesisCore
         {
             totalTrackerNumber++;
             trackerNumber = totalTrackerNumber;
+            // Print the nodes found
+            InputTracking.GetNodeStates(xrNodes);
+            foreach (XRNodeState ns in xrNodes)
+            {
+                Debug.Log(ns.nodeType.ToString());
+            }
         }
 
         /// <summary>
@@ -57,13 +63,17 @@ namespace VRProEP.ProsthesisCore
             SetTrackerTransform(trackerTransform);
             totalTrackerNumber++;
             trackerNumber = totalTrackerNumber;
+            // Print the nodes found
+            InputTracking.GetNodeStates(xrNodes);
+            foreach (XRNodeState ns in xrNodes)
+            {
+                Debug.Log(ns.nodeType.ToString());
+            }
         }
 
         public void SetTrackerTransform(Transform trackerTransform)
         {
-            if (trackerTransform == null)
-                throw new System.ArgumentNullException();
-            this.trackerTransform = trackerTransform;
+            this.trackerTransform = trackerTransform ?? throw new System.ArgumentNullException();
         }
         
         /// <summary>
@@ -239,7 +249,7 @@ namespace VRProEP.ProsthesisCore
             }
             else if (channel == 4)
             {
-                float offsetAngle = (-trackerTransform.localRotation.eulerAngles.y + 270.0f);
+                float offsetAngle = (-trackerTransform.localRotation.eulerAngles.y + 0.0f);
                 if (offsetAngle > 180.0f)
                 {
                     offsetAngle -= 360;
@@ -248,7 +258,7 @@ namespace VRProEP.ProsthesisCore
             }
             else
             {
-                float offsetAngle = (-trackerTransform.localRotation.eulerAngles.z + 270.0f);
+                float offsetAngle = (-trackerTransform.localRotation.eulerAngles.z + 180.0f);
                 if (offsetAngle > 180.0f)
                 {
                     offsetAngle -= 360;
