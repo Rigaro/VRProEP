@@ -7,22 +7,32 @@ using VRProEP.ExperimentCore;
 using VRProEP.GameEngineCore;
 using VRProEP.ProsthesisCore;
 
-public class TestGM : GameMaster
+public class ProsthesisTrainingGM : GameMaster
 {
-    [Header("Test config. variables.")]
-    public AvatarType avatarType = AvatarType.AbleBodied;
+    [Header("Training mode configuration.")]
+    public Camera TrainingCamera;
+    public AvatarType avatarType = AvatarType.Transhumeral;
+    public Transform fixedProsthesisPosition;
 
-    [Header("EMG config")]
+    [Header("EMG configuration")]
     public bool emgEnable = false;
     public string ip = "192.168.137.2";
     public int port = 2390;
     public int channelSize = 1;
 
+    [Header("Instructions")]
+    [TextArea]
+    public string synergyInstructions;
+    [TextArea]
+    public string emgInstructions;
+
     private float taskTime = 0.0f;
+    private string instructionsText;
 
     // Start is called before the first frame update
     void Start()
     {
+        TrainingCamera.enabled = false;
         // Load player
         SaveSystem.LoadUserData("MD1942");
         AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, avatarType);
@@ -43,14 +53,17 @@ public class TestGM : GameMaster
             // Welcome subject to the virtual world.
             case ExperimentState.HelloWorld:
                 // Load avatar
-                if (avatarType == AvatarType.AbleBodied)
-                {
-                    AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
-
-                }
-                else if (avatarType == AvatarType.Transhumeral)
+                if (avatarType == AvatarType.Transhumeral)
                 {
                     AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
+
+                    // Find the residual limb and change the follower
+                    GameObject residualLimbGO = GameObject.FindGameObjectWithTag("ResidualLimbAvatar");
+                    ResidualLimbFollower limbFollower = residualLimbGO.GetComponent<ResidualLimbFollower>();
+                    Destroy(limbFollower);
+                    AngleFollower angleFollower = residualLimbGO.AddComponent<AngleFollower>();
+                    angleFollower.fixedTransform = fixedProsthesisPosition;
+
 
                     // Initialize prosthesis
                     GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
@@ -58,6 +71,7 @@ public class TestGM : GameMaster
                     elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + SaveSystem.ActiveUser.handLength / 2.0f));
                     // Set the reference generator to jacobian-based.
                     elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
+                    instructionsText = synergyInstructions;
 
                     // Enable & configure EMG
                     if (emgEnable)
@@ -67,13 +81,19 @@ public class TestGM : GameMaster
                         AvatarSystem.AddActiveSensor(emgSensor);
                         elbowManager.AddSensor(emgSensor);
                         emgSensor.StartSensorReading();
-                        
+
                         // Set active sensor and reference generator to EMG.
                         elbowManager.ChangeSensor("VAL_SENSOR_SEMG");
                         elbowManager.ChangeReferenceGenerator("VAL_REFGEN_EMGPROP");
+                        instructionsText = emgInstructions;
                     }
                 }
+                else
+                {
+                    throw new System.NotImplementedException();
+                }
 
+                monitorManager.DisplayText("Instructions:\n" + instructionsText);
                 experimentState = ExperimentState.InitializingApplication;
                 break;
             /*
@@ -157,7 +177,11 @@ public class TestGM : GameMaster
                         break;
                     case WaitState.Countdown:
                         if (WaitFlag)
+                        {
+                            // Enable training camera
+                            TrainingCamera.enabled = true;
                             experimentState = ExperimentState.PerformingTask;
+                        }
                         break;
                     default:
                         break;
@@ -355,25 +379,36 @@ public class TestGM : GameMaster
                 //
                 // Gather data while experiment is in progress
                 //
-                string logData = taskTime.ToString();
+                string displayData = "Time: " + taskTime.ToString();
                 // Read from all user sensors
                 foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
                 {
-                    logData += "\n" + sensor.GetSensorType().ToString();
-                    float[] sensorData = sensor.GetAllProcessedData();
-                    foreach (float element in sensorData)
-                        logData += "\n" + element.ToString();
+                    if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
+                    {
+                        displayData += "\n" + sensor.GetSensorType().ToString() + " Command:";
+                        float[] sensorData = sensor.GetAllProcessedData();
+                        foreach (float element in sensorData)
+                        displayData += "\n" + element.ToString();
+                    }
+                    else if (sensor.GetSensorType().Equals(SensorType.VirtualEncoder))
+                    {
+                        displayData += "\n" + sensor.GetSensorType().ToString() + " Command:";
+                        float[] sensorData = sensor.GetAllProcessedData();
+                        foreach (float element in sensorData)
+                            displayData += "\n" + element.ToString();
+                    }
                 }
                 // Read from all experiment sensors
                 foreach (ISensor sensor in ExperimentSystem.GetActiveSensors())
                 {
-                    logData += "\n" + sensor.GetSensorType().ToString();
+                    displayData += "\n" + sensor.GetSensorType().ToString();
                     float[] sensorData = sensor.GetAllProcessedData();
                     foreach (float element in sensorData)
-                        logData += "\n" + element.ToString();
+                        displayData += "\n" + element.ToString();
                 }
 
-                hudManager.DisplayText(logData);
+                instructionManager.DisplayText(displayData);
+                //hudManager.DisplayText(logData);
 
                 //
                 // Append data to lists
@@ -444,6 +479,8 @@ public class TestGM : GameMaster
         //
         // Set the experiment type and ID
         //
+        experimentType = ExperimentType.TypeOne;
+        ExperimentSystem.SetActiveExperimentID("Test");
 
         //
         // Create data loggers
