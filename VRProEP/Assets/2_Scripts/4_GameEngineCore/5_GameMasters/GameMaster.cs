@@ -201,14 +201,14 @@ public abstract class GameMaster : MonoBehaviour
             {
                 hudManager.DisplayText("Resuming experiment!", 3.0f);
                 instructionManager.DisplayText("Resuming experiment!", 3.0f);
-                monitorManager.DisplayText("Resuming experiment!", 3.0f);
+                //monitorManager.DisplayText("Resuming experiment!", 3.0f);
                 experimentState = ExperimentState.WaitingForStart;
             }
             else if (experimentState == ExperimentState.WaitingForStart)
             {
                 hudManager.DisplayText("Pausing experiment...", 3.0f);
                 instructionManager.DisplayText("Pausing experiment!", 3.0f);
-                monitorManager.DisplayText("Pausing experiment!", 3.0f);
+                //monitorManager.DisplayText("Pausing experiment!", 3.0f);
                 experimentState = ExperimentState.Paused;
             }
         }
@@ -229,6 +229,14 @@ public abstract class GameMaster : MonoBehaviour
         }
         else
             return false;
+    }
+
+    protected void UpdateCloseApplication()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
     }
 
     protected bool UpdateNext()

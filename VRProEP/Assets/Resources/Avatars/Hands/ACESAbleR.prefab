@@ -1089,7 +1089,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d37c2cf88f7c59f4c8cf5d3812568143, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  index: 3
+  index: 4
   origin: {fileID: 0}
 --- !u!1 &1737611483399334
 GameObject:
@@ -1586,9 +1586,9 @@ MonoBehaviour:
   attachmentPoint: {fileID: 4324669838775834}
   managerType: 0
   managerMode: 0
+  dropOffVelocityThreshold: 0.02
   throwEnable: 0
   throwMultiplier: 1
-  dropOffVelocityThreshold: 0.02
 --- !u!135 &135778854017009914
 SphereCollider:
   m_ObjectHideFlags: 0
