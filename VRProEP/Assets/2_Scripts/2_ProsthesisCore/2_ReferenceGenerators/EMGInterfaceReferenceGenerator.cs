@@ -15,6 +15,8 @@ namespace VRProEP.ProsthesisCore
 
         private List<float> gains = new List<float>();
         private EMGInterfaceType interfaceType;
+        private bool isEnabled = false;
+        private bool enableRequested = false;
 
         public List<float> Gains
         {
@@ -31,7 +33,9 @@ namespace VRProEP.ProsthesisCore
 
 
         /// <summary>
-        /// Proportional EMG reference generator that converts an EMG signal (either single or dual site) into a joint velocity reference.
+        /// Proportional EMG reference generator that converts an EMG signal into a joint angle or velocity reference.
+        /// Single site: joint angle reference.
+        /// Dual site: joint velocity reference.
         /// Sets all integrator gains to the default: 1.0.
         /// </summary>
         /// <param name="xBar">The initial condition for the references.</param>
@@ -45,7 +49,9 @@ namespace VRProEP.ProsthesisCore
         }
 
         /// <summary>
-        /// Proportional EMG reference generator that converts an EMG signal (either single or dual site) into a joint velocity reference.
+        /// Proportional EMG reference generator that converts an EMG signal into a joint angle or velocity reference.
+        /// Single site: joint angle reference.
+        /// Dual site: joint velocity reference.
         /// </summary>
         /// <param name="xBar">The initial condition for the references.</param>
         /// <param name="gains">The desired integrator gain for each reference.</param>
@@ -62,7 +68,9 @@ namespace VRProEP.ProsthesisCore
         }
 
         /// <summary>
-        /// Proportional EMG reference generator that converts an EMG signal (either single or dual site) into a joint velocity reference.
+        /// Proportional EMG reference generator that converts an EMG signal into a joint angle or velocity reference.
+        /// Single site: joint angle reference.
+        /// Dual site: joint velocity reference.
         /// Sets all gains to the default: 1.0.
         /// </summary>
         /// <param name="xBar">The initial condition for the references.</param>
@@ -83,7 +91,9 @@ namespace VRProEP.ProsthesisCore
         }
 
         /// <summary>
-        /// Proportional EMG reference generator that converts an EMG signal (either single or dual site) into a joint velocity reference.
+        /// Proportional EMG reference generator that converts an EMG signal into a joint angle or velocity reference.
+        /// Single site: joint angle reference.
+        /// Dual site: joint velocity reference.
         /// Sets all gains to the default: 1.0.
         /// </summary>
         /// <param name="xBar">The initial condition for the references.</param>
@@ -121,16 +131,41 @@ namespace VRProEP.ProsthesisCore
             if (!IsInputValid(input))
                 throw new System.ArgumentOutOfRangeException("The provided input does not match the interface type.");
 
-            float tempXBar = 0.0f;
+            // Extract input
+            bool enable = false;
+            if (input[0] >= 1.0f)
+                enable = true;
 
-            // Generate and integrate reference.
-            if (interfaceType == EMGInterfaceType.singleSiteProportional)
+            // Check if requested to enable the synergy
+            if (enable && !enableRequested && !isEnabled)
             {
-                tempXBar = xBar[channel] + (Gains[channel] * input[0] * Time.fixedDeltaTime);
+                // Requested to enable, get button down
+                //Debug.Log("Enable requested.");
+                enableRequested = true;
+                isEnabled = true;
             }
-            else if (interfaceType == EMGInterfaceType.dualSiteProportional)
+            else if (!enable && enableRequested) // Released button
             {
-                tempXBar = xBar[channel] + (Gains[channel] * (input[0] - input[1]) * Time.fixedDeltaTime);
+                enableRequested = false;
+            }
+            else if (enable && !enableRequested && isEnabled)
+            {
+                //Debug.Log("Disable requested.");
+                // Requested to disable, get button down
+                enableRequested = true;
+                isEnabled = false;
+            }
+
+            float tempXBar = xBar[channel];
+
+            // Generate reference.
+            if (isEnabled && interfaceType == EMGInterfaceType.singleSiteProportional)
+            {
+                tempXBar = - Mathf.Deg2Rad * Gains[channel] * input[1]; // Obtained angle from scaled EMG input, since processed EMG input range is 0-100.
+            }
+            else if (isEnabled && interfaceType == EMGInterfaceType.dualSiteProportional)
+            {
+                tempXBar = xBar[channel] + (Gains[channel] * (input[1] - input[2]) * Time.fixedDeltaTime); // Differential velocity control.
             }
 
             // Saturate reference
@@ -140,6 +175,7 @@ namespace VRProEP.ProsthesisCore
                 tempXBar = xMin[channel];
 
             xBar[channel] = (float)System.Math.Round(tempXBar, 3);
+            //Debug.Log(isEnabled.ToString() + " " + xBar[channel] + " " + input[1]);
             return xBar[channel];
 
         }
@@ -152,20 +188,17 @@ namespace VRProEP.ProsthesisCore
         /// <returns>The updated set of references.</returns>
         public override float[] UpdateAllReferences(float[] input)
         {
-            // Check validity of provided input
-            if (!(input.Length == channelSize || input.Length/2 == channelSize))
-                throw new System.ArgumentOutOfRangeException("The length of the parameters does not match the number of reference channels.");
-
             for (int i = 0; i < channelSize; i++)
             {
                 // Update each channel depending on type.
                 if (interfaceType == EMGInterfaceType.singleSiteProportional)
                 {
+                    float[] tempIn = { input[2 * i], input[2 * i + 1] };
                     UpdateReference(i, input);
                 }
                 else if (interfaceType == EMGInterfaceType.dualSiteProportional)
                 {
-                    float[] tempIn = { input[2*i], input[2*i + 1] }; // Select the correct pair.
+                    float[] tempIn = { input[2*i], input[2*i + 1], input[2 * i + 2] }; // Select the correct pair.
                     UpdateReference(i, tempIn);
                 }
             }
@@ -192,9 +225,9 @@ namespace VRProEP.ProsthesisCore
         protected new bool IsInputValid(float[] input)
         {
             // Check validity of the provided channel
-            if (interfaceType == EMGInterfaceType.singleSiteProportional && input.Length != 1)
+            if (interfaceType == EMGInterfaceType.singleSiteProportional && input.Length != 2)
                 return false;
-            if (interfaceType == EMGInterfaceType.dualSiteProportional && input.Length != 2)
+            if (interfaceType == EMGInterfaceType.dualSiteProportional && input.Length != 3)
                 return false;
             else
                 return true;

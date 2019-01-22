@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
+
 using VRProEP.ProsthesisCore;
 
 
@@ -16,24 +17,15 @@ namespace VRProEP.GameEngineCore
         private static AvatarData activeAvatarData;
         private static List<ISensor> activeSensors = new List<ISensor>();
 
+        private static AvatarType activeAvatarType;
         private static bool isPlayerAvailable = false;
         private static bool isAvatarAvaiable = false;
 
-        public static bool IsAvatarAvaiable
-        {
-            get
-            {
-                return isAvatarAvaiable;
-            }
-        }
+        public static bool IsAvatarAvaiable { get => isAvatarAvaiable; }
+        public static bool IsPlayerAvailable { get => isPlayerAvailable; }
+        public static AvatarType AvatarType { get => activeAvatarType; }
 
-        public static bool IsPlayerAvailable
-        {
-            get
-            {
-                return isPlayerAvailable;
-            }
-        }
+
 
         /// <summary>
         /// Creates an avatar configuration file.
@@ -147,16 +139,19 @@ namespace VRProEP.GameEngineCore
                 LoadTrackerFrame(userData.type, avatarType);
                 CustomizeTrackingFrame(userData, avatarType);
                 AvatarSpawner.SpawnTranshumeralAvatar(userData, activeAvatarData);
+                activeAvatarType = AvatarType.Transhumeral;
             }
             else if (avatarType == AvatarType.Transradial)
             {
                 LoadTrackerFrame(userData.type, avatarType);
                 CustomizeTrackingFrame(userData, avatarType);
                 AvatarSpawner.SpawnTransradialAvatar(userData, activeAvatarData);
+                activeAvatarType = AvatarType.Transradial;
             }
             else if (avatarType == AvatarType.AbleBodied)
             {
                 AvatarSpawner.SpawnAbleBodiedAvatar(userData, activeAvatarData);
+                activeAvatarType = AvatarType.AbleBodied;
             }
 
             isAvatarAvaiable = true;
@@ -307,6 +302,18 @@ namespace VRProEP.GameEngineCore
         public static List<ISensor> GetActiveSensors()
         {
             return activeSensors;
+        }
+
+        /// <summary>
+        /// Adds a motion tracker to the avatar using VIVE Trackers.
+        /// </summary>
+        /// <returns></returns>
+        public static GameObject AddMotionTracker()
+        {
+            if (!IsPlayerAvailable)
+                throw new System.Exception("Player object has not been loaded. First load the player object.");
+
+            return AvatarSpawner.SpawnMotionTracker();
         }
     }
 }

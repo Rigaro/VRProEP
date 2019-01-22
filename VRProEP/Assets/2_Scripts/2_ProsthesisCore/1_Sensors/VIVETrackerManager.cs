@@ -1,6 +1,11 @@
-﻿using UnityEngine;
+﻿// System
+using System;
 using System.Collections.Generic;
+// Unity
+using UnityEngine;
 using UnityEngine.XR;
+// VRProEP
+using VRProEP.Utilities;
 
 namespace VRProEP.ProsthesisCore
 {
@@ -22,7 +27,8 @@ namespace VRProEP.ProsthesisCore
         }
 
         // Configuration variables.
-        private static int trackerNumber = 0; // Sets tracker number for when there are multiple ones.
+        private static int totalTrackerNumber = 0; // Sets tracker number for when there are multiple ones.
+        private int trackerNumber = 0;
 
         // Transform to get position information
         private Transform trackerTransform;
@@ -30,14 +36,21 @@ namespace VRProEP.ProsthesisCore
         // Unity XR nodes for accessing VIVETracker data.
         private List<XRNodeState> xrNodes = new List<XRNodeState>();
         private XRNodeState trackerState;
-
+        
         /// <summary>
         /// Tracks a body part using a VIVE Tracker. Uses Unity's XR API to obtain tracking data.
         /// Requires reference to a the Tracker's object Transform.
         /// </summary>
         public VIVETrackerManager() : base (6, SensorType.VIVETracker)
         {
-            trackerNumber++;
+            totalTrackerNumber++;
+            trackerNumber = totalTrackerNumber;
+            // Print the nodes found
+            InputTracking.GetNodeStates(xrNodes);
+            foreach (XRNodeState ns in xrNodes)
+            {
+                Debug.Log(ns.nodeType.ToString());
+            }
         }
 
         /// <summary>
@@ -48,14 +61,19 @@ namespace VRProEP.ProsthesisCore
         public VIVETrackerManager(Transform trackerTransform) : base(6, SensorType.VIVETracker)
         {
             SetTrackerTransform(trackerTransform);
-            trackerNumber++;
+            totalTrackerNumber++;
+            trackerNumber = totalTrackerNumber;
+            // Print the nodes found
+            InputTracking.GetNodeStates(xrNodes);
+            foreach (XRNodeState ns in xrNodes)
+            {
+                Debug.Log(ns.nodeType.ToString());
+            }
         }
 
         public void SetTrackerTransform(Transform trackerTransform)
         {
-            if (trackerTransform == null)
-                throw new System.ArgumentNullException();
-            this.trackerTransform = trackerTransform;
+            this.trackerTransform = trackerTransform ?? throw new System.ArgumentNullException();
         }
         
         /// <summary>
@@ -65,14 +83,24 @@ namespace VRProEP.ProsthesisCore
         /// <returns>True if sucessful.</returns>
         private bool TryGetTrackerAngularVelocity(out Vector3 localAngVel)
         {
-            // Get node information
+            // Get VR tracking nodes states
             InputTracking.GetNodeStates(xrNodes);
+            //
             // Look for Hardware trackers
+            //
+            // Generate a list with tracker indexes
+            List<float> trackerIndexes = new List<float>(totalTrackerNumber);
+            for (int i = 1; i <= totalTrackerNumber; i++)
+                trackerIndexes.Add(i);
+            // Look for trackers
             int currentTracker = 1;
             foreach (XRNodeState ns in xrNodes)
             {
-                if (ns.nodeType == XRNode.HardwareTracker && currentTracker == trackerNumber)
+                // If a hardware tracker is found, and matches index.
+                //Debug.Log(ns.nodeType.ToString() + " " + currentTracker + " " + trackerIndexes[trackerNumber - 1]);
+                if (ns.nodeType == XRNode.HardwareTracker && currentTracker == trackerIndexes[trackerNumber - 1])
                 {
+                    //Debug.Log(currentTracker.ToString());
                     if (ns.TryGetAngularVelocity(out localAngVel))
                         return true;
                     else
@@ -100,6 +128,7 @@ namespace VRProEP.ProsthesisCore
             {
                 if (ns.nodeType == XRNode.HardwareTracker && currentTracker == trackerNumber)
                 {
+                    Debug.Log(currentTracker.ToString());
                     if (ns.TryGetRotation(out localAngPos))
                         return true;
                 }
@@ -180,7 +209,8 @@ namespace VRProEP.ProsthesisCore
         }
 
         /// <summary>
-        /// Returns processed tracking data in .
+        /// Returns processed tracking data in radians.
+        /// Filters angular velocity data.
         /// Converts from world coordinates to local residual limb coordinates.
         /// Angular velocity given radians per second, world coordinates.
         /// Angular displacement given in Euler angles, world coordinates.
@@ -196,9 +226,12 @@ namespace VRProEP.ProsthesisCore
             else if (trackerTransform == null)
                 throw new System.Exception("The tracker transform has not been set.");
 
+            // Convert to local coordinates
             Vector3 angVel;
             TryGetTrackerAngularVelocity(out angVel);
             Vector3 localAngVel = trackerTransform.InverseTransformVector(angVel);
+
+            // Select requested data
             if (channel == 0)
                 return localAngVel.z;
             else if (channel == 1)
@@ -208,34 +241,45 @@ namespace VRProEP.ProsthesisCore
             else if (channel == 3)
             {
                 float offsetAngle = (-trackerTransform.localRotation.eulerAngles.x + 270.0f);
-                if (offsetAngle > 180.0f)
+                if (offsetAngle > 360.0f)
                 {
-                    offsetAngle -= 360;
+                    offsetAngle -= 360.0f;
+                }
+                if (offsetAngle < -360.0f)
+                {
+                    offsetAngle += 360.0f;
                 }
                 return Mathf.Deg2Rad * offsetAngle;
             }
             else if (channel == 4)
             {
                 float offsetAngle = (-trackerTransform.localRotation.eulerAngles.y + 270.0f);
-                if (offsetAngle > 180.0f)
+                if (offsetAngle > 360.0f)
                 {
-                    offsetAngle -= 360;
+                    offsetAngle -= 360.0f;
+                }
+                if (offsetAngle < -360.0f)
+                {
+                    offsetAngle += 360.0f;
                 }
                 return Mathf.Deg2Rad * offsetAngle;
             }
             else
             {
-                float offsetAngle = (-trackerTransform.localRotation.eulerAngles.z + 270.0f);
-                if (offsetAngle > 180.0f)
+                float offsetAngle = (-trackerTransform.localRotation.eulerAngles.z + 180.0f);
+                if (offsetAngle > 360.0f)
                 {
-                    offsetAngle -= 360;
+                    offsetAngle -= 360.0f;
+                }
+                if (offsetAngle < -360.0f)
+                {
+                    offsetAngle += 360.0f;
                 }
                 return Mathf.Deg2Rad * offsetAngle;
             }
         }
 
         /// <summary>
-        /// Not implemented, performs GetRawData.
         /// </summary>
         /// <param name="channel">The channel/data identifier.</param>
         /// <returns>Pre-processed sensor data for the given channel.</returns>
@@ -247,7 +291,6 @@ namespace VRProEP.ProsthesisCore
         }
 
         /// <summary>
-        /// Not implemented, performs GetAllRawData.
         /// </summary>
         /// <returns>The array with all pre-processed sensor data.</returns>
         public override float[] GetAllProcessedData()
@@ -255,10 +298,13 @@ namespace VRProEP.ProsthesisCore
             if (trackerTransform == null)
                 throw new System.Exception("The tracker transform has not been set.");
 
+            /*
             Vector3 angVel;
             TryGetTrackerAngularVelocity(out angVel);
             Vector3 localAngVel = trackerTransform.InverseTransformVector(angVel);
             float[] data = { localAngVel.z, localAngVel.y, localAngVel.x, GetProcessedData(3), GetProcessedData(4), GetProcessedData(5) };
+            */
+            float[] data = { GetProcessedData(0), GetProcessedData(1), GetProcessedData(2), GetProcessedData(3), GetProcessedData(4), GetProcessedData(5) };
             return data;
         }
 

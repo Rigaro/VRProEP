@@ -20,6 +20,11 @@ TagManager:
   - Head
   - Graspable
   - DropOff
+  - GraspManager
+  - HUD
+  - Console
+  - Monitor
+  - MotionTracker
   layers:
   - Default
   - TransparentFX

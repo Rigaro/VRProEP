@@ -5,7 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/0_Scenes/Development/TestScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
@@ -14,4 +14,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/0_Scenes/DemoPlayground.unity
     guid: 2d1dd22ecd75bc44b92ffb73f43f5de0
+  - enabled: 1
+    path: Assets/0_Scenes/Experiments/JacobianSynergyExperiment.unity
+    guid: 109a4465252919148a52ace03703cb13
+  - enabled: 1
+    path: Assets/0_Scenes/Experiments/EMGShoulderData.unity
+    guid: 528d0eeccef45c74398d2eaf085fae7a
   m_configObjects: {}

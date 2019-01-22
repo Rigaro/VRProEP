@@ -19,6 +19,7 @@ namespace VRProEP.GameEngineCore
         private static AvatarObjectData activeHandData;
 
         //private const float objectGap = 0.0f; // Helps with the gap between certain objects to avoid overlapping issues.
+        private static int motionTrackerNumber = 0;
 
         private static readonly string resourcesDataPath = Application.dataPath + "/Resources/Avatars";
 
@@ -325,6 +326,36 @@ namespace VRProEP.GameEngineCore
             handFixedJoint.connectedBody = forearmRB;
 
             return forearmGO;
+        }
+
+        public static GameObject SpawnMotionTracker()
+        {
+            // Load prefab and check validity
+            GameObject motionTrackerPrefab = Resources.Load<GameObject>("Trackers/VIVETracker");
+            if (motionTrackerPrefab == null)
+                throw new System.Exception("The requested motion tracker prefab was not found.");
+
+            // Load Player object
+            GameObject playerGO = GameObject.FindGameObjectWithTag("Player");
+            if (playerGO == null)
+                throw new System.Exception("The player GameObject was not found.");
+
+            // Load Avatar object to set as parent.
+            GameObject avatarGO = GameObject.FindGameObjectWithTag("Avatar");
+
+            // Instantiate
+            GameObject motionTrackerGO = Object.Instantiate(motionTrackerPrefab, avatarGO.transform);
+
+            // Configure
+            SteamVR_TrackedObject motionTrackerConfig = motionTrackerGO.GetComponent<SteamVR_TrackedObject>();
+            if (AvatarSystem.AvatarType == AvatarType.AbleBodied)
+                motionTrackerConfig.SetDeviceIndex(motionTrackerNumber + 5); // Set hardware device index to follow
+            else
+                motionTrackerConfig.SetDeviceIndex(motionTrackerNumber + 6); // Set hardware device index to follow
+            motionTrackerConfig.origin = playerGO.transform; 
+            motionTrackerNumber++; 
+
+            return motionTrackerGO;
         }
     }
 

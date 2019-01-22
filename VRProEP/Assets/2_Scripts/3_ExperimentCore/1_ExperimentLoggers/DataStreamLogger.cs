@@ -134,6 +134,34 @@ namespace VRProEP.ExperimentCore
         }
 
         /// <summary>
+        /// Adds a new log for the given session number and iteration.
+        /// </summary>
+        /// <param name="sessionNum">The current experiment session number.</param>
+        /// <param name="iteration">The current task iteration.</param>
+        /// <param name="format">The format to be used as header for the data in the Log.</param>
+        public void AddNewLogFile(string sessionID, int iteration, string format)
+        {
+            if (!isInitialized || !isConfigured)
+                throw new System.Exception("The logger has not been initialized or configured.");
+
+            if (sessionID == null)
+                throw new System.ArgumentNullException("The session ID is empty.");
+
+            // Create directory for the given session number if not available.
+            string newFilePath = Path.Combine(activeDataPath, sessionID);
+            if (!Directory.Exists(newFilePath))
+                Directory.CreateDirectory(newFilePath);
+            // Create comma separated file to hold data stream for the given iteration
+            newFilePath = Path.Combine(newFilePath, "i" + "_" + iteration + ".csv");
+            FileStream sb = new FileStream(newFilePath, FileMode.Create);
+            // Initialize file StreamWriter with the given file.
+            fileWriter = new StreamWriter(sb);
+            // Add log format as header
+            fileWriter.WriteLine(format);
+            SaveLog();
+        }
+
+        /// <summary>
         /// Appends new data to the current Log file.
         /// </summary>
         /// <param name="data">The string data to be appended.</param>

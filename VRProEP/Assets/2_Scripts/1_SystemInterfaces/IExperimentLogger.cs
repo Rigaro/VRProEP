@@ -42,6 +42,14 @@ namespace VRProEP.ExperimentCore
         void AddNewLogFile(int sessionNum, int iteration, string format);
 
         /// <summary>
+        /// Adds a new log for the given session identifier and Iteration.
+        /// </summary>
+        /// <param name="sessionID">The current session identifier.</param>
+        /// <param name="iteration">The current task iteration.</param>
+        /// <param name="format">The format to be used as header for the data in the Log.</param>
+        void AddNewLogFile(string sessionID, int iteration, string format);
+
+        /// <summary>
         /// Appends new data to the current Log file.
         /// </summary>
         /// <param name="data">The string data to be appended.</param>

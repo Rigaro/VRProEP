@@ -21,7 +21,9 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         public void InitializeProsthesis(float upperArmLength, float lowerArmLength)
         {
+            //
             // ConfigurableInputManagar
+            //
             // Find ResdiualLimbTracker GameObject and extract its Transform.
             GameObject residualLimbTrackerGO = GameObject.FindGameObjectWithTag("ResidualLimbTracker");
             // Create a VIVETracker with the obtained transform
@@ -34,7 +36,9 @@ namespace VRProEP.ProsthesisCore
             // Create configurable input manager with the created sensor and RG.
             inputManager = new ConfigurableInputManager(trackerManager, integratorRG);
 
+            //
             // ElbowManager
+            //
             // Find Elbow_Lower GameObject and extract its HingeJoint and Rigidbody
             GameObject elbowLowerGO = GameObject.FindGameObjectWithTag("Elbow_Lower");
             if (elbowLowerGO == null)
@@ -47,27 +51,39 @@ namespace VRProEP.ProsthesisCore
             elbowManager = new ElbowManager(virtualEncoder, elbowRB);
             elbowManager.Axis = elbowJoint.axis;
 
+            //
+            // Sensors
+            //
             // Add the created sensors to the list of available sensors.
             AvatarSystem.AddActiveSensor(trackerManager);
             AvatarSystem.AddActiveSensor(virtualEncoder);
 
-            // Add a LKS to the prosthesis
+            // Add VIVE controller as sensor to enable manual inputs.
+            VIVEControllerManager controllerManager = new VIVEControllerManager();
+            inputManager.Configure("CMD_ADD_SENSOR", controllerManager);
+
+            // Add joint encoder as sensor for jacobian synergy
+            inputManager.Configure("CMD_ADD_SENSOR", virtualEncoder);
+
+            //
+            // Reference generators
+            //
+            // Add a Linear Kinematic Synergy to the prosthesis
             float[] theta = { -2.5f };
             float[] thetaMin = { -1.0f };
             float[] thetaMax = { -3.5f };
             LinearKinematicSynergy linSyn = new LinearKinematicSynergy(xBar, xMin, xMax, theta, thetaMin, thetaMax);
             inputManager.Configure("CMD_ADD_REFGEN", linSyn);
 
-            // Add a Jacobian based synergy
+            // Add a Jacobian based Kinematic Synergy
             JacobianSynergy jacSyn = new JacobianSynergy(xBar, xMin, xMax, upperArmLength, lowerArmLength);
             inputManager.Configure("CMD_ADD_REFGEN", jacSyn);
-            
-            // Add VIVE controller as sensor to manually move.
-            VIVEControllerManager controllerManager = new VIVEControllerManager();
-            inputManager.Configure("CMD_ADD_SENSOR", controllerManager);
 
-            // Add joint encoder as sensor for jacobian synergy
-            inputManager.Configure("CMD_ADD_SENSOR", virtualEncoder);
+            // Add an EMG reference generator
+            List<float> emgGains = new List<float>(1);
+            emgGains.Add(1.3f);
+            EMGInterfaceReferenceGenerator emgRG = new EMGInterfaceReferenceGenerator(xBar, xMin, xMax, emgGains, EMGInterfaceType.singleSiteProportional);
+            inputManager.Configure("CMD_ADD_REFGEN", emgRG);
 
             // Enable
             isConfigured = true;

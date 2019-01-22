@@ -125,9 +125,9 @@ namespace VRProEP.ProsthesisCore
             trackingTransform.position.x,
             trackingTransform.position.y,
             trackingTransform.position.z,
-            Mathf.Deg2Rad * trackingTransform.localEulerAngles.x,
-            Mathf.Deg2Rad * trackingTransform.localEulerAngles.y,
-            Mathf.Deg2Rad * trackingTransform.localEulerAngles.z,
+            trackingTransform.rotation.eulerAngles.x,
+            trackingTransform.rotation.eulerAngles.y,
+            trackingTransform.rotation.eulerAngles.z,
             };
             return x;
         }

@@ -56,6 +56,7 @@ namespace VRProEP.ProsthesisCore
         /// <returns>The updated elbow joint angle reference.</returns>
         public override float UpdateReference(int channel, float[] input)
         {
+            //Debug.Log(isEnabled);
             // Check validity of the provided channel
             if (!IsChannelValid(channel))
                 throw new System.ArgumentOutOfRangeException("The requested channel number is invalid.");
