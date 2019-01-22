@@ -61,7 +61,8 @@ namespace VRProEP.ExperimentCore
         {
             foreach (IExperimentLogger logger in activeLoggers)
             {
-                logger.CloseLog();
+                if (logger != null)
+                    logger.CloseLog();
             }
         }
 

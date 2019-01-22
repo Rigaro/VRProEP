@@ -201,7 +201,7 @@ public class JacobianExperimentGM : GameMaster
                 // Print status
                 infoText = "Status: Waiting to start.\n";
                 infoText += "Progress: " + iterationNumber + "/" + iterationLimit + ".\n";
-                infoText += "Time: " + System.DateTime.Now + ".\n";
+                infoText += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
                 instructionManager.DisplayText(infoText);
                 // Enable task object, drop-off if not done
                 if (!taskManager.enableFlag)
@@ -239,7 +239,7 @@ public class JacobianExperimentGM : GameMaster
                 //
                 infoText = "Status: Performing task.\n";
                 infoText += "Progress: " + iterationNumber + "/" + iterationLimit + ".\n";
-                infoText += "Time: " + System.DateTime.Now + ".\n";
+                infoText += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
                 instructionManager.DisplayText(infoText);
 
                 break;
@@ -249,9 +249,6 @@ public class JacobianExperimentGM : GameMaster
              *************************************************
              */
             case ExperimentState.AnalizingResults:
-                hudManager.DisplayText("Good job!", 2.0f);
-                // Allow 3 seconds after task end to do calculations
-                SetWaitFlag(3.0f);
                 // Disable drop-off location.
                 activeDropOff.SetActive(false);
 
@@ -274,6 +271,7 @@ public class JacobianExperimentGM : GameMaster
                 remainingDropOffIterations[activeDropOffNumber]--;
                 if (CheckEndCondition())
                 {
+                    hudManager.DisplayText("Experiment end. Thank you!", 5.0f);
                     experimentState = ExperimentState.End;
                 }
                 // Check whether the new session condition is met
@@ -284,11 +282,17 @@ public class JacobianExperimentGM : GameMaster
                 // Rest for some time when required
                 else if (CheckRestCondition())
                 {
+                    hudManager.DisplayText("Rest time.", 5.0f);
                     SetWaitFlag(restTime);
                     experimentState = ExperimentState.Resting;
                 }
                 else
+                {
+                    hudManager.DisplayText("Good job!", 2.0f);
+                    // Allow 3 seconds after task end to do calculations
+                    SetWaitFlag(3.0f);
                     experimentState = ExperimentState.UpdatingApplication;
+                }
                 break;
             /*
              *************************************************
@@ -355,7 +359,7 @@ public class JacobianExperimentGM : GameMaster
             case ExperimentState.Resting:
                 infoText = "Status: Resting.\n";
                 infoText += "Progress: " + iterationNumber + "/" + iterationLimit + ".\n";
-                infoText += "Time: " + System.DateTime.Now + ".\n";
+                infoText += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
                 instructionManager.DisplayText(infoText);
                 //
                 // Check for session change or end request from experimenter
@@ -392,7 +396,7 @@ public class JacobianExperimentGM : GameMaster
                 //
                 infoText = "Status: Experiment paused.\n";
                 infoText += "Progress: " + iterationNumber + "/" + iterationLimit + ".\n";
-                infoText += "Time: " + System.DateTime.Now + ".\n";
+                infoText += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
                 instructionManager.DisplayText(infoText);
                 // Disable task object, drop-off
                 if (taskManager.enableFlag)
@@ -437,7 +441,7 @@ public class JacobianExperimentGM : GameMaster
         //
         // Update information displayed for debugging purposes
         //
-        if (debug)
+        if (false)
         {
             string debugText = experimentState.ToString() + ".\n";
             if (experimentState == ExperimentState.WaitingForStart)
@@ -888,6 +892,8 @@ public class JacobianExperimentGM : GameMaster
         yield return new WaitForSeconds(8.0f);
         instructionManager.DisplayText(defaultText + "The drop-off location will be chosen randomly.");
         yield return new WaitForSeconds(5.0f);
+        instructionManager.DisplayText(defaultText + "You will get a " + restTime + " second rest every " + restIterations + " iterations.");
+        yield return new WaitForSeconds(8.0f);
         instructionManager.DisplayText(defaultText + "Your progress will be displayed here along with the status of the experiment.");
         yield return new WaitForSeconds(8.0f);
         instructionManager.DisplayText(defaultText + "If you need any rest please request it to the experimenter.");

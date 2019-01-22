@@ -241,27 +241,39 @@ namespace VRProEP.ProsthesisCore
             else if (channel == 3)
             {
                 float offsetAngle = (-trackerTransform.localRotation.eulerAngles.x + 270.0f);
-                if (offsetAngle > 180.0f)
+                if (offsetAngle > 360.0f)
                 {
-                    offsetAngle -= 360;
+                    offsetAngle -= 360.0f;
+                }
+                if (offsetAngle < -360.0f)
+                {
+                    offsetAngle += 360.0f;
                 }
                 return Mathf.Deg2Rad * offsetAngle;
             }
             else if (channel == 4)
             {
-                float offsetAngle = (-trackerTransform.localRotation.eulerAngles.y + 0.0f);
-                if (offsetAngle > 180.0f)
+                float offsetAngle = (-trackerTransform.localRotation.eulerAngles.y + 270.0f);
+                if (offsetAngle > 360.0f)
                 {
-                    offsetAngle -= 360;
+                    offsetAngle -= 360.0f;
+                }
+                if (offsetAngle < -360.0f)
+                {
+                    offsetAngle += 360.0f;
                 }
                 return Mathf.Deg2Rad * offsetAngle;
             }
             else
             {
                 float offsetAngle = (-trackerTransform.localRotation.eulerAngles.z + 180.0f);
-                if (offsetAngle > 180.0f)
+                if (offsetAngle > 360.0f)
                 {
-                    offsetAngle -= 360;
+                    offsetAngle -= 360.0f;
+                }
+                if (offsetAngle < -360.0f)
+                {
+                    offsetAngle += 360.0f;
                 }
                 return Mathf.Deg2Rad * offsetAngle;
             }

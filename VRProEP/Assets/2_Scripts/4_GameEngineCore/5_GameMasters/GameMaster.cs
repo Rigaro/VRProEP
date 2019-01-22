@@ -263,6 +263,7 @@ public abstract class GameMaster : MonoBehaviour
     /// <param name="seconds">The time in seconds to wait to set flag.</param>
     protected void SetWaitFlag(float seconds)
     {
+        StopCoroutine("SetWaitFlagCoroutine");
         StartCoroutine(SetWaitFlagCoroutine(seconds));
     }
 
