@@ -54,9 +54,6 @@ namespace VRProEP.ProsthesisCore
             //
             // Sensors
             //
-            // Add the created sensors to the list of available sensors.
-            AvatarSystem.AddActiveSensor(trackerManager);
-            AvatarSystem.AddActiveSensor(virtualEncoder);
 
             // Add VIVE controller as sensor to enable manual inputs.
             VIVEControllerManager controllerManager = new VIVEControllerManager();
@@ -64,6 +61,12 @@ namespace VRProEP.ProsthesisCore
 
             // Add joint encoder as sensor for jacobian synergy
             inputManager.Configure("CMD_ADD_SENSOR", virtualEncoder);
+
+            // Add the created sensors to the list of available sensors.
+            AvatarSystem.AddActiveSensor(trackerManager);
+            AvatarSystem.AddActiveSensor(virtualEncoder);
+            AvatarSystem.AddActiveSensor(controllerManager);
+
 
             //
             // Reference generators

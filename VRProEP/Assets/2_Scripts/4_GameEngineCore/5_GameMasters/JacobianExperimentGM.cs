@@ -17,6 +17,7 @@ public class JacobianExperimentGM : GameMaster
     public int iterationsPerDropOff = 20;
     public int trainingIterations = 20;
     public int restIterations = 25;
+    public bool skipTraining = false;
 
     // Experiment management
     private GraspTaskManager taskManager;
@@ -29,12 +30,13 @@ public class JacobianExperimentGM : GameMaster
     private bool instructionsEnd = false;
     private bool inInstructions = false;
     private string infoText;
+    private bool logEnd = false;
 
     // Data logging:
     private DataStreamLogger motionLogger;
-    private const string motionDataAbleFormat = "loc,t,aDotS,bDotS,gDotS,aS,bS,gS,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xHand,yHand,zHand,aHand,bHand,gHand";
-    private const string motionDataEMGFormat = "loc,t,aDotS,bDotS,gDotS,aS,bS,gS,qE,qDotE,emg,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xHand,yHand,zHand,aHand,bHand,gHand";
-    private const string motionDataSynFormat = "loc,t,aDotS,bDotS,gDotS,aS,bS,gS,qE,qDotE,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xHand,yHand,zHand,aHand,bHand,gHand";
+    private const string motionDataAbleFormat = "loc,t,aDotS,bDotS,gDotS,aS,bS,gS,aDotE,bDotE,gDotE,aE,bE,gE,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xHand,yHand,zHand,aHand,bHand,gHand";
+    private const string motionDataEMGFormat = "loc,t,aDotS,bDotS,gDotS,aS,bS,gS,qE,qDotE,tpad,enable,emg,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xHand,yHand,zHand,aHand,bHand,gHand";
+    private const string motionDataSynFormat = "loc,t,aDotS,bDotS,gDotS,aS,bS,gS,qE,qDotE,tpad,enable,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xHand,yHand,zHand,aHand,bHand,gHand";
     private string motionDataFormat;
     private float taskTime = 0.0f;
 
@@ -44,8 +46,16 @@ public class JacobianExperimentGM : GameMaster
         if (debug)
         {
             SaveSystem.LoadUserData("MD1942");
-            AvatarSystem.LoadPlayer(UserType.AbleBodied, AvatarType.AbleBodied);
-            AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
+            //AvatarSystem.LoadPlayer(UserType.AbleBodied, AvatarType.AbleBodied);
+            //AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
+            AvatarSystem.LoadPlayer(UserType.AbleBodied, AvatarType.Transhumeral);
+            AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
+            // Initialize prosthesis
+            GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+            ConfigurableElbowManager elbowManager = prosthesisManagerGO.AddComponent<ConfigurableElbowManager>();
+            elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + SaveSystem.ActiveUser.handLength / 2.0f));
+            // Set the reference generator to jacobian-based.
+            elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
         }
         // Initialize ExperimentSystem
         InitExperimentSystem();
@@ -271,7 +281,7 @@ public class JacobianExperimentGM : GameMaster
                 remainingDropOffIterations[activeDropOffNumber]--;
                 if (CheckEndCondition())
                 {
-                    hudManager.DisplayText("Experiment end. Thank you!", 5.0f);
+                    hudManager.DisplayText("Experiment end. Thank you!", 6.0f);
                     experimentState = ExperimentState.End;
                 }
                 // Check whether the new session condition is met
@@ -282,7 +292,7 @@ public class JacobianExperimentGM : GameMaster
                 // Rest for some time when required
                 else if (CheckRestCondition())
                 {
-                    hudManager.DisplayText("Rest time.", 5.0f);
+                    hudManager.DisplayText("Take a " + restTime + " seconds rest.", 6.0f);
                     SetWaitFlag(restTime);
                     experimentState = ExperimentState.Resting;
                 }
@@ -528,12 +538,12 @@ public class JacobianExperimentGM : GameMaster
     private void OnApplicationQuit()
     {
         //
-        // Handle application quit procedures.
+        // Handle application quit procedures, make sure everything is stopped properly.
         //
         // Check if WiFi sensors are available
         foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
         {
-            if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
+            if (sensor != null && sensor.GetSensorType().Equals(SensorType.EMGWiFi))
             {
                 WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
                 wifiSensor.StopSensorReading();
@@ -607,11 +617,15 @@ public class JacobianExperimentGM : GameMaster
         //
         // Add VIVE Trackers.
         //
-        if (experimentType == ExperimentType.TypeOne && !debug) // Additional tracker for upper arm when able-bodied type
+        if (experimentType == ExperimentType.TypeOne && !debug) // Additional trackers for upper and lower arm when able-bodied type
         {
-            GameObject motionTrackerGO = AvatarSystem.AddMotionTracker();
-            VIVETrackerManager upperArmTracker = new VIVETrackerManager(motionTrackerGO.transform);
+            GameObject ulMotionTrackerGO = AvatarSystem.AddMotionTracker();
+            VIVETrackerManager upperArmTracker = new VIVETrackerManager(ulMotionTrackerGO.transform);
             ExperimentSystem.AddSensor(upperArmTracker);
+
+            GameObject llMotionTrackerGO = AvatarSystem.AddMotionTracker();
+            VIVETrackerManager lowerArmTracker = new VIVETrackerManager(llMotionTrackerGO.transform);
+            ExperimentSystem.AddSensor(lowerArmTracker);
         }
         else if (experimentType == ExperimentType.TypeTwo) // EMG case
         {
@@ -723,6 +737,25 @@ public class JacobianExperimentGM : GameMaster
         //
         // Update log data and close logs.
         //
+        if (!logEnd)
+        {
+            // Check if WiFi sensors are available
+            foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
+            {
+                if (sensor != null && sensor.GetSensorType().Equals(SensorType.EMGWiFi))
+                {
+                    WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
+                    wifiSensor.StopSensorReading();
+                }
+            }
+
+            //
+            // Save and close all logs
+            //
+            ExperimentSystem.CloseAllExperimentLoggers();
+
+            logEnd = true;
+        }
 
         //
         // Display information
@@ -755,6 +788,8 @@ public class JacobianExperimentGM : GameMaster
 
     #endregion
 
+    #region Instruction Coroutines
+
     /// <summary>
     /// Training coroutine
     /// </summary>
@@ -778,74 +813,78 @@ public class JacobianExperimentGM : GameMaster
         if (experimentType == ExperimentType.TypeOne)
         {
             instructionManager.DisplayText("Today we will be testing your forward reaching capabilities using your actual arm.");
-            yield return new WaitForSeconds(8.0f);
+            yield return new WaitForSeconds(7.0f);
             instructionManager.DisplayText("You should already be familiar with it. ;)");
-            yield return new WaitForSeconds(8.0f);
+            yield return new WaitForSeconds(7.0f);
 
         }
         else if (experimentType == ExperimentType.TypeTwo)
         {
             instructionManager.DisplayText("Today we will be testing your forward reaching capabilities using a traditional prosthesis.");
-            yield return new WaitForSeconds(8.0f);
+            yield return new WaitForSeconds(7.0f);
             instructionManager.DisplayText("You should be familiar with how to make the prosthesis move using your muscles.");
-            yield return new WaitForSeconds(8.0f);
+            yield return new WaitForSeconds(7.0f);
         }
         else if (experimentType == ExperimentType.TypeThree)
         {
             instructionManager.DisplayText("Today we will be testing your forward reaching capabilities using an experimental prosthesis.");
-            yield return new WaitForSeconds(8.0f);
+            yield return new WaitForSeconds(7.0f);
             instructionManager.DisplayText("You should be familiar with how the prosthesis moves accoring to the motion of your arm.");
-            yield return new WaitForSeconds(8.0f);
+            yield return new WaitForSeconds(7.0f);
         }
 
-        instructionManager.DisplayText("You will be required to grasp an object in front of you and place it on a shelf.");
-        yield return new WaitForSeconds(8.0f);
-        instructionManager.DisplayText("You should not step when reaching for the object or dropping it off.");
-        yield return new WaitForSeconds(8.0f);
-
-        // Look in the direction of the task.
-        instructionManager.DisplayText("Please look forward.");
-        hudManager.DisplayText("Look forward.", 3.0f);
-        yield return new WaitForSeconds(4.0f);
-
-        // Show object
-        hudManager.DisplayText("The object will appear on the +.");
-        yield return new WaitForSeconds(5.0f);
-        taskManager.SetObjectEnable(true);
-        hudManager.DisplayText("You can see it now.");
-        yield return new WaitForSeconds(3.0f);
-        taskManager.SetObjectEnable(false);
-
-        // Show drop-off points
-        hudManager.DisplayText("You'll need to drop it off...");
-        yield return new WaitForSeconds(5.0f);
-        hudManager.DisplayText("on the shelf in front of you.");
-        yield return new WaitForSeconds(5.0f);
-        hudManager.DisplayText("The drop-off location will be...");
-        yield return new WaitForSeconds(5.0f);
-        hudManager.DisplayText("shown to you like this...");
-        yield return new WaitForSeconds(5.0f);
-        int dropNum = 1;
-        foreach (GameObject dropOff in dropOffLocations)
+        if (!skipTraining)
         {
-            dropOff.SetActive(true);
-            hudManager.DisplayText("Drop-off #" + dropNum + ".");
-            dropNum++;
+            instructionManager.DisplayText("You will be required to grasp an object in front of you and place it on a shelf.");
+            yield return new WaitForSeconds(7.0f);
+            instructionManager.DisplayText("You should not step when reaching for the object or dropping it off.");
+            yield return new WaitForSeconds(7.0f);
+
+            // Look in the direction of the task.
+            instructionManager.DisplayText("Please look forward.");
+            hudManager.DisplayText("Look forward.", 3.0f);
+            yield return new WaitForSeconds(4.0f);
+
+            // Show object
+            hudManager.DisplayText("The object will appear on the +.");
+            yield return new WaitForSeconds(4.0f);
+            taskManager.SetObjectEnable(true);
+            hudManager.DisplayText("You can see it now.");
+            yield return new WaitForSeconds(3.0f);
+            taskManager.SetObjectEnable(false);
+
+            // Show drop-off points
+            hudManager.DisplayText("You'll need to drop it off...");
+            yield return new WaitForSeconds(4.0f);
+            hudManager.DisplayText("on the shelf in front of you.");
+            yield return new WaitForSeconds(4.0f);
+            hudManager.DisplayText("The drop-off location will be...");
+            yield return new WaitForSeconds(4.0f);
+            hudManager.DisplayText("shown to you like this...");
+            yield return new WaitForSeconds(4.0f);
+            int dropNum = 1;
+            foreach (GameObject dropOff in dropOffLocations)
+            {
+                dropOff.SetActive(true);
+                hudManager.DisplayText("Drop-off #" + dropNum + ".");
+                dropNum++;
+                yield return new WaitForSeconds(3.0f);
+                dropOff.SetActive(false);
+            }
+            // Handling
+            hudManager.DisplayText("Grasping is done automatically...");
             yield return new WaitForSeconds(5.0f);
-            dropOff.SetActive(false);
+            hudManager.DisplayText("by touching the object with your fingers.");
+            yield return new WaitForSeconds(5.0f);
+            hudManager.DisplayText("Try it now.");
+            taskManager.SetObjectEnable(true);
+            activeDropOff.SetActive(true);
+            yield return new WaitUntil(() => taskManager.SuccessFlag);
+            hudManager.DisplayText("Good job!");
+            activeDropOff.SetActive(false);
+            yield return new WaitForSeconds(5.0f);
         }
-        // Handling
-        hudManager.DisplayText("Grasping is done automatically...");
-        yield return new WaitForSeconds(5.0f);
-        hudManager.DisplayText("by touching the object with your fingers.");
-        yield return new WaitForSeconds(5.0f);
-        hudManager.DisplayText("Try it now.");
-        taskManager.SetObjectEnable(true);
-        activeDropOff.SetActive(true);
-        yield return new WaitUntil(() => taskManager.SuccessFlag);
-        hudManager.DisplayText("Good job!");
-        activeDropOff.SetActive(false);
-        yield return new WaitForSeconds(5.0f);
+
 
         // Practice
         hudManager.DisplayText("Let's do some practice.");
@@ -874,9 +913,9 @@ public class JacobianExperimentGM : GameMaster
         instructionManager.DisplayText("Hi again. :)");
         yield return new WaitForSeconds(4.0f);
         instructionManager.DisplayText("I think you are ready to get started!");
-        yield return new WaitForSeconds(8.0f);
+        yield return new WaitForSeconds(5.0f);
         instructionManager.DisplayText("The experiment will start after some final instructions.");
-        yield return new WaitForSeconds(8.0f);
+        yield return new WaitForSeconds(6.0f);
 
         trainingEnd = true;
     }
@@ -912,4 +951,6 @@ public class JacobianExperimentGM : GameMaster
 
         instructionsEnd = true;
     }
+
+    #endregion
 }
