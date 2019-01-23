@@ -1208,6 +1208,7 @@ MonoBehaviour:
   iterationsPerDropOff: 25
   trainingIterations: 10
   restIterations: 25
+  skipTraining: 0
 --- !u!4 &615444011 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 479976, guid: 35415bd24cbf1304fb8f04ba7d00afb2,

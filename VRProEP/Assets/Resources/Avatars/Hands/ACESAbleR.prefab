@@ -1586,7 +1586,7 @@ MonoBehaviour:
   attachmentPoint: {fileID: 4324669838775834}
   managerType: 0
   managerMode: 0
-  dropOffVelocityThreshold: 0.02
+  dropOffVelocityThreshold: 0.03
   throwEnable: 0
   throwMultiplier: 1
 --- !u!135 &135778854017009914
