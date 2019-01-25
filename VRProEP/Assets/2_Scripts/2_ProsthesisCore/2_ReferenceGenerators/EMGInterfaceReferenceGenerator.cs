@@ -165,7 +165,10 @@ namespace VRProEP.ProsthesisCore
             }
             else if (isEnabled && interfaceType == EMGInterfaceType.dualSiteProportional)
             {
-                tempXBar = xBar[channel] + (Gains[channel] * (input[1] - input[2]) * Time.fixedDeltaTime); // Differential velocity control.
+                // Threshold diff EMG behaviour
+                float diffEmg = input[2] - input[1];
+                if (Mathf.Abs(diffEmg) > 20.0f)
+                    tempXBar = xBar[channel] + (Gains[channel] * diffEmg * Time.fixedDeltaTime); // Differential velocity control.
             }
 
             // Saturate reference

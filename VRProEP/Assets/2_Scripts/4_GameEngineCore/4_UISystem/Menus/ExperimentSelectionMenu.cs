@@ -92,8 +92,12 @@ public class ExperimentSelectionMenu : MonoBehaviour
                 if (EMGAvailable)
                 {
                     KeepOnLoad();
+
                     // Load experiment.
-                    SteamVR_LoadLevel.Begin("JacobianSynergyExperiment");
+                    // SteamVR_LoadLevel.Begin("JacobianSynergyExperiment");
+
+                    // Load training
+                    SteamVR_LoadLevel.Begin("ProsthesisTraining");
                 }
                 else
                     logManager.DisplayInformationOnLog(3.0f, "Please add and configure an EMG sensor.");
@@ -102,8 +106,12 @@ public class ExperimentSelectionMenu : MonoBehaviour
             else if (optionNumber == 3 && AvatarSystem.AvatarType == AvatarType.Transhumeral)
             {
                 KeepOnLoad();
+
                 // Load experiment.
-                SteamVR_LoadLevel.Begin("JacobianSynergyExperiment");
+                // SteamVR_LoadLevel.Begin("JacobianSynergyExperiment");
+
+                // Load training
+                SteamVR_LoadLevel.Begin("ProsthesisTraining");
             }
             else
                 logManager.DisplayInformationOnLog(3.0f, "Please configure the " + optionList[optionNumber] + " avatar.");

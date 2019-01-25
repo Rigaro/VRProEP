@@ -82,9 +82,24 @@ public class ConfigEMGWiFi : MonoBehaviour
             // Configure all sensor channels
             for (int i = 0; i < sensor.ChannelSize; i++)
             {
-                sensor.ConfigureLimits(i, (int)maxValues[i], (int)minValues[i]);
+                sensor.ConfigureLimits(i, maxValues[i], minValues[i]);
             }
-            StartCoroutine(DisplayInformationOnLog(2.0f, "Configured sensor."));
+            StartCoroutine(DisplayInformationOnLog(2.0f, "Sensor successfully configured."));
+        }
+    }
+
+    public void ResetLimits()
+    {
+        // Check that sensors and sliders are available.
+        if (sensor != null && sliders.Count == sensor.ChannelSize)
+        {
+            // Reset all sensor channels limits
+            for (int i = 0; i < sensor.ChannelSize; i++)
+            {
+                maxValues[i] = 1023.0f;
+                minValues[i] = 0.0f;
+            }
+            StartCoroutine(DisplayInformationOnLog(2.0f, "Sensor limits successfully reset."));
         }
     }
 

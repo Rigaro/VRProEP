@@ -12,6 +12,7 @@ public class AddEMGWiFiSensor : MonoBehaviour {
     private string ip;
     private int port = 0;
     private int channelSize = 0;
+    private bool isRaw = false;
 
     public TextMeshProUGUI logTMP;
     public AddSensorMenu addSensorMenu;
@@ -31,6 +32,11 @@ public class AddEMGWiFiSensor : MonoBehaviour {
         this.channelSize = int.Parse(channelSize);
     }
 
+    public void UpdateIsRaw(bool isRaw)
+    {
+        this.isRaw = isRaw;
+    }
+
     /// <summary>
     /// Add a new EMG sensor
     /// </summary>
@@ -42,7 +48,7 @@ public class AddEMGWiFiSensor : MonoBehaviour {
         try
         {
             // Create and add sensor
-            EMGWiFiManager emgSensor = new EMGWiFiManager(ip, port, channelSize);
+            EMGWiFiManager emgSensor = new EMGWiFiManager(ip, port, channelSize, isRaw);
             AvatarSystem.AddActiveSensor(emgSensor);
 
             // Get prosthesis and add sensor
@@ -65,9 +71,9 @@ public class AddEMGWiFiSensor : MonoBehaviour {
             StartCoroutine(DisplayInformationOnLog(3.0f, "Port already in use."));
 
         }
-        catch
+        catch (System.Exception e)
         {
-            StartCoroutine(DisplayInformationOnLog(3.0f, "An error occured while adding the sensor."));
+            StartCoroutine(DisplayInformationOnLog(3.0f, "An error occured while adding the sensor.\nError message: " + e.Message));
         }
     }
 

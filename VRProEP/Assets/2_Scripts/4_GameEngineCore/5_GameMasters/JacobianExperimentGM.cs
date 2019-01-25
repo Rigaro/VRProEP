@@ -10,6 +10,9 @@ using VRProEP.ProsthesisCore;
 
 public class JacobianExperimentGM : GameMaster
 {
+    public bool skipAll = false;
+    public bool skipTraining = false;
+
     [Header("Jacobian Synergy Experiment")]
     [Tooltip("The GameObject used for the experiment task.")]
     public GameObject graspTaskObject;
@@ -17,7 +20,6 @@ public class JacobianExperimentGM : GameMaster
     public int iterationsPerDropOff = 20;
     public int trainingIterations = 20;
     public int restIterations = 25;
-    public bool skipTraining = false;
 
     // Experiment management
     private GraspTaskManager taskManager;
@@ -139,7 +141,13 @@ public class JacobianExperimentGM : GameMaster
                 //
                 // Go to training
                 //
-                experimentState = ExperimentState.Training;
+                if (skipAll)
+                {
+                    skipInstructions = true;
+                    experimentState = ExperimentState.GivingInstructions;
+                }
+                else
+                    experimentState = ExperimentState.Training;
                 break;
             /*
              *************************************************

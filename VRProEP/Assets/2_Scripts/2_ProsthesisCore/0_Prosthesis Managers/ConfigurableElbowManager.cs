@@ -84,8 +84,9 @@ namespace VRProEP.ProsthesisCore
 
             // Add an EMG reference generator
             List<float> emgGains = new List<float>(1);
-            emgGains.Add(1.3f);
-            EMGInterfaceReferenceGenerator emgRG = new EMGInterfaceReferenceGenerator(xBar, xMin, xMax, emgGains, EMGInterfaceType.singleSiteProportional);
+            // emgGains.Add(1.3f); // single site
+            emgGains.Add(0.01f);
+            EMGInterfaceReferenceGenerator emgRG = new EMGInterfaceReferenceGenerator(xBar, xMin, xMax, emgGains, EMGInterfaceType.dualSiteProportional);
             inputManager.Configure("CMD_ADD_REFGEN", emgRG);
 
             // Enable
