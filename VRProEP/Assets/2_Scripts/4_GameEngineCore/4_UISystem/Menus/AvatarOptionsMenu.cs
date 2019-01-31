@@ -43,7 +43,7 @@ public class AvatarOptionsMenu : MonoBehaviour {
             // Initialize prosthesis
             GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
             ConfigurableElbowManager elbowManager = prosthesisManagerGO.AddComponent<ConfigurableElbowManager>();
-            elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + SaveSystem.ActiveUser.handLength / 2.0f));
+            elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + (SaveSystem.ActiveUser.handLength / 2.0f)));
             // Set the reference generator to jacobian-based.
             elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
         }

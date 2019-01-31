@@ -37,7 +37,7 @@ public class JacobianExperimentGM : GameMaster
     // Data logging:
     private DataStreamLogger motionLogger;
     private const string motionDataAbleFormat = "loc,t,aDotS,bDotS,gDotS,aS,bS,gS,aDotE,bDotE,gDotE,aE,bE,gE,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xHand,yHand,zHand,aHand,bHand,gHand";
-    private const string motionDataEMGFormat = "loc,t,aDotS,bDotS,gDotS,aS,bS,gS,qE,qDotE,tpad,enable,emg,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xHand,yHand,zHand,aHand,bHand,gHand";
+    private const string motionDataEMGFormat = "loc,t,aDotS,bDotS,gDotS,aS,bS,gS,qE,qDotE,tpad,enable,emgA,emgB,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xHand,yHand,zHand,aHand,bHand,gHand";
     private const string motionDataSynFormat = "loc,t,aDotS,bDotS,gDotS,aS,bS,gS,qE,qDotE,tpad,enable,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xHand,yHand,zHand,aHand,bHand,gHand";
     private string motionDataFormat;
     private float taskTime = 0.0f;

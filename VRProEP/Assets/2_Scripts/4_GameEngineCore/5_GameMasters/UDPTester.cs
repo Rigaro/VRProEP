@@ -64,7 +64,7 @@ public class UDPTester : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-            Debug.Log("Sensor data: " + sensorValues[0] + ", " + sensorValues[1] + ", " + sensorValues[2]);
+            //Debug.Log("Sensor data: " + sensorValues[0] + ", " + sensorValues[1] + ", " + sensorValues[2]);
             // guiTransform.position = new Vector3(0.01f * sensorValues[1], 0.01f * sensorValues[0], guiTransform.position.z);
     }
 
@@ -120,6 +120,7 @@ public class UDPTester : MonoBehaviour {
                 sensorValues[i] = float.Parse(value);
                 i++;
             }
+            Debug.Log("Sensor data: " + sensorValues[0] + ", " + sensorValues[1] + ", " + sensorValues[2]);
         }
         //Debug.Log("rs" + sensorValue);
     }

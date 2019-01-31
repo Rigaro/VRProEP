@@ -147,13 +147,13 @@ MonoBehaviour:
   skipInstructions: 0
   debug: 0
   debugText: {fileID: 0}
-  TrainingCamera: {fileID: 326020862}
   avatarType: 0
-  fixedProsthesisPosition: {fileID: 2001964277}
-  emgEnable: 1
+  emgEnable: 0
   ip: 192.168.137.247
   port: 2390
   channelSize: 2
+  TrainingCamera: {fileID: 326020862}
+  fixedProsthesisPosition: {fileID: 2001964277}
   synergyInstructions: '- Press O button to enable prosthesis.
 
     - Move upper arm to move prosthesis.'

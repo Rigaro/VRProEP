@@ -138,8 +138,8 @@ namespace VRProEP.ProsthesisCore
         /// <param name="qElbow">The starting position elbow angle in radians.</param>
         private void SetDirectionOfMotionFrameOffset(float qShoulder, float qElbow)
         {
-            // Compute the unity vector from the shoulder joint to the hand grasp point.
-            Vector2 dShoulderToHand = new Vector2(upperArmLength * Mathf.Cos(qShoulder) + lowerArmLength * Mathf.Cos(qShoulder + qElbow), upperArmLength * Mathf.Sin(qShoulder) + lowerArmLength * Mathf.Sin(qShoulder + qElbow));
+            // Compute the unit vector from the shoulder joint to the hand grasp point.
+            Vector2 dShoulderToHand = new Vector2((upperArmLength * Mathf.Cos(qShoulder)) + (lowerArmLength * Mathf.Cos(qShoulder + qElbow)), (upperArmLength * Mathf.Sin(qShoulder)) + (lowerArmLength * Mathf.Sin(qShoulder + qElbow)));
              Vector2 uS2H = dShoulderToHand / (dShoulderToHand.magnitude);
             // Compute the raw rotation
             alpha = Mathf.Acos(uS2H.x);
@@ -201,13 +201,7 @@ namespace VRProEP.ProsthesisCore
         }
 
         // Encapsulation
-        public bool IsEnabled
-        {
-            get
-            {
-                return isEnabled;
-            }
-        }
+        public bool IsEnabled { get => isEnabled; }
     }
 
 }

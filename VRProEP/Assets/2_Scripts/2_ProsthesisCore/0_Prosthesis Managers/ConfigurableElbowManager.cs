@@ -14,7 +14,7 @@ namespace VRProEP.ProsthesisCore
         private float elbowState = 0.0f;
 
         private bool isConfigured = false;
-
+        
         /// <summary>
         /// Initializes the Elbow prosthesis with basic functionality.
         /// Must be called only after the avatar is available.
@@ -85,7 +85,7 @@ namespace VRProEP.ProsthesisCore
             // Add an EMG reference generator
             List<float> emgGains = new List<float>(1);
             // emgGains.Add(1.3f); // single site
-            emgGains.Add(0.01f);
+            emgGains.Add(0.025f);
             EMGInterfaceReferenceGenerator emgRG = new EMGInterfaceReferenceGenerator(xBar, xMin, xMax, emgGains, EMGInterfaceType.dualSiteProportional);
             inputManager.Configure("CMD_ADD_REFGEN", emgRG);
 

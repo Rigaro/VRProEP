@@ -213,7 +213,7 @@ namespace VRProEP.ProsthesisCore
         /// Filters angular velocity data.
         /// Converts from world coordinates to local residual limb coordinates.
         /// Angular velocity given radians per second, world coordinates.
-        /// Angular displacement given in Euler angles, world coordinates.
+        /// Angular displacement given in Euler angles in radians, world coordinates.
         /// </summary>
         /// <param name="channel">The channel number.</param>
         /// <returns>Pre-processed sensor data for the given channel.</returns>

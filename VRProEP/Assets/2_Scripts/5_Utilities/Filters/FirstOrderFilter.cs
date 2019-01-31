@@ -27,7 +27,7 @@ namespace VRProEP.Utilities
             SetGain(g);
             SetSampleTime(dt);
             ComputeAlpha();
-            Debug.Log(alpha);
+            //Debug.Log(alpha);
         }
 
         public FirstOrderFilter() : this(1, 1, 1)
