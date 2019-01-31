@@ -96,8 +96,8 @@ public class ConfigEMGWiFi : MonoBehaviour
             // Reset all sensor channels limits
             for (int i = 0; i < sensor.ChannelSize; i++)
             {
-                maxValues[i] = 1023.0f;
-                minValues[i] = 0.0f;
+                maxValues[i] = 0.0f;
+                minValues[i] = 1023.0f;
             }
             StartCoroutine(DisplayInformationOnLog(2.0f, "Sensor limits successfully reset."));
         }

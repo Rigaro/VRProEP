@@ -21,8 +21,8 @@ namespace VRProEP.ProsthesisCore
             {
                 gains.Add(100.0f / 1023.0f);
                 lowerLimits.Add(100.0f);
-                lowPassFilters.Add( new LowPassFilter(3.0f, 1.0f, Time.fixedDeltaTime) );
-                movingAverageFilters.Add(new MovingAverage(20));
+                lowPassFilters.Add( new LowPassFilter(3.0f, 1.17f, Time.fixedDeltaTime) );
+                movingAverageFilters.Add(new MovingAverage(15));
             }
 
             this.isRaw = isRaw;
@@ -92,10 +92,10 @@ namespace VRProEP.ProsthesisCore
                     // Shift and rectify
                     //float shiftRect = sensorValues[i] - 512.0f;
                     float shiftRect = Mathf.Abs(sensorValues[i] - 512.0f);
-                    filteredValues[i] = (float)Math.Round(lowPassFilters[i].Update(shiftRect), 2);
-                    averagedValues[i] = movingAverageFilters[i].Update(filteredValues[i]);
+                    filteredValues[i] = lowPassFilters[i].Update(shiftRect);
+                    averagedValues[i] = (float)Math.Round(movingAverageFilters[i].Update(filteredValues[i]), 1);
                 }
-                return filteredValues;
+                return averagedValues;
             }
             else
             {
@@ -142,16 +142,21 @@ namespace VRProEP.ProsthesisCore
             {
                 float[] filteredValues = sensorValues;
                 float[] averagedValues = sensorValues;
+                float[] normalizedValues = sensorValues;
                 // Transform to 0-100 value.
                 for (int i = 0; i < sensorValues.Length; i++)
                 {
                     // Shift and rectify
                     float shiftRect = Mathf.Abs(sensorValues[i] - 512.0f);
-                    float normalized = gains[i] * (shiftRect - lowerLimits[i]);
-                    filteredValues[i] = (float)Math.Round(lowPassFilters[i].Update(normalized), 2);
-                    averagedValues[i] = movingAverageFilters[i].Update(filteredValues[i]);
+                    filteredValues[i] = lowPassFilters[i].Update(shiftRect);
+                    averagedValues[i] = (float)Math.Round(movingAverageFilters[i].Update(filteredValues[i]), 1);
+                    normalizedValues[i] = gains[i] * (averagedValues[i] - lowerLimits[i]);
+                    if (normalizedValues[i] > 100.0f)
+                        normalizedValues[i] = 100.0f;
+                    else if (normalizedValues[i] < 0.0f)
+                        normalizedValues[i] = 0.0f;
                 }
-                return filteredValues;
+                return normalizedValues;
             }
             else
             {
@@ -161,6 +166,10 @@ namespace VRProEP.ProsthesisCore
                     // Shift and rectify
                     float normalized = gains[i] * (sensorValues[i] - lowerLimits[i]);
                     sensorValues[i] = lowPassFilters[i].Update(normalized);
+                    if (sensorValues[i] > 100.0f)
+                        sensorValues[i] = 100.0f;
+                    if (sensorValues[i] < 0.0f)
+                        sensorValues[i] = 0.0f;
                 }
                 return sensorValues;
             }
