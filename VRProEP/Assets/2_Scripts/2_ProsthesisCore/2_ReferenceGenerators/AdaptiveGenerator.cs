@@ -41,7 +41,7 @@ namespace VRProEP.ProsthesisCore
         /// <param name="theta">The initial parameters.</param>
         /// <param name="thetaMin">The lower limit for the parameters.</param>
         /// <param name="thetaMax">The upper limit for the parameters.</param>
-        public AdaptiveGenerator(float[] xBar, float[] xMin, float[] xMax, float[] theta, float[] thetaMin, float[] thetaMax)
+        public AdaptiveGenerator(float[] xBar, float[] xMin, float[] xMax, float[] theta, float[] thetaMin, float[] thetaMax, ReferenceGeneratorType generatorType)
         {
             if (xBar.Length != xMin.Length || xBar.Length != xMax.Length || theta.Length != xBar.Length || theta.Length != thetaMin.Length || theta.Length != thetaMax.Length)
                 throw new System.ArgumentOutOfRangeException("The length of the parameters does not match.");
@@ -54,7 +54,7 @@ namespace VRProEP.ProsthesisCore
             this.theta = theta;
             this.thetaMin = thetaMin;
             this.thetaMax = thetaMax;
-            generatorType = ReferenceGeneratorType.LinearKinematicSynergy;
+            this.generatorType = generatorType;
         }
 
         /// <summary>

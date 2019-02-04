@@ -142,6 +142,28 @@ namespace VRProEP.ProsthesisCore
                 // Generate reference
                 return activeGenerator.UpdateReference(channel, input);
             }
+            // Linear synergy reference generator requires multiple sensors.
+            else if (GetActiveReferenceGeneratorType() == ReferenceGeneratorType.LinearKinematicSynergy)
+            {
+                // Save currently active sensor
+                SensorType prevSensorType = activeSensor.GetSensorType();
+                // Get residual limb velocity
+                Configure("CMD_SET_ACTIVE_SENSOR", SensorType.VIVETracker);
+                float qDotShoulder = activeSensor.GetProcessedData(0);
+                // Get enable
+                Configure("CMD_SET_ACTIVE_SENSOR", SensorType.VIVEController);
+                float enableValue = activeSensor.GetProcessedData(1);
+
+                // Combine input
+                float[] input = { qDotShoulder, enableValue };
+                //Debug.Log("The input is: qs = " + Mathf.Rad2Deg * input[0] + ", qe = " + Mathf.Rad2Deg * input[1] + ", qDotS = " + input[2] + ", enable = " + input[3]);
+
+                // Go back to previously active sensor
+                Configure("CMD_SET_ACTIVE_SENSOR", prevSensorType);
+
+                // Generate reference
+                return activeGenerator.UpdateReference(channel, input);
+            }
             else if (GetActiveReferenceGeneratorType() == ReferenceGeneratorType.EMGInterface)
             {
                 // Save currently active sensor

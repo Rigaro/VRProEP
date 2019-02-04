@@ -125,8 +125,8 @@ namespace VRProEP.ProsthesisCore
 
             for (int i = 1; i <= channelSize; i++)
             {
-                float[] newInput = { input[4 * i - 4], input[4 * i - 3], input[4 * i - 2], input[4 * i - 1] };
-                UpdateReference(i - 1, newInput);
+                float[] channelInput = { input[4 * i - 4], input[4 * i - 3], input[4 * i - 2], input[4 * i - 1] };
+                UpdateReference(i - 1, channelInput);
             }
             return xBar;
         }

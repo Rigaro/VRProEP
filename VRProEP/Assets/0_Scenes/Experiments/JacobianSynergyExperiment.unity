@@ -121,11 +121,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1056419134542794, guid: be77503495d973e4d9af45c305447932, type: 3}
       propertyPath: m_Name
-      value: Holographic Battery BL
+      value: Holographic Battery BL_F
       objectReference: {fileID: 0}
     - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.1999998
+      value: -5.5
       objectReference: {fileID: 0}
     - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
       propertyPath: m_LocalPosition.y
@@ -267,11 +267,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1056419134542794, guid: be77503495d973e4d9af45c305447932, type: 3}
       propertyPath: m_Name
-      value: Holographic Battery TL
+      value: Holographic Battery TL_F
       objectReference: {fileID: 0}
     - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.1999998
+      value: -5.5
       objectReference: {fileID: 0}
     - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
       propertyPath: m_LocalPosition.y
@@ -701,7 +701,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 166c46565a20cbd48b376b1082b8376b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.182
+      value: 1.154
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 166c46565a20cbd48b376b1082b8376b, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1066,6 +1066,69 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!1001 &486497212
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 329824084}
+    m_Modifications:
+    - target: {fileID: 1056419134542794, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_Name
+      value: Holographic Battery BL_B
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 3.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.499996
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1.5100015
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_RootOrder
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.5748031
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.5748031
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.5748031
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: be77503495d973e4d9af45c305447932, type: 3}
+--- !u!1 &486497213 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1056419134542794, guid: be77503495d973e4d9af45c305447932,
+    type: 3}
+  m_PrefabInstance: {fileID: 486497212}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &505682701
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1197,7 +1260,7 @@ MonoBehaviour:
   demoMode: 0
   restTime: 60
   skipInstructions: 0
-  debug: 0
+  debug: 1
   debugText: {fileID: 0}
   skipAll: 1
   skipTraining: 0
@@ -1207,6 +1270,10 @@ MonoBehaviour:
   - {fileID: 56289262}
   - {fileID: 1454447661}
   - {fileID: 112394527}
+  - {fileID: 1928436493}
+  - {fileID: 486497213}
+  - {fileID: 1786535588}
+  - {fileID: 905208901}
   iterationsPerDropOff: 10
   trainingIterations: 10
   restIterations: 50
@@ -1706,6 +1773,69 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 892009979}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1001 &905208900
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 329824084}
+    m_Modifications:
+    - target: {fileID: 1056419134542794, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_Name
+      value: Holographic Battery TL_B
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 3.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -7.499996
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 15.629999
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_RootOrder
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.5748031
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.5748031
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.5748031
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: be77503495d973e4d9af45c305447932, type: 3}
+--- !u!1 &905208901 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1056419134542794, guid: be77503495d973e4d9af45c305447932,
+    type: 3}
+  m_PrefabInstance: {fileID: 905208900}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &947581300
 GameObject:
   m_ObjectHideFlags: 0
@@ -2001,11 +2131,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1056419134542794, guid: be77503495d973e4d9af45c305447932, type: 3}
       propertyPath: m_Name
-      value: Holographic Battery BR
+      value: Holographic Battery BR_F
       objectReference: {fileID: 0}
     - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.2
+      value: -5.5
       objectReference: {fileID: 0}
     - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2096,11 +2226,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1056419134542794, guid: be77503495d973e4d9af45c305447932, type: 3}
       propertyPath: m_Name
-      value: Holographic Battery TR
+      value: Holographic Battery TR_F
       objectReference: {fileID: 0}
     - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.1999998
+      value: -5.5
       objectReference: {fileID: 0}
     - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3063,6 +3193,69 @@ Transform:
   m_Father: {fileID: 1738454596}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1786535587
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 329824084}
+    m_Modifications:
+    - target: {fileID: 1056419134542794, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_Name
+      value: Holographic Battery TR_B
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 3.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 7.500001
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 15.629999
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_RootOrder
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.5748031
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.5748031
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.5748031
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: be77503495d973e4d9af45c305447932, type: 3}
+--- !u!1 &1786535588 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1056419134542794, guid: be77503495d973e4d9af45c305447932,
+    type: 3}
+  m_PrefabInstance: {fileID: 1786535587}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1790853192
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3264,6 +3457,57 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 434982, guid: 6812e31ceb91fc04da03973c6b1054cd,
     type: 3}
   m_PrefabInstance: {fileID: 1880442538}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1928436492
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 329824084}
+    m_Modifications:
+    - target: {fileID: 1056419134542794, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_Name
+      value: Holographic Battery BR_B
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 3.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 7.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1.5100015
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605162876388206, guid: be77503495d973e4d9af45c305447932, type: 3}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: be77503495d973e4d9af45c305447932, type: 3}
+--- !u!1 &1928436493 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1056419134542794, guid: be77503495d973e4d9af45c305447932,
+    type: 3}
+  m_PrefabInstance: {fileID: 1928436492}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1949601800 stripped
 Transform:

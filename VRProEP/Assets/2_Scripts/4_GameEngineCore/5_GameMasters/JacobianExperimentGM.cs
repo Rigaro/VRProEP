@@ -48,8 +48,12 @@ public class JacobianExperimentGM : GameMaster
         if (debug)
         {
             SaveSystem.LoadUserData("MD1942");
-            //AvatarSystem.LoadPlayer(UserType.AbleBodied, AvatarType.AbleBodied);
-            //AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
+            // Debug Able
+            /*
+            AvatarSystem.LoadPlayer(UserType.AbleBodied, AvatarType.AbleBodied);
+            AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
+            */
+            // Debug Jacobian
             AvatarSystem.LoadPlayer(UserType.AbleBodied, AvatarType.Transhumeral);
             AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
             // Initialize prosthesis
@@ -605,9 +609,22 @@ public class JacobianExperimentGM : GameMaster
             }
             else
             {
-                experimentType = ExperimentType.TypeThree;
-                ExperimentSystem.SetActiveExperimentID("Jacobian/Syn");
-                motionDataFormat = motionDataSynFormat;
+                GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+                ConfigurableElbowManager elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
+                if (elbowManager.GetInterfaceType() == ReferenceGeneratorType.JacobianSynergy)
+                {
+                    experimentType = ExperimentType.TypeThree;
+                    ExperimentSystem.SetActiveExperimentID("Jacobian/Jac");
+                    motionDataFormat = motionDataSynFormat;
+                }
+                else if (elbowManager.GetInterfaceType() == ReferenceGeneratorType.LinearKinematicSynergy)
+                {
+                    experimentType = ExperimentType.TypeFour;
+                    ExperimentSystem.SetActiveExperimentID("Jacobian/Lin");
+                    motionDataFormat = motionDataSynFormat;
+                }
+                else
+                    throw new System.Exception("The prosthesis interface available is not supported.");
             }
         }
         else
@@ -655,6 +672,19 @@ public class JacobianExperimentGM : GameMaster
             elbowManager.ChangeSensor("VAL_SENSOR_VIVETRACKER");
             elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
         }
+        else if (experimentType == ExperimentType.TypeFour) // Linear synergy case
+        {
+            // Set VIVE tracker and Linear synergy as active.
+            // Get prosthesis
+            GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+            ConfigurableElbowManager elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
+            // Set the reference generator to linear synergy.
+            elbowManager.ChangeSensor("VAL_SENSOR_VIVETRACKER");
+            elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
+        }
+        //
+        // Body motion trackers
+        //
         if (!debug)
         {
             // Shoulder acromium head tracker
