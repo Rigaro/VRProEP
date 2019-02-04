@@ -38,7 +38,7 @@ public class AvatarOptionsMenu : MonoBehaviour {
             KeepPlayerGameObjects();
 
             StartCoroutine(ResetCamera());
-            StartCoroutine(DisplayInformationAndReturn(2.0f, "Successfully loaded able-bodied avatar."));
+            StartCoroutine(DisplayInformationAndReturn(2.0f, "Successfully loaded transhumeral avatar."));
 
             // Initialize prosthesis
             GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");

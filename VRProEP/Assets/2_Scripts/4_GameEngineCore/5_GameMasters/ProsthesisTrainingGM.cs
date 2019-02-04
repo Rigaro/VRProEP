@@ -542,9 +542,20 @@ public class ProsthesisTrainingGM : GameMaster
                 // Get prosthesis
                 GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
                 ConfigurableElbowManager elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
-                // Set the reference generator to jacobian-based.
-                elbowManager.ChangeSensor("VAL_SENSOR_VIVETRACKER");
-                elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
+                if (elbowManager.GetInterfaceType() == ReferenceGeneratorType.JacobianSynergy)
+                {
+                    // Set the reference generator to jacobian-based.
+                    elbowManager.ChangeSensor("VAL_SENSOR_VIVETRACKER");
+                    elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
+                }
+                else if (elbowManager.GetInterfaceType() == ReferenceGeneratorType.LinearKinematicSynergy)
+                {
+                    // Set the reference generator to linear synergy.
+                    elbowManager.ChangeSensor("VAL_SENSOR_VIVETRACKER");
+                    elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
+                }
+                else
+                    throw new System.Exception("The prosthesis interface available is not supported.");
             }
             
             if(!debug)

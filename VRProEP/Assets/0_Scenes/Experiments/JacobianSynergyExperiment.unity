@@ -1260,7 +1260,7 @@ MonoBehaviour:
   demoMode: 0
   restTime: 60
   skipInstructions: 0
-  debug: 1
+  debug: 0
   debugText: {fileID: 0}
   skipAll: 1
   skipTraining: 0
@@ -1274,7 +1274,7 @@ MonoBehaviour:
   - {fileID: 486497213}
   - {fileID: 1786535588}
   - {fileID: 905208901}
-  iterationsPerDropOff: 10
+  iterationsPerDropOff: 3
   trainingIterations: 10
   restIterations: 50
 --- !u!4 &615444011 stripped

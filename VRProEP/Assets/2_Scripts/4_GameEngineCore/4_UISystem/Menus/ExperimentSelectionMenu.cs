@@ -45,7 +45,8 @@ public class ExperimentSelectionMenu : MonoBehaviour
             optionList.Add("");
             optionList.Add("Able-bodied");
             optionList.Add("EMG");
-            optionList.Add("Synergy");
+            optionList.Add("Jacobian Synergy");
+            optionList.Add("Linear Synergy");
             optionsDropdown.AddOptions(optionList);
             // Activate dropdown
             optionDropdownGO.SetActive(true);
@@ -103,12 +104,36 @@ public class ExperimentSelectionMenu : MonoBehaviour
                     logManager.DisplayInformationOnLog(3.0f, "Please add and configure an EMG sensor.");
             }
             // Synergy case
-            else if (optionNumber == 3 && AvatarSystem.AvatarType == AvatarType.Transhumeral)
+            else if ( (optionNumber == 3 || optionNumber == 4) && AvatarSystem.AvatarType == AvatarType.Transhumeral)
             {
                 KeepOnLoad();
 
                 // Load experiment.
                 // SteamVR_LoadLevel.Begin("JacobianSynergyExperiment");
+
+                GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+                ConfigurableElbowManager elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
+                if (optionNumber == 3)
+                {
+                    // Set VIVE tracker and Jacobian synergy as active.
+                    // Get prosthesis
+                    prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+                    elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
+                    // Set the reference generator to jacobian-based.
+                    elbowManager.ChangeSensor("VAL_SENSOR_VIVETRACKER");
+                    elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
+                }
+                else if (optionNumber == 4)
+                {
+                    // Set VIVE tracker and Linear synergy as active.
+                    // Get prosthesis
+                    prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+                    elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
+                    // Set the reference generator to linear synergy.
+                    elbowManager.ChangeSensor("VAL_SENSOR_VIVETRACKER");
+                    elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
+
+                }
 
                 // Load training
                 SteamVR_LoadLevel.Begin("ProsthesisTraining");

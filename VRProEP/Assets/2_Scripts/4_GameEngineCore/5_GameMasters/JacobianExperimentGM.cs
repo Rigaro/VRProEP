@@ -48,12 +48,16 @@ public class JacobianExperimentGM : GameMaster
         if (debug)
         {
             SaveSystem.LoadUserData("MD1942");
-            // Debug Able
             /*
+            //
+            // Debug Able
+            //
             AvatarSystem.LoadPlayer(UserType.AbleBodied, AvatarType.AbleBodied);
             AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
             */
+            //
             // Debug Jacobian
+            //
             AvatarSystem.LoadPlayer(UserType.AbleBodied, AvatarType.Transhumeral);
             AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
             // Initialize prosthesis
@@ -61,7 +65,9 @@ public class JacobianExperimentGM : GameMaster
             ConfigurableElbowManager elbowManager = prosthesisManagerGO.AddComponent<ConfigurableElbowManager>();
             elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + SaveSystem.ActiveUser.handLength / 2.0f));
             // Set the reference generator to jacobian-based.
-            elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
+            //elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
+            // Set the reference generator to linear synergy.
+            elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
         }
         // Initialize ExperimentSystem
         InitExperimentSystem();
@@ -576,6 +582,9 @@ public class JacobianExperimentGM : GameMaster
     /// </summary>
     protected override void InitExperimentSystem()
     {
+        // Prosthesis handling objects
+        GameObject prosthesisManagerGO;
+        ConfigurableElbowManager elbowManager;
         //
         // Set the experiment type and ID
         //
@@ -609,8 +618,8 @@ public class JacobianExperimentGM : GameMaster
             }
             else
             {
-                GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
-                ConfigurableElbowManager elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
+                prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+                elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
                 if (elbowManager.GetInterfaceType() == ReferenceGeneratorType.JacobianSynergy)
                 {
                     experimentType = ExperimentType.TypeThree;
@@ -656,8 +665,8 @@ public class JacobianExperimentGM : GameMaster
         {
             // Set EMG sensor and reference generator as active.
             // Get prosthesis
-            GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
-            ConfigurableElbowManager elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
+            prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+            elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
             // Set active sensor and reference generator to EMG.
             elbowManager.ChangeSensor("VAL_SENSOR_SEMG");
             elbowManager.ChangeReferenceGenerator("VAL_REFGEN_EMGPROP");
@@ -666,8 +675,8 @@ public class JacobianExperimentGM : GameMaster
         {
             // Set VIVE tracker and Jacobian synergy as active.
             // Get prosthesis
-            GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
-            ConfigurableElbowManager elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
+            prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+            elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
             // Set the reference generator to jacobian-based.
             elbowManager.ChangeSensor("VAL_SENSOR_VIVETRACKER");
             elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
@@ -676,8 +685,8 @@ public class JacobianExperimentGM : GameMaster
         {
             // Set VIVE tracker and Linear synergy as active.
             // Get prosthesis
-            GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
-            ConfigurableElbowManager elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
+            prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+            elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
             // Set the reference generator to linear synergy.
             elbowManager.ChangeSensor("VAL_SENSOR_VIVETRACKER");
             elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
