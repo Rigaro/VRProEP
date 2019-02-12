@@ -5,6 +5,7 @@
       "app_key": "application.generated.unity.vrproep.exe",
       "launch_type": "url",
       "url": "steam://launch/",
+      "action_manifest_path": "D:\\Rigaro\\Dropbox\\Research\\Development\\Workspace\\VRProEP\\VRProEP\\actions.json",
       "strings": {
         "en_us": {
           "name": "VRProEP [Testing]"

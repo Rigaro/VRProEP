@@ -30,7 +30,7 @@ public class ProsthesisTrainingGM : GameMaster
     private float taskTime = 0.0f;
     private string instructionsText;
     private GameObject residualLimbGO;
-    private ResidualLimbFollower limbFollower;
+    private LimbFollower limbFollower;
     private AngleFollower angleFollower;
 
     // Debug
@@ -439,7 +439,7 @@ public class ProsthesisTrainingGM : GameMaster
 
             // Find the residual limb and change the follower
             GameObject residualLimbGO = GameObject.FindGameObjectWithTag("ResidualLimbAvatar");
-            ResidualLimbFollower limbFollower = residualLimbGO.GetComponent<ResidualLimbFollower>();
+            LimbFollower limbFollower = residualLimbGO.GetComponent<LimbFollower>();
             Destroy(limbFollower);
             AngleFollower angleFollower = residualLimbGO.AddComponent<AngleFollower>();
             angleFollower.fixedTransform = fixedProsthesisPosition;
@@ -562,7 +562,7 @@ public class ProsthesisTrainingGM : GameMaster
             {
                 // Find the residual limb and change the follower
                 residualLimbGO = GameObject.FindGameObjectWithTag("ResidualLimbAvatar");
-                limbFollower = residualLimbGO.GetComponent<ResidualLimbFollower>();
+                limbFollower = residualLimbGO.GetComponent<LimbFollower>();
                 limbFollower.enabled = false;
                 angleFollower = residualLimbGO.AddComponent<AngleFollower>();
                 angleFollower.fixedTransform = fixedProsthesisPosition;

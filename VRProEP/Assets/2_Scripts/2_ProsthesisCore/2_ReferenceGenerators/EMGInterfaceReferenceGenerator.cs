@@ -16,7 +16,6 @@ namespace VRProEP.ProsthesisCore
 
         private List<float> gains = new List<float>();
         private EMGInterfaceType interfaceType;
-        private bool isEnabled = false;
         private bool enableRequested = false;
         private List<LowPassFilter> lowPassFilters = new List<LowPassFilter>();
         private List<MovingAverage> movingAverageFilters = new List<MovingAverage>();
@@ -33,8 +32,7 @@ namespace VRProEP.ProsthesisCore
                 gains = value;
             }
         }
-
-
+        
         /// <summary>
         /// Proportional EMG reference generator that converts an EMG signal into a joint angle or velocity reference.
         /// Single site: joint angle reference.
@@ -196,7 +194,7 @@ namespace VRProEP.ProsthesisCore
                 float diffEmg = input[2] - input[1];
                 float filtDiffEmg = lowPassFilters[channel].Update(diffEmg);
                 float avfDiffEmg = (float)Math.Round(movingAverageFilters[channel].Update(filtDiffEmg), 1);
-                Debug.Log(avfDiffEmg);
+                //Debug.Log(avfDiffEmg);
                 if (Mathf.Abs(avfDiffEmg) > 7.0f)
                 {
                     tempXBar = xBar[channel] + (Gains[channel] * avfDiffEmg * Time.fixedDeltaTime); // Differential velocity control.
@@ -266,5 +264,6 @@ namespace VRProEP.ProsthesisCore
             else
                 return true;
         }
+
     }
 }

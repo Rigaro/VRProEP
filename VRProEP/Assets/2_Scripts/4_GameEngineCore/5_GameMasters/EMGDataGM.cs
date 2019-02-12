@@ -403,7 +403,6 @@ public class EMGDataGM : GameMaster
         string experimentInfoText = "Experiment info: \n";
         experimentInfoText += "Iteration: " + iterationNumber + "/" + iterationsPerAngle + ".\n";
         experimentInfoText += "Session: " + sessionNumber + "/" + startAngleList.Count * movementTimeList.Count + ".\n";
-        int j = 0;
         instructionManager.DisplayText(experimentInfoText);
 
         //

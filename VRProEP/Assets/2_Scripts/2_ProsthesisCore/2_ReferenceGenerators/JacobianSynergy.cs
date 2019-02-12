@@ -12,7 +12,6 @@ namespace VRProEP.ProsthesisCore
         private float upperArmLength;
         private float lowerArmLength;
         private float alpha;
-        private bool isEnabled = false;
         private bool enableRequested = false;
 
         /// <summary>
@@ -199,9 +198,6 @@ namespace VRProEP.ProsthesisCore
             else
                 return true;
         }
-
-        // Encapsulation
-        public bool IsEnabled { get => isEnabled; }
     }
 
 }

@@ -63,5 +63,7 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <returns>The reference generator's type</returns>
         ReferenceGeneratorType GeneratorType();
+
+        bool IsEnabled();
     }
 }

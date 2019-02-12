@@ -9,6 +9,7 @@ namespace VRProEP.ProsthesisCore
     {
         protected ISensor sensorManager;
         protected IReferenceGenerator referenceGenerator;
+        protected bool isEnabled = false;
 
         /// <summary>
         /// Generates an updated reference for the given device channel.
@@ -24,6 +25,11 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <returns>The updated set of references.</returns>
         public abstract float[] GenerateAllReferences();
+        
+        public bool IsEnabled()
+        {
+            return isEnabled;
+        }
     }
 
 }

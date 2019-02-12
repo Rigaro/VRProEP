@@ -16,6 +16,7 @@ namespace VRProEP.ProsthesisCore
         protected float[] xMin;
         protected float[] xMax;
         protected ReferenceGeneratorType generatorType;
+        protected bool isEnabled = false;
 
         public int ParameterChannelSize()
         {
@@ -238,6 +239,12 @@ namespace VRProEP.ProsthesisCore
         public ReferenceGeneratorType GeneratorType()
         {
             return generatorType;
+        }
+
+
+        public bool IsEnabled()
+        {
+            return isEnabled;
         }
     }
 

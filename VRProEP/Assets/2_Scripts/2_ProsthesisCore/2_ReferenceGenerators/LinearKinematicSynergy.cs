@@ -10,10 +10,8 @@ namespace VRProEP.ProsthesisCore
     /// </summary>
     public class LinearKinematicSynergy : AdaptiveGenerator
     {
-
-        private bool isEnabled = false;
         private bool enableRequested = false;
-
+        
         /// <summary>
         /// Basic synergistic prosthesis reference generator.
         /// Provides position reference for prosthesis joints through a simple linear kinematic synergy.

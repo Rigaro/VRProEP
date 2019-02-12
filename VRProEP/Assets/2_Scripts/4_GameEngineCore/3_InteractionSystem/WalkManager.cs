@@ -15,10 +15,10 @@ public class WalkManager : MonoBehaviour {
     void Start ()
     {
         // Check that the action set is active.
-        if (!SteamVR_Input.vrproep.IsActive())
+        if (!SteamVR_Input.GetActionSet("vrproep").IsActive())
         {
-            SteamVR_Input._default.Deactivate();
-            SteamVR_Input.vrproep.ActivatePrimary();
+            SteamVR_Input.GetActionSet("default").Deactivate();
+            SteamVR_Input.GetActionSet("vrproep").Activate();
         }
 
         // Get head transform
@@ -32,8 +32,8 @@ public class WalkManager : MonoBehaviour {
 	void FixedUpdate ()
     {
         if (walkEnable.GetState(inputSource))
-        {
-            Vector2 trackpad = SteamVR_Input.vrproep.inActions.Trackpad.GetAxis(SteamVR_Input_Sources.Any);
+        {            
+            Vector2 trackpad = SteamVR_Input.GetAction<SteamVR_Action_Vector2>("Trackpad").GetAxis(SteamVR_Input_Sources.Any);
             Vector3 walkingMotion = new Vector3(trackpad.x * Time.fixedDeltaTime, 0.0f, trackpad.y * Time.fixedDeltaTime);
             player.position += new Vector3(headTransform.TransformVector(walkingMotion).x, 0.0f, headTransform.TransformVector(walkingMotion).z);
         }

@@ -13,9 +13,8 @@ namespace VRProEP.ProsthesisCore
     {
         // Channel size given by the number of actions implemented.
         // Curently implemented actions:
-
-        private SteamVR_Action_Vector2 trackpadAction = SteamVR_Input.vrproep.inActions.Trackpad;
-        private SteamVR_Action_Boolean buttonAction = SteamVR_Input.vrproep.inActions.InterfaceEnableButton;
+        private SteamVR_Action_Vector2 trackpadAction = SteamVR_Input.GetAction<SteamVR_Action_Vector2>("Trackpad");
+        private SteamVR_Action_Boolean buttonAction = SteamVR_Input.GetAction<SteamVR_Action_Boolean>("InterfaceEnableButton");
 
         public VIVEControllerManager() : base(2, SensorType.VIVEController)
         {
@@ -35,12 +34,12 @@ namespace VRProEP.ProsthesisCore
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels. The number of available channels is: " + ChannelSize + ".");
             else if (channel < 0)
                 throw new System.ArgumentOutOfRangeException("The channel number starts from 0.");
-            
+
             // Check that the action set is active.
-            if (!SteamVR_Input.vrproep.IsActive())
+            if (!SteamVR_Input.GetActionSet("vrproep").IsActive())
             {
-                SteamVR_Input._default.Deactivate();
-                SteamVR_Input.vrproep.ActivatePrimary();
+                SteamVR_Input.GetActionSet("default").Deactivate();
+                SteamVR_Input.GetActionSet("vrproep").Activate();
             }
             if (channel == 0)
             {
@@ -72,10 +71,10 @@ namespace VRProEP.ProsthesisCore
             if (channel.Equals("TRACKPAD"))
             {
                 // Check that the action set is active.
-                if (!SteamVR_Input.vrproep.IsActive())
+                if (!SteamVR_Input.GetActionSet("vrproep").IsActive())
                 {
-                    SteamVR_Input._default.Deactivate();
-                    SteamVR_Input.vrproep.ActivatePrimary();
+                    SteamVR_Input.GetActionSet("default").Deactivate();
+                    SteamVR_Input.GetActionSet("vrproep").Activate();
                 }
 
                 Vector2 trackpadValue = trackpadAction.GetAxis(SteamVR_Input_Sources.Any);
@@ -103,10 +102,10 @@ namespace VRProEP.ProsthesisCore
         public override float[] GetAllRawData()
         {
             // Check that the action set is active.
-            if (!SteamVR_Input.vrproep.IsActive())
+            if (!SteamVR_Input.GetActionSet("vrproep").IsActive())
             {
-                SteamVR_Input._default.Deactivate();
-                SteamVR_Input.vrproep.ActivatePrimary();
+                SteamVR_Input.GetActionSet("default").Deactivate();
+                SteamVR_Input.GetActionSet("vrproep").Activate();
             }
 
             Vector2 trackpadValue = trackpadAction.GetAxis(SteamVR_Input_Sources.Any);
@@ -137,10 +136,10 @@ namespace VRProEP.ProsthesisCore
                 throw new System.ArgumentOutOfRangeException("The channel number starts from 0.");
 
             // Check that the action set is active.
-            if (!SteamVR_Input.vrproep.IsActive())
+            if (!SteamVR_Input.GetActionSet("vrproep").IsActive())
             {
-                SteamVR_Input._default.Deactivate();
-                SteamVR_Input.vrproep.ActivatePrimary();
+                SteamVR_Input.GetActionSet("default").Deactivate();
+                SteamVR_Input.GetActionSet("vrproep").Activate();
             }
 
             if (channel == 0)
@@ -172,10 +171,10 @@ namespace VRProEP.ProsthesisCore
             if (channel.Equals("TRACKPAD"))
             {
                 // Check that the action set is active.
-                if (!SteamVR_Input.vrproep.IsActive())
+                if (!SteamVR_Input.GetActionSet("vrproep").IsActive())
                 {
-                    SteamVR_Input._default.Deactivate();
-                    SteamVR_Input.vrproep.ActivatePrimary();
+                    SteamVR_Input.GetActionSet("default").Deactivate();
+                    SteamVR_Input.GetActionSet("vrproep").Activate();
                 }
 
                 Vector2 trackpadValue = trackpadAction.GetAxis(SteamVR_Input_Sources.Any);
@@ -202,10 +201,10 @@ namespace VRProEP.ProsthesisCore
         public override float[] GetAllProcessedData()
         {
             // Check that the action set is active.
-            if (!SteamVR_Input.vrproep.IsActive())
+            if (!SteamVR_Input.GetActionSet("vrproep").IsActive())
             {
-                SteamVR_Input._default.Deactivate();
-                SteamVR_Input.vrproep.ActivatePrimary();
+                SteamVR_Input.GetActionSet("default").Deactivate();
+                SteamVR_Input.GetActionSet("vrproep").Activate();
             }
 
             Vector2 trackpadValue = trackpadAction.GetAxis(SteamVR_Input_Sources.Any);

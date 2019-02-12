@@ -62,12 +62,12 @@ public class GraspManager : MonoBehaviour {
     private void Start()
     {
         // Check that the action set is active.
-        if (!SteamVR_Input.vrproep.IsActive())
+        if (!SteamVR_Input.GetActionSet("vrproep").IsActive())
         {
-            SteamVR_Input._default.Deactivate();
-            SteamVR_Input.vrproep.ActivatePrimary();
+            SteamVR_Input.GetActionSet("default").Deactivate();
+            SteamVR_Input.GetActionSet("vrproep").Activate();
         }
-        
+
         handGO = GameObject.FindGameObjectWithTag("Hand");
                 
         // Get tracking handle when able-bodied
@@ -136,8 +136,8 @@ public class GraspManager : MonoBehaviour {
     /// </summary>
     private void HandleGrasp()
     {
-        // Check manager type and if requested to interact.
-        if (managerType == GraspManagerType.Assisted || (managerType == GraspManagerType.Controller && SteamVR_Input.vrproep.inActions.ObjectInteractButton.GetStateDown(SteamVR_Input_Sources.Any)))
+        // Check manager type and if requested to interact.       
+        if (managerType == GraspManagerType.Assisted || (managerType == GraspManagerType.Controller && SteamVR_Input.GetAction<SteamVR_Action_Boolean>("ObjectInteractButton").GetStateDown(SteamVR_Input_Sources.Any)))
         {
             if (objectGraspable == null)
                 throw new System.NullReferenceException("There was no object found within grasp.");
@@ -162,7 +162,7 @@ public class GraspManager : MonoBehaviour {
         if (managerType == GraspManagerType.Controller)
         {
             // Releases object when the object interaction button is pressed and there is an object in hand.
-            if (SteamVR_Input.vrproep.inActions.ObjectInteractButton.GetStateDown(SteamVR_Input_Sources.Any) && objectInHand != null && (managerMode == GraspManagerMode.Open || (managerMode == GraspManagerMode.Restriced && inDropOff)))
+            if (SteamVR_Input.GetAction<SteamVR_Action_Boolean>("ObjectInteractButton").GetStateDown(SteamVR_Input_Sources.Any) && objectInHand != null && (managerMode == GraspManagerMode.Open || (managerMode == GraspManagerMode.Restriced && inDropOff)))
             {
                 ReleaseObjectInHand();
             }

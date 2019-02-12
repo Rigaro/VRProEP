@@ -14,7 +14,11 @@ namespace VRProEP.ProsthesisCore
         private float elbowState = 0.0f;
 
         private bool isConfigured = false;
-        
+        private bool isEnabled = false;
+
+        public bool IsEnabled { get => isEnabled; }
+
+
         /// <summary>
         /// Initializes the Elbow prosthesis with basic functionality.
         /// Must be called only after the avatar is available.
@@ -65,7 +69,7 @@ namespace VRProEP.ProsthesisCore
             // Add the created sensors to the list of available sensors.
             AvatarSystem.AddActiveSensor(trackerManager);
             AvatarSystem.AddActiveSensor(virtualEncoder);
-            AvatarSystem.AddActiveSensor(controllerManager);
+            //AvatarSystem.AddActiveSensor(controllerManager);
 
 
             //
@@ -103,6 +107,7 @@ namespace VRProEP.ProsthesisCore
                 elbowState = inputManager.GenerateReference(0);
                 // Update device state
                 elbowManager.UpdateState(0, elbowState);
+                isEnabled = inputManager.IsEnabled();
             }
         }
 

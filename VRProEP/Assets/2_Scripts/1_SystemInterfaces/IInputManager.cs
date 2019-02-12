@@ -22,5 +22,8 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <returns>The updated set of references.</returns>
         float[] GenerateAllReferences();
+
+
+        bool IsEnabled();
     }
 }

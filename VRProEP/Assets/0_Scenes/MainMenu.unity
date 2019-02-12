@@ -543,7 +543,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Forearm length (cm)...
+  m_Text: Forearm length (m)...
 --- !u!222 &38449145
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8387,7 +8387,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Upper arm length (cm)...
+  m_Text: Upper arm length (m)...
 --- !u!222 &563496631
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -12261,7 +12261,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Hand length (cm)...
+  m_Text: Hand length (m)...
 --- !u!222 &872918304
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -15837,7 +15837,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Upper arm width (cm)...
+  m_Text: Upper arm width (m)...
 --- !u!222 &1163459094
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -16320,7 +16320,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Forearm Width (cm)...
+  m_Text: Forearm Width (m)...
 --- !u!222 &1185948806
 CanvasRenderer:
   m_ObjectHideFlags: 0

@@ -17,9 +17,10 @@ public class JacobianExperimentGM : GameMaster
     [Tooltip("The GameObject used for the experiment task.")]
     public GameObject graspTaskObject;
     public List<GameObject> dropOffLocations = new List<GameObject>();
-    public int iterationsPerDropOff = 20;
+    public int iterationsPerDropOff = 5;
     public int trainingIterations = 20;
-    public int restIterations = 25;
+    public int restIterations = 20;
+    public int numberOfSessions = 3;
 
     // Experiment management
     private GraspTaskManager taskManager;
@@ -33,12 +34,17 @@ public class JacobianExperimentGM : GameMaster
     private bool inInstructions = false;
     private string infoText;
     private bool logEnd = false;
+    private bool successTriggered = false;
+
+    // Prosthesis handling objects
+    private GameObject prosthesisManagerGO;
+    private ConfigurableElbowManager elbowManager;
 
     // Data logging:
     private DataStreamLogger motionLogger;
-    private const string motionDataAbleFormat = "loc,t,aDotS,bDotS,gDotS,aS,bS,gS,aDotE,bDotE,gDotE,aE,bE,gE,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xHand,yHand,zHand,aHand,bHand,gHand";
-    private const string motionDataEMGFormat = "loc,t,aDotS,bDotS,gDotS,aS,bS,gS,qE,qDotE,tpad,enable,emgA,emgB,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xHand,yHand,zHand,aHand,bHand,gHand";
-    private const string motionDataSynFormat = "loc,t,aDotS,bDotS,gDotS,aS,bS,gS,qE,qDotE,tpad,enable,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xHand,yHand,zHand,aHand,bHand,gHand";
+    private const string motionDataAbleFormat = "loc,t,aDotS,bDotS,gDotS,aS,bS,gS,xS,yS,zS,aDotE,bDotE,gDotE,aE,bE,gE,xE,yE,zE,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,xHand,yHand,zHand,aHand,bHand,gHand";
+    private const string motionDataEMGFormat = "loc,t,aDotS,bDotS,gDotS,aS,bS,gS,xS,yS,zS,qE,qDotE,emgA,emgB,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,xHand,yHand,zHand,aHand,bHand,gHand,enable";
+    private const string motionDataSynFormat = "loc,t,aDotS,bDotS,gDotS,aS,bS,gS,xS,yS,zS,qE,qDotE,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,xHand,yHand,zHand,aHand,bHand,gHand,enable";
     private string motionDataFormat;
     private float taskTime = 0.0f;
 
@@ -48,13 +54,13 @@ public class JacobianExperimentGM : GameMaster
         if (debug)
         {
             SaveSystem.LoadUserData("MD1942");
-            /*
+            
             //
             // Debug Able
             //
-            AvatarSystem.LoadPlayer(UserType.AbleBodied, AvatarType.AbleBodied);
+            AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
             AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
-            */
+            /*
             //
             // Debug Jacobian
             //
@@ -68,6 +74,7 @@ public class JacobianExperimentGM : GameMaster
             //elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
             // Set the reference generator to linear synergy.
             elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
+            */
         }
         // Initialize ExperimentSystem
         InitExperimentSystem();
@@ -146,7 +153,7 @@ public class JacobianExperimentGM : GameMaster
                 //
                 // Initialize data logs
                 //
-                motionLogger.AddNewLogFile(1, iterationNumber, motionDataFormat);
+                motionLogger.AddNewLogFile(sessionNumber, iterationNumber, motionDataFormat);
 
                 //
                 // Go to training
@@ -228,7 +235,7 @@ public class JacobianExperimentGM : GameMaster
             case ExperimentState.WaitingForStart:
                 // Print status
                 infoText = "Status: Waiting to start.\n";
-                infoText += "Progress: " + iterationNumber + "/" + iterationLimit + ".\n";
+                infoText += "Progress: " + (((sessionNumber - 1) * iterationLimit) + iterationNumber) + "/" + iterationLimit * numberOfSessions + ".\n";
                 infoText += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
                 instructionManager.DisplayText(infoText);
                 // Enable task object, drop-off if not done
@@ -247,6 +254,7 @@ public class JacobianExperimentGM : GameMaster
                         {
                             hudManager.ClearText();
                             taskTime = 0.0f;
+                            successTriggered = false;
                             experimentState = ExperimentState.PerformingTask;
                         }
                         break;
@@ -266,7 +274,7 @@ public class JacobianExperimentGM : GameMaster
                 // Display experiment information to subject.
                 //
                 infoText = "Status: Performing task.\n";
-                infoText += "Progress: " + iterationNumber + "/" + iterationLimit + ".\n";
+                infoText += "Progress: " + (((sessionNumber - 1) * iterationLimit) + iterationNumber) + "/" + iterationLimit * numberOfSessions + ".\n";
                 infoText += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
                 instructionManager.DisplayText(infoText);
 
@@ -277,6 +285,13 @@ public class JacobianExperimentGM : GameMaster
              *************************************************
              */
             case ExperimentState.AnalizingResults:
+                //
+                // Display experiment information to subject.
+                //
+                infoText = "Status: Analizing results.\n";
+                infoText += "Progress: " + (((sessionNumber - 1) * iterationLimit) + iterationNumber) + "/" + iterationLimit * numberOfSessions + ".\n";
+                infoText += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
+                instructionManager.DisplayText(infoText);
                 // Disable drop-off location.
                 activeDropOff.SetActive(false);
 
@@ -296,6 +311,7 @@ public class JacobianExperimentGM : GameMaster
                 //
                 // Flow managment
                 //
+                successTriggered = false;
                 remainingDropOffIterations[activeDropOffNumber]--;
                 if (CheckEndCondition())
                 {
@@ -344,7 +360,7 @@ public class JacobianExperimentGM : GameMaster
                     // 
                     // Update log requirements
                     //
-                    motionLogger.AddNewLogFile(1, iterationNumber, motionDataFormat);
+                    motionLogger.AddNewLogFile(sessionNumber, iterationNumber, motionDataFormat);
 
                     //
                     // Go to start of next iteration
@@ -369,15 +385,22 @@ public class JacobianExperimentGM : GameMaster
                 //
                 // Initialize new session variables and flow control
                 //
-                iterationNumber = 1;
+                iterationNumber = 0;
                 sessionNumber++;
-                skipInstructions = true;
 
                 //
                 // Initialize data logging
                 //
+                // Initialize iteration management.
+                remainingDropOffIterations = new List<int>(dropOffLocations.Count);
+                for (int i = 0; i < dropOffLocations.Count; i++)
+                    remainingDropOffIterations.Add(iterationsPerDropOff);
+                iterationLimit = iterationsPerDropOff * dropOffLocations.Count;
 
-                experimentState = ExperimentState.InitializingApplication; // Initialize next session
+                hudManager.DisplayText("Take a " + restTime + " seconds rest.", 6.0f);
+                SetWaitFlag(restTime);
+
+                experimentState = ExperimentState.Resting; // Initialize next session
                 break;
             /*
              *************************************************
@@ -386,7 +409,7 @@ public class JacobianExperimentGM : GameMaster
              */
             case ExperimentState.Resting:
                 infoText = "Status: Resting.\n";
-                infoText += "Progress: " + iterationNumber + "/" + iterationLimit + ".\n";
+                infoText += "Progress: " + (((sessionNumber - 1) * iterationLimit) + iterationNumber) + "/" + iterationLimit * numberOfSessions + ".\n";
                 infoText += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
                 instructionManager.DisplayText(infoText);
                 //
@@ -423,7 +446,7 @@ public class JacobianExperimentGM : GameMaster
                 // Check for session change or end request from experimenter
                 //
                 infoText = "Status: Experiment paused.\n";
-                infoText += "Progress: " + iterationNumber + "/" + iterationLimit + ".\n";
+                infoText += "Progress: " + ( ((sessionNumber - 1) * iterationLimit) + iterationNumber) + "/" + iterationLimit * numberOfSessions + ".\n";
                 infoText += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
                 instructionManager.DisplayText(infoText);
                 // Disable task object, drop-off
@@ -514,6 +537,8 @@ public class JacobianExperimentGM : GameMaster
                     foreach (float element in sensorData)
                         logData += "," + element.ToString();
                 }
+                if (experimentType == ExperimentType.TypeTwo || experimentType == ExperimentType.TypeThree || experimentType == ExperimentType.TypeFour)
+                    logData += "," + elbowManager.IsEnabled;
 
                 //
                 // Update data and append
@@ -529,11 +554,12 @@ public class JacobianExperimentGM : GameMaster
                 //
                 // Save log and reset flags when successfully compeleted task
                 //
-                if (CheckTaskCompletion())
+                if (CheckTaskCompletion() && !successTriggered)
                 {
                     //
                     // Perform data management, such as appending data to lists for analysis
                     //
+                    successTriggered = true;
 
                     //
                     // Save logger for current experiment and change to data analysis
@@ -543,7 +569,7 @@ public class JacobianExperimentGM : GameMaster
                     //
                     // Clear data management buffers
                     //
-                    experimentState = ExperimentState.AnalizingResults;
+                    StartCoroutine(EndTask());
                     break;
                 }
 
@@ -552,7 +578,7 @@ public class JacobianExperimentGM : GameMaster
                 break;
         }
     }
-
+    
     private void OnApplicationQuit()
     {
         //
@@ -574,6 +600,12 @@ public class JacobianExperimentGM : GameMaster
         ExperimentSystem.CloseAllExperimentLoggers();
     }
 
+    private IEnumerator EndTask()
+    {
+        yield return new WaitForSecondsRealtime(0.3f);
+        experimentState = ExperimentState.AnalizingResults;
+    }
+
     #region Inherited methods overrides
 
     /// <summary>
@@ -582,9 +614,7 @@ public class JacobianExperimentGM : GameMaster
     /// </summary>
     protected override void InitExperimentSystem()
     {
-        // Prosthesis handling objects
-        GameObject prosthesisManagerGO;
-        ConfigurableElbowManager elbowManager;
+        sessionNumber = 1;
         //
         // Set the experiment type and ID
         //
@@ -657,7 +687,8 @@ public class JacobianExperimentGM : GameMaster
             VIVETrackerManager upperArmTracker = new VIVETrackerManager(ulMotionTrackerGO.transform);
             ExperimentSystem.AddSensor(upperArmTracker);
 
-            GameObject llMotionTrackerGO = AvatarSystem.AddMotionTracker();
+
+            GameObject llMotionTrackerGO = GameObject.FindGameObjectWithTag("ForearmTracker");
             VIVETrackerManager lowerArmTracker = new VIVETrackerManager(llMotionTrackerGO.transform);
             ExperimentSystem.AddSensor(lowerArmTracker);
         }
@@ -753,7 +784,12 @@ public class JacobianExperimentGM : GameMaster
     /// <returns>True if the condition for changing sessions has been reached.</returns>
     public override bool CheckNextSessionCondition()
     {
-        return false;
+        if (iterationNumber >= iterationLimit)
+        {
+            return true;
+        }
+        else
+            return false;
     }
 
     /// <summary>
@@ -762,7 +798,7 @@ public class JacobianExperimentGM : GameMaster
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
     public override bool CheckEndCondition()
     {
-        if (iterationNumber >= iterationLimit)
+        if (sessionNumber >= numberOfSessions && iterationNumber >= iterationLimit)
             return true;
         else
             return false;
@@ -892,8 +928,14 @@ public class JacobianExperimentGM : GameMaster
             hudManager.DisplayText("Look forward.", 3.0f);
             yield return new WaitForSeconds(4.0f);
 
+            // Hand rest
+            hudManager.DisplayText("You can rest your hand on...");
+            yield return new WaitForSeconds(4.0f);
+            hudManager.DisplayText("the orange circle between iterations.");
+            yield return new WaitForSeconds(4.0f);
+
             // Show object
-            hudManager.DisplayText("The object will appear on the +.");
+            hudManager.DisplayText("The object will appear on the blue +.");
             yield return new WaitForSeconds(4.0f);
             taskManager.SetObjectEnable(true);
             hudManager.DisplayText("You can see it now.");
@@ -974,7 +1016,7 @@ public class JacobianExperimentGM : GameMaster
 
         string defaultText = "Instructions:\n";
 
-        instructionManager.DisplayText(defaultText + "The experiment requires you to repeat the grasp-and-drop-off task for " + iterationLimit + " iterations.");
+        instructionManager.DisplayText(defaultText + "The experiment requires you to repeat the grasp-and-drop-off task for " + iterationLimit * numberOfSessions + " iterations.");
         yield return new WaitForSeconds(8.0f);
         instructionManager.DisplayText(defaultText + "The drop-off location will be chosen randomly.");
         yield return new WaitForSeconds(5.0f);

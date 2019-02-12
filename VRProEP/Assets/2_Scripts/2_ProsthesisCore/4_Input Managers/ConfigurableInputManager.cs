@@ -26,7 +26,7 @@ namespace VRProEP.ProsthesisCore
         public const string VAL_REFGEN_INTEGRATOR = "VAL_REFGEN_INTEGRATOR";
         public const string VAL_REFGEN_POINTGRAD = "VAL_REFGEN_POINTGRAD";
         public const string VAL_REFGEN_EMGPROP = "VAL_REFGEN_EMGPROP";
-
+        
         /// <summary>
         /// Input manager that allows for dynamic customization of sensors and reference generators.
         /// </summary>
@@ -139,6 +139,9 @@ namespace VRProEP.ProsthesisCore
                 // Go back to previously active sensor
                 Configure("CMD_SET_ACTIVE_SENSOR", prevSensorType);
 
+                // Update enable
+                isEnabled = activeGenerator.IsEnabled();
+
                 // Generate reference
                 return activeGenerator.UpdateReference(channel, input);
             }
@@ -160,6 +163,9 @@ namespace VRProEP.ProsthesisCore
 
                 // Go back to previously active sensor
                 Configure("CMD_SET_ACTIVE_SENSOR", prevSensorType);
+
+                // Update enable
+                isEnabled = activeGenerator.IsEnabled();
 
                 // Generate reference
                 return activeGenerator.UpdateReference(channel, input);
@@ -186,6 +192,9 @@ namespace VRProEP.ProsthesisCore
 
                 // Go back to previously active sensor
                 Configure("CMD_SET_ACTIVE_SENSOR", prevSensorType);
+
+                // Update enable
+                isEnabled = activeGenerator.IsEnabled();
 
                 // Generate reference
                 return activeGenerator.UpdateReference(channel, input.ToArray());
