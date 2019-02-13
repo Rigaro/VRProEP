@@ -33,6 +33,13 @@ public class CreateNewUserMenu : MonoBehaviour {
         dataSet += 1;
     }
 
+    public void SetHeight(string height)
+    {
+        float f_height = float.Parse(height);
+        userData.height = f_height;
+        dataSet += 1;
+    }
+
     public void SetUpperArmLength(string uaLength)
     {
         float f_uaLength = float.Parse(uaLength);
@@ -87,7 +94,7 @@ public class CreateNewUserMenu : MonoBehaviour {
     public void CreateUser()
     {
         // Check that all data has been set.
-        if (dataSet < 8)
+        if (dataSet < 9)
             logManager.DisplayInformationOnLog(3.0f, "Not all user information has been set.");
         else if (!userTypeSet)
             logManager.DisplayInformationOnLog(3.0f, "Choose a valid user type.");

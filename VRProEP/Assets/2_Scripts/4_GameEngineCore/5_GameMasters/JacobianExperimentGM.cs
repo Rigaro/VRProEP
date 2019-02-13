@@ -16,11 +16,21 @@ public class JacobianExperimentGM : GameMaster
     [Header("Jacobian Synergy Experiment")]
     [Tooltip("The GameObject used for the experiment task.")]
     public GameObject graspTaskObject;
+    public Transform graspObjectStart;
+    public Transform subjectStandLocation;
+    public float startHeightMultiplier;
+    public float startReachMultiplier;
+    [Tooltip("The GameObjects used for the drop-off areas.")]
     public List<GameObject> dropOffLocations = new List<GameObject>();
+    [Tooltip("The user height parametrization multipliers for the drop-off areas.")]
+    public List<float> dropOffHeightMultipliers = new List<float>();
+    [Tooltip("The user arm length parametrization multipliers for the drop-off areas.")]
+    public List<float> dropOffReachMultipliers = new List<float>();
     public int iterationsPerDropOff = 5;
     public int trainingIterations = 20;
     public int restIterations = 20;
     public int numberOfSessions = 3;
+    public Transform deskTransform;
 
     // Experiment management
     private GraspTaskManager taskManager;
@@ -53,14 +63,15 @@ public class JacobianExperimentGM : GameMaster
     {
         if (debug)
         {
-            SaveSystem.LoadUserData("MD1942");
-            
+            //SaveSystem.LoadUserData("MD1942");
+            SaveSystem.LoadUserData("RG1988");
+
             //
             // Debug Able
             //
-            AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
-            AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
-            /*
+            //AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
+            //AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
+            
             //
             // Debug Jacobian
             //
@@ -74,7 +85,7 @@ public class JacobianExperimentGM : GameMaster
             //elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
             // Set the reference generator to linear synergy.
             elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
-            */
+            
         }
         // Initialize ExperimentSystem
         InitExperimentSystem();
@@ -292,8 +303,6 @@ public class JacobianExperimentGM : GameMaster
                 infoText += "Progress: " + (((sessionNumber - 1) * iterationLimit) + iterationNumber) + "/" + iterationLimit * numberOfSessions + ".\n";
                 infoText += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
                 instructionManager.DisplayText(infoText);
-                // Disable drop-off location.
-                activeDropOff.SetActive(false);
 
                 //
                 // Data analysis and calculations
@@ -354,6 +363,8 @@ public class JacobianExperimentGM : GameMaster
                     //
                     // Update experiment object
                     //
+                    // Disable drop-off location.
+                    activeDropOff.SetActive(false);
                     // Enable new drop-off location.
                     SetNextDropOff();
 
@@ -449,6 +460,7 @@ public class JacobianExperimentGM : GameMaster
                 infoText += "Progress: " + ( ((sessionNumber - 1) * iterationLimit) + iterationNumber) + "/" + iterationLimit * numberOfSessions + ".\n";
                 infoText += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
                 instructionManager.DisplayText(infoText);
+
                 // Disable task object, drop-off
                 if (taskManager.enableFlag)
                 {
@@ -488,6 +500,11 @@ public class JacobianExperimentGM : GameMaster
         // Update information displayed on monitor
         //
 
+        //
+        // Update HUD state
+        //
+        if (experimentType != ExperimentType.TypeOne)
+            hudManager.enable = elbowManager.IsEnabled;
 
         //
         // Update information displayed for debugging purposes
@@ -539,7 +556,7 @@ public class JacobianExperimentGM : GameMaster
                 }
                 if (experimentType == ExperimentType.TypeTwo || experimentType == ExperimentType.TypeThree || experimentType == ExperimentType.TypeFour)
                     logData += "," + elbowManager.IsEnabled;
-
+                
                 //
                 // Update data and append
                 //
@@ -615,6 +632,26 @@ public class JacobianExperimentGM : GameMaster
     protected override void InitExperimentSystem()
     {
         sessionNumber = 1;
+        //
+        // Initialize world positioning
+        //
+        float subjectHeight = SaveSystem.ActiveUser.height;
+        float subjectArmLength = SaveSystem.ActiveUser.upperArmLength + SaveSystem.ActiveUser.forearmLength + (SaveSystem.ActiveUser.handLength / 2);
+        // Set task start position
+        graspObjectStart.localPosition = new Vector3(0.0f, startHeightMultiplier * subjectHeight, subjectStandLocation.position.z + (startReachMultiplier * subjectArmLength));
+        // Set desk height 
+        deskTransform.localPosition = new Vector3(deskTransform.localPosition.x, (1.2f * graspObjectStart.localPosition.y) - deskTransform.GetChild(0).transform.localPosition.y, graspObjectStart.localPosition.z + deskTransform.GetChild(0).transform.localPosition.z);
+        // Set task object start position
+        graspTaskObject.transform.position = graspObjectStart.position;
+        // Set drop-off locations
+        int i = 0;
+        foreach (GameObject dropOff in dropOffLocations)
+        {
+            Transform dropOffTransform = dropOff.transform;
+            dropOffTransform.localPosition = new Vector3(dropOffTransform.localPosition.x, dropOffHeightMultipliers[i] * subjectHeight, subjectStandLocation.position.z + (dropOffReachMultipliers[i] * subjectArmLength));
+            i++;
+        }
+
         //
         // Set the experiment type and ID
         //

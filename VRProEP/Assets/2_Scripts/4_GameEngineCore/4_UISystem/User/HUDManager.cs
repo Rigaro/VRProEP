@@ -10,6 +10,9 @@ namespace VRProEP.GameEngineCore
 
         public GameObject hudText;
         public GameObject hudGraphics;
+        public GameObject hudEnableGraphics;
+        public GameObject hudDisableGraphics;
+        public bool enable = true;
 
         private TextMeshPro hudTextMesh;
 
@@ -23,6 +26,16 @@ namespace VRProEP.GameEngineCore
         {
             // Animate HUD.
             hudGraphics.transform.Rotate(new Vector3(0.0f, 0.0f, 10.0f) * Time.deltaTime);
+            if (enable && !hudEnableGraphics.activeSelf)
+            {
+                hudEnableGraphics.SetActive(true);
+                hudDisableGraphics.SetActive(false);
+            }
+            if (!enable && !hudDisableGraphics.activeSelf)
+            {
+                hudEnableGraphics.SetActive(false);
+                hudDisableGraphics.SetActive(true);
+            }
         }
 
         public void MinimizeHUD()
@@ -57,7 +70,8 @@ namespace VRProEP.GameEngineCore
 
         private IEnumerator DisplayTextCoroutine(string text, float time)
         {
-            hudTextMesh.text = text;
+            if (hudTextMesh != null && text != null)
+                hudTextMesh.text = text;
             yield return new WaitForSecondsRealtime(time);
             hudTextMesh.text = "";
             MinimizeHUD();
