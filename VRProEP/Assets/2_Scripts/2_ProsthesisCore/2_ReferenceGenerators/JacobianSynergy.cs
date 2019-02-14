@@ -12,7 +12,6 @@ namespace VRProEP.ProsthesisCore
         private float upperArmLength;
         private float lowerArmLength;
         private float alpha;
-        private bool isEnabled = false;
         private bool enableRequested = false;
 
         /// <summary>
@@ -125,8 +124,8 @@ namespace VRProEP.ProsthesisCore
 
             for (int i = 1; i <= channelSize; i++)
             {
-                float[] newInput = { input[4 * i - 4], input[4 * i - 3], input[4 * i - 2], input[4 * i - 1] };
-                UpdateReference(i - 1, newInput);
+                float[] channelInput = { input[4 * i - 4], input[4 * i - 3], input[4 * i - 2], input[4 * i - 1] };
+                UpdateReference(i - 1, channelInput);
             }
             return xBar;
         }
@@ -138,8 +137,8 @@ namespace VRProEP.ProsthesisCore
         /// <param name="qElbow">The starting position elbow angle in radians.</param>
         private void SetDirectionOfMotionFrameOffset(float qShoulder, float qElbow)
         {
-            // Compute the unity vector from the shoulder joint to the hand grasp point.
-            Vector2 dShoulderToHand = new Vector2(upperArmLength * Mathf.Cos(qShoulder) + lowerArmLength * Mathf.Cos(qShoulder + qElbow), upperArmLength * Mathf.Sin(qShoulder) + lowerArmLength * Mathf.Sin(qShoulder + qElbow));
+            // Compute the unit vector from the shoulder joint to the hand grasp point.
+            Vector2 dShoulderToHand = new Vector2((upperArmLength * Mathf.Cos(qShoulder)) + (lowerArmLength * Mathf.Cos(qShoulder + qElbow)), (upperArmLength * Mathf.Sin(qShoulder)) + (lowerArmLength * Mathf.Sin(qShoulder + qElbow)));
              Vector2 uS2H = dShoulderToHand / (dShoulderToHand.magnitude);
             // Compute the raw rotation
             alpha = Mathf.Acos(uS2H.x);
@@ -198,15 +197,6 @@ namespace VRProEP.ProsthesisCore
                 return false;
             else
                 return true;
-        }
-
-        // Encapsulation
-        public bool IsEnabled
-        {
-            get
-            {
-                return isEnabled;
-            }
         }
     }
 

@@ -20,4 +20,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/0_Scenes/Experiments/EMGShoulderData.unity
     guid: 528d0eeccef45c74398d2eaf085fae7a
+  - enabled: 1
+    path: Assets/0_Scenes/Training/ProsthesisTraining.unity
+    guid: 6ae0257ec68a4b34f99ee9de1a2a1609
   m_configObjects: {}

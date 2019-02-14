@@ -17,6 +17,41 @@ namespace Valve.VR
         LeftHand,
 
         [Description("/user/hand/right")]
-        RightHand
+        RightHand,
+
+        [Description("/user/foot/left")]
+        LeftFoot,
+
+        [Description("/user/foot/right")]
+        RightFoot,
+
+        [Description("/user/shoulder/left")]
+        LeftShoulder,
+
+        [Description("/user/shoulder/right")]
+        RightShoulder,
+
+        [Description("/user/waist")]
+        Waist,
+
+        [Description("/user/chest")]
+        Chest,
+
+        [Description("/user/head")]
+        Head,
+
+        [Description("/user/gamepad")]
+        Gamepad,
+
+        [Description("/user/camera")]
+        Camera,
+
+        [Description("/user/keyboard")]
+        Keyboard,
     }
+}
+
+namespace Valve.VR.InputSources
+{
+    using Sources = SteamVR_Input_Sources;
 }

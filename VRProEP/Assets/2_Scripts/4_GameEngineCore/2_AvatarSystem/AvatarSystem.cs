@@ -13,7 +13,8 @@ namespace VRProEP.GameEngineCore
     /// </summary>
     public static class AvatarSystem
     {
-        private static readonly string dataFolder = Application.dataPath + "/UserData/";
+        //private static readonly string dataFolder = Application.dataPath + "/UserData/";
+        private static readonly string dataFolder = Application.persistentDataPath + "/UserData/";
         private static AvatarData activeAvatarData;
         private static List<ISensor> activeSensors = new List<ISensor>();
 
@@ -136,22 +137,22 @@ namespace VRProEP.GameEngineCore
             // Select avatar type, customize tracking frame and spawn avatar.
             if (avatarType == AvatarType.Transhumeral)
             {
+                activeAvatarType = AvatarType.Transhumeral;
                 LoadTrackerFrame(userData.type, avatarType);
                 CustomizeTrackingFrame(userData, avatarType);
                 AvatarSpawner.SpawnTranshumeralAvatar(userData, activeAvatarData);
-                activeAvatarType = AvatarType.Transhumeral;
             }
             else if (avatarType == AvatarType.Transradial)
             {
+                activeAvatarType = AvatarType.Transradial;
                 LoadTrackerFrame(userData.type, avatarType);
                 CustomizeTrackingFrame(userData, avatarType);
                 AvatarSpawner.SpawnTransradialAvatar(userData, activeAvatarData);
-                activeAvatarType = AvatarType.Transradial;
             }
             else if (avatarType == AvatarType.AbleBodied)
             {
-                AvatarSpawner.SpawnAbleBodiedAvatar(userData, activeAvatarData);
                 activeAvatarType = AvatarType.AbleBodied;
+                AvatarSpawner.SpawnAbleBodiedAvatar(userData, activeAvatarData);
             }
 
             isAvatarAvaiable = true;

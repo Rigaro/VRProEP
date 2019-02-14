@@ -14,6 +14,10 @@ namespace VRProEP.ProsthesisCore
         private float elbowState = 0.0f;
 
         private bool isConfigured = false;
+        private bool isEnabled = false;
+
+        public bool IsEnabled { get => isEnabled; }
+
 
         /// <summary>
         /// Initializes the Elbow prosthesis with basic functionality.
@@ -65,14 +69,14 @@ namespace VRProEP.ProsthesisCore
             // Add the created sensors to the list of available sensors.
             AvatarSystem.AddActiveSensor(trackerManager);
             AvatarSystem.AddActiveSensor(virtualEncoder);
-            AvatarSystem.AddActiveSensor(controllerManager);
+            //AvatarSystem.AddActiveSensor(controllerManager);
 
 
             //
             // Reference generators
             //
             // Add a Linear Kinematic Synergy to the prosthesis
-            float[] theta = { -2.5f };
+            float[] theta = { -1.0f };
             float[] thetaMin = { -1.0f };
             float[] thetaMax = { -3.5f };
             LinearKinematicSynergy linSyn = new LinearKinematicSynergy(xBar, xMin, xMax, theta, thetaMin, thetaMax);
@@ -84,8 +88,9 @@ namespace VRProEP.ProsthesisCore
 
             // Add an EMG reference generator
             List<float> emgGains = new List<float>(1);
-            emgGains.Add(1.3f);
-            EMGInterfaceReferenceGenerator emgRG = new EMGInterfaceReferenceGenerator(xBar, xMin, xMax, emgGains, EMGInterfaceType.singleSiteProportional);
+            // emgGains.Add(1.3f); // single site
+            emgGains.Add(0.025f);
+            EMGInterfaceReferenceGenerator emgRG = new EMGInterfaceReferenceGenerator(xBar, xMin, xMax, emgGains, EMGInterfaceType.dualSiteProportional);
             inputManager.Configure("CMD_ADD_REFGEN", emgRG);
 
             // Enable
@@ -102,6 +107,7 @@ namespace VRProEP.ProsthesisCore
                 elbowState = inputManager.GenerateReference(0);
                 // Update device state
                 elbowManager.UpdateState(0, elbowState);
+                isEnabled = inputManager.IsEnabled();
             }
         }
 
@@ -148,6 +154,11 @@ namespace VRProEP.ProsthesisCore
         public void AddRefGen(IReferenceGenerator refGen)
         {
             inputManager.Configure("CMD_ADD_REFGEN", refGen);
+        }
+
+        public ReferenceGeneratorType GetInterfaceType()
+        {
+            return inputManager.GetActiveReferenceGeneratorType();
         }
     }
 }

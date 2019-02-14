@@ -77,6 +77,10 @@
       "name": "/actions/vrproep/in/ObjectInteractButton",
       "type": "boolean",
       "requirement": "mandatory"
+    },
+    {
+      "name": "/actions/vrproep/out/HapticFeedback",
+      "type": "vibration"
     }
   ],
   "action_sets": [
@@ -126,10 +130,6 @@
       "/actions/default/in/SkeletonRightHand": "Skeleton (Right)",
       "/actions/default/in/Pose": "Pose",
       "/actions/default/out/Haptic": "Haptic",
-      "/actions/buggybuddy/in/Steering": "Steering",
-      "/actions/buggybuddy/in/Throttle": "Throttle",
-      "/actions/buggybuddy/in/Brake": "Brake",
-      "/actions/buggybuddy/in/Reset": "Reset",
       "/actions/platformer/in/Move": "Move",
       "/actions/platformer/in/Jump": "Jump"
     }

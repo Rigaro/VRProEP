@@ -8,53 +8,44 @@ namespace VRProEP.Utilities
     public abstract class FirstOrderFilter : IFilter
     {
 
-        protected float x_prev = 0;
+        protected float y_prev = 0;
         protected float u_prev = 0;
-        private float wo; // Cut-off frequency
+        protected float fc; // Cut-off frequency
         protected float g; // Filter gain
-        private float ts; // Sample time
-        private float alpha; // Discretization alpha.
+        protected float dt; // Sample time
+        protected float alpha; // Discretization alpha.
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="wo">Cut-off frequency in rad/s.</param>
+        /// <param name="fc">Cut-off frequency in Hz.</param>
         /// <param name="g"></param>
-        /// <param name="ts"></param>
-        public FirstOrderFilter(float wo, float g, float ts)
+        /// <param name="dt"></param>
+        public FirstOrderFilter(float fc, float g, float dt)
         {
-            SetCutOffFrequency(wo);
+            SetCutOffFrequency(fc);
             SetGain(g);
-            SetSampleTime(ts);
+            SetSampleTime(dt);
             ComputeAlpha();
-            Debug.Log(alpha);
+            //Debug.Log(alpha);
         }
 
         public FirstOrderFilter() : this(1, 1, 1)
         {
         }
 
-        protected float Alpha
-        {
-            set { alpha = value; }
-            get { return alpha; }
-        }
-
         /// <summary>
         /// Computes the alpha value of discrete filter according to ZOH discretization.
         /// </summary>
-        private void ComputeAlpha()
-        {
-            Alpha = (float)Math.Exp(-wo * ts);
-        }
+        protected abstract void ComputeAlpha();
 
         /// <summary>
         /// Sets the cut-off frequency 'wo' in rad/s of the filter.
         /// </summary>
-        /// <param name="wo">The filter cut-off frequency 'wo' in rad/s.</param>
-        public void SetCutOffFrequency(float wo)
+        /// <param name="fc">The filter cut-off frequency 'wo' in rad/s.</param>
+        public void SetCutOffFrequency(float fc)
         {
-            this.wo = wo;
+            this.fc = fc;
         }
         /// <summary>
         /// Sets the gain 'G' of the filter.
@@ -68,17 +59,17 @@ namespace VRProEP.Utilities
         /// Sets the sample time 'Ts' of the filter.
         /// </summary>
         /// <param name="Ts">The filter (system) sample time.</param>
-        public void SetSampleTime(float ts)
+        public void SetSampleTime(float dt)
         {
-            if (ts <= 0)
+            if (dt <= 0)
                 throw new System.ArgumentOutOfRangeException("Sample time should be greater than 0.");
-            this.ts = ts;
+            this.dt = dt;
         }
         /// <summary>
-        /// Updates the filter output for given 'ym' input.
+        /// Updates the filter output for given 'u' input.
         /// </summary>
-        /// <param name="ym">The signal to be filtered</param>
+        /// <param name="u">The signal to be filtered</param>
         /// <returns>The filtered signal 'yf'.</returns>
-        public abstract float Update(float ym);
+        public abstract float Update(float u);
     }
 }

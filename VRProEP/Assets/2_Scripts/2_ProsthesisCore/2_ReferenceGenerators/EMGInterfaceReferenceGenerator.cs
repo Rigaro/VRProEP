@@ -1,6 +1,7 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using VRProEP.Utilities;
 
 namespace VRProEP.ProsthesisCore
 {
@@ -15,8 +16,9 @@ namespace VRProEP.ProsthesisCore
 
         private List<float> gains = new List<float>();
         private EMGInterfaceType interfaceType;
-        private bool isEnabled = false;
         private bool enableRequested = false;
+        private List<LowPassFilter> lowPassFilters = new List<LowPassFilter>();
+        private List<MovingAverage> movingAverageFilters = new List<MovingAverage>();
 
         public List<float> Gains
         {
@@ -30,8 +32,7 @@ namespace VRProEP.ProsthesisCore
                 gains = value;
             }
         }
-
-
+        
         /// <summary>
         /// Proportional EMG reference generator that converts an EMG signal into a joint angle or velocity reference.
         /// Single site: joint angle reference.
@@ -46,6 +47,12 @@ namespace VRProEP.ProsthesisCore
             SetDefaultGains();
             generatorType = ReferenceGeneratorType.EMGInterface;
             this.interfaceType = interfaceType;
+            //  initialize filters
+            for (int i = 0; i < channelSize; i++)
+            {
+                lowPassFilters.Add(new LowPassFilter(3.0f, 1.0f, Time.fixedDeltaTime));
+                movingAverageFilters.Add(new MovingAverage(15));
+            }
         }
 
         /// <summary>
@@ -65,6 +72,12 @@ namespace VRProEP.ProsthesisCore
             this.Gains = gains;
             generatorType = ReferenceGeneratorType.EMGInterface;
             this.interfaceType = interfaceType;
+            //  initialize filters
+            for (int i = 0; i < channelSize; i++)
+            {
+                lowPassFilters.Add(new LowPassFilter(3.0f, 1.0f, Time.fixedDeltaTime));
+                movingAverageFilters.Add(new MovingAverage(15));
+            }
         }
 
         /// <summary>
@@ -88,6 +101,12 @@ namespace VRProEP.ProsthesisCore
             SetDefaultGains();
             generatorType = ReferenceGeneratorType.EMGInterface;
             this.interfaceType = interfaceType;
+            //  initialize filters
+            for (int i = 0; i < channelSize; i++)
+            {
+                lowPassFilters.Add(new LowPassFilter(3.0f, 1.0f, Time.fixedDeltaTime));
+                movingAverageFilters.Add(new MovingAverage(15));
+            }
         }
 
         /// <summary>
@@ -112,6 +131,12 @@ namespace VRProEP.ProsthesisCore
             this.Gains = gains;
             generatorType = ReferenceGeneratorType.EMGInterface;
             this.interfaceType = interfaceType;
+            //  initialize filters
+            for (int i = 0; i < channelSize; i++)
+            {
+                lowPassFilters.Add(new LowPassFilter(3.0f, 1.0f, Time.fixedDeltaTime));
+                movingAverageFilters.Add(new MovingAverage(15));
+            }
         }
 
         /// <summary>
@@ -165,7 +190,15 @@ namespace VRProEP.ProsthesisCore
             }
             else if (isEnabled && interfaceType == EMGInterfaceType.dualSiteProportional)
             {
-                tempXBar = xBar[channel] + (Gains[channel] * (input[1] - input[2]) * Time.fixedDeltaTime); // Differential velocity control.
+                // Threshold diff EMG behaviour
+                float diffEmg = input[2] - input[1];
+                float filtDiffEmg = lowPassFilters[channel].Update(diffEmg);
+                float avfDiffEmg = (float)Math.Round(movingAverageFilters[channel].Update(filtDiffEmg), 1);
+                //Debug.Log(avfDiffEmg);
+                if (Mathf.Abs(avfDiffEmg) > 7.0f)
+                {
+                    tempXBar = xBar[channel] + (Gains[channel] * avfDiffEmg * Time.fixedDeltaTime); // Differential velocity control.
+                }
             }
 
             // Saturate reference
@@ -175,7 +208,7 @@ namespace VRProEP.ProsthesisCore
                 tempXBar = xMin[channel];
 
             xBar[channel] = (float)System.Math.Round(tempXBar, 3);
-            //Debug.Log(isEnabled.ToString() + " " + xBar[channel] + " " + input[1]);
+            //Debug.Log(xBar[channel]);
             return xBar[channel];
 
         }
@@ -210,10 +243,9 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         private void SetDefaultGains()
         {
-            ;
             for (int i = 0; i < xBar.Length; i++)
             {
-                gains.Add(1.0f);
+                    gains.Add(1.0f);
             }
         }
 
@@ -232,5 +264,6 @@ namespace VRProEP.ProsthesisCore
             else
                 return true;
         }
+
     }
 }

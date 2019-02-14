@@ -14,6 +14,7 @@ namespace VRProEP.ProsthesisCore
         private int sensorNum;
         protected List<IReferenceGenerator> referenceGenerators = new List<IReferenceGenerator>(1);
         private int refGenNum;
+        protected bool isEnabled = false;
 
         public int SensorNum
         {
@@ -186,6 +187,11 @@ namespace VRProEP.ProsthesisCore
             // Failed to find a reference generator with the provided type.
             outRefGen = null;
             return false;
+        }
+
+        public bool IsEnabled()
+        {
+            return isEnabled;
         }
     }
 }

@@ -25,6 +25,7 @@ TagManager:
   - Console
   - Monitor
   - MotionTracker
+  - ForearmTracker
   layers:
   - Default
   - TransparentFX

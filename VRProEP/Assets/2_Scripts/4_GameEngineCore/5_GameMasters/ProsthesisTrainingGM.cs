@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
+using Valve.VR;
 using UnityEngine;
 
 // GameMaster includes
@@ -9,18 +9,19 @@ using VRProEP.ProsthesisCore;
 
 public class ProsthesisTrainingGM : GameMaster
 {
-    [Header("Training mode configuration.")]
-    public Camera TrainingCamera;
     public AvatarType avatarType = AvatarType.Transhumeral;
-    public Transform fixedProsthesisPosition;
-
-    [Header("EMG configuration")]
+    [Header("Debug EMG configuration:")]
     public bool emgEnable = false;
     public string ip = "192.168.137.2";
     public int port = 2390;
     public int channelSize = 1;
 
-    [Header("Instructions")]
+
+    [Header("Training mode configuration:")]
+    public Camera TrainingCamera;
+    public Transform fixedProsthesisPosition;
+
+    [Header("Instructions:")]
     [TextArea]
     public string synergyInstructions;
     [TextArea]
@@ -28,16 +29,29 @@ public class ProsthesisTrainingGM : GameMaster
 
     private float taskTime = 0.0f;
     private string instructionsText;
+    private GameObject residualLimbGO;
+    private LimbFollower limbFollower;
+    private AngleFollower angleFollower;
+
+    // Debug
+    // private GameObject handGO;
+    // private GameObject elbowGO;
 
     // Start is called before the first frame update
     void Start()
     {
         TrainingCamera.enabled = false;
-        // Load player
-        SaveSystem.LoadUserData("MD1942");
-        AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, avatarType);
-        InitExperimentSystem();
-        InitializeUI();
+        if (debug)
+        {
+            // Load player
+            SaveSystem.LoadUserData("MD1942");
+            AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, avatarType);
+        }
+        else
+        {
+            InitExperimentSystem();
+            InitializeUI();
+        }
     }
 
     // Update is called once per frame
@@ -52,45 +66,11 @@ public class ProsthesisTrainingGM : GameMaster
              */
             // Welcome subject to the virtual world.
             case ExperimentState.HelloWorld:
-                // Load avatar
-                if (avatarType == AvatarType.Transhumeral)
+                if (debug)
                 {
-                    AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
-
-                    // Find the residual limb and change the follower
-                    GameObject residualLimbGO = GameObject.FindGameObjectWithTag("ResidualLimbAvatar");
-                    ResidualLimbFollower limbFollower = residualLimbGO.GetComponent<ResidualLimbFollower>();
-                    Destroy(limbFollower);
-                    AngleFollower angleFollower = residualLimbGO.AddComponent<AngleFollower>();
-                    angleFollower.fixedTransform = fixedProsthesisPosition;
-
-
-                    // Initialize prosthesis
-                    GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
-                    ConfigurableElbowManager elbowManager = prosthesisManagerGO.AddComponent<ConfigurableElbowManager>();
-                    elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + SaveSystem.ActiveUser.handLength / 2.0f));
-                    // Set the reference generator to jacobian-based.
-                    elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
-                    instructionsText = synergyInstructions;
-
-                    // Enable & configure EMG
-                    if (emgEnable)
-                    {
-                        // Create and add sensor
-                        EMGWiFiManager emgSensor = new EMGWiFiManager(ip, port, channelSize);
-                        AvatarSystem.AddActiveSensor(emgSensor);
-                        elbowManager.AddSensor(emgSensor);
-                        emgSensor.StartSensorReading();
-
-                        // Set active sensor and reference generator to EMG.
-                        elbowManager.ChangeSensor("VAL_SENSOR_SEMG");
-                        elbowManager.ChangeReferenceGenerator("VAL_REFGEN_EMGPROP");
-                        instructionsText = emgInstructions;
-                    }
-                }
-                else
-                {
-                    throw new System.NotImplementedException();
+                    LoadDebugAvatar();
+                    InitExperimentSystem();
+                    InitializeUI();
                 }
 
                 monitorManager.DisplayText("Instructions:\n" + instructionsText);
@@ -138,23 +118,10 @@ public class ProsthesisTrainingGM : GameMaster
              *************************************************
              */
             case ExperimentState.GivingInstructions:
-                // Skip instructions when repeating sessions
-                if (skipInstructions)
-                {
-                    hudManager.DisplayText("Move to start", 2.0f);
-                    // Turn targets clear
-                    experimentState = ExperimentState.WaitingForStart;
-                    break;
-                }
-
-                //
-                // Give instructions
-                //
-
                 //
                 // Go to waiting for start
                 //
-                hudManager.DisplayText("Move to start", 2.0f);
+                hudManager.DisplayText("Loading...", 2.0f);
                 // Turn targets clear
                 experimentState = ExperimentState.WaitingForStart;
 
@@ -341,9 +308,11 @@ public class ProsthesisTrainingGM : GameMaster
              *************************************************
              */
             case ExperimentState.End:
-            //
-            // Update log data and close logs.
-            //
+                //
+                // Update log data and close logs.
+                //
+                EndExperiment();
+                break;
 
             //
             // Return to main menu
@@ -359,12 +328,6 @@ public class ProsthesisTrainingGM : GameMaster
         //
         // Update information displayed for debugging purposes
         //
-        if (debug)
-        {
-            debugText.text = experimentState.ToString() + "\n";
-            if (experimentState == ExperimentState.WaitingForStart)
-                debugText.text += waitState.ToString() + "\n";
-        }
     }
 
     private void FixedUpdate()
@@ -379,7 +342,7 @@ public class ProsthesisTrainingGM : GameMaster
                 //
                 // Gather data while experiment is in progress
                 //
-                string displayData = "Time: " + taskTime.ToString();
+                string displayData = "Training time elapsed: " + taskTime.ToString() + " seconds.";
                 // Read from all user sensors
                 foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
                 {
@@ -398,14 +361,8 @@ public class ProsthesisTrainingGM : GameMaster
                             displayData += "\n" + element.ToString();
                     }
                 }
-                // Read from all experiment sensors
-                foreach (ISensor sensor in ExperimentSystem.GetActiveSensors())
-                {
-                    displayData += "\n" + sensor.GetSensorType().ToString();
-                    float[] sensorData = sensor.GetAllProcessedData();
-                    foreach (float element in sensorData)
-                        displayData += "\n" + element.ToString();
-                }
+
+
 
                 instructionManager.DisplayText(displayData);
                 //hudManager.DisplayText(logData);
@@ -416,9 +373,11 @@ public class ProsthesisTrainingGM : GameMaster
                 taskTime += Time.fixedDeltaTime;
 
                 //
-                // Log current data
+                // Raycast debug
                 //
-                //ExperimentSystem.GetActiveLogger(1).AppendData(logData);
+                // Vector3 shoulderToElbow = elbowGO.transform.position - residualLimbGO.transform.position;
+                // Vector3 shoulderToHand = handGO.transform.position - (residualLimbGO.transform.position - 0.25f * shoulderToElbow);
+                // Debug.DrawRay(residualLimbGO.transform.position - 0.2f * shoulderToElbow, shoulderToHand, Color.magenta);
 
                 //
                 // Save log and reset flags when successfully compeleted task
@@ -440,6 +399,9 @@ public class ProsthesisTrainingGM : GameMaster
                     experimentState = ExperimentState.AnalizingResults;
                     break;
                 }
+
+                // Check if requested to end training
+                UpdateEnd();
 
                 break;
             default:
@@ -468,6 +430,67 @@ public class ProsthesisTrainingGM : GameMaster
         ExperimentSystem.CloseAllExperimentLoggers();
     }
 
+    private void LoadDebugAvatar()
+    {
+        // Load avatar
+        if (avatarType == AvatarType.Transhumeral)
+        {
+            AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
+
+            // Find the residual limb and change the follower
+            GameObject residualLimbGO = GameObject.FindGameObjectWithTag("ResidualLimbAvatar");
+            LimbFollower limbFollower = residualLimbGO.GetComponent<LimbFollower>();
+            Destroy(limbFollower);
+            AngleFollower angleFollower = residualLimbGO.AddComponent<AngleFollower>();
+            angleFollower.fixedTransform = fixedProsthesisPosition;
+
+
+            // Initialize prosthesis
+            GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+            ConfigurableElbowManager elbowManager = prosthesisManagerGO.AddComponent<ConfigurableElbowManager>();
+            elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + SaveSystem.ActiveUser.handLength / 2.0f));
+            // Set the reference generator to jacobian-based.
+            elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
+            instructionsText = synergyInstructions;
+
+            // Enable & configure EMG
+            if (emgEnable)
+            {
+                // Create and add sensor
+                EMGWiFiManager emgSensor = new EMGWiFiManager(ip, port, channelSize);
+                emgSensor.ConfigureLimits(0, 1023, 0);
+                emgSensor.ConfigureLimits(1, 1023, 0);
+                AvatarSystem.AddActiveSensor(emgSensor);
+                elbowManager.AddSensor(emgSensor);
+                emgSensor.StartSensorReading();
+
+                // Set active sensor and reference generator to EMG.
+                elbowManager.ChangeSensor("VAL_SENSOR_SEMG");
+                elbowManager.ChangeReferenceGenerator("VAL_REFGEN_EMGPROP");
+                instructionsText = emgInstructions;
+            }
+        }
+        else
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+
+    private void KeepOnLoad()
+    {
+        // Keep player and avatar objects
+        GameObject playerGO = GameObject.FindGameObjectWithTag("Player");
+        GameObject avatarGO = GameObject.FindGameObjectWithTag("Avatar");
+        if (playerGO == null || avatarGO == null)
+        {
+            monitorManager.DisplayText("The user or avatar has not been loaded.");
+            throw new System.Exception("The player or avatar has not been loaded.");
+        }
+        DontDestroyOnLoad(playerGO);
+        DontDestroyOnLoad(avatarGO);
+    }
+
     #region Inherited methods overrides
 
     /// <summary>
@@ -479,13 +502,79 @@ public class ProsthesisTrainingGM : GameMaster
         //
         // Set the experiment type and ID
         //
-        experimentType = ExperimentType.TypeOne;
-        ExperimentSystem.SetActiveExperimentID("Test");
+        if (AvatarSystem.AvatarType == AvatarType.AbleBodied)
+        {
+            experimentType = ExperimentType.TypeOne;
+            monitorManager.DisplayText("Wrong avatar used. Please use a Transhumeral avatar.");
+            throw new System.Exception("Able-bodied avatar not suitable for prosthesis training.");
+        }
+        else if (AvatarSystem.AvatarType == AvatarType.Transhumeral)
+        {
+            // Check if EMG is available
+            bool EMGAvailable = false;
+            foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
+            {
+                if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
+                {
+                    EMGAvailable = true;
+                    WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
+                    wifiSensor.StartSensorReading();
+                }
+            }
+            // Set whether emg or synergy based
+            if (EMGAvailable)
+            {
+                experimentType = ExperimentType.TypeTwo;
+                instructionsText = emgInstructions;
+                // Set EMG sensor and reference generator as active.
+                // Get prosthesis
+                GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+                ConfigurableElbowManager elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
+                // Set active sensor and reference generator to EMG.
+                elbowManager.ChangeSensor("VAL_SENSOR_SEMG");
+                elbowManager.ChangeReferenceGenerator("VAL_REFGEN_EMGPROP");
+            }
+            else
+            {
+                experimentType = ExperimentType.TypeThree;
+                instructionsText = synergyInstructions;
+                // Set VIVE tracker and Jacobian synergy as active.
+                // Get prosthesis
+                GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+                ConfigurableElbowManager elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
+                if (elbowManager.GetInterfaceType() == ReferenceGeneratorType.JacobianSynergy)
+                {
+                    // Set the reference generator to jacobian-based.
+                    elbowManager.ChangeSensor("VAL_SENSOR_VIVETRACKER");
+                    elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
+                }
+                else if (elbowManager.GetInterfaceType() == ReferenceGeneratorType.LinearKinematicSynergy)
+                {
+                    // Set the reference generator to linear synergy.
+                    elbowManager.ChangeSensor("VAL_SENSOR_VIVETRACKER");
+                    elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
+                }
+                else
+                    throw new System.Exception("The prosthesis interface available is not supported.");
+            }
+            
+            if(!debug)
+            {
+                // Find the residual limb and change the follower
+                residualLimbGO = GameObject.FindGameObjectWithTag("ResidualLimbAvatar");
+                limbFollower = residualLimbGO.GetComponent<LimbFollower>();
+                limbFollower.enabled = false;
+                angleFollower = residualLimbGO.AddComponent<AngleFollower>();
+                angleFollower.fixedTransform = fixedProsthesisPosition;
+            }
+        }
+        else
+            throw new System.NotImplementedException();
 
-        //
-        // Create data loggers
-        //
-
+        // Get Raycast Debug info
+        // handGO = GameObject.FindGameObjectWithTag("Hand");
+        // elbowGO = GameObject.FindGameObjectWithTag("Elbow_Upper");
+        // residualLimbGO = GameObject.FindGameObjectWithTag("ResidualLimbAvatar");
     }
 
     /// <summary>
@@ -547,7 +636,16 @@ public class ProsthesisTrainingGM : GameMaster
     /// </summary>
     public override void EndExperiment()
     {
-        throw new System.NotImplementedException();
+        if (!debug)
+        {
+            // Find the residual limb and change the follower
+            Destroy(angleFollower);
+            limbFollower.enabled = true;
+
+            KeepOnLoad();
+            // Load experiment.
+            SteamVR_LoadLevel.Begin("JacobianSynergyExperiment");
+        }
     }
 
     #endregion

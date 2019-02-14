@@ -22,6 +22,7 @@ namespace VRProEP.GameEngineCore
         public string familyName;
         public int yearOfBirth;
         public string id;
+        public float height;
         public float upperArmLength;
         public float upperArmWidth;
         public float forearmLength;
