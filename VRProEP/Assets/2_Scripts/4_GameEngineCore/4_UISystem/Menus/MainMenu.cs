@@ -33,6 +33,7 @@ public class MainMenu : MonoBehaviour {
     
     public void OnEnable()
     {
+        //Debug.Log(Application.persistentDataPath);
         if (createdUser)
         {
             logManager.DisplayInformationOnLog(3.0f, "Created new user with ID " + SaveSystem.ActiveUser.id);

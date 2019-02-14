@@ -15,6 +15,7 @@ namespace VRProEP.GameEngineCore
         private static UserData activeUser;
         private static string activeSaveFolder;
         private static bool isUserAvailable;
+        private static readonly string dataFolder = Application.persistentDataPath;
 
         // Encapsulation
         public static UserData ActiveUser
@@ -92,7 +93,7 @@ namespace VRProEP.GameEngineCore
 
             // If successfully created then we can proceed to make it the active user.
             activeUser = newUser;
-            activeSaveFolder = Application.dataPath + "/UserData/" + activeUser.id.ToString();
+            activeSaveFolder = dataFolder + "/UserData/" + activeUser.id.ToString();
             // And save its data
             SaveActiveUserData();
 
@@ -108,7 +109,7 @@ namespace VRProEP.GameEngineCore
         private static void CreateNewUserFolder(UserData userData)
         {
             string userFolder = "/UserData/" + userData.id.ToString();
-            string userPath = Application.dataPath + userFolder;
+            string userPath = dataFolder + userFolder;
 
             if (Directory.Exists(userPath))
                 throw new System.Exception("The provided user already exists in the user file directory.");
@@ -123,7 +124,7 @@ namespace VRProEP.GameEngineCore
         public static void SaveUserData(UserData userData)
         {
             string userFolder = "/UserData/" + userData.id.ToString();
-            string userPath = Application.dataPath + userFolder;
+            string userPath = dataFolder + userFolder;
 
             // If the directory doesn't exist throw an exception. A new user must be created.
             if (!Directory.Exists(userPath))
@@ -155,7 +156,7 @@ namespace VRProEP.GameEngineCore
         {
             UserData loadedUserData;
             // Get the folder for the given user ID
-            string userPath = Application.dataPath + "/UserData/" + userID;
+            string userPath = dataFolder + "/UserData/" + userID;
             string loadFilePath = userPath + "/userInfo.json";
 
             if (File.Exists(loadFilePath))

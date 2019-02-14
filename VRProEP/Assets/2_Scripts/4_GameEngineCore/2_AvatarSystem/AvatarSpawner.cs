@@ -22,7 +22,7 @@ namespace VRProEP.GameEngineCore
         //private const float objectGap = 0.0f; // Helps with the gap between certain objects to avoid overlapping issues.
         private static int motionTrackerNumber = 0;
 
-        private static readonly string resourcesDataPath = Application.dataPath + "/Resources/Avatars";
+        //private static readonly string resourcesDataPath = Application.dataPath + "/Resources/Avatars";
 
         /// <summary>
         /// Spawns a transradial avatar for the given user.
@@ -106,10 +106,12 @@ namespace VRProEP.GameEngineCore
             // Instantiate and set reference frame;
             GameObject handGO = Object.Instantiate(handPrefab, handPrefab.transform.position, handPrefab.transform.rotation, avatarGO.transform);
             handGO.GetComponent<SteamVR_TrackedObject>().origin = playerGO.transform;
-            
+
             // Load hand object info
-            string objectPath = resourcesDataPath + "/Hands/ACESAble" + side + ".json";
-            string objectDataAsJson = File.ReadAllText(objectPath);
+            //string objectPath = resourcesDataPath + "/Hands/ACESAble" + side + ".json";
+            //string objectDataAsJson = File.ReadAllText(objectPath);
+            string objectPath = "Avatars/Hands/ACESAble" + side;
+            string objectDataAsJson = Resources.Load<TextAsset>(objectPath).text;
             activeHandData = JsonUtility.FromJson<AvatarObjectData>(objectDataAsJson);
             if (activeHandData == null)
                 throw new System.Exception("The requested hand information was not found.");
@@ -138,8 +140,10 @@ namespace VRProEP.GameEngineCore
                 throw new System.Exception("The requested residual limb prefab was not found.");
 
             // Load the residual object info.
-            string objectPath = resourcesDataPath + "/ResidualLimbs/" + rlType + ".json";
-            string objectDataAsJson = File.ReadAllText(objectPath);
+            //string objectPath = resourcesDataPath + "/ResidualLimbs/" + rlType + ".json";
+            //string objectDataAsJson = File.ReadAllText(objectPath);
+            string objectPath = "Avatars/ResidualLimbs/" + rlType;
+            string objectDataAsJson = Resources.Load<TextAsset>(objectPath).text;
             activeResidualLimbData = JsonUtility.FromJson<AvatarObjectData>(objectDataAsJson);
             if (activeResidualLimbData == null)
                 throw new System.Exception("The requested residual limb information was not found.");
@@ -179,8 +183,10 @@ namespace VRProEP.GameEngineCore
             GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
 
             // Load socket object info
-            string objectPath = resourcesDataPath + "/Sockets/" + socketType + ".json";
-            string objectDataAsJson = File.ReadAllText(objectPath);
+            //string objectPath = resourcesDataPath + "/Sockets/" + socketType + ".json";
+            //string objectDataAsJson = File.ReadAllText(objectPath);
+            string objectPath = "Avatars/Sockets/" + socketType;
+            string objectDataAsJson = Resources.Load<TextAsset>(objectPath).text;
             activeSocketData = JsonUtility.FromJson<AvatarObjectData>(objectDataAsJson);
             if (activeSocketData == null)
                 throw new System.Exception("The requested socket information was not found.");
@@ -222,10 +228,14 @@ namespace VRProEP.GameEngineCore
             GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
 
             // Load elbow objects info
-            string objectPath_Upper = resourcesDataPath + "/Elbows/" + elbowType + "_Upper.json";
-            string objectPath_Lower = resourcesDataPath + "/Elbows/" + elbowType + "_Lower.json";
-            string objectDataAsJson_Upper = File.ReadAllText(objectPath_Upper);
-            string objectDataAsJson_Lower = File.ReadAllText(objectPath_Lower);
+            //string objectPath_Upper = resourcesDataPath + "/Elbows/" + elbowType + "_Upper.json";
+            //string objectPath_Lower = resourcesDataPath + "/Elbows/" + elbowType + "_Lower.json";
+            //string objectDataAsJson_Upper = File.ReadAllText(objectPath_Upper);
+            //string objectDataAsJson_Lower = File.ReadAllText(objectPath_Lower);
+            string objectPath_Upper = "Avatars/Elbows/" + elbowType + "_Upper";
+            string objectPath_Lower = "Avatars/Elbows/" + elbowType + "_Lower";
+            string objectDataAsJson_Upper = Resources.Load<TextAsset>(objectPath_Upper).text;
+            string objectDataAsJson_Lower = Resources.Load<TextAsset>(objectPath_Lower).text;
             activeElbowData_Upper = JsonUtility.FromJson<AvatarObjectData>(objectDataAsJson_Upper);
             activeElbowData_Lower = JsonUtility.FromJson<AvatarObjectData>(objectDataAsJson_Lower);
 
@@ -273,8 +283,10 @@ namespace VRProEP.GameEngineCore
             GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
 
             // Load forearm object info
-            string objectPath = resourcesDataPath + "/Forearms/" + forearmType + ".json";
-            string objectDataAsJson = File.ReadAllText(objectPath);
+            //string objectPath = resourcesDataPath + "/Forearms/" + forearmType + ".json";
+            //string objectDataAsJson = File.ReadAllText(objectPath);
+            string objectPath = "Avatars/Forearms/" + forearmType;
+            string objectDataAsJson = Resources.Load<TextAsset>(objectPath).text;
             activeForearmData = JsonUtility.FromJson<AvatarObjectData>(objectDataAsJson);
             if (activeForearmData == null)
                 throw new System.Exception("The requested forearm information was not found.");
@@ -317,8 +329,10 @@ namespace VRProEP.GameEngineCore
             GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
 
             // Load forearm object info
-            string objectPath = resourcesDataPath + "/Forearms/ForearmAble.json";
-            string objectDataAsJson = File.ReadAllText(objectPath);
+            //string objectPath = resourcesDataPath + "/Forearms/ForearmAble.json";
+            //string objectDataAsJson = File.ReadAllText(objectPath);
+            string objectPath = "Avatars/Forearms/ForearmAble";
+            string objectDataAsJson = Resources.Load<TextAsset>(objectPath).text;
             activeForearmData = JsonUtility.FromJson<AvatarObjectData>(objectDataAsJson);
             if (activeForearmData == null)
                 throw new System.Exception("The requested forearm information was not found.");
@@ -363,8 +377,10 @@ namespace VRProEP.GameEngineCore
             GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
 
             // Load hand object info
-            string objectPath = resourcesDataPath + "/Hands/" + handType + ".json";
-            string objectDataAsJson = File.ReadAllText(objectPath);
+            //string objectPath = resourcesDataPath + "/Hands/" + handType + ".json";
+            //string objectDataAsJson = File.ReadAllText(objectPath);
+            string objectPath = "Avatars/Hands/" + handType;
+            string objectDataAsJson = Resources.Load<TextAsset>(objectPath).text;
             activeHandData = JsonUtility.FromJson<AvatarObjectData>(objectDataAsJson);
             if (activeHandData == null)
                 throw new System.Exception("The requested hand information was not found.");

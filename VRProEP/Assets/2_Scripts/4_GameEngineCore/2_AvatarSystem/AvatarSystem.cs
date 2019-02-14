@@ -13,7 +13,8 @@ namespace VRProEP.GameEngineCore
     /// </summary>
     public static class AvatarSystem
     {
-        private static readonly string dataFolder = Application.dataPath + "/UserData/";
+        //private static readonly string dataFolder = Application.dataPath + "/UserData/";
+        private static readonly string dataFolder = Application.persistentDataPath + "/UserData/";
         private static AvatarData activeAvatarData;
         private static List<ISensor> activeSensors = new List<ISensor>();
 

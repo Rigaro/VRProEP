@@ -20,7 +20,7 @@ public class LoadUserMenu : MonoBehaviour {
     private void OnEnable()
     {
         // Get the data folder
-        userDataFolder =  Application.dataPath + "/UserData";
+        userDataFolder =  Application.persistentDataPath + "/UserData";
         // Empty all options.
         availableUserDropdown.ClearOptions();
 

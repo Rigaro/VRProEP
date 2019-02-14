@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR;
+using VRProEP.Utilities;
 
 /// <summary>
 /// Manages object grasping behavior for VRProEP platform.
@@ -51,13 +52,15 @@ public class GraspManager : MonoBehaviour {
     private GameObject handGO;
     private Rigidbody handRB;
     private GameObject objectInHand = null;
-    private ObjectHandTracking oIHHandTracker = null;
+    private ObjectGraspHandle oIHHandTracker = null;
     private GameObject objectGraspable = null;
     private bool inGrasp = false;
     private bool inDropOff = false;
     private bool releasing = false;
     private float handVelocity = 0.0f;
     private Vector3 prevHandPosition;
+
+    private MovingAverage averageFilter;
 
     private void Start()
     {
@@ -81,6 +84,7 @@ public class GraspManager : MonoBehaviour {
         }
         else
         {
+            averageFilter = new MovingAverage(5);
             prevHandPosition = handGO.transform.position;
         }
     }
@@ -93,7 +97,6 @@ public class GraspManager : MonoBehaviour {
             inGrasp = true;
             objectGraspable = other.gameObject;
         }
-
         // If object in hand and in a DropOff point enable drop-off.
         else if (objectInHand != null && objectGraspable == null && other.tag == "DropOff")
         {
@@ -122,7 +125,7 @@ public class GraspManager : MonoBehaviour {
     {
         if (inGrasp && objectInHand == null)
             HandleGrasp();
-        else if ((inDropOff || managerMode == GraspManagerMode.Open) && objectInHand != null)
+        else if (((managerMode == GraspManagerMode.Restriced && inDropOff) || managerMode == GraspManagerMode.Open) && objectInHand != null)
             HandleDropOff();
 
         if (isTrackedObject)
@@ -144,7 +147,7 @@ public class GraspManager : MonoBehaviour {
 
             // Attach object to hand with hand Tracking script
             objectInHand = objectGraspable;
-            oIHHandTracker = objectInHand.AddComponent<ObjectHandTracking>();
+            oIHHandTracker = objectInHand.AddComponent<ObjectGraspHandle>();
             oIHHandTracker.handTransform = attachmentPoint;
             // clear flag and handle
             inGrasp = false;
@@ -223,6 +226,7 @@ public class GraspManager : MonoBehaviour {
     {
         Vector3 poseDifference = handGO.transform.position - prevHandPosition;
         handVelocity = poseDifference.magnitude / Time.fixedDeltaTime;
+        handVelocity = averageFilter.Update(handVelocity);
         prevHandPosition = handGO.transform.position;
     }
 
