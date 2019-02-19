@@ -26,6 +26,7 @@ TagManager:
   - Monitor
   - MotionTracker
   - ForearmTracker
+  - Floor
   layers:
   - Default
   - TransparentFX

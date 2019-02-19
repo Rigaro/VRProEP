@@ -29,6 +29,10 @@ public class GraspTaskManager : MonoBehaviour {
         {
             inDropOff = true;
         }
+        else if (other.tag == "Floor")
+        {
+            StartCoroutine(ReturnToStart());
+        }
     }
 
     private void OnTriggerExit(Collider other)

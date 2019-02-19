@@ -64,15 +64,15 @@ public class JacobianExperimentGM : GameMaster
     {
         if (debug)
         {
-            //SaveSystem.LoadUserData("MD1942");
-            SaveSystem.LoadUserData("RG1988");
+            SaveSystem.LoadUserData("MD1942");
+            //SaveSystem.LoadUserData("RG1988");
 
             //
             // Debug Able
             //
-            AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
-            AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
-            /*
+            //AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
+            //AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
+            
             //
             // Debug Jacobian
             //
@@ -86,7 +86,7 @@ public class JacobianExperimentGM : GameMaster
             //elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
             // Set the reference generator to linear synergy.
             elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
-            */
+            
         }
     }
 
@@ -1014,9 +1014,11 @@ public class JacobianExperimentGM : GameMaster
             hudManager.DisplayText("appear over the blue +.");
             yield return new WaitForSeconds(4.0f);
             taskManager.SetObjectEnable(true);
+            taskManager.gameObject.tag = "Untagged";
             hudManager.DisplayText("You can see it now.");
             yield return new WaitForSeconds(3.0f);
             taskManager.SetObjectEnable(false);
+            taskManager.gameObject.tag = "Graspable";
 
             // Show drop-off points
             hudManager.DisplayText("You'll need to drop it off...");
