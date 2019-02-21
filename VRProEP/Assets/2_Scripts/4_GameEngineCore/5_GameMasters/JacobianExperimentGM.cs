@@ -511,7 +511,24 @@ public class JacobianExperimentGM : GameMaster
         // Update HUD state
         //
         if (experimentType != ExperimentType.TypeOne)
-            hudManager.enable = elbowManager.IsEnabled;
+        {
+            if (experimentState != ExperimentState.Resting && experimentState != ExperimentState.End)
+            {
+                if (elbowManager.IsEnabled)
+                    hudManager.colour = HUDManager.HUDColour.Blue;
+                else
+                    hudManager.colour = HUDManager.HUDColour.Red;
+            }
+            else
+                hudManager.colour = HUDManager.HUDColour.Green;
+        }
+        else
+        {
+            if (experimentState != ExperimentState.Resting && experimentState != ExperimentState.End)
+                hudManager.colour = HUDManager.HUDColour.Blue;
+            else
+                hudManager.colour = HUDManager.HUDColour.Green;
+        }
 
         //
         // Update information displayed for debugging purposes

@@ -35,12 +35,17 @@ public class GraspTaskManager : MonoBehaviour {
         }
     }
 
+
     private void OnTriggerExit(Collider other)
     {
         if (other.tag == "DropOff")
         {
             inDropOff = false;
-        }            
+        }
+        else if (other.tag == "Boundary")
+        {
+            StartCoroutine(ReturnToStart());
+        }
     }
 
     // Update is called once per frame
