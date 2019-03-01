@@ -47,6 +47,7 @@ public class JacobianExperimentGM : GameMaster
     private string infoText;
     private bool logEnd = false;
     private bool successTriggered = false;
+    private SteamVR_Action_Boolean buttonAction = SteamVR_Input.GetAction<SteamVR_Action_Boolean>("ObjectInteractButton");
 
     // Prosthesis handling objects
     private GameObject prosthesisManagerGO;
@@ -512,22 +513,24 @@ public class JacobianExperimentGM : GameMaster
         //
         if (experimentType != ExperimentType.TypeOne)
         {
-            if (experimentState != ExperimentState.Resting && experimentState != ExperimentState.End)
+            if (experimentState == ExperimentState.Resting || experimentState == ExperimentState.End)
+            {
+                hudManager.colour = HUDManager.HUDColour.Green;
+            }
+            else
             {
                 if (elbowManager.IsEnabled)
                     hudManager.colour = HUDManager.HUDColour.Blue;
                 else
                     hudManager.colour = HUDManager.HUDColour.Red;
             }
-            else
-                hudManager.colour = HUDManager.HUDColour.Green;
         }
         else
         {
-            if (experimentState != ExperimentState.Resting && experimentState != ExperimentState.End)
-                hudManager.colour = HUDManager.HUDColour.Blue;
-            else
+            if (experimentState == ExperimentState.Resting || experimentState == ExperimentState.End)
                 hudManager.colour = HUDManager.HUDColour.Green;
+            else
+                hudManager.colour = HUDManager.HUDColour.Blue;
         }
 
         //
@@ -940,6 +943,7 @@ public class JacobianExperimentGM : GameMaster
     /// <returns></returns>
     private IEnumerator TrainingLoop()
     {
+        string defaultText = "\n\n...Press the Trigger to continue...";
         // Look in the direction of the monitor.
         inTraining = true;
         trainingEnd = false;
@@ -947,44 +951,55 @@ public class JacobianExperimentGM : GameMaster
         yield return new WaitForSeconds(3.0f);
 
         // Introduce experiment modality.
-        instructionManager.DisplayText("Welcome to the space facility for prosthesis training.");
-        yield return new WaitForSeconds(8.0f);
-        instructionManager.DisplayText("Make sure you are standing on top of the green circle.");
-        yield return new WaitForSeconds(10.0f);
-        instructionManager.DisplayText("Do not step outside of the circle for the duration of the experiment.");
-        yield return new WaitForSeconds(10.0f);
+        instructionManager.DisplayText("Welcome to the space facility for prosthesis training." + defaultText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText("Make sure you are standing on top of the green circle." + defaultText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText("Do not step outside of the circle for the duration of the experiment." + defaultText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
 
         if (experimentType == ExperimentType.TypeOne)
         {
-            instructionManager.DisplayText("Today we will be testing your forward reaching capabilities using your actual arm.");
-            yield return new WaitForSeconds(7.0f);
-            instructionManager.DisplayText("You should already be familiar with it. ;)");
-            yield return new WaitForSeconds(7.0f);
+            instructionManager.DisplayText("Today we will be testing your forward reaching capabilities using your actual arm." + defaultText);
+            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+            yield return new WaitForSeconds(0.5f);
+            instructionManager.DisplayText("You should already be familiar with it. ;)" + defaultText);
+            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+            yield return new WaitForSeconds(0.5f);
 
         }
         else if (experimentType == ExperimentType.TypeTwo)
         {
-            instructionManager.DisplayText("Today we will be testing your forward reaching capabilities using a traditional prosthesis.");
-            yield return new WaitForSeconds(7.0f);
-            instructionManager.DisplayText("You should be familiar with how to make the prosthesis move using your muscles.");
-            yield return new WaitForSeconds(7.0f);
+            instructionManager.DisplayText("Today we will be testing your forward reaching capabilities using a traditional prosthesis." + defaultText);
+            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+            yield return new WaitForSeconds(0.5f);
+            instructionManager.DisplayText("You should be familiar with how to make the prosthesis move using your muscles." + defaultText);
+            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+            yield return new WaitForSeconds(0.5f);
         }
         else if (experimentType == ExperimentType.TypeThree || experimentType == ExperimentType.TypeFour)
         {
-            instructionManager.DisplayText("Today we will be testing your forward reaching capabilities using an experimental prosthesis.");
-            yield return new WaitForSeconds(7.0f);
-            instructionManager.DisplayText("You should be familiar with how the prosthesis moves according to the motion of your arm.");
-            yield return new WaitForSeconds(7.0f);
+            instructionManager.DisplayText("Today we will be testing your forward reaching capabilities using an experimental prosthesis." + defaultText);
+            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+            yield return new WaitForSeconds(0.5f);
+            instructionManager.DisplayText("You should be familiar with how the prosthesis moves according to the motion of your arm." + defaultText);
+            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+            yield return new WaitForSeconds(0.5f);
         }
 
         if (!skipTraining)
         {
             if (experimentType == ExperimentType.TypeTwo || experimentType == ExperimentType.TypeThree || experimentType == ExperimentType.TypeFour)
             {
-                instructionManager.DisplayText("You can see whether your prosthesis is enabled by the colour of your HUD.");
-                yield return new WaitForSeconds(7.0f);
-                instructionManager.DisplayText("A blue circle means it is enabled, a red circle means it is disabled.");
-                yield return new WaitForSeconds(7.0f);
+                instructionManager.DisplayText("You can see whether your prosthesis is enabled by the colour of your HUD." + defaultText);
+                yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+                yield return new WaitForSeconds(0.5f);
+                instructionManager.DisplayText("A blue circle means it is enabled, a red circle means it is disabled." + defaultText);
+                yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+                yield return new WaitForSeconds(0.5f);
                 instructionManager.DisplayText("Try enabling it.");
                 yield return new WaitUntil(() => elbowManager.IsEnabled);
                 instructionManager.DisplayText("Well done!");
@@ -995,10 +1010,12 @@ public class JacobianExperimentGM : GameMaster
                 yield return new WaitForSeconds(3.0f);
             }
 
-            instructionManager.DisplayText("You will be required to grasp an object in front of you and place it on a shelf.");
-            yield return new WaitForSeconds(7.0f);
-            instructionManager.DisplayText("You should not step when reaching for the object or dropping it off.");
-            yield return new WaitForSeconds(7.0f);
+            instructionManager.DisplayText("You will be required to grasp an object in front of you and place it on a shelf." + defaultText);
+            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+            yield return new WaitForSeconds(0.5f);
+            instructionManager.DisplayText("You should not step when reaching for the object or dropping it off." + defaultText);
+            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+            yield return new WaitForSeconds(0.5f);
 
             // Look in the direction of the task.
             instructionManager.DisplayText("Please look forward towards the desk.");
@@ -1034,8 +1051,8 @@ public class JacobianExperimentGM : GameMaster
             taskManager.gameObject.tag = "Untagged";
             hudManager.DisplayText("You can see it now.");
             yield return new WaitForSeconds(3.0f);
-            taskManager.SetObjectEnable(false);
             taskManager.gameObject.tag = "Graspable";
+            taskManager.SetObjectEnable(false);
 
             // Show drop-off points
             hudManager.DisplayText("You'll need to drop it off...");
@@ -1111,27 +1128,41 @@ public class JacobianExperimentGM : GameMaster
         instructionsEnd = false;
 
         string defaultText = "Instructions:\n";
+        string continueText = "\n\n...Press the Trigger to continue...";
 
-        instructionManager.DisplayText(defaultText + "The experiment requires you to repeat the grasp-and-drop-off task for " + iterationLimit * numberOfSessions + " iterations.");
-        yield return new WaitForSeconds(8.0f);
-        instructionManager.DisplayText(defaultText + "The drop-off location will be chosen randomly.");
-        yield return new WaitForSeconds(5.0f);
-        instructionManager.DisplayText(defaultText + "You will get " + restTime + " seconds rest every " + restIterations + " iterations.");
-        yield return new WaitForSeconds(8.0f);
-        instructionManager.DisplayText(defaultText + "Your progress will be displayed here along with the status of the experiment.");
-        yield return new WaitForSeconds(8.0f);
-        instructionManager.DisplayText(defaultText + "If you need any rest please request it to the experimenter.");
-        yield return new WaitForSeconds(8.0f);
-        instructionManager.DisplayText(defaultText + "If you feel dizzy or want to stop the experiment please let the experimenter know immediately.");
-        yield return new WaitForSeconds(8.0f);
-        instructionManager.DisplayText(defaultText + "Remember to not step during the experiment to perform the grasp-and-drop-off task.");
-        yield return new WaitForSeconds(8.0f);
-        instructionManager.DisplayText(defaultText + "Remember that objects in VR are not physical so do not try to lean or support on them, particularly on the virtual desk in front of you while performing the task.");
-        yield return new WaitForSeconds(8.0f);
-        instructionManager.DisplayText(defaultText + "All the information regarding the task will be displayed on your HUD.");
-        yield return new WaitForSeconds(8.0f);
-        instructionManager.DisplayText(defaultText + "Your progress will be displayed here along with the current time.");
-        yield return new WaitForSeconds(8.0f);
+        instructionManager.DisplayText(defaultText + "The experiment requires you to repeat the grasp-and-drop-off task for " + iterationLimit * numberOfSessions + " iterations." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "The drop-off location will be chosen randomly." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "You will get " + restTime + " seconds rest every " + restIterations + " iterations." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "Your HUD will indicate when it is time to rest by turning green." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "Your progress will be displayed here along with the status of the experiment." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "If you need any rest please request it to the experimenter." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "If you feel dizzy or want to stop the experiment please let the experimenter know immediately." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "Remember to not step during the experiment to perform the grasp-and-drop-off task." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "Remember that objects in VR are not physical so do not try to lean or support on them, particularly on the virtual desk in front of you while performing the task." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "All the information regarding the task will be displayed on your HUD." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "Your progress will be displayed here along with the current time." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
         instructionManager.DisplayText("Get ready to start! Look forward towards the desk.");
         hudManager.DisplayText("Look forward.", 3.0f);
         yield return new WaitForSeconds(5.0f);

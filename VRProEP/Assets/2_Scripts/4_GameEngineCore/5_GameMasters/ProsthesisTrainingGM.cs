@@ -20,6 +20,7 @@ public class ProsthesisTrainingGM : GameMaster
     [Header("Training mode configuration:")]
     public Camera TrainingCamera;
     public Transform fixedProsthesisPosition;
+    public HUDManager trainingHudManager;
 
     [Header("Instructions:")]
     [TextArea]
@@ -32,6 +33,7 @@ public class ProsthesisTrainingGM : GameMaster
     private GameObject residualLimbGO;
     private LimbFollower limbFollower;
     private AngleFollower angleFollower;
+    private ConfigurableElbowManager elbowManager;
 
     // Debug
     // private GameObject handGO;
@@ -328,6 +330,14 @@ public class ProsthesisTrainingGM : GameMaster
         //
         // Update information displayed for debugging purposes
         //
+
+        //
+        // Update HUD state
+        //
+        if (elbowManager.IsEnabled)
+            trainingHudManager.colour = HUDManager.HUDColour.Blue;
+        else
+            trainingHudManager.colour = HUDManager.HUDColour.Red;
     }
 
     private void FixedUpdate()
@@ -529,7 +539,7 @@ public class ProsthesisTrainingGM : GameMaster
                 // Set EMG sensor and reference generator as active.
                 // Get prosthesis
                 GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
-                ConfigurableElbowManager elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
+                elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
                 // Set active sensor and reference generator to EMG.
                 elbowManager.ChangeSensor("VAL_SENSOR_SEMG");
                 elbowManager.ChangeReferenceGenerator("VAL_REFGEN_EMGPROP");
@@ -541,7 +551,7 @@ public class ProsthesisTrainingGM : GameMaster
                 // Set VIVE tracker and Jacobian synergy as active.
                 // Get prosthesis
                 GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
-                ConfigurableElbowManager elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
+                elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
                 if (elbowManager.GetInterfaceType() == ReferenceGeneratorType.JacobianSynergy)
                 {
                     // Set the reference generator to jacobian-based.
