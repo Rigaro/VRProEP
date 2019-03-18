@@ -10,7 +10,7 @@ using System;
 public class ExperimentSelectionMenu : MonoBehaviour
 {
     public GameObject mainMenu;
-    public GameObject modeSelectionMenu;
+    public GameObject experimentConfigMenu;
     public GameObject optionDropdownGO;
     public LogManager logManager;
     public Dropdown optionsDropdown;
@@ -18,7 +18,7 @@ public class ExperimentSelectionMenu : MonoBehaviour
 
     private const int NONE = 0;
     private const int JACOBIAN_SYNERGY = 1;
-    private const int EMG_DATA = 2;
+    private const int EMG_DATA = 2; // Shoulder motion estimation from EMG
 
     private List<string> optionList = new List<string>();
 
@@ -45,8 +45,8 @@ public class ExperimentSelectionMenu : MonoBehaviour
             optionList.Add("");
             optionList.Add("Able-bodied");
             optionList.Add("EMG");
-            optionList.Add("Jacobian Synergy");
-            optionList.Add("Linear Synergy");
+            optionList.Add("Task-space Synergy");
+            optionList.Add("Joint-space Synergy");
             optionsDropdown.AddOptions(optionList);
             // Activate dropdown
             optionDropdownGO.SetActive(true);
@@ -162,9 +162,9 @@ public class ExperimentSelectionMenu : MonoBehaviour
         }
     }
 
-    public void ReturnToModeSelectionMenu()
+    public void ReturnToExperimentConfigMenu()
     {
-        modeSelectionMenu.SetActive(true);
+        experimentConfigMenu.SetActive(true);
         gameObject.SetActive(false);
     }
 
