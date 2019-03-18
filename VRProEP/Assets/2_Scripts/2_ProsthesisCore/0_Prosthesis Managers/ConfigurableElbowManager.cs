@@ -35,7 +35,7 @@ namespace VRProEP.ProsthesisCore
             // Create a basic reference generator: Integrator.
             float[] xBar = { Mathf.Deg2Rad * -90.0f };
             float[] xMin = { Mathf.Deg2Rad * -145.0f };
-            float[] xMax = { Mathf.Deg2Rad * 0.0f };
+            float[] xMax = { Mathf.Deg2Rad * -0.1f };
             IntegratorReferenceGenerator integratorRG = new IntegratorReferenceGenerator(xBar, xMin, xMax);
             // Create configurable input manager with the created sensor and RG.
             inputManager = new ConfigurableInputManager(trackerManager, integratorRG);
@@ -77,7 +77,7 @@ namespace VRProEP.ProsthesisCore
             //
             // Add a Linear Kinematic Synergy to the prosthesis
             float[] theta = { -1.0f };
-            float[] thetaMin = { -1.0f };
+            float[] thetaMin = { -0.5f };
             float[] thetaMax = { -3.5f };
             LinearKinematicSynergy linSyn = new LinearKinematicSynergy(xBar, xMin, xMax, theta, thetaMin, thetaMax);
             inputManager.Configure("CMD_ADD_REFGEN", linSyn);
