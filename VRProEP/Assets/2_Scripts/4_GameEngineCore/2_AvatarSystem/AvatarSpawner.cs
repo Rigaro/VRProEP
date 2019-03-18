@@ -74,10 +74,10 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         /// <param name="userData"></param>
         /// <param name="avatarData"></param>
-        public static void SpawnAbleBodiedAvatar(UserData userData, AvatarData avatarData)
+        public static void SpawnAbleBodiedAvatar(UserData userData, AvatarData avatarData, bool isNew = true)
         {
             LoadAbleHand(userData.lefty, userData.handLength);
-            LoadAbleForearm(userData.forearmLength);
+            LoadAbleForearm(userData.forearmLength, isNew);
         }
 
         /// <summary>
@@ -313,10 +313,11 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         /// <param name="forearmType">The name of the prefab forearm avatar to be loaded.</param>
         /// <returns>The instantiated forearm GameObject.</returns>
-        private static GameObject LoadAbleForearm(float lowerArmLength)
+        private static GameObject LoadAbleForearm(float lowerArmLength, bool newTracker = true)
         {
             // Add motion tracker and assign as forearm tracker, use as parent
-            GameObject llMotionTrackerGO = AvatarSystem.AddMotionTracker();
+            //GameObject llMotionTrackerGO = AvatarSystem.AddMotionTracker();
+            GameObject llMotionTrackerGO = SpawnMotionTracker(newTracker);
             llMotionTrackerGO.tag = "ForearmTracker";
             llMotionTrackerGO.transform.GetChild(1).gameObject.SetActive(false); // Disable marker
 
@@ -404,7 +405,7 @@ namespace VRProEP.GameEngineCore
             return forearmGO;
         }
 
-        public static GameObject SpawnMotionTracker()
+        public static GameObject SpawnMotionTracker(bool newTracker)
         {
             // Load prefab and check validity
             GameObject motionTrackerPrefab = Resources.Load<GameObject>("Trackers/VIVETracker");
@@ -429,7 +430,8 @@ namespace VRProEP.GameEngineCore
             else
                 motionTrackerConfig.SetDeviceIndex(motionTrackerNumber + 6); // Set hardware device index to follow
             motionTrackerConfig.origin = playerGO.transform; 
-            motionTrackerNumber++; 
+            if(newTracker)
+                motionTrackerNumber++; 
 
             return motionTrackerGO;
         }

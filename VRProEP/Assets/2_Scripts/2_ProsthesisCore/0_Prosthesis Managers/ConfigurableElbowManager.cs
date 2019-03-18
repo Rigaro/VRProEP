@@ -23,7 +23,7 @@ namespace VRProEP.ProsthesisCore
         /// Initializes the Elbow prosthesis with basic functionality.
         /// Must be called only after the avatar is available.
         /// </summary>
-        public void InitializeProsthesis(float upperArmLength, float lowerArmLength)
+        public void InitializeProsthesis(float upperArmLength, float lowerArmLength, float synValue = 1.0f)
         {
             //
             // ConfigurableInputManagar
@@ -76,7 +76,7 @@ namespace VRProEP.ProsthesisCore
             // Reference generators
             //
             // Add a Linear Kinematic Synergy to the prosthesis
-            float[] theta = { -1.0f };
+            float[] theta = { -synValue };
             float[] thetaMin = { -0.5f };
             float[] thetaMax = { -3.5f };
             LinearKinematicSynergy linSyn = new LinearKinematicSynergy(xBar, xMin, xMax, theta, thetaMin, thetaMax);

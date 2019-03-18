@@ -15,7 +15,7 @@ public class CollisionFeedbackHandle : MonoBehaviour
     // Vibrate when colliding with non-graspable or non-drop-off objects.
     private void OnCollisionEnter(Collision collision)
     {
-        if (!(collision.gameObject.CompareTag("Graspable") || collision.gameObject.CompareTag("DropOff") || collision.gameObject.CompareTag("GraspManager") || collision.gameObject.CompareTag("Forearm") || collision.gameObject.CompareTag("Hand")))
+        if (!(collision.gameObject.CompareTag("Graspable") || collision.gameObject.CompareTag("DropOff") || collision.gameObject.CompareTag("GraspManager") || collision.gameObject.CompareTag("Forearm") || collision.gameObject.CompareTag("Hand") || collision.gameObject.name == "Colliders"))
         {
             hapticFeedback.Execute(0.0f, duration, frequency, intensity, SteamVR_Input_Sources.Any);
         }
