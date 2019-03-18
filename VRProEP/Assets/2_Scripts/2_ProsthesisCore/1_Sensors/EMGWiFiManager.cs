@@ -160,16 +160,16 @@ namespace VRProEP.ProsthesisCore
             }
             else
             {
+                float[] normalizedValues = sensorValues;
                 // Transform to 0-100 value.
                 for (int i = 0; i < sensorValues.Length; i++)
                 {
                     // Shift and rectify
-                    float normalized = gains[i] * (sensorValues[i] - lowerLimits[i]);
-                    sensorValues[i] = lowPassFilters[i].Update(normalized);
-                    if (sensorValues[i] > 100.0f)
-                        sensorValues[i] = 100.0f;
-                    if (sensorValues[i] < 0.0f)
-                        sensorValues[i] = 0.0f;
+                    normalizedValues[i] = (float)Math.Round(gains[i] * (sensorValues[i] - lowerLimits[i]), 1);
+                    if (normalizedValues[i] > 100.0f)
+                        normalizedValues[i] = 100.0f;
+                    if (normalizedValues[i] < 0.0f)
+                        normalizedValues[i] = 0.0f;
                 }
                 return sensorValues;
             }

@@ -26,6 +26,8 @@ TagManager:
   - Monitor
   - MotionTracker
   - ForearmTracker
+  - Floor
+  - Boundary
   layers:
   - Default
   - TransparentFX

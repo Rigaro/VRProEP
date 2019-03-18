@@ -195,7 +195,7 @@ namespace VRProEP.ProsthesisCore
                 float filtDiffEmg = lowPassFilters[channel].Update(diffEmg);
                 float avfDiffEmg = (float)Math.Round(movingAverageFilters[channel].Update(filtDiffEmg), 1);
                 //Debug.Log(avfDiffEmg);
-                if (Mathf.Abs(avfDiffEmg) > 7.0f)
+                if (Mathf.Abs(avfDiffEmg) > 20.0f)
                 {
                     tempXBar = xBar[channel] + (Gains[channel] * avfDiffEmg * Time.fixedDeltaTime); // Differential velocity control.
                 }

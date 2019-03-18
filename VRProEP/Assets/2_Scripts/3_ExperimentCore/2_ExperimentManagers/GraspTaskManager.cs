@@ -29,14 +29,23 @@ public class GraspTaskManager : MonoBehaviour {
         {
             inDropOff = true;
         }
+        else if (other.tag == "Floor")
+        {
+            StartCoroutine(ReturnToStart());
+        }
     }
+
 
     private void OnTriggerExit(Collider other)
     {
         if (other.tag == "DropOff")
         {
             inDropOff = false;
-        }            
+        }
+        else if (other.tag == "Boundary")
+        {
+            StartCoroutine(ReturnToStart());
+        }
     }
 
     // Update is called once per frame

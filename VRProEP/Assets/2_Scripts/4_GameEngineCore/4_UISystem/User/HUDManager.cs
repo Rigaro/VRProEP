@@ -7,12 +7,19 @@ namespace VRProEP.GameEngineCore
 {
     public class HUDManager : MonoBehaviour
     {
+        public enum HUDColour
+        {
+            Blue,
+            Red,
+            Green
+        }
 
         public GameObject hudText;
         public GameObject hudGraphics;
-        public GameObject hudEnableGraphics;
-        public GameObject hudDisableGraphics;
-        public bool enable = true;
+        public GameObject hudBlueGraphics;
+        public GameObject hudRedGraphics;
+        public GameObject hudGreenGraphics;
+        public HUDColour colour;
 
         private TextMeshPro hudTextMesh;
 
@@ -26,15 +33,23 @@ namespace VRProEP.GameEngineCore
         {
             // Animate HUD.
             hudGraphics.transform.Rotate(new Vector3(0.0f, 0.0f, 10.0f) * Time.deltaTime);
-            if (enable && !hudEnableGraphics.activeSelf)
+            if (colour == HUDColour.Blue && !hudBlueGraphics.activeSelf)
             {
-                hudEnableGraphics.SetActive(true);
-                hudDisableGraphics.SetActive(false);
+                hudRedGraphics.SetActive(false);
+                hudGreenGraphics.SetActive(false);
+                hudBlueGraphics.SetActive(true);
             }
-            if (!enable && !hudDisableGraphics.activeSelf)
+            if (colour == HUDColour.Red && !hudRedGraphics.activeSelf)
             {
-                hudEnableGraphics.SetActive(false);
-                hudDisableGraphics.SetActive(true);
+                hudBlueGraphics.SetActive(false);
+                hudGreenGraphics.SetActive(false);
+                hudRedGraphics.SetActive(true);
+            }
+            if (colour == HUDColour.Green && !hudGreenGraphics.activeSelf)
+            {
+                hudBlueGraphics.SetActive(false);
+                hudRedGraphics.SetActive(false);
+                hudGreenGraphics.SetActive(true);
             }
         }
 
