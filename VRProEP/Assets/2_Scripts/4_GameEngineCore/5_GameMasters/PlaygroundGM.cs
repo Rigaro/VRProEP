@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR;
+using Valve.VR.InteractionSystem;
 
 // GameMaster includes
 using VRProEP.ExperimentCore;
@@ -12,6 +13,7 @@ public class PlaygroundGM : GameMaster
 {
     [Header("Playground config. variables.")]
     public AvatarType avatarType = AvatarType.AbleBodied;
+    public Transform startTransform;
 
 
     private string defaultText = "\n\no o";
@@ -80,6 +82,9 @@ public class PlaygroundGM : GameMaster
                     // Set the reference generator to jacobian-based.
                     elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
                 }
+
+                // Teleport to the start position
+                TeleportToStartPosition();
 
                 experimentState = ExperimentState.InitializingApplication;
                 break;
@@ -515,21 +520,35 @@ public class PlaygroundGM : GameMaster
 
     public void LoadAbleBodiedAvatar()
     {
+        // Fade
+        SteamVR_Fade.Start(Color.black, 0.0f);
+        // Load
         avatarType = AvatarType.AbleBodied;
         AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
         AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied, false);
         // Enable colliders
-        AvatarSystem.EnableAvatarColliders();
+        StartCoroutine(EnableColliders());
         // Initialize UI.
         InitializeUI();
+        // Fade
+        SteamVR_Fade.Start(Color.black, 0.0f);
+
+        // Teleport to the start position
+        StartCoroutine(TeleportCoroutine());
     }
 
     public void LoadTHAvatar()
     {
+        // Fade
+        SteamVR_Fade.Start(Color.black, 0.0f);
+        // Load
         avatarType = AvatarType.Transhumeral;
 
         AvatarSystem.LoadPlayer(UserType.AbleBodied, AvatarType.Transhumeral);
         AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
+        // Fade
+        SteamVR_Fade.Start(Color.black, 0.0f);
+
         // Change the number for the residual limb tracker being used
         GameObject rlTrackerGO = GameObject.FindGameObjectWithTag("ResidualLimbTracker");
         SteamVR_TrackedObject steamvrConfig = rlTrackerGO.GetComponent<SteamVR_TrackedObject>();
@@ -541,12 +560,20 @@ public class PlaygroundGM : GameMaster
         elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + SaveSystem.ActiveUser.handLength / 2.0f), 1.5f);
         // Set the reference generator to jacobian-based.
         elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
-        
 
-        // Enable colliders
-        AvatarSystem.EnableAvatarColliders();
+        StartCoroutine(EnableColliders());
         // Initialize UI.
         InitializeUI();
+
+        // Teleport to the start position
+        StartCoroutine(TeleportCoroutine());
+    }
+
+    public IEnumerator EnableColliders()
+    {
+        yield return new WaitForSecondsRealtime(3.0f);
+        // Enable colliders
+        AvatarSystem.EnableAvatarColliders();
     }
 
     public void SendExternalMessage(string message)
@@ -558,5 +585,28 @@ public class PlaygroundGM : GameMaster
     {
         // Load level.
         SteamVR_LoadLevel.Begin("MainMenu");
+    }
+
+    private IEnumerator TeleportCoroutine()
+    {
+        yield return new WaitForSeconds(1.0f);
+        TeleportToStartPosition();
+        SteamVR_Fade.Start(Color.clear, 1.0f);
+    }
+
+    private void TeleportToStartPosition()
+    {
+        // Get player object
+        GameObject playerGO = GameObject.FindGameObjectWithTag("Player");
+        if (playerGO == null)
+            throw new System.NullReferenceException("Player GameObject not found.");
+
+        Player player = playerGO.GetComponent<Player>();
+        if (player == null)
+            throw new System.NullReferenceException("Player component not found.");
+
+        // Teleport to the start position
+        Vector3 playerFeetOffset = player.trackingOriginTransform.position - player.feetPositionGuess;
+        player.trackingOriginTransform.position = startTransform.position + playerFeetOffset;
     }
 }

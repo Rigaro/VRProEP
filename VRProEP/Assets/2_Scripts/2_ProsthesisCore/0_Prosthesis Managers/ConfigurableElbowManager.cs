@@ -77,8 +77,8 @@ namespace VRProEP.ProsthesisCore
             //
             // Add a Linear Kinematic Synergy to the prosthesis
             float[] theta = { -synValue };
-            float[] thetaMin = { -0.5f };
-            float[] thetaMax = { -3.5f };
+            float[] thetaMin = { -3.5f };
+            float[] thetaMax = { -0.5f };
             LinearKinematicSynergy linSyn = new LinearKinematicSynergy(xBar, xMin, xMax, theta, thetaMin, thetaMax);
             inputManager.Configure("CMD_ADD_REFGEN", linSyn);
 
@@ -159,6 +159,15 @@ namespace VRProEP.ProsthesisCore
         public ReferenceGeneratorType GetInterfaceType()
         {
             return inputManager.GetActiveReferenceGeneratorType();
+        }
+
+        /// <summary>
+        /// Sets the synergy value for a synergistic elbow.
+        /// </summary>
+        /// <param name="theta">The synergy value.</param>
+        public void SetSynergy(float theta)
+        {
+            inputManager.Configure("CMD_SET_SYNERGY", -theta);
         }
     }
 }
