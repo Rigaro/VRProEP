@@ -5,9 +5,11 @@ using System.Collections;
 namespace TMPro.Examples
 {
 
-    [ExecuteInEditMode]
     public class TMP_TextInfoDebugTool : MonoBehaviour
     {
+        // Since this script is used for debugging, we exclude it from builds.
+        // TODO: Rework this script to make it into an editor utility.
+        #if UNITY_EDITOR
         public bool ShowCharacters;
         public bool ShowWords;
         public bool ShowLinks;
@@ -18,24 +20,26 @@ namespace TMPro.Examples
         [TextArea(2, 2)]
         public string ObjectStats;
 
+        [SerializeField]
         private TMP_Text m_TextComponent;
 
+        [SerializeField]
         private Transform m_Transform;
-
-// Since this script is used for visual debugging, we exclude most of it in builds.
-#if UNITY_EDITOR
-
-        void OnEnable()
-        {
-            m_TextComponent = gameObject.GetComponent<TMP_Text>();
-
-            if (m_Transform == null)
-                m_Transform = gameObject.GetComponent<Transform>();
-        }
 
 
         void OnDrawGizmos()
         {
+            if (m_TextComponent == null)
+            {
+                m_TextComponent = gameObject.GetComponent<TMP_Text>();
+
+                if (m_TextComponent == null)
+                    return;
+
+                if (m_Transform == null)
+                    m_Transform = gameObject.GetComponent<Transform>();
+            }
+
             // Update Text Statistics
             TMP_TextInfo textInfo = m_TextComponent.textInfo;
 
@@ -132,22 +136,46 @@ namespace TMPro.Examples
                 Gizmos.DrawLine(descenderStart, descenderEnd);
 
                 // Draw Cap Height
-                float capHeight = cInfo.baseLine + cInfo.fontAsset.fontInfo.CapHeight * cInfo.scale;
+                float capHeight = cInfo.baseLine + cInfo.fontAsset.faceInfo.capLine * cInfo.scale;
                 Vector3 capHeightStart = new Vector3(topLeft.x, m_Transform.TransformPoint(new Vector3(0, capHeight, 0)).y, 0);
                 Vector3 capHeightEnd = new Vector3(topRight.x, m_Transform.TransformPoint(new Vector3(0, capHeight, 0)).y, 0);
 
                 Gizmos.color = Color.cyan;
                 Gizmos.DrawLine(capHeightStart, capHeightEnd);
 
+                // Draw Centerline
+                float meanline = cInfo.baseLine + cInfo.fontAsset.faceInfo.meanLine * cInfo.scale;
+                Vector3 centerlineStart = new Vector3(topLeft.x, m_Transform.TransformPoint(new Vector3(0, meanline, 0)).y, 0);
+                Vector3 centerlineEnd = new Vector3(topRight.x, m_Transform.TransformPoint(new Vector3(0, meanline, 0)).y, 0);
+
+                Gizmos.color = Color.cyan;
+                Gizmos.DrawLine(centerlineStart, centerlineEnd);
+
+                // Draw Origin for each character.
+                float gizmoSize = (ascenderEnd.y - descenderEnd.y) * 0.02f;
+                Vector3 origin = m_Transform.TransformPoint(cInfo.origin, cInfo.baseLine, 0);
+                Vector3 originBL = new Vector3(origin.x - gizmoSize, origin.y - gizmoSize, 0);
+                Vector3 originTL = new Vector3(originBL.x, origin.y + gizmoSize, 0);
+                Vector3 originTR = new Vector3(origin.x + gizmoSize, originTL.y, 0);
+                Vector3 originBR = new Vector3(originTR.x, originBL.y, 0);
+
+                Gizmos.color = new Color(1, 0.5f, 0);
+                Gizmos.DrawLine(originBL, originTL);
+                Gizmos.DrawLine(originTL, originTR);
+                Gizmos.DrawLine(originTR, originBR);
+                Gizmos.DrawLine(originBR, originBL);
+
                 // Draw xAdvance for each character.
+                gizmoSize = (ascenderEnd.y - descenderEnd.y) * 0.04f;
                 float xAdvance = m_Transform.TransformPoint(cInfo.xAdvance, 0, 0).x;
-                Vector3 topAdvance = new Vector3(xAdvance, topLeft.y, 0);
-                Vector3 bottomAdvance = new Vector3(xAdvance, bottomLeft.y, 0);
+                Vector3 topAdvance = new Vector3(xAdvance, baselineStart.y + gizmoSize, 0);
+                Vector3 bottomAdvance = new Vector3(xAdvance, baselineStart.y - gizmoSize, 0);
+                Vector3 leftAdvance = new Vector3(xAdvance - gizmoSize, baselineStart.y, 0);
+                Vector3 rightAdvance = new Vector3(xAdvance + gizmoSize, baselineStart.y, 0);
 
                 Gizmos.color = Color.green;
                 Gizmos.DrawLine(topAdvance, bottomAdvance);
-
-
+                Gizmos.DrawLine(leftAdvance, rightAdvance);
             }
         }
 
