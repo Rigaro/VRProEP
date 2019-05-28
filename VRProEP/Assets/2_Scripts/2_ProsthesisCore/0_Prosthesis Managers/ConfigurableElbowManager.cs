@@ -9,7 +9,8 @@ namespace VRProEP.ProsthesisCore
     public class ConfigurableElbowManager : MonoBehaviour
     {
         private ConfigurableInputManager inputManager;
-        private ElbowManager elbowManager;
+        //private ElbowManager elbowManager;
+        private IdealElbowManager elbowManager;
 
         private float elbowState = 0.0f;
 
@@ -51,9 +52,17 @@ namespace VRProEP.ProsthesisCore
             Rigidbody elbowRB = elbowLowerGO.GetComponent<Rigidbody>();
             // Create VirtualEncoder and attach to HingeJoint.
             VirtualEncoderManager virtualEncoder = new VirtualEncoderManager(elbowJoint);
+            //*******************************
+            // ELBOW DEVICE MANAGER
+            //
+            // PD controller version
             // Create ElbowManager with the given VirtualEncoder and Rigidbody, and set the axis.
-            elbowManager = new ElbowManager(virtualEncoder, elbowRB);
-            elbowManager.Axis = elbowJoint.axis;
+            //elbowManager = new ElbowManager(virtualEncoder, elbowRB);
+            //elbowManager.Axis = elbowJoint.axis;
+            // Ideal tracking version
+            // Create ElbowManager with the given elbowJoint.
+            elbowManager = new IdealElbowManager(elbowJoint);
+            //*******************************
 
             //
             // Sensors
