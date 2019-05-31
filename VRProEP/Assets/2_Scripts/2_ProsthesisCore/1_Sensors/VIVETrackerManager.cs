@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
 // VRProEP
-using VRProEP.Utilities;
+using VRProEP.AdaptationCore;
 
 namespace VRProEP.ProsthesisCore
 {

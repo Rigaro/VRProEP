@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using VRProEP.Utilities;
+using VRProEP.AdaptationCore;
 
 namespace VRProEP.ProsthesisCore
 {
@@ -10,8 +10,8 @@ namespace VRProEP.ProsthesisCore
     {
         private List<float> gains = new List<float>();
         private List<float> lowerLimits = new List<float>();
-        private List<LowPassFilter> lowPassFilters = new List<LowPassFilter>();
-        private List<MovingAverage> movingAverageFilters = new List<MovingAverage>();
+        private List<FOLPDFilter> lowPassFilters = new List<FOLPDFilter>();
+        private List<MovingAverageFilter> movingAverageFilters = new List<MovingAverageFilter>();
         private bool isRaw = false;
 
         public EMGWiFiManager(string ipAddress, int port, int channelSize, bool isRaw = false) : base(ipAddress, port, channelSize, SensorType.EMGWiFi, UDPType.UDP_Async)
@@ -21,8 +21,8 @@ namespace VRProEP.ProsthesisCore
             {
                 gains.Add(100.0f / 1023.0f);
                 lowerLimits.Add(100.0f);
-                lowPassFilters.Add( new LowPassFilter(3.0f, 1.17f, Time.fixedDeltaTime) );
-                movingAverageFilters.Add(new MovingAverage(15));
+                lowPassFilters.Add( new FOLPDFilter(2*Mathf.PI*3.0f, 1.17f, Time.fixedDeltaTime) );
+                movingAverageFilters.Add(new MovingAverageFilter(15));
             }
 
             this.isRaw = isRaw;

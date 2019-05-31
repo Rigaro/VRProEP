@@ -5,7 +5,8 @@ namespace VRProEP.ProsthesisCore
 {
     /// <summary>
     /// Jacobian-based synergistic prosthesis reference generator.
-    /// Provides position reference for prosthesis joints through a Jacobian-based kinematic synergy.
+    /// Provides position reference for prosthesis joints through a Task-space kinematic synergy.
+    /// Uses a forward line path reference.
     /// </summary>
     public class JacobianSynergy : ReferenceGenerator
     {

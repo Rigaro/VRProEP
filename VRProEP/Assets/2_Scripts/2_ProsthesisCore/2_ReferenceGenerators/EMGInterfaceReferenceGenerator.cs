@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using VRProEP.Utilities;
+using VRProEP.AdaptationCore;
 
 namespace VRProEP.ProsthesisCore
 {
@@ -17,8 +17,8 @@ namespace VRProEP.ProsthesisCore
         private List<float> gains = new List<float>();
         private EMGInterfaceType interfaceType;
         private bool enableRequested = false;
-        private List<LowPassFilter> lowPassFilters = new List<LowPassFilter>();
-        private List<MovingAverage> movingAverageFilters = new List<MovingAverage>();
+        private List<FOLPDFilter> lowPassFilters = new List<FOLPDFilter>();
+        private List<MovingAverageFilter> movingAverageFilters = new List<MovingAverageFilter>();
 
         public List<float> Gains
         {
@@ -50,8 +50,8 @@ namespace VRProEP.ProsthesisCore
             //  initialize filters
             for (int i = 0; i < channelSize; i++)
             {
-                lowPassFilters.Add(new LowPassFilter(3.0f, 1.0f, Time.fixedDeltaTime));
-                movingAverageFilters.Add(new MovingAverage(15));
+                lowPassFilters.Add(new FOLPDFilter(2 * Mathf.PI * 3.0f, 1.0f, Time.fixedDeltaTime));
+                movingAverageFilters.Add(new MovingAverageFilter(15));
             }
         }
 
@@ -75,8 +75,8 @@ namespace VRProEP.ProsthesisCore
             //  initialize filters
             for (int i = 0; i < channelSize; i++)
             {
-                lowPassFilters.Add(new LowPassFilter(3.0f, 1.0f, Time.fixedDeltaTime));
-                movingAverageFilters.Add(new MovingAverage(15));
+                lowPassFilters.Add(new FOLPDFilter(2 * Mathf.PI * 3.0f, 1.0f, Time.fixedDeltaTime));
+                movingAverageFilters.Add(new MovingAverageFilter(15));
             }
         }
 
@@ -104,8 +104,8 @@ namespace VRProEP.ProsthesisCore
             //  initialize filters
             for (int i = 0; i < channelSize; i++)
             {
-                lowPassFilters.Add(new LowPassFilter(3.0f, 1.0f, Time.fixedDeltaTime));
-                movingAverageFilters.Add(new MovingAverage(15));
+                lowPassFilters.Add(new FOLPDFilter(2 * Mathf.PI * 3.0f, 1.0f, Time.fixedDeltaTime));
+                movingAverageFilters.Add(new MovingAverageFilter(15));
             }
         }
 
@@ -134,8 +134,8 @@ namespace VRProEP.ProsthesisCore
             //  initialize filters
             for (int i = 0; i < channelSize; i++)
             {
-                lowPassFilters.Add(new LowPassFilter(3.0f, 1.0f, Time.fixedDeltaTime));
-                movingAverageFilters.Add(new MovingAverage(15));
+                lowPassFilters.Add(new FOLPDFilter(2 * Mathf.PI * 3.0f, 1.0f, Time.fixedDeltaTime));
+                movingAverageFilters.Add(new MovingAverageFilter(15));
             }
         }
 

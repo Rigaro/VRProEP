@@ -2,25 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace VRProEP.Utilities
+namespace VRProEP.AdaptationCore
 {
-    public class HighPassFilter : FirstOrderFilter
+    public class FOHPDFilter : FODFilter
     {
         /// <summary>
-        /// 
+        /// Creates a first order high-pass filter.
         /// </summary>
-        /// <param name="fc">Cut-off frequency in Hz.</param>
-        /// <param name="g"></param>
-        /// <param name="ts"></param>
-        public HighPassFilter(float fc, float g, float ts) : base(fc, g, ts)
+        /// <param name="wo">Cut-off frequency in rad/s.</param>
+        /// <param name="g">The filter gain.</param>
+        /// <param name="ts">The sampling time (seconds).</param>
+        public FOHPDFilter(float wo, float g, float ts) : base(wo, g, ts)
         {
         }
 
 
         protected override void ComputeAlpha()
         {
-            float RC = 1 / (2 * Mathf.PI * fc);
-            alpha = RC / (RC + dt);
+            float RC = 1 / wo;
+            alpha = RC / (RC + ts);
         }
 
         /// <summary>
@@ -30,9 +30,9 @@ namespace VRProEP.Utilities
         /// <returns>The filtered signal 'yf'.</returns>
         public override float Update(float u)
         {
-            float y = (float)Math.Round((alpha * y_prev) + g * (u - u_prev), 2);
+            float y = (float)Math.Round((alpha * x_prev) + g * (u - u_prev), 2);
             u_prev = u;
-            y_prev = y;
+            x_prev = y;
             return y;
         }
     }

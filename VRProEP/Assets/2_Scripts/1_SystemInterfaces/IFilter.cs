@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace VRProEP.Utilities
+namespace VRProEP.AdaptationCore
 {
     public interface IFilter
     {
@@ -15,19 +15,23 @@ namespace VRProEP.Utilities
         /// <summary>
         /// Sets the gain 'G' of the filter.
         /// </summary>
-        /// <param name="G"></param>
-        void SetGain(float G);
+        /// <param name="g"></param>
+        void SetGain(float g);
         /// <summary>
         /// Sets the sample time 'Ts' of the filter.
         /// </summary>
-        /// <param name="Ts">The filter (system) sample time.</param>
-        void SetSampleTime(float Ts);
+        /// <param name="ts">The filter (system) sample time.</param>
+        void SetSamplingTime(float ts);
         /// <summary>
-        /// Updates the filter output for given 'ym' input.
+        /// Updates the filter output for given 'u' input.
         /// </summary>
-        /// <param name="ym">The signal to be filtered</param>
-        /// <returns>The filtered signal 'yf'.</returns>
-        float Update(float ym);
+        /// <param name="u">The signal to be filtered</param>
+        /// <returns>The filtered signal 'y'.</returns>
+        float Update(float u);
+        /// <summary>
+        /// Resets the filter states.
+        /// </summary>
+        void Reset();
 
 
     }

@@ -17,23 +17,23 @@ using UnityEngine;
 /// For more filter references see: http://www.analog.com/en/analog-dialogue/articles/band-pass-response-in-active-filters.html
 
 /// </summary>
-namespace VRProEP.Utilities
+namespace VRProEP.AdaptationCore
 {
-    public class BandPassQFilter : IFilter
+    public class SOBPDQFilter : IFilter
     {
 
         private float x_1 = 0;
         private float x_2 = 0;
         private float u_1 = 0;
         private float wo; // Cut-off frequency
-        private float G; // Filter gain
-        private float Ts; // Sample time
+        private float g; // Filter gain
+        private float ts; // Sample time
         private float b1;
         private float b2;
 
-        public BandPassQFilter(float G, float b1, float b2)
+        public SOBPDQFilter(float g, float b1, float b2)
         {
-            SetGain(G);
+            SetGain(g);
             this.b1 = b1;
             this.b2 = b2;
         }
@@ -49,33 +49,42 @@ namespace VRProEP.Utilities
         /// <summary>
         /// Sets the gain 'G' of the filter.
         /// </summary>
-        /// <param name="G"></param>
-        public void SetGain(float G)
+        /// <param name="g"></param>
+        public void SetGain(float g)
         {
-            this.G = G;
+            this.g = g;
         }
         /// <summary>
         /// Sets the sample time 'Ts' of the filter.
         /// </summary>
-        /// <param name="Ts">The filter (system) sample time.</param>
-        public void SetSampleTime(float Ts)
+        /// <param name="ts">The filter (system) sample time.</param>
+        public void SetSamplingTime(float ts)
         {
-            if (Ts <= 0)
+            if (ts <= 0)
                 throw new System.ArgumentOutOfRangeException("Sample time should be greater than 0.");
-            this.Ts = Ts;
+            this.ts = ts;
         }
         /// <summary>
-        /// Updates the filter output for given 'ym' input.
+        /// Updates the filter output for given 'u' input.
         /// </summary>
-        /// <param name="ym">The signal to be filtered</param>
-        /// <returns>The filtered signal 'yf'.</returns>
-        public float Update(float ym)
+        /// <param name="u">The signal to be filtered</param>
+        /// <returns>The filtered signal 'y'.</returns>
+        public float Update(float u)
         {
-            float yf = -b1 * x_1 - b2 * x_2 + G * (ym - u_1);
+            float y = -b1 * x_1 - b2 * x_2 + g * (u - u_1);
             x_2 = x_1;
-            x_1 = yf;
-            u_1 = ym;
-            return yf;
+            x_1 = y;
+            u_1 = u;
+            return y;
+        }
+        /// <summary>
+        /// Resets the filter states.
+        /// </summary>
+        public void Reset()
+        {
+            x_1 = 0;
+            x_2 = 0;
+            u_1 = 0;
         }
     }
 }
