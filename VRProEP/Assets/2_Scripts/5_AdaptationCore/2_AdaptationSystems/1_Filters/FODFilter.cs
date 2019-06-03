@@ -45,6 +45,9 @@ namespace VRProEP.AdaptationCore
         /// <param name="wo">The filter cut-off frequency 'wo' in rad/s.</param>
         public void SetCutOffFrequency(float wo)
         {
+            if (wo <= 0)
+                throw new System.ArgumentOutOfRangeException("The estimator frequnecy should be greater than 0.");
+
             this.wo = wo;
         }
         /// <summary>
