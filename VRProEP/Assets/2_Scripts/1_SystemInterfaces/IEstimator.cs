@@ -26,8 +26,8 @@ namespace VRProEP.AdaptationCore
         /// </summary>
         /// <param name="u">The input signal.</param>
         /// <param name="t">Current system time/iteration.</param>
-        /// <returns>True if an estimate is succesfully updated.</returns>
-        bool Update(float u, float t);
+        /// <returns>The updates estimates.</returns>
+        float[] Update(float u, float t);
         /// <summary>
         /// Returns the current value of the state estimate in the given channel.
         /// Call Update beforehand to get an updated state estimate.

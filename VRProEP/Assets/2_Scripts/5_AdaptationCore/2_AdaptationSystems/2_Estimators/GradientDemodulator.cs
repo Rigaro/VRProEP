@@ -93,12 +93,12 @@ namespace VRProEP.AdaptationCore
         /// </summary>
         /// <param name="u">The input signal.</param>
         /// <param name="t">Current system time/iteration.</param>
-        /// <returns>True if an estimate is succesfully updated.</returns>
-        public bool Update(float u, float t)
+        /// <returns>The updates estimates.</returns>
+        public float[] Update(float u, float t)
         {
             x = lpf.Update(dither.Update(t) * hpf.Update(u));
-            return true;
-
+            float[] duHat = { x };
+            return duHat;
         }
 
         /// <summary>

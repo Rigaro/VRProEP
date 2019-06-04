@@ -217,8 +217,8 @@ namespace VRProEP.AdaptationCore
         /// </summary>
         /// <param name="u">The input signal.</param>
         /// <param name="t">Current system time/iteration.</param>
-        /// <returns>True if an estimate is succesfully updated.</returns>
-        public bool Update(float u, float t)
+        /// <returns>The updated estimates.</returns>
+        public float[] Update(float u, float t)
         {
             // First, multiply the previous states estimate xHat times C.
             // And remove it from the input u to get estimation error 'uTilde'.
@@ -258,7 +258,7 @@ namespace VRProEP.AdaptationCore
                 default:
                     throw new System.Exception("Invalid observer type.");
             }
-            return true;
+            return duHat;
         }
 
         /// <summary>

@@ -9,7 +9,7 @@ namespace VRProEP.AdaptationCore
     /// and positive gain for maximisation.
     /// For more details see:
     /// Garcia-Rosas R., Tan Y., Oetomo D., Manzie C., Choong P. "Personalized On-line Adaptation of 
-    /// Kinematic Synergies for Human-Prosthesis Interfaces". Transactions on Cybernetics.
+    /// Kinematic Synergies for Human-Prosthesis Interfaces". Transactions on Cybernetics. 2019.
     /// </summary>
     public class SGNOptimiser : IOptimiser
     {
