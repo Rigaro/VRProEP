@@ -426,9 +426,9 @@ namespace VRProEP.GameEngineCore
             // Configure
             SteamVR_TrackedObject motionTrackerConfig = motionTrackerGO.GetComponent<SteamVR_TrackedObject>();
             if (AvatarSystem.AvatarType == AvatarType.AbleBodied)
-                motionTrackerConfig.SetDeviceIndex(motionTrackerNumber + 5); // Set hardware device index to follow
+                motionTrackerConfig.SetDeviceIndex(motionTrackerNumber + 8); // Set hardware device index to follow
             else
-                motionTrackerConfig.SetDeviceIndex(motionTrackerNumber + 6); // Set hardware device index to follow
+                motionTrackerConfig.SetDeviceIndex(motionTrackerNumber + 8); // Set hardware device index to follow
             motionTrackerConfig.origin = playerGO.transform; 
             if(newTracker)
                 motionTrackerNumber++; 
