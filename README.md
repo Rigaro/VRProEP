@@ -5,4 +5,5 @@ Development is generalized from the online synergy identification platform.
 ## TNSRE paper submission version
 - VRProEP Version: 0.4. Tag Link: https://github.com/Rigaro/VRProEP/releases/tag/0.4
 - Unity Version: 2018.3.8f1
-Run from Unity Editor. See Wiki for more information.
+
+Runs from Unity Editor. See Wiki for more information.
