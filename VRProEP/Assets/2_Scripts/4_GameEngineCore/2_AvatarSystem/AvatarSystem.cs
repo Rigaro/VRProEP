@@ -111,7 +111,7 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         /// <param name="userData">The user's data to be used for avatar loading.</param>
         /// <param name="avatarType">The type of avatar to load.</param>
-        public static void LoadAvatar(UserData userData, AvatarType avatarType)
+        public static void LoadAvatar(UserData userData, AvatarType avatarType, bool isNew = true)
         {
             if (!IsPlayerAvailable)
                 throw new System.Exception("Player object has not been loaded. First load the player object.");
@@ -152,7 +152,7 @@ namespace VRProEP.GameEngineCore
             else if (avatarType == AvatarType.AbleBodied)
             {
                 activeAvatarType = AvatarType.AbleBodied;
-                AvatarSpawner.SpawnAbleBodiedAvatar(userData, activeAvatarData);
+                AvatarSpawner.SpawnAbleBodiedAvatar(userData, activeAvatarData, isNew);
             }
 
             isAvatarAvaiable = true;
@@ -246,6 +246,7 @@ namespace VRProEP.GameEngineCore
 
                             // Instantiate
                             Object.Instantiate(playerAbleTHPrefab);
+                            // Make sure the correct VIVE Tracker is selected for the upper arm
                             isPlayerAvailable = true;
                             break;
                         default:
@@ -314,7 +315,7 @@ namespace VRProEP.GameEngineCore
             if (!IsPlayerAvailable)
                 throw new System.Exception("Player object has not been loaded. First load the player object.");
 
-            return AvatarSpawner.SpawnMotionTracker();
+            return AvatarSpawner.SpawnMotionTracker(true);
         }
     }
 }

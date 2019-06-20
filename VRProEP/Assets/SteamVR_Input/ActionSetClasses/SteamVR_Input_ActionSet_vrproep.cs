@@ -41,6 +41,54 @@ namespace Valve.VR
             }
         }
         
+        public virtual SteamVR_Action_Pose ResidualLimbPose
+        {
+            get
+            {
+                return SteamVR_Actions.vrproep_ResidualLimbPose;
+            }
+        }
+        
+        public virtual SteamVR_Action_Pose ForearmPose
+        {
+            get
+            {
+                return SteamVR_Actions.vrproep_ForearmPose;
+            }
+        }
+        
+        public virtual SteamVR_Action_Pose ShoulderPose
+        {
+            get
+            {
+                return SteamVR_Actions.vrproep_ShoulderPose;
+            }
+        }
+        
+        public virtual SteamVR_Action_Pose C7Pose
+        {
+            get
+            {
+                return SteamVR_Actions.vrproep_C7Pose;
+            }
+        }
+        
+        public virtual SteamVR_Action_Pose MRCameraPose
+        {
+            get
+            {
+                return SteamVR_Actions.vrproep_MRCameraPose;
+            }
+        }
+        
+        public virtual SteamVR_Action_Pose HandPose
+        {
+            get
+            {
+                return SteamVR_Actions.vrproep_HandPose;
+            }
+        }
+        
         public virtual SteamVR_Action_Vibration HapticFeedback
         {
             get

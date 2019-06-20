@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR;
-using VRProEP.Utilities;
+using VRProEP.AdaptationCore;
 
 /// <summary>
 /// Manages object grasping behavior for VRProEP platform.
@@ -60,7 +60,7 @@ public class GraspManager : MonoBehaviour {
     private float handVelocity = 0.0f;
     private Vector3 prevHandPosition;
 
-    private MovingAverage averageFilter;
+    private MovingAverageFilter averageFilter;
 
     private void Start()
     {
@@ -84,7 +84,7 @@ public class GraspManager : MonoBehaviour {
         }
         else
         {
-            averageFilter = new MovingAverage(5);
+            averageFilter = new MovingAverageFilter(5);
             prevHandPosition = handGO.transform.position;
         }
     }

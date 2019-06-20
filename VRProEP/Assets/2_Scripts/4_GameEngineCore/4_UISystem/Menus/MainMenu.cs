@@ -7,13 +7,14 @@ using VRProEP.ExperimentCore;
 
 public class MainMenu : MonoBehaviour {
 
+    public GameObject modeSelection;
     public GameObject userOptionsMenu;
     public GameObject avatarOptionsButton;
     public GameObject avatarOptionsMenu;
     public GameObject sensorOptionsButton;
     public GameObject sensorOptionsMenu;
     public GameObject modeSelectionButton;
-    public GameObject modeSelectionMenu;
+    public GameObject experimentSelectionMenu;
     public TextMeshProUGUI activeUserTMP;
     public TextMeshProUGUI sensorTMP;
     public TextMeshProUGUI experimentSensorsTMP;
@@ -133,7 +134,15 @@ public class MainMenu : MonoBehaviour {
         // Clear log
         logManager.ClearLog();
         // Switch
-        modeSelectionMenu.SetActive(true);
+        experimentSelectionMenu.SetActive(true);
+        gameObject.SetActive(false);
+    }
+
+
+    public void ReturnToModeSelection()
+    {
+        // Return to main menu
+        modeSelection.SetActive(true);
         gameObject.SetActive(false);
     }
 }

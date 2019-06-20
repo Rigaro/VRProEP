@@ -4,8 +4,10 @@ using System.Collections.Generic;
 // Unity
 using UnityEngine;
 using UnityEngine.XR;
+// SteamVR
+using Valve.VR;
 // VRProEP
-using VRProEP.Utilities;
+using VRProEP.AdaptationCore;
 
 namespace VRProEP.ProsthesisCore
 {
@@ -70,7 +72,7 @@ namespace VRProEP.ProsthesisCore
             InputTracking.GetNodeStates(xrNodes);
             foreach (XRNodeState ns in xrNodes)
             {
-                Debug.Log(ns.nodeType.ToString());
+                Debug.Log("Device: " + ns.uniqueID + ", type: " + ns.nodeType.ToString());
             }
         }
 
@@ -78,7 +80,7 @@ namespace VRProEP.ProsthesisCore
         {
             this.trackerTransform = trackerTransform ?? throw new System.ArgumentNullException();
         }
-        
+
         /// <summary>
         /// Uses Unity's XR API to extract angular velocity information from the tracker.
         /// </summary>
@@ -101,7 +103,7 @@ namespace VRProEP.ProsthesisCore
             {
                 // If a hardware tracker is found, and matches index.
                 //Debug.Log(ns.nodeType.ToString() + " " + currentTracker + " " + trackerIndexes[trackerNumber - 1]);
-                if (ns.nodeType == XRNode.HardwareTracker && currentTracker == trackerIndexes[trackerNumber - 1])
+                if (ns.nodeType == XRNode.HardwareTracker && currentTracker == (trackerIndexes[trackerNumber - 1]))
                 {
                     //Debug.Log(currentTracker.ToString());
                     if (ns.TryGetAngularVelocity(out localAngVel))
@@ -126,10 +128,15 @@ namespace VRProEP.ProsthesisCore
             // Get node information
             InputTracking.GetNodeStates(xrNodes);
             // Look for Hardware trackers
+            // Generate a list with tracker indexes
+            List<float> trackerIndexes = new List<float>(totalTrackerNumber);
+            for (int i = 1; i <= totalTrackerNumber; i++)
+                trackerIndexes.Add(i);
+            // Find this hardare tracker
             int currentTracker = 1;
             foreach (XRNodeState ns in xrNodes)
             {
-                if (ns.nodeType == XRNode.HardwareTracker && currentTracker == trackerNumber)
+                if (ns.nodeType == XRNode.HardwareTracker && currentTracker == (trackerIndexes[trackerNumber - 1]))
                 {
                     Debug.Log(currentTracker.ToString());
                     if (ns.TryGetRotation(out localAngPos))

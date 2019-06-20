@@ -2,15 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR;
+using VRProEP.GameEngineCore;
 
 public class ModeSelectionMenu : MonoBehaviour {
-
-    public GameObject mainMenu;
-    public GameObject experimentSelectionMenu;
+    
+    public GameObject experimentMenu;
     public LogManager logManager;
 
     public void LoadPlayground()
     {
+        // Load player and able bodied avatar (without adaptive tracker).
+        SaveSystem.LoadUserData("MD1942");
+        AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
+        AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied, false);
+        // Change the number for the forearm tracker being used
+        GameObject faTrackerGO = GameObject.FindGameObjectWithTag("ForearmTracker");
+        SteamVR_TrackedObject steamvrConfig = faTrackerGO.GetComponent<SteamVR_TrackedObject>();
+        steamvrConfig.index = SteamVR_TrackedObject.EIndex.Device5;
+        //
         KeepOnLoad();
         // Load level.
         SteamVR_LoadLevel.Begin("DemoPlayground");
@@ -32,14 +41,16 @@ public class ModeSelectionMenu : MonoBehaviour {
 
     public void LoadExperimentSelectionMenu()
     {
-        experimentSelectionMenu.SetActive(true);
+        experimentMenu.SetActive(true);
         gameObject.SetActive(false);
     }
 
-    public void ReturnToMainMenu()
+    public void ExitGame()
     {
-        // Return to main menu
-        mainMenu.SetActive(true);
-        gameObject.SetActive(false);
+    #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+    #else
+            Application.Quit();
+    #endif
     }
 }

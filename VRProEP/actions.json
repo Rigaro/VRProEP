@@ -79,6 +79,36 @@
       "requirement": "mandatory"
     },
     {
+      "name": "/actions/vrproep/in/ResidualLimbPose",
+      "type": "pose",
+      "requirement": "optional"
+    },
+    {
+      "name": "/actions/vrproep/in/ForearmPose",
+      "type": "pose",
+      "requirement": "optional"
+    },
+    {
+      "name": "/actions/vrproep/in/ShoulderPose",
+      "type": "pose",
+      "requirement": "optional"
+    },
+    {
+      "name": "/actions/vrproep/in/C7Pose",
+      "type": "pose",
+      "requirement": "optional"
+    },
+    {
+      "name": "/actions/vrproep/in/MRCameraPose",
+      "type": "pose",
+      "requirement": "optional"
+    },
+    {
+      "name": "/actions/vrproep/in/HandPose",
+      "type": "pose",
+      "requirement": "mandatory"
+    },
+    {
       "name": "/actions/vrproep/out/HapticFeedback",
       "type": "vibration"
     }

@@ -16,6 +16,7 @@ namespace VRProEP.ProsthesisCore
         public const string CMD_SET_ACTIVE_REFGEN = "CMD_SET_ACTIVE_REFGEN";
         public const string CMD_ADD_SENSOR = "CMD_ADD_SENSOR";
         public const string CMD_ADD_REFGEN = "CMD_ADD_REFGEN";
+        public const string CMD_SET_SYNERGY = "CMD_SET_SYNERGY";
         public const string VAL_SENSOR_VIVETRACKER = "VAL_SENSOR_VIVETRACKER";
         public const string VAL_SENSOR_VIVECONTROLLER = "VAL_SENSOR_VIVECONTROLLER";
         public const string VAL_SENSOR_OCULUSTOUCH = "VAL_SENSOR_OCULUSTOUCH";
@@ -227,6 +228,24 @@ namespace VRProEP.ProsthesisCore
             return references.ToArray();
         }
 
+        /// <summary>
+        /// Sets the synergy value for a linear kinematic synergy type reference generator.
+        /// </summary>
+        /// <param name="channel">The channel number.</param>
+        /// <param name="theta">The new synergy value.</param>
+        private void SetLinKinSynergy(int channel, float theta)
+        {
+            // Check that the active reference generator is of the right type
+            if (GetActiveReferenceGeneratorType() == ReferenceGeneratorType.LinearKinematicSynergy)
+            {
+                // Type cast to be able to access the right method
+                LinearKinematicSynergy typeCastActiveGenerator = (LinearKinematicSynergy)activeGenerator;
+                typeCastActiveGenerator.UpdateParameter(channel, theta);
+            }
+            else
+                throw new System.ArgumentException("Invalid value reference generator. Active RG type: " + GetActiveReferenceGeneratorType());
+        }
+
 
         /// <summary>
         /// Updates the configuration of a parameter defined by the "command" parameter to the provided "value".
@@ -259,6 +278,12 @@ namespace VRProEP.ProsthesisCore
                 case CMD_SET_ACTIVE_REFGEN:
                     if (value is ReferenceGeneratorType)
                         SetActiveReferenceGenerator(value);
+                    else
+                        throw new System.ArgumentException("Invalid value provided.");
+                    break;
+                case CMD_SET_SYNERGY:
+                    if (value is float)
+                        SetLinKinSynergy(0, value);
                     else
                         throw new System.ArgumentException("Invalid value provided.");
                     break;
