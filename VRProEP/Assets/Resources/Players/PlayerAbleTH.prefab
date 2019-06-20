@@ -877,7 +877,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4083563655917994}
-  - component: {fileID: 114153563392306608}
+  - component: {fileID: 4129350109313156106}
   m_Layer: 0
   m_Name: ResidualLimbTracker
   m_TagString: ResidualLimbTracker
@@ -900,7 +900,7 @@ Transform:
   m_Father: {fileID: 4628314277051796}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114153563392306608
+--- !u!114 &4129350109313156106
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -912,7 +912,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d37c2cf88f7c59f4c8cf5d3812568143, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  index: 7
+  index: 4
   origin: {fileID: 0}
 --- !u!1 &1451517636235344
 GameObject:
@@ -1043,7 +1043,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   poseAction:
-    actionPath: /actions/default/in/Pose
+    actionPath: /actions/vrproep/in/HandPose
     needsReinit: 0
   inputSource: 2
   origin: {fileID: 0}
@@ -2065,7 +2065,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   poseAction:
-    actionPath: /actions/default/in/Pose
+    actionPath: /actions/vrproep/in/HandPose
     needsReinit: 0
   inputSource: 1
   origin: {fileID: 0}

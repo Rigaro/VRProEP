@@ -53,6 +53,18 @@ namespace Valve.VR
         
         private static SteamVR_Action_Boolean p_vrproep_ObjectInteractButton;
         
+        private static SteamVR_Action_Pose p_vrproep_ResidualLimbPose;
+        
+        private static SteamVR_Action_Pose p_vrproep_ForearmPose;
+        
+        private static SteamVR_Action_Pose p_vrproep_ShoulderPose;
+        
+        private static SteamVR_Action_Pose p_vrproep_C7Pose;
+        
+        private static SteamVR_Action_Pose p_vrproep_MRCameraPose;
+        
+        private static SteamVR_Action_Pose p_vrproep_HandPose;
+        
         private static SteamVR_Action_Vibration p_vrproep_HapticFeedback;
         
         public static SteamVR_Action_Boolean default_InteractUI
@@ -199,6 +211,54 @@ namespace Valve.VR
             }
         }
         
+        public static SteamVR_Action_Pose vrproep_ResidualLimbPose
+        {
+            get
+            {
+                return SteamVR_Actions.p_vrproep_ResidualLimbPose.GetCopy<SteamVR_Action_Pose>();
+            }
+        }
+        
+        public static SteamVR_Action_Pose vrproep_ForearmPose
+        {
+            get
+            {
+                return SteamVR_Actions.p_vrproep_ForearmPose.GetCopy<SteamVR_Action_Pose>();
+            }
+        }
+        
+        public static SteamVR_Action_Pose vrproep_ShoulderPose
+        {
+            get
+            {
+                return SteamVR_Actions.p_vrproep_ShoulderPose.GetCopy<SteamVR_Action_Pose>();
+            }
+        }
+        
+        public static SteamVR_Action_Pose vrproep_C7Pose
+        {
+            get
+            {
+                return SteamVR_Actions.p_vrproep_C7Pose.GetCopy<SteamVR_Action_Pose>();
+            }
+        }
+        
+        public static SteamVR_Action_Pose vrproep_MRCameraPose
+        {
+            get
+            {
+                return SteamVR_Actions.p_vrproep_MRCameraPose.GetCopy<SteamVR_Action_Pose>();
+            }
+        }
+        
+        public static SteamVR_Action_Pose vrproep_HandPose
+        {
+            get
+            {
+                return SteamVR_Actions.p_vrproep_HandPose.GetCopy<SteamVR_Action_Pose>();
+            }
+        }
+        
         public static SteamVR_Action_Vibration vrproep_HapticFeedback
         {
             get
@@ -228,6 +288,12 @@ namespace Valve.VR
                     SteamVR_Actions.vrproep_Trackpad,
                     SteamVR_Actions.vrproep_InterfaceEnableButton,
                     SteamVR_Actions.vrproep_ObjectInteractButton,
+                    SteamVR_Actions.vrproep_ResidualLimbPose,
+                    SteamVR_Actions.vrproep_ForearmPose,
+                    SteamVR_Actions.vrproep_ShoulderPose,
+                    SteamVR_Actions.vrproep_C7Pose,
+                    SteamVR_Actions.vrproep_MRCameraPose,
+                    SteamVR_Actions.vrproep_HandPose,
                     SteamVR_Actions.vrproep_HapticFeedback};
             Valve.VR.SteamVR_Input.actionsIn = new Valve.VR.ISteamVR_Action_In[] {
                     SteamVR_Actions.default_InteractUI,
@@ -246,7 +312,13 @@ namespace Valve.VR
                     SteamVR_Actions.buggy_Reset,
                     SteamVR_Actions.vrproep_Trackpad,
                     SteamVR_Actions.vrproep_InterfaceEnableButton,
-                    SteamVR_Actions.vrproep_ObjectInteractButton};
+                    SteamVR_Actions.vrproep_ObjectInteractButton,
+                    SteamVR_Actions.vrproep_ResidualLimbPose,
+                    SteamVR_Actions.vrproep_ForearmPose,
+                    SteamVR_Actions.vrproep_ShoulderPose,
+                    SteamVR_Actions.vrproep_C7Pose,
+                    SteamVR_Actions.vrproep_MRCameraPose,
+                    SteamVR_Actions.vrproep_HandPose};
             Valve.VR.SteamVR_Input.actionsOut = new Valve.VR.ISteamVR_Action_Out[] {
                     SteamVR_Actions.default_Haptic,
                     SteamVR_Actions.vrproep_HapticFeedback};
@@ -254,7 +326,13 @@ namespace Valve.VR
                     SteamVR_Actions.default_Haptic,
                     SteamVR_Actions.vrproep_HapticFeedback};
             Valve.VR.SteamVR_Input.actionsPose = new Valve.VR.SteamVR_Action_Pose[] {
-                    SteamVR_Actions.default_Pose};
+                    SteamVR_Actions.default_Pose,
+                    SteamVR_Actions.vrproep_ResidualLimbPose,
+                    SteamVR_Actions.vrproep_ForearmPose,
+                    SteamVR_Actions.vrproep_ShoulderPose,
+                    SteamVR_Actions.vrproep_C7Pose,
+                    SteamVR_Actions.vrproep_MRCameraPose,
+                    SteamVR_Actions.vrproep_HandPose};
             Valve.VR.SteamVR_Input.actionsBoolean = new Valve.VR.SteamVR_Action_Boolean[] {
                     SteamVR_Actions.default_InteractUI,
                     SteamVR_Actions.default_Teleport,
@@ -313,6 +391,12 @@ namespace Valve.VR
             SteamVR_Actions.p_vrproep_Trackpad = ((SteamVR_Action_Vector2)(SteamVR_Action.Create<SteamVR_Action_Vector2>("/actions/vrproep/in/Trackpad")));
             SteamVR_Actions.p_vrproep_InterfaceEnableButton = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/vrproep/in/InterfaceEnableButton")));
             SteamVR_Actions.p_vrproep_ObjectInteractButton = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/vrproep/in/ObjectInteractButton")));
+            SteamVR_Actions.p_vrproep_ResidualLimbPose = ((SteamVR_Action_Pose)(SteamVR_Action.Create<SteamVR_Action_Pose>("/actions/vrproep/in/ResidualLimbPose")));
+            SteamVR_Actions.p_vrproep_ForearmPose = ((SteamVR_Action_Pose)(SteamVR_Action.Create<SteamVR_Action_Pose>("/actions/vrproep/in/ForearmPose")));
+            SteamVR_Actions.p_vrproep_ShoulderPose = ((SteamVR_Action_Pose)(SteamVR_Action.Create<SteamVR_Action_Pose>("/actions/vrproep/in/ShoulderPose")));
+            SteamVR_Actions.p_vrproep_C7Pose = ((SteamVR_Action_Pose)(SteamVR_Action.Create<SteamVR_Action_Pose>("/actions/vrproep/in/C7Pose")));
+            SteamVR_Actions.p_vrproep_MRCameraPose = ((SteamVR_Action_Pose)(SteamVR_Action.Create<SteamVR_Action_Pose>("/actions/vrproep/in/MRCameraPose")));
+            SteamVR_Actions.p_vrproep_HandPose = ((SteamVR_Action_Pose)(SteamVR_Action.Create<SteamVR_Action_Pose>("/actions/vrproep/in/HandPose")));
             SteamVR_Actions.p_vrproep_HapticFeedback = ((SteamVR_Action_Vibration)(SteamVR_Action.Create<SteamVR_Action_Vibration>("/actions/vrproep/out/HapticFeedback")));
         }
     }

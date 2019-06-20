@@ -522,6 +522,7 @@ public class PlaygroundGM : GameMaster
     {
         // Fade
         SteamVR_Fade.Start(Color.black, 0.0f);
+
         // Load
         avatarType = AvatarType.AbleBodied;
         AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
@@ -532,6 +533,11 @@ public class PlaygroundGM : GameMaster
         InitializeUI();
         // Fade
         SteamVR_Fade.Start(Color.black, 0.0f);
+
+        // Change the number for the forearm tracker being used
+        GameObject faTrackerGO = GameObject.FindGameObjectWithTag("ForearmTracker");
+        SteamVR_TrackedObject steamvrConfig = faTrackerGO.GetComponent<SteamVR_TrackedObject>();
+        steamvrConfig.index = SteamVR_TrackedObject.EIndex.Device5;
 
         // Teleport to the start position
         StartCoroutine(TeleportCoroutine());
@@ -548,11 +554,6 @@ public class PlaygroundGM : GameMaster
         AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
         // Fade
         SteamVR_Fade.Start(Color.black, 0.0f);
-
-        // Change the number for the residual limb tracker being used
-        GameObject rlTrackerGO = GameObject.FindGameObjectWithTag("ResidualLimbTracker");
-        SteamVR_TrackedObject steamvrConfig = rlTrackerGO.GetComponent<SteamVR_TrackedObject>();
-        steamvrConfig.index = SteamVR_TrackedObject.EIndex.Device6;
 
         // Initialize prosthesis
         GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");

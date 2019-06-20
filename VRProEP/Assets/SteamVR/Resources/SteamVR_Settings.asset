@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pauseGameWhenDashboardVisible: 1
   lockPhysicsUpdateRateToRenderFrequency: 1
-  trackingSpace: 1
+  trackingSpaceOrigin: 1
   actionsFilePath: actions.json
   steamVRInputPath: SteamVR_Input
   inputUpdateMode: 2
@@ -22,3 +22,9 @@ MonoBehaviour:
   activateFirstActionSetOnStart: 1
   editorAppKey: application.generated.unity.vrproep.exe
   autoEnableVR: 1
+  legacyMixedRealityCamera: 1
+  mixedRealityCameraPose:
+    actionPath: /actions/vrproep/in/MRCameraPose
+    needsReinit: 1
+  mixedRealityCameraInputSource: 11
+  mixedRealityActionSetAutoEnable: 1

@@ -15,6 +15,10 @@ public class ModeSelectionMenu : MonoBehaviour {
         SaveSystem.LoadUserData("MD1942");
         AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
         AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied, false);
+        // Change the number for the forearm tracker being used
+        GameObject faTrackerGO = GameObject.FindGameObjectWithTag("ForearmTracker");
+        SteamVR_TrackedObject steamvrConfig = faTrackerGO.GetComponent<SteamVR_TrackedObject>();
+        steamvrConfig.index = SteamVR_TrackedObject.EIndex.Device5;
         //
         KeepOnLoad();
         // Load level.

@@ -246,6 +246,7 @@ namespace VRProEP.GameEngineCore
 
                             // Instantiate
                             Object.Instantiate(playerAbleTHPrefab);
+                            // Make sure the correct VIVE Tracker is selected for the upper arm
                             isPlayerAvailable = true;
                             break;
                         default:
