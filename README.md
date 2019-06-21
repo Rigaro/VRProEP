@@ -9,3 +9,8 @@ Wiki: https://github.com/Rigaro/VRProEP/wiki
 - Unity Version: 2018.3.8f1
 
 Runs from Unity Editor. See Wiki for more information.
+
+## Integrations
+### LIV
+Software to create Mixed reality videos.
+https://liv.tv/
