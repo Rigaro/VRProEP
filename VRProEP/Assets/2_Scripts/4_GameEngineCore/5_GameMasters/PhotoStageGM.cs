@@ -17,48 +17,43 @@ public class PhotoStageGM : GameMaster
 
     private ConfigurableElbowManager elbowManager;
 
-    void Awake()
+
+    private void Awake()
+    {
+        LoadAbleBodiedAvatar();
+    }
+
+    public void LoadAbleBodiedAvatar()
+    {
+        // Load
+        SaveSystem.LoadUserData("RG1988");
+        AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
+        AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied, false);
+        // Initialize UI.
+        //InitializeUI();
+
+        // Change the number for the forearm tracker being used
+        GameObject faTrackerGO = GameObject.FindGameObjectWithTag("ForearmTracker");
+        SteamVR_TrackedObject steamvrConfig = faTrackerGO.GetComponent<SteamVR_TrackedObject>();
+        steamvrConfig.index = SteamVR_TrackedObject.EIndex.Device5;
+    }
+
+    public void LoadTHAvatar()
     {
         SaveSystem.LoadUserData("RG1988");
         AvatarSystem.LoadPlayer(UserType.AbleBodied, AvatarType.Transhumeral);
         AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
+
         // Initialize prosthesis
         GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
         elbowManager = prosthesisManagerGO.AddComponent<ConfigurableElbowManager>();
-        elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + SaveSystem.ActiveUser.handLength / 2.0f), synergyValue);
-        // Set the reference generator to linear synergy.
+        elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + SaveSystem.ActiveUser.handLength / 2.0f), 1.5f);
+        // Set the reference generator to jacobian-based.
         elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
 
-    }
-
-    private void Start()
-    {
         // Initialize UI.
         //InitializeUI();
-
-        // Configure the grasp manager
-        GameObject graspManagerGO = GameObject.FindGameObjectWithTag("GraspManager");
-        if (graspManagerGO == null)
-            throw new System.Exception("Grasp Manager not found.");
-        GraspManager graspManager = graspManagerGO.GetComponent<GraspManager>();
-        graspManager.managerType = GraspManager.GraspManagerType.Controller;
-        graspManager.managerMode = GraspManager.GraspManagerMode.Open;
-
-        AvatarSystem.EnableAvatarColliders();
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        // Move object back to start and set synergy
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            objectTransform.localPosition = objectStart;
-            objectTransform.rotation = Quaternion.identity;
-            elbowManager.SetSynergy(synergyValue);
-        }
-    }
-
 
     #region Inherited methods overrides
 
