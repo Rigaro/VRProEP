@@ -15,12 +15,6 @@ using UnityEngine;
 
 namespace VRProEP.Utilities
 {
-    public enum UDPType
-    {
-        UDP_Async,
-        UDP_Sync
-    }
-
     /// <summary>
     /// Manager for WiFi sensors implemented with UDP protocol.
     /// </summary>

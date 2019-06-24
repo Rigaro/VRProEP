@@ -13,7 +13,9 @@ using UnityEngine;
 
 namespace VRProEP.Utilities
 {
-    public enum UDPDeviceType { Writer, Listener, Dual };
+    public enum UDPType { UDP_Async, UDP_Sync }
+
+    public enum UDPDeviceType { Writer, Listener, Dual }
 
     public abstract class UDPDeviceManager : ICommunicationsManager
     {
@@ -38,32 +40,8 @@ namespace VRProEP.Utilities
             public IPEndPoint e;
         }
         private UdpState udpState;
-
-
-        public UDPDeviceManager(string ipAddress, int port, string deviceName, UDPDeviceType deviceType)
-        {
-            this.deviceName = deviceName;
-            this.deviceType = deviceType;
-
-            // Set UDP data
-            udpType = UDPType.UDP_Async;
-            ip = IPAddress.Parse(ipAddress);
-            this.port = port;
-
-            // Connect
-            EstablishConnection();
-
-            // Start listening when listener type
-            if (deviceType == UDPDeviceType.Listener || deviceType == UDPDeviceType.Dual)
-            {
-                // Create and start communication thread
-                thread = new Thread(new ThreadStart(ListenForData));
-                thread.Start();
-            }
-        }
-
-
-        public UDPDeviceManager(string ipAddress, int port, string deviceName, UDPDeviceType deviceType, UDPType udpType)
+               
+        public UDPDeviceManager(string ipAddress, int port, string deviceName, UDPDeviceType deviceType, UDPType udpType = UDPType.UDP_Async)
         {
             this.deviceName = deviceName;
             this.deviceType = deviceType;
@@ -199,7 +177,7 @@ namespace VRProEP.Utilities
         /// Sends a data string through UDP
         /// </summary>
         /// <param name="data"></param>
-        protected void WriteData(string data)
+        protected void TransferData(string data)
         {
             if (deviceType == UDPDeviceType.Writer || deviceType == UDPDeviceType.Dual)
             {
