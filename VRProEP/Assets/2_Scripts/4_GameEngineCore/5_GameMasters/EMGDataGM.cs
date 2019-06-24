@@ -495,7 +495,7 @@ public class EMGDataGM : GameMaster
         {
             if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
             {
-                UDPClientManager udpSensor = (UDPClientManager)sensor;
+                UDPSensorManager udpSensor = (UDPSensorManager)sensor;
                 udpSensor.StopSensorReading();
             }
         }
@@ -533,7 +533,7 @@ public class EMGDataGM : GameMaster
                 {
                     EMGAvailable = true;
 
-                    UDPClientManager udpSensor = (UDPClientManager)sensor;
+                    UDPSensorManager udpSensor = (UDPSensorManager)sensor;
                     //Debug.Log(wifiSensor.RunThread);
                     udpSensor.StartSensorReading();
                     //Debug.Log(wifiSensor.RunThread);

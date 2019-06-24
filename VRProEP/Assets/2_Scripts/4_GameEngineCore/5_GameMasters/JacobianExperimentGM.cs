@@ -634,7 +634,7 @@ public class JacobianExperimentGM : GameMaster
         {
             if (sensor != null && sensor.GetSensorType().Equals(SensorType.EMGWiFi))
             {
-                UDPClientManager udpSensor = (UDPClientManager)sensor;
+                UDPSensorManager udpSensor = (UDPSensorManager)sensor;
                 udpSensor.StopSensorReading();
             }
         }
@@ -698,7 +698,7 @@ public class JacobianExperimentGM : GameMaster
                 if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
                 {
                     EMGAvailable = true;
-                    UDPClientManager udpSensor = (UDPClientManager)sensor;
+                    UDPSensorManager udpSensor = (UDPSensorManager)sensor;
                     //Debug.Log(wifiSensor.RunThread);
                     udpSensor.StartSensorReading();
                     //Debug.Log(wifiSensor.RunThread);
@@ -892,7 +892,7 @@ public class JacobianExperimentGM : GameMaster
             {
                 if (sensor != null && sensor.GetSensorType().Equals(SensorType.EMGWiFi))
                 {
-                    UDPClientManager udpSensor = (UDPClientManager)sensor;
+                    UDPSensorManager udpSensor = (UDPSensorManager)sensor;
                     udpSensor.StopSensorReading();
                 }
             }

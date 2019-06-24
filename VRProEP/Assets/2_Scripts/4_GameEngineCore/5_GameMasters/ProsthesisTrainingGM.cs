@@ -430,7 +430,7 @@ public class ProsthesisTrainingGM : GameMaster
         {
             if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
             {
-                UDPClientManager udpSensor = (UDPClientManager)sensor;
+                UDPSensorManager udpSensor = (UDPSensorManager)sensor;
                 udpSensor.StopSensorReading();
             }
         }
@@ -528,7 +528,7 @@ public class ProsthesisTrainingGM : GameMaster
                 if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
                 {
                     EMGAvailable = true;
-                    UDPClientManager udpSensor = (UDPClientManager)sensor;
+                    UDPSensorManager udpSensor = (UDPSensorManager)sensor;
                     udpSensor.StartSensorReading();
                 }
             }

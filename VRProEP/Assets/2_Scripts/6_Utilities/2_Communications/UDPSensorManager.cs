@@ -10,8 +10,6 @@ using System.Net.Sockets;
 // Threading includes
 using System.Threading;
 
-// VRProEP includes
-
 // Debug
 using UnityEngine;
 
@@ -26,9 +24,9 @@ namespace VRProEP.Utilities
     /// <summary>
     /// Manager for WiFi sensors implemented with UDP protocol.
     /// </summary>
-    public abstract class UDPClientManager
+    public abstract class UDPSensorManager
     {
-        // Generic sensor info
+        // Generic device info
         private int channelSize;
         private string deviceName;
 
@@ -60,12 +58,12 @@ namespace VRProEP.Utilities
         private const string ACKNOWLEDGE_CHANNEL = "ack_chan";
 
         /// <summary>
-        /// Manager for WiFi sensors implemented with UDP protocol.
+        /// Manager for sensors implemented with UDP protocol.
         /// </summary>
         /// <param name="ipAddress">The IP address of the sensor to connect to.</param>
         /// <param name="port">The UDP port to use for data transfer.</param>
         /// <param name="deviceName">The device name.</param>
-        public UDPClientManager(string ipAddress, int port, string deviceName)
+        public UDPSensorManager(string ipAddress, int port, string deviceName)
         {
             channelSize = 1;
             this.deviceName = deviceName;
@@ -86,14 +84,14 @@ namespace VRProEP.Utilities
         }
 
         /// <summary>
-        /// Manager for WiFi sensors implemented with UDP protocol.
+        /// Manager for sensors implemented with UDP protocol.
         /// </summary>
         /// <param name="ipAddress">The IP address of the sensor to connect to.</param>
         /// <param name="port">The UDP port to use for data transfer.</param>
         /// <param name="channelSize">The number of sensor channels available.</param>
         /// <param name="deviceName">The device name.</param>
         /// <param name="udpType">The type of UDP connection to use (Asynchronous or Synchronous).</param>
-        public UDPClientManager(string ipAddress, int port, int channelSize, string deviceName, UDPType udpType)
+        public UDPSensorManager(string ipAddress, int port, int channelSize, string deviceName, UDPType udpType)
         {
             // Set sensor data
             if (channelSize <= 0)
@@ -124,7 +122,7 @@ namespace VRProEP.Utilities
         /// <summary>
         /// Stop the thread when destroying and close the UDP port.
         /// </summary>
-        ~UDPClientManager()
+        ~UDPSensorManager()
         {
             StopSensorReading();
             udpState.u.Close();

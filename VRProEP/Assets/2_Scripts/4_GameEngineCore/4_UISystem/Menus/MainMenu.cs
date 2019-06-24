@@ -97,7 +97,7 @@ public class MainMenu : MonoBehaviour {
             // Stop all UDP sensors
             if (sensor.GetSensorType() == SensorType.EMGWiFi)
             {
-                UDPClientManager udpSensor = (UDPClientManager)sensor;
+                UDPSensorManager udpSensor = (UDPSensorManager)sensor;
                 udpSensor.StopSensorReading();
             }
         }

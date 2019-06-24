@@ -7,7 +7,7 @@ using VRProEP.Utilities;
 namespace VRProEP.ProsthesisCore
 {
 
-    public class EMGWiFiManager : UDPClientManager, ISensor
+    public class EMGWiFiManager : UDPSensorManager, ISensor
     {
         private List<float> gains = new List<float>();
         private List<float> lowerLimits = new List<float>();

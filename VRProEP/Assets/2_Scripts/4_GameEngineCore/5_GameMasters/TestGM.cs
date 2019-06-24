@@ -423,7 +423,7 @@ public class TestGM : GameMaster
         {
             if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
             {
-                UDPClientManager udpSensor = (UDPClientManager)sensor;
+                UDPSensorManager udpSensor = (UDPSensorManager)sensor;
                 udpSensor.StopSensorReading();
             }
         }
