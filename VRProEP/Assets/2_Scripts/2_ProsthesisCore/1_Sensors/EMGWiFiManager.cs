@@ -7,7 +7,7 @@ using VRProEP.Utilities;
 namespace VRProEP.ProsthesisCore
 {
 
-    public class EMGWiFiManager : UDPClientManager, ISensor, IConfigurable
+    public class EMGWiFiManager : UDPClientManager, ISensor
     {
         private List<float> gains = new List<float>();
         private List<float> lowerLimits = new List<float>();
@@ -56,7 +56,7 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <param name="channel">The channel number.</param>
         /// <returns>EMG amplitude data for the given channel.</returns>
-        public override float GetRawData(int channel)
+        public float GetRawData(int channel)
         {
             if (channel >= ChannelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels. The number of available channels is: " + ChannelSize + ".");
@@ -71,7 +71,7 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <param name="channel">The channel/data identifier.</param>
         /// <returns>EMG amplitude data for the given channel.</returns>
-        public override float GetRawData(string channel)
+        public float GetRawData(string channel)
         {
             throw new System.NotImplementedException("Not implemented, use int version.");
         }
@@ -80,7 +80,7 @@ namespace VRProEP.ProsthesisCore
         /// Returns EMG amplitude data for all channels in a 0-1023 range.
         /// </summary>
         /// <returns>The array with all EMG amplitude data.</returns>
-        public override float[] GetAllRawData()
+        public float[] GetAllRawData()
         {
             // Get current sensor data from memory.
             float[] sensorValues = GetCurrentSensorValues();
@@ -111,7 +111,7 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <param name="channel">The channel number.</param>
         /// <returns>EMG amplitude data for the given channel.</returns>
-        public override float GetProcessedData(int channel)
+        public float GetProcessedData(int channel)
         {
             if (channel >= ChannelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels. The number of available channels is: " + ChannelSize + ".");
@@ -126,7 +126,7 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <param name="channel">The channel/data identifier.</param>
         /// <returns>Pre-processed sensor data for the given channel.</returns>
-        public override float GetProcessedData(string channel)
+        public float GetProcessedData(string channel)
         {
             throw new System.NotImplementedException("Not implemented, use int version.");
         }
@@ -135,7 +135,7 @@ namespace VRProEP.ProsthesisCore
         /// Returns EMG amplitude data for all channels in a 0-100 range.
         /// </summary>
         /// <returns>The array with all EMG amplitude data.</returns>
-        public override float[] GetAllProcessedData()
+        public float[] GetAllProcessedData()
         {
             // Get current sensor data from memory.
             float[] sensorValues = GetCurrentSensorValues();
@@ -181,28 +181,6 @@ namespace VRProEP.ProsthesisCore
         public SensorType GetSensorType()
         {
             return sensorType;
-        }
-
-        /// <summary>
-        /// Updates the configuration of a parameter defined by the "command" parameter to the provided "value".
-        /// </summary>
-        /// <remarks>Commands are defined by the implementing class.</remarks>
-        /// <param name="command">The configuration command as established by the implementing class.</param>
-        /// <param name="value">The value to update the configuration parameter determined by "command".</param>
-        public override void Configure(string command, dynamic value)
-        {
-
-        }
-
-        /// <summary>
-        /// Updates the configuration of a parameter defined by the "command" parameter to the provided "value".
-        /// </summary>
-        /// <remarks>Commands are defined by the implementing class.</remarks>
-        /// <param name="command">The configuration command as established by the implementing class.</param>
-        /// <param name="value">The value to update the configuration parameter determined by "command".</param>
-        public override void Configure(string command, string value)
-        {
-
         }
     }
 

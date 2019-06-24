@@ -81,7 +81,7 @@ namespace VRProEP.Utilities
             EstablishConnection();
 
             // Create and start communication thread
-            thread = new Thread(new ThreadStart(GetDataFromSensor));
+            thread = new Thread(new ThreadStart(GetDataFromDevice));
             thread.Start();            
         }
 
@@ -117,7 +117,7 @@ namespace VRProEP.Utilities
             EstablishConnection();
 
             // Create and start communication thread
-            thread = new Thread(new ThreadStart(GetDataFromSensor));
+            thread = new Thread(new ThreadStart(GetDataFromDevice));
             thread.Start();
         }
 
@@ -154,7 +154,7 @@ namespace VRProEP.Utilities
         /// <summary>
         /// Sends the current command to the sensor to retrieve data.
         /// </summary>
-        private void GetDataFromSensor()
+        private void GetDataFromDevice()
         {
             // Continuously read from sensor while active.
             while(runThread)
@@ -255,7 +255,7 @@ namespace VRProEP.Utilities
                 //Debug.Log(ip + " " + port);
                 runThread = true;
                 // Create and start communication thread
-                thread = new Thread(new ThreadStart(GetDataFromSensor));
+                thread = new Thread(new ThreadStart(GetDataFromDevice));
                 thread.Start();
             }
         }
@@ -267,63 +267,6 @@ namespace VRProEP.Utilities
         {
             runThread = false;
         }
-               
-        /// <summary>
-        /// Returns raw sensor data for the selected channel.
-        /// </summary>
-        /// <param name="channel">The channel number.</param>
-        /// <returns>Raw sensor data for the given channel.</returns>
-        public abstract float GetRawData(int channel);
-
-        /// <summary>
-        /// Returns raw sensor data for the selected channel.
-        /// </summary>
-        /// <param name="channel">The channel/data identifier.</param>
-        /// <returns>Raw sensor data for the given channel.</returns>
-        public abstract float GetRawData(string channel);
-
-        /// <summary>
-        /// Returns all raw sensor data in an array.
-        /// </summary>
-        /// <returns>The array with all raw sensor data.</returns>
-        public abstract float[] GetAllRawData();
-
-        /// <summary>
-        /// Returns pre-processed sensor data for the selected channel.
-        /// </summary>
-        /// <param name="channel">The channel number.</param>
-        /// <returns>Pre-processed sensor data for the given channel.</returns>
-        public abstract float GetProcessedData(int channel);
-
-        /// <summary>
-        /// Returns pre-processed sensor data for the selected channel.
-        /// </summary>
-        /// <param name="channel">The channel/data identifier.</param>
-        /// <returns>Pre-processed sensor data for the given channel.</returns>
-        public abstract float GetProcessedData(string channel);
-
-        /// <summary>
-        /// Returns all pre-processed sensor data in an array.
-        /// </summary>
-        /// <returns>The array with all pre-processed sensor data.</returns>
-        public abstract float[] GetAllProcessedData();
-
-        /// <summary>
-        /// Updates the configuration of a parameter defined by the "command" parameter to the provided "value".
-        /// </summary>
-        /// <remarks>Commands are defined by the implementing class.</remarks>
-        /// <param name="command">The configuration command as established by the implementing class.</param>
-        /// <param name="value">The value to update the configuration parameter determined by "command".</param>
-        public abstract void Configure(string command, dynamic value);
-
-        /// <summary>
-        /// Updates the configuration of a parameter defined by the "command" parameter to the provided "value".
-        /// </summary>
-        /// <remarks>Commands are defined by the implementing class.</remarks>
-        /// <param name="command">The configuration command as established by the implementing class.</param>
-        /// <param name="value">The value to update the configuration parameter determined by "command".</param>
-        public abstract void Configure(string command, string value);
-
 
         // Encapsulation
         public int ChannelSize
