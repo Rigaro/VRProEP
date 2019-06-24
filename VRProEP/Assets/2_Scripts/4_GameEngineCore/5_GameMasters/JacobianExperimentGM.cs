@@ -7,6 +7,7 @@ using Valve.VR;
 using VRProEP.ExperimentCore;
 using VRProEP.GameEngineCore;
 using VRProEP.ProsthesisCore;
+using VRProEP.Utilities;
 
 public class JacobianExperimentGM : GameMaster
 {
@@ -633,8 +634,8 @@ public class JacobianExperimentGM : GameMaster
         {
             if (sensor != null && sensor.GetSensorType().Equals(SensorType.EMGWiFi))
             {
-                WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
-                wifiSensor.StopSensorReading();
+                UDPClientManager udpSensor = (UDPClientManager)sensor;
+                udpSensor.StopSensorReading();
             }
         }
 
@@ -697,9 +698,9 @@ public class JacobianExperimentGM : GameMaster
                 if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
                 {
                     EMGAvailable = true;
-                    WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
+                    UDPClientManager udpSensor = (UDPClientManager)sensor;
                     //Debug.Log(wifiSensor.RunThread);
-                    wifiSensor.StartSensorReading();
+                    udpSensor.StartSensorReading();
                     //Debug.Log(wifiSensor.RunThread);
                 }
             }
@@ -886,13 +887,13 @@ public class JacobianExperimentGM : GameMaster
         //
         if (!logEnd)
         {
-            // Check if WiFi sensors are available
+            // Check if UDP sensors are available
             foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
             {
                 if (sensor != null && sensor.GetSensorType().Equals(SensorType.EMGWiFi))
                 {
-                    WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
-                    wifiSensor.StopSensorReading();
+                    UDPClientManager udpSensor = (UDPClientManager)sensor;
+                    udpSensor.StopSensorReading();
                 }
             }
 

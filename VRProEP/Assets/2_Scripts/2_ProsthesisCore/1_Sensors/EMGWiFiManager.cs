@@ -2,19 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 using VRProEP.AdaptationCore;
+using VRProEP.Utilities;
 
 namespace VRProEP.ProsthesisCore
 {
 
-    public class EMGWiFiManager : WiFiSensorManager
+    public class EMGWiFiManager : UDPClientManager, ISensor, IConfigurable
     {
         private List<float> gains = new List<float>();
         private List<float> lowerLimits = new List<float>();
         private List<FOLPDFilter> lowPassFilters = new List<FOLPDFilter>();
         private List<MovingAverageFilter> movingAverageFilters = new List<MovingAverageFilter>();
         private bool isRaw = false;
+        private SensorType sensorType;
 
-        public EMGWiFiManager(string ipAddress, int port, int channelSize, bool isRaw = false) : base(ipAddress, port, channelSize, SensorType.EMGWiFi, UDPType.UDP_Async)
+        public EMGWiFiManager(string ipAddress, int port, int channelSize, bool isRaw = false) : base(ipAddress, port, channelSize, "EMGWiFi", UDPType.UDP_Async)
         {
             // Set the default gains and initialize filters
             for (int i = 0; i < channelSize; i++)
@@ -93,7 +95,7 @@ namespace VRProEP.ProsthesisCore
                     //float shiftRect = sensorValues[i] - 512.0f;
                     float shiftRect = Mathf.Abs(sensorValues[i] - 512.0f);
                     filteredValues[i] = lowPassFilters[i].Update(shiftRect);
-                    averagedValues[i] = (float)Math.Round(movingAverageFilters[i].Update(filteredValues[i]), 1);
+                    averagedValues[i] = (float)System.Math.Round(movingAverageFilters[i].Update(filteredValues[i]), 1);
                 }
                 return averagedValues;
             }
@@ -149,7 +151,7 @@ namespace VRProEP.ProsthesisCore
                     // Shift and rectify
                     float shiftRect = Mathf.Abs(sensorValues[i] - 512.0f);
                     filteredValues[i] = lowPassFilters[i].Update(shiftRect);
-                    averagedValues[i] = (float)Math.Round(movingAverageFilters[i].Update(filteredValues[i]), 1);
+                    averagedValues[i] = (float)System.Math.Round(movingAverageFilters[i].Update(filteredValues[i]), 1);
                     normalizedValues[i] = gains[i] * (averagedValues[i] - lowerLimits[i]);
                     if (normalizedValues[i] > 100.0f)
                         normalizedValues[i] = 100.0f;
@@ -165,7 +167,7 @@ namespace VRProEP.ProsthesisCore
                 for (int i = 0; i < sensorValues.Length; i++)
                 {
                     // Shift and rectify
-                    normalizedValues[i] = (float)Math.Round(gains[i] * (sensorValues[i] - lowerLimits[i]), 1);
+                    normalizedValues[i] = (float)System.Math.Round(gains[i] * (sensorValues[i] - lowerLimits[i]), 1);
                     if (normalizedValues[i] > 100.0f)
                         normalizedValues[i] = 100.0f;
                     if (normalizedValues[i] < 0.0f)
@@ -173,6 +175,12 @@ namespace VRProEP.ProsthesisCore
                 }
                 return sensorValues;
             }
+        }
+
+
+        public SensorType GetSensorType()
+        {
+            return sensorType;
         }
 
         /// <summary>

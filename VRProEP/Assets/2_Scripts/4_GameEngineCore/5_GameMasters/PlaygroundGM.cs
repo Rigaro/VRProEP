@@ -8,6 +8,7 @@ using Valve.VR.InteractionSystem;
 using VRProEP.ExperimentCore;
 using VRProEP.GameEngineCore;
 using VRProEP.ProsthesisCore;
+using VRProEP.Utilities;
 
 public class PlaygroundGM : GameMaster
 {
@@ -16,7 +17,7 @@ public class PlaygroundGM : GameMaster
     public Transform startTransform;
 
 
-    private string defaultText = "\n\no o";
+    //private string defaultText = "\n\no o";
     private ConfigurableElbowManager elbowManager;
 
     // Start is called before the first frame update
@@ -424,8 +425,8 @@ public class PlaygroundGM : GameMaster
         {
             if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
             {
-                WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
-                wifiSensor.StopSensorReading();
+                UDPClientManager udpSensor = (UDPClientManager)sensor;
+                udpSensor.StopSensorReading();
             }
         }
 

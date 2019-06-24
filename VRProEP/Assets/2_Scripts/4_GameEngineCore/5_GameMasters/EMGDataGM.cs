@@ -7,6 +7,7 @@ using Valve.VR;
 using VRProEP.ExperimentCore;
 using VRProEP.GameEngineCore;
 using VRProEP.ProsthesisCore;
+using VRProEP.Utilities;
 
 public class EMGDataGM : GameMaster
 {
@@ -494,8 +495,8 @@ public class EMGDataGM : GameMaster
         {
             if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
             {
-                WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
-                wifiSensor.StopSensorReading();
+                UDPClientManager udpSensor = (UDPClientManager)sensor;
+                udpSensor.StopSensorReading();
             }
         }
         //
@@ -531,10 +532,10 @@ public class EMGDataGM : GameMaster
                 if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
                 {
                     EMGAvailable = true;
-                    
-                    WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
+
+                    UDPClientManager udpSensor = (UDPClientManager)sensor;
                     //Debug.Log(wifiSensor.RunThread);
-                    wifiSensor.StartSensorReading();
+                    udpSensor.StartSensorReading();
                     //Debug.Log(wifiSensor.RunThread);
                 }
             }

@@ -11,16 +11,19 @@ using VRProEP.ProsthesisCore;
 public class PhotoStageGM : GameMaster
 {
     [Header("Configuration")]
-    public float synergyValue = 1.0f;
     public Transform objectTransform;
-    public Vector3 objectStart;
+    public Transform objectStart;
+    public bool isAble = true;
 
     private ConfigurableElbowManager elbowManager;
 
 
     private void Awake()
     {
-        LoadAbleBodiedAvatar();
+        if (isAble)
+            LoadAbleBodiedAvatar();
+        else
+            LoadTHAvatar();
     }
 
     public void LoadAbleBodiedAvatar()
@@ -87,10 +90,6 @@ public class PhotoStageGM : GameMaster
         if (true)
         {
             return true;
-        }
-        else
-        {
-            return false;
         }
     }
 

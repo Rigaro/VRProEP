@@ -6,6 +6,7 @@ using UnityEngine;
 using VRProEP.ExperimentCore;
 using VRProEP.GameEngineCore;
 using VRProEP.ProsthesisCore;
+using VRProEP.Utilities;
 
 public class ProsthesisTrainingGM : GameMaster
 {
@@ -424,13 +425,13 @@ public class ProsthesisTrainingGM : GameMaster
         //
         // Handle application quit procedures.
         //
-        // Check if WiFi sensors are available
+        // Check if UDP sensors are available
         foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
         {
             if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
             {
-                WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
-                wifiSensor.StopSensorReading();
+                UDPClientManager udpSensor = (UDPClientManager)sensor;
+                udpSensor.StopSensorReading();
             }
         }
 
@@ -527,8 +528,8 @@ public class ProsthesisTrainingGM : GameMaster
                 if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
                 {
                     EMGAvailable = true;
-                    WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
-                    wifiSensor.StartSensorReading();
+                    UDPClientManager udpSensor = (UDPClientManager)sensor;
+                    udpSensor.StartSensorReading();
                 }
             }
             // Set whether emg or synergy based

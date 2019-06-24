@@ -10,10 +10,12 @@ using System.Net.Sockets;
 // Threading includes
 using System.Threading;
 
+// VRProEP includes
+
 // Debug
 using UnityEngine;
 
-namespace VRProEP.ProsthesisCore
+namespace VRProEP.Utilities
 {
     public enum UDPType
     {
@@ -24,11 +26,11 @@ namespace VRProEP.ProsthesisCore
     /// <summary>
     /// Manager for WiFi sensors implemented with UDP protocol.
     /// </summary>
-    public abstract class WiFiSensorManager : ISensor, IConfigurable
+    public abstract class UDPClientManager
     {
         // Generic sensor info
         private int channelSize;
-        private SensorType sensorType;
+        private string deviceName;
 
         // WiFi sensor info
         private IPAddress ip;
@@ -62,11 +64,11 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <param name="ipAddress">The IP address of the sensor to connect to.</param>
         /// <param name="port">The UDP port to use for data transfer.</param>
-        /// <param name="sensorType">The type of sensor.</param>
-        public WiFiSensorManager(string ipAddress, int port, SensorType sensorType)
+        /// <param name="deviceName">The device name.</param>
+        public UDPClientManager(string ipAddress, int port, string deviceName)
         {
             channelSize = 1;
-            this.sensorType = sensorType;
+            this.deviceName = deviceName;
 
             // Set WiFi data
             udpType = UDPType.UDP_Async;
@@ -89,15 +91,15 @@ namespace VRProEP.ProsthesisCore
         /// <param name="ipAddress">The IP address of the sensor to connect to.</param>
         /// <param name="port">The UDP port to use for data transfer.</param>
         /// <param name="channelSize">The number of sensor channels available.</param>
-        /// <param name="sensorType">The type of sensor.</param>
+        /// <param name="deviceName">The device name.</param>
         /// <param name="udpType">The type of UDP connection to use (Asynchronous or Synchronous).</param>
-        public WiFiSensorManager(string ipAddress, int port, int channelSize, SensorType sensorType, UDPType udpType)
+        public UDPClientManager(string ipAddress, int port, int channelSize, string deviceName, UDPType udpType)
         {
             // Set sensor data
             if (channelSize <= 0)
                 throw new System.ArgumentException("The given channel size is invalid. It should be greater than zero.");
             this.channelSize = channelSize;
-            this.sensorType = sensorType;
+            this.deviceName = deviceName;
 
             // Set WiFi data
             this.udpType = udpType;
@@ -122,7 +124,7 @@ namespace VRProEP.ProsthesisCore
         /// <summary>
         /// Stop the thread when destroying and close the UDP port.
         /// </summary>
-        ~WiFiSensorManager()
+        ~UDPClientManager()
         {
             StopSensorReading();
             udpState.u.Close();
@@ -146,7 +148,7 @@ namespace VRProEP.ProsthesisCore
 
             // Connect to sensor
             udpState.u.Connect(ip, port);
-            Debug.Log( sensorType + " sensor connection established.");
+            Debug.Log( deviceName + " device connection established.");
         }
 
         /// <summary>
@@ -249,7 +251,7 @@ namespace VRProEP.ProsthesisCore
         {
             if (runThread == false)
             {
-                Debug.Log( sensorType + " data gathering started.");
+                Debug.Log( deviceName + " device data gathering started.");
                 //Debug.Log(ip + " " + port);
                 runThread = true;
                 // Create and start communication thread
@@ -334,10 +336,6 @@ namespace VRProEP.ProsthesisCore
 
         public bool RunThread { get => runThread; }
 
-        public SensorType GetSensorType()
-        {
-            return sensorType;
-        }
     }
 
 }

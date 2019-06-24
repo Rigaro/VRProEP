@@ -6,6 +6,7 @@ using UnityEngine;
 using VRProEP.ExperimentCore;
 using VRProEP.GameEngineCore;
 using VRProEP.ProsthesisCore;
+using VRProEP.Utilities;
 
 public class TestGM : GameMaster
 {
@@ -417,13 +418,13 @@ public class TestGM : GameMaster
         //
         // Handle application quit procedures.
         //
-        // Check if WiFi sensors are available
+        // Check if UDP sensors are available
         foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
         {
             if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
             {
-                WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
-                wifiSensor.StopSensorReading();
+                UDPClientManager udpSensor = (UDPClientManager)sensor;
+                udpSensor.StopSensorReading();
             }
         }
 
