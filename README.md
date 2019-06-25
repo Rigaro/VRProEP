@@ -12,13 +12,20 @@ Wiki: https://github.com/Rigaro/VRProEP/wiki
 - Mixed reality: Allows recording of the user and virtual reality environment in Mixed Reality by placing the user in the virtual world.
 - External hardware: Allows the integration of external hardware devices. Currently implemented: bone conduction feedback device, myoware sEMG electrode system.
 
-## TNSRE paper submission version
+## TNSRE 2019 Paper
+The following platform and Unity versions were used for the experiments included in the paper submitted to IEEE Transactions in Neural Systems and Rehabilitation Engineering in 2019.
+
 - VRProEP Version: 0.4. Tag Link: https://github.com/Rigaro/VRProEP/releases/tag/0.4
 - Unity Version: 2018.3.8f1
 
 Runs from Unity Editor. See Wiki for more information.
 
 ## Integrations
+### SteamVR
+SteamVR used to handle Virtual Reality headsets.
+Current headset compatibility: HTC Vive Pro.
+
 ### LIV
 Software to create Mixed reality videos.
 https://liv.tv/
+
