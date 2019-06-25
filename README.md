@@ -26,6 +26,6 @@ SteamVR used to handle Virtual Reality headsets.
 Current headset compatibility: HTC Vive Pro.
 
 ### LIV
-Software to create Mixed reality videos.
+Software to create Mixed Reality videos.
 https://liv.tv/
 
