@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System;
 using System.Text;
 
+// Debug
+using UnityEngine;
+
 namespace VRProEP.Utilities
 {
     public class UDPWriter : UDPDeviceManager
@@ -40,12 +43,14 @@ namespace VRProEP.Utilities
                 {
                     dataString += value + "%";
                 }
+                dataString = dataString.Remove(dataString.Length - 1);
             }
             else
             {
                 throw new System.NotImplementedException("Provided data type (" + data.GetType() + ") not yet implemented.");
             }
             // Send data
+            //Debug.Log(dataString);
             TransferData(dataString);
         }
 

@@ -138,7 +138,14 @@ public class UDPTester : MonoBehaviour {
     void OnApplicationQuit()
     {
         runThread = false;
-        udpState.u.Close();
+        try
+        {
+            udpState.u.Close();
+        }
+        catch
+        {
+            // Do nothing because no need to close it.
+        }
     }
 
 }

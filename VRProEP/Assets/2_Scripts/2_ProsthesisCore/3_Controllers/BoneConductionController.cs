@@ -1,4 +1,5 @@
 ﻿//======= Copyright (c) Melbourne Robotics Lab, All rights reserved. ===============
+using VRProEP.Utilities;
 
 namespace VRProEP.ProsthesisCore
 {
@@ -7,7 +8,7 @@ namespace VRProEP.ProsthesisCore
     /// </summary>
     public class BoneConductionController : UDPWriter
     {
-        public BoneConductionController(string ipAddress, int port, int channel, float Amplitude_max, int SampleRate) : base(ipAddress, port, Amplitude_max, SampleRate)
+        public BoneConductionController(string ipAddress, int port, int channel, float Amplitude_max, int SampleRate) : base(ipAddress, port, "BoniRemote")
         {
             SetUpControlInput(channel);
         }
