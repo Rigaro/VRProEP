@@ -178,7 +178,7 @@ public class GraspManager : MonoBehaviour {
                 handVelocity = handRB.velocity.magnitude;
             }
             // Get hand velocity and compare to threshold.
-            if (handVelocity < dropOffVelocityThreshold && objectInHand != null && !releasing)
+            if (HasHandStopped() && objectInHand != null && !releasing)
             {
                 ReleaseObjectInHand();
             }
@@ -258,5 +258,13 @@ public class GraspManager : MonoBehaviour {
             oIHHandTracker = null;
             StartCoroutine(EnableObjectGraspability(1.0f));
         }
+    }
+
+    public bool HasHandStopped()
+    {
+        if (handVelocity < dropOffVelocityThreshold)
+            return true;
+        else
+            return false;
     }
 }
