@@ -150,7 +150,7 @@ namespace VRProEP.GameEngineCore
                 throw new System.Exception("The requested residual limb information was not found.");
 
             // Instantiate with tracker as parent.
-            GameObject residualLimbGO = Object.Instantiate(residualLimbPrefab, new Vector3(0.0f, -activeResidualLimbData.dimensions.x / 2.0f, 0.0f), Quaternion.identity, avatarGO.transform);
+            GameObject residualLimbGO = Object.Instantiate(residualLimbPrefab, new Vector3(0.0f, -activeResidualLimbData.dimensions.x / 1.0f, 0.0f), Quaternion.identity, avatarGO.transform);
             
             // Make sure the loaded residual limb has a the follower script and set the offset
             LimbFollower follower = residualLimbGO.GetComponent<LimbFollower>();
@@ -158,7 +158,7 @@ namespace VRProEP.GameEngineCore
             if (follower == null)
                 follower = residualLimbGO.AddComponent<LimbFollower>();
 
-            follower.offset = new Vector3(0.0f, -activeResidualLimbData.dimensions.x / 2.0f, 0.0f);
+            follower.offset = new Vector3(0.0f, -activeResidualLimbData.dimensions.x / 1.0f, 0.0f);
 
             return residualLimbGO;
         }

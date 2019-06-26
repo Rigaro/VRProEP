@@ -33,7 +33,7 @@ public class PhotoStageGM : GameMaster
     {
         float subjectHeight = SaveSystem.ActiveUser.height;
         float subjectArmLength = SaveSystem.ActiveUser.upperArmLength + SaveSystem.ActiveUser.forearmLength + (SaveSystem.ActiveUser.handLength / 2);
-        Debug.Log(subjectArmLength);
+        //Debug.Log(subjectArmLength);
 
         List<float> dropOffHeightMultipliers = new List<float>();
         dropOffHeightMultipliers.Add(0.65f);
@@ -43,7 +43,7 @@ public class PhotoStageGM : GameMaster
         List<float> dropOffReachMultipliers = new List<float>();
         dropOffReachMultipliers.Add(0.75f);
         dropOffReachMultipliers.Add(1.0f);
-        dropOffReachMultipliers.Add(1.5f);
+        dropOffReachMultipliers.Add(1.2f);
         dropOffReachMultipliers.Add(1.0f);
         // Set drop-off locations
         int i = 0;
@@ -68,6 +68,13 @@ public class PhotoStageGM : GameMaster
         GameObject faTrackerGO = GameObject.FindGameObjectWithTag("ForearmTracker");
         SteamVR_TrackedObject steamvrConfig = faTrackerGO.GetComponent<SteamVR_TrackedObject>();
         steamvrConfig.index = SteamVR_TrackedObject.EIndex.Device5;
+        // Configure the grasp manager
+        GameObject graspManagerGO = GameObject.FindGameObjectWithTag("GraspManager");
+        if (graspManagerGO == null)
+            throw new System.Exception("Grasp Manager not found.");
+        GraspManager graspManager = graspManagerGO.GetComponent<GraspManager>();
+        graspManager.managerType = GraspManager.GraspManagerType.Assisted;
+        graspManager.managerMode = GraspManager.GraspManagerMode.Restriced;
     }
 
     public void LoadTHAvatar()
@@ -86,6 +93,13 @@ public class PhotoStageGM : GameMaster
 
         // Initialize UI.
         //InitializeUI();
+        // Configure the grasp manager
+        GameObject graspManagerGO = GameObject.FindGameObjectWithTag("GraspManager");
+        if (graspManagerGO == null)
+            throw new System.Exception("Grasp Manager not found.");
+        GraspManager graspManager = graspManagerGO.GetComponent<GraspManager>();
+        graspManager.managerType = GraspManager.GraspManagerType.Assisted;
+        graspManager.managerMode = GraspManager.GraspManagerMode.Restriced;
     }
 
     #region Inherited methods overrides
