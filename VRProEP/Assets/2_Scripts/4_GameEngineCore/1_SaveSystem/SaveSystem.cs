@@ -70,7 +70,7 @@ namespace VRProEP.GameEngineCore
             newUser.handLength = handL;
             newUser.type = userType;
             newUser.lefty = lefty;
-
+                        
             return CreateNewUser(newUser);
         }
 
@@ -180,42 +180,6 @@ namespace VRProEP.GameEngineCore
             isUserAvailable = true;
 
             return loadedUserData;
-        }
-
-        /// <summary>
-        /// Loads the user data for the given userID.
-        /// </summary>
-        /// <param name="userID">The ID of the user to load the data for.</param>
-        ///  <param name="feedBackType">The type of feedback to load the characterization data for.</param>
-        /// <returns>The UserData for the requested user.</returns>
-        public static FeedbackCharacterization LoadUserData(string userID,FeedbackType feedBackType)
-        {
-            FeedbackCharacterization loadedfeedbackCharacterization;
-            // Get the folder for the given user ID
-            string userPath = dataFolder + "/UserData/" + userID;
-            string loadFilePath = userPath + feedBackType.ToString() + "/feedBackCharacterization.json";
-
-            if (File.Exists(loadFilePath))
-            {
-                // Load data
-                string feedbackCharacterizationAsJson = File.ReadAllText(loadFilePath);
-                loadedfeedbackCharacterization = JsonUtility.FromJson<FeedbackCharacterization>(feedbackCharacterizationAsJson);
-            }
-            else
-            {
-                throw new System.Exception("The provided users Feedback Characterization does not exist in the user file directory.");
-            }
-            //// Set as active user
-            //activeUser = loadedUserData;
-            //activeSaveFolder = userPath;
-
-            //// Re-initialize the experiment logger for the new active user.
-            //foreach (IExperimentLogger logger in ExperimentSystem.GetActiveLoggers())
-            //    logger.InitializeLog(activeSaveFolder);
-
-            //isUserAvailable = true;
-
-            return loadedfeedbackCharacterization;
         }
 
     }

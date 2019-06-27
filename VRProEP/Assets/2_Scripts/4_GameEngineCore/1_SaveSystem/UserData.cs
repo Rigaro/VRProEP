@@ -1,4 +1,5 @@
 ﻿//======= Copyright (c) Melbourne Robotics Lab, All rights reserved. ===============
+
 namespace VRProEP.GameEngineCore
 {
     /// <summary>
@@ -30,4 +31,5 @@ namespace VRProEP.GameEngineCore
         public UserType type = UserType.AbleBodied;
         public bool lefty = false;
     }
+
 }
