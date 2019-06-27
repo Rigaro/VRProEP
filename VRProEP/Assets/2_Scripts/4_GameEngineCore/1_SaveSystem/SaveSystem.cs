@@ -167,7 +167,7 @@ namespace VRProEP.GameEngineCore
             }
             else
             {
-                throw new System.Exception("The provided user does not exist in the user file directory.");
+                throw new System.Exception("The file :" + loadFilePath + ", could not be found.");
             }
             // Set as active user
             activeUser = loadedUserData;
@@ -183,37 +183,36 @@ namespace VRProEP.GameEngineCore
         }
 
         /// <summary>
-        /// Loads the user data for the given userID.
+        /// Loads the given user's feedback characterisation for the given feedback type.
         /// </summary>
         /// <param name="userID">The ID of the user to load the data for.</param>
-        ///  <param name="feedBackType">The type of feedback to load the characterization data for.</param>
+        ///  <param name="feedbackType">The type of feedback to load the characterization data for.</param>
         /// <returns>The UserData for the requested user.</returns>
-        public static FeedbackCharacterization LoadFeedbackCharacterization(string userID,FeedbackType feedBackType)
+        public static FeedbackCharacterization LoadFeedbackCharacterization(string userID, FeedbackType feedbackType)
         {
             FeedbackCharacterization loadedfeedbackCharacterization;
             // Get the folder for the given user ID
             string userPath = dataFolder + "/UserData/" + userID;
-            string loadFilePath = userPath + feedBackType.ToString() + "/feedBackCharacterization.json";
+            string loadFilePath = userPath + "/FeedbackCharacterizations/" + feedbackType.ToString() + ".json";
 
             if (File.Exists(loadFilePath))
             {
                 // Load data
                 string feedbackCharacterizationAsJson = File.ReadAllText(loadFilePath);
-                loadedfeedbackCharacterization = JsonUtility.FromJson<FeedbackCharacterization>(feedbackCharacterizationAsJson);
+                // Check type of feedback to be loaded
+                switch(feedbackType)
+                {
+                    case FeedbackType.BoneConduction:
+                        loadedfeedbackCharacterization = JsonUtility.FromJson<BoneConductionCharacterization>(feedbackCharacterizationAsJson);
+                        break;
+                    default:
+                        throw new System.NotImplementedException("Feedback type not yet supported.");
+                }
             }
             else
             {
-                throw new System.Exception("The provided users Feedback Characterization does not exist in the user file directory.");
+                throw new System.Exception("The file :" + loadFilePath + ", could not be found.");
             }
-            //// Set as active user
-            //activeUser = loadedUserData;
-            //activeSaveFolder = userPath;
-
-            //// Re-initialize the experiment logger for the new active user.
-            //foreach (IExperimentLogger logger in ExperimentSystem.GetActiveLoggers())
-            //    logger.InitializeLog(activeSaveFolder);
-
-            //isUserAvailable = true;
 
             return loadedfeedbackCharacterization;
         }

@@ -35,8 +35,8 @@ namespace VRProEP.Utilities
             {
                 dataString = data;
             }
-            // List<float>
-            else if (data.GetType() == typeof(List<float>))
+            // List<float> || float[]
+            else if (data.GetType() == typeof(List<float>) || data.GetType() == typeof(float[]))
             {
                 // Concatenate all values in a string separated by %
                 foreach(float value in data)

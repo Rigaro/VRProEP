@@ -1,6 +1,7 @@
 ﻿//======= Copyright (c) Melbourne Robotics Lab, All rights reserved. ===============
 using System.Collections.Generic;
 using UnityEngine;
+using VRProEP.GameEngineCore;
 
 namespace VRProEP.ProsthesisCore
 {
@@ -10,8 +11,8 @@ namespace VRProEP.ProsthesisCore
     public class BoneConductionReferenceGenerator : ReferenceGenerator
     {
 
-        private List<float> gains;
-        private List<float> offset;
+        private float[] gains;
+        private float[] offset;
 
         /// <summary>
         /// Autonomous reference generator that gives a linear relationship of input to output
@@ -37,37 +38,15 @@ namespace VRProEP.ProsthesisCore
         /// <param name="xBar">The initial condition for the references.</param>
         /// <param name="gains">The desired gain for each reference.</param>
         /// <param name="ofsset">The desired offset for each reference.</param>
-        public BoneConductionReferenceGenerator(float[] xBar, List<float> gains, List<float> offset)
+        public BoneConductionReferenceGenerator(float[] xBar, float[] gains, float[] offset)
         {
-            if (xBar.Length != gains.Count)
+            if (xBar.Length != gains.Length)
                 throw new System.ArgumentOutOfRangeException("The length of the parameters does not match.");
 
             channelSize = xBar.Length;
             this.xBar = xBar;
             this.gains = gains;
             this.offset = offset;
-            generatorType = ReferenceGeneratorType.BoneConduction;
-        }
-
-        /// <summary>
-        /// Autonomous reference generator that gives a linear relationship of input to output
-        /// Sets all gains to the default: 0.0.
-        /// Sets all offsets to the default: 0.0.
-        /// </summary>
-        /// <param name="xBar">The initial condition for the references.</param>
-        /// <param name="xMin">The lower limits for the references.</param>
-        /// <param name="xMax">The upper limits for the references.</param>
-        public BoneConductionReferenceGenerator(float[] xBar, float[] xMin, float[] xMax)
-        {
-            if (xBar.Length != xMin.Length || xBar.Length != xMax.Length)
-                throw new System.ArgumentOutOfRangeException("The length of the parameters does not match.");
-
-            channelSize = xBar.Length;
-            this.xBar = xBar;
-            this.xMin = xMin;
-            this.xMax = xMax;
-            SetDefaultGains();
-            SetDefaultOffset();
             generatorType = ReferenceGeneratorType.BoneConduction;
         }
 
@@ -80,9 +59,9 @@ namespace VRProEP.ProsthesisCore
         /// <param name="xMin">The lower limits for the references.</param>
         /// <param name="xMax">The upper limits for the references.</param>
         /// <param name="gains">The desired integrator gain for each reference.</param>
-        public BoneConductionReferenceGenerator(float[] xBar, float[] xMin, float[] xMax, List<float> gains, List<float> offset)
+        public BoneConductionReferenceGenerator(float[] xBar, float[] xMin, float[] xMax, float[] gains, float[] offset)
         {
-            if (xBar.Length != xMin.Length || xBar.Length != xMax.Length || xBar.Length != gains.Count)
+            if (xBar.Length != xMin.Length || xBar.Length != xMax.Length || xBar.Length != gains.Length)
                 throw new System.ArgumentOutOfRangeException("The length of the parameters does not match.");
 
             channelSize = xBar.Length;
@@ -92,6 +71,35 @@ namespace VRProEP.ProsthesisCore
             this.gains = gains;
             this.offset = offset;
             generatorType = ReferenceGeneratorType.BoneConduction;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="xBar"></param>
+        /// <param name="bcCharac"></param>
+        public BoneConductionReferenceGenerator(float[] xBar, BoneConductionCharacterization bcCharac)
+        {
+            this.xBar = xBar;
+            channelSize = xBar.Length;
+            ExtractParameters(bcCharac);
+            generatorType = ReferenceGeneratorType.BoneConduction;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bcCharac"></param>
+        private void ExtractParameters(BoneConductionCharacterization bcCharac)
+        {
+            // Extract all parameters from characterisation file and load into class.
+            this.xMin = bcCharac.xMin;
+            this.xMax = bcCharac.xMax;
+            this.gains = bcCharac.gains;
+            this.offset = bcCharac.offset;
+            if (xBar.Length != xMin.Length || xBar.Length != xMax.Length)
+                throw new System.ArgumentOutOfRangeException("The length of the parameters does not match.");
+
         }
 
         /// <summary>
@@ -115,9 +123,9 @@ namespace VRProEP.ProsthesisCore
             if (input.Length != 2)
                 throw new System.ArgumentOutOfRangeException("The input array length should be = 2.");
 
-            //force to stimulation amplitude
+            //roughness to stimulation frequency
             xBar[0] = offset[0] + input[0] * gains[0];
-            //surfaceroughness to frequency 
+            //force to amplitude 
             xBar[1] = offset[1] + input[1] * gains[1];
 
             return xBar;
@@ -130,7 +138,7 @@ namespace VRProEP.ProsthesisCore
         {
             for (int i = 0; i < xBar.Length; i++)
             {
-                gains.Add(0.0f);
+                gains[i] = 0.0f;
             }
         }
 
@@ -141,7 +149,7 @@ namespace VRProEP.ProsthesisCore
         {
             for (int i = 0; i < xBar.Length; i++)
             {
-                offset.Add(0.0f);
+                offset[i] = 0.0f;
             }
         }
     }

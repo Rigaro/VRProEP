@@ -2,6 +2,17 @@
 namespace VRProEP.ProsthesisCore
 {
     /// <summary>
+    /// The types of Feedback supported.
+    /// </summary>
+    public enum FeedbackType
+    {
+        Vibrotactile,
+        Electrotactile,
+        Mechanotactile,
+        BoneConduction
+    }
+
+    /// <summary>
     /// Interface for managers that handle output to feedback systems.
     /// Examples of feedback systems: bone conduction, visual.
     /// </summary>

@@ -1,4 +1,6 @@
 ﻿//======= Copyright (c) Melbourne Robotics Lab, All rights reserved. ===============
+using System.Collections;
+using System.Collections.Generic;
 using VRProEP.Utilities;
 
 namespace VRProEP.ProsthesisCore
@@ -6,9 +8,9 @@ namespace VRProEP.ProsthesisCore
     /// <summary>
     /// Basic bone conduction controller a given plant.
     /// </summary>
-    public class BoneConductionController : UDPWriter
+    public class BoneConductionController : UDPWriter, IController
     {
-        public BoneConductionController(string ipAddress, int port, int channel, float Amplitude_max, int SampleRate) : base(ipAddress, port, "BoniRemote")
+        public BoneConductionController(string ipAddress, int port, int channel, float amplitudeMax, int sampleRate) : base(ipAddress, port, "BoniRemote")
         {
             SetUpControlInput(channel);
         }
