@@ -24,7 +24,7 @@ MonoBehaviour:
   autoEnableVR: 1
   legacyMixedRealityCamera: 1
   mixedRealityCameraPose:
-    actionPath: /actions/vrproep/in/MRCameraPose
+    actionPath: /actions//in/ExternalCamera
     needsReinit: 1
   mixedRealityCameraInputSource: 11
   mixedRealityActionSetAutoEnable: 1
