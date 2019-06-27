@@ -43,14 +43,14 @@ public class PhotoStageGM : GameMaster
         List<float> dropOffReachMultipliers = new List<float>();
         dropOffReachMultipliers.Add(0.75f);
         dropOffReachMultipliers.Add(1.0f);
-        dropOffReachMultipliers.Add(1.2f);
+        dropOffReachMultipliers.Add(0.5f);
         dropOffReachMultipliers.Add(1.0f);
         // Set drop-off locations
         int i = 0;
         foreach (GameObject dropOff in dropOffLocations)
         {
             Transform dropOffTransform = dropOff.transform;
-            dropOffTransform.localPosition = new Vector3((-standOffset + subjectStandLocation.localPosition.x - (dropOffReachMultipliers[i] * subjectArmLength)), dropOffHeightMultipliers[i] * subjectHeight, dropOffTransform.localPosition.z);
+            dropOffTransform.localPosition = new Vector3((subjectStandLocation.localPosition.x - (dropOffReachMultipliers[i] * subjectArmLength)), dropOffHeightMultipliers[i] * subjectHeight, dropOffTransform.localPosition.z);
             i++;
         }
     }
@@ -88,8 +88,8 @@ public class PhotoStageGM : GameMaster
         elbowManager = prosthesisManagerGO.AddComponent<ConfigurableElbowManager>();
         elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + SaveSystem.ActiveUser.handLength / 2.0f), 1.5f);
         // Set the reference generator to jacobian-based.
-        elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
-        //elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
+        //elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
+        elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
 
         // Initialize UI.
         //InitializeUI();
