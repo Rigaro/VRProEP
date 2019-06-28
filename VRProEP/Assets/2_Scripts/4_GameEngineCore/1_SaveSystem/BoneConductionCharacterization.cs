@@ -11,7 +11,6 @@ namespace VRProEP.GameEngineCore
     {
         public float[] gains;
         public float[] offset;
-        public float[] frequency;
         public float[] xMin;
         public float[] xMax;
     }
