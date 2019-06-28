@@ -26,10 +26,9 @@ namespace VRProEP.GameEngineCore
             }
             if (avatarType == AvatarType.Transradial)
             {
-                throw new System.NotImplementedException("Transradial avatars not yet implemented");
-                // Get the shoulder location object and initialize
-                //GameObject residualLimbTracker = GameObject.FindGameObjectWithTag("ElbowLocation");
-                //trackerTransform = residualLimbTracker.transform;
+                // Get the elbow location object and initialize
+                GameObject residualLimbTracker = GameObject.FindGameObjectWithTag("ElbowLocation");
+                trackerTransform = residualLimbTracker.transform;
             }
             if (avatarType == AvatarType.AbleBodied)
             {

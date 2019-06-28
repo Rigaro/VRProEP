@@ -65,8 +65,10 @@ namespace VRProEP.GameEngineCore
         public static void SpawnTransradialAvatar(UserData userData, AvatarData avatarData)
         {
             // Load
-            // Customize
-            throw new System.NotImplementedException("Transradial avatars not yet implemented.");
+            LoadResidualLimb(avatarData.residualLimbType);
+            LoadSocket(avatarData.socketType);
+            LoadForearm(avatarData.forearmType, userData.forearmLength);
+            LoadHand(avatarData.handType, userData.forearmLength, userData.handLength);
         }
 
         /// <summary>
@@ -262,18 +264,64 @@ namespace VRProEP.GameEngineCore
             return elbowGO;
         }
 
+        /// <summary>
+        /// Loads and instantiates a forearm avatar prefab from Resources/Avatars/Forearms.
+        /// The prefab must include the tag "Forearm". Loads by name.
+        /// Use this in Transhumeral avatars.
+        /// </summary>
+        /// <param name="forearmType">The name of the type of forearm to load.</param>
+        /// <param name="upperArmLength">The user's upper-arm length.</param>
+        /// <param name="lowerArmLength">The user's lower-arm length.</param>
+        /// <returns>The loaded forearm.</returns>
+        private static GameObject LoadForearm(string forearmType, float upperArmLength, float lowerArmLength)
+        {
+
+            // Load forearm from avatar folder and check whether successfully loaded.
+            GameObject forearmPrefab = Resources.Load<GameObject>("Avatars/Forearms/" + forearmType);
+            if (forearmPrefab == null)
+                throw new System.Exception("The requested socket prefab was not found.");
+
+            // Get parent prosthesis manager
+            GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+            
+            // Load forearm object info
+            //string objectPath = resourcesDataPath + "/Forearms/" + forearmType + ".json";
+            //string objectDataAsJson = File.ReadAllText(objectPath);
+            string objectPath = "Avatars/Forearms/" + forearmType;
+            string objectDataAsJson = Resources.Load<TextAsset>(objectPath).text;
+            activeForearmData = JsonUtility.FromJson<AvatarObjectData>(objectDataAsJson);
+            if (activeForearmData == null)
+                throw new System.Exception("The requested forearm information was not found.");
+
+            // Need to attach to Elbow_Lower, so find that first and get its Rigidbody.
+            GameObject elbowLowerGO = GameObject.FindGameObjectWithTag("Elbow_Lower");
+            Rigidbody elbowLowerRB = elbowLowerGO.GetComponent<Rigidbody>();
+
+            // Instantiate with prosthesis manager as parent.
+            float forearmOffset = upperArmLength + lowerArmLength - (activeForearmData.dimensions.x / 2.0f);
+            GameObject forearmGO = Object.Instantiate(forearmPrefab, new Vector3(forearmPrefab.transform.localPosition.x, -forearmOffset, forearmPrefab.transform.localPosition.z), forearmPrefab.transform.localRotation, prosthesisManagerGO.transform);
+
+            // Attach the socket to the residual limb through a fixed joint.
+            FixedJoint forearmFixedJoint = forearmGO.GetComponent<FixedJoint>();
+            // If no fixed joint was found, then add it.
+            if (forearmFixedJoint == null)
+                forearmFixedJoint = forearmGO.AddComponent<FixedJoint>();
+            // Connect
+            forearmFixedJoint.connectedBody = elbowLowerRB;
+
+            return forearmGO;
+        }
 
         /// <summary>
         /// Loads and instantiates a forearm avatar prefab from Resources/Avatars/Forearms.
         /// The prefab must include the tag "Forearm". Loads by name.
+        /// Use this in Transradial avatars.
         /// </summary>
-        /// <param name="forearmType">The name of the prefab forearm avatar to be loaded.</param>
-        /// <returns>The instantiated forearm GameObject.</returns>
-        private static GameObject LoadForearm(string forearmType, float upperArmLength, float lowerArmLength)
+        /// <param name="forearmType">The name of the type of forearm to load.</param>
+        /// <param name="lowerArmLength">The user's lower-arm length.</param>
+        /// <returns>The loaded forearm.</returns>
+        private static GameObject LoadForearm(string forearmType, float lowerArmLength)
         {
-            // Need to attach to Elbow_Lower, so find that first and get its Rigidbody.
-            GameObject elbowLowerGO = GameObject.FindGameObjectWithTag("Elbow_Lower");
-            Rigidbody elbowLowerRB = elbowLowerGO.GetComponent<Rigidbody>();
 
             // Load forearm from avatar folder and check whether successfully loaded.
             GameObject forearmPrefab = Resources.Load<GameObject>("Avatars/Forearms/" + forearmType);
@@ -291,19 +339,23 @@ namespace VRProEP.GameEngineCore
             activeForearmData = JsonUtility.FromJson<AvatarObjectData>(objectDataAsJson);
             if (activeForearmData == null)
                 throw new System.Exception("The requested forearm information was not found.");
+            
+            // Need to attach to Socket, so find that first and get its Rigidbody.
+            GameObject socketGO = GameObject.FindGameObjectWithTag("Socket");
+            Rigidbody socketRB = socketGO.GetComponent<Rigidbody>();
 
             // Instantiate with prosthesis manager as parent.
-            float forearmOffset = upperArmLength + lowerArmLength - (activeForearmData.dimensions.x / 2.0f);
+            float forearmOffset = lowerArmLength - (activeForearmData.dimensions.x / 2.0f);
             GameObject forearmGO = Object.Instantiate(forearmPrefab, new Vector3(forearmPrefab.transform.localPosition.x, -forearmOffset, forearmPrefab.transform.localPosition.z), forearmPrefab.transform.localRotation, prosthesisManagerGO.transform);
-            
+
             // Attach the socket to the residual limb through a fixed joint.
             FixedJoint forearmFixedJoint = forearmGO.GetComponent<FixedJoint>();
             // If no fixed joint was found, then add it.
             if (forearmFixedJoint == null)
                 forearmFixedJoint = forearmGO.AddComponent<FixedJoint>();
             // Connect
-            forearmFixedJoint.connectedBody = elbowLowerRB;
-            
+            forearmFixedJoint.connectedBody = socketRB;
+
             return forearmGO;
         }
 
@@ -360,10 +412,14 @@ namespace VRProEP.GameEngineCore
 
         /// <summary>
         /// Loads and instantiates a hand avatar prefab from Resources/Avatars/Hands.
-        /// The prefab must include the tag "Forearm". Loads by name.
+        /// The prefab must include the tag "Hand". Loads by name.
+        /// Use this in Transhumeral avatars.
         /// </summary>
         /// <param name="handType">The name of the prefab forearm avatar to be loaded.</param>
-        /// <returns>The instantiated forearm GameObject.</returns>
+        /// <param name="upperArmLength">The user's upper-arm length.</param>
+        /// <param name="lowerArmLength">The user's lower-arm length.</param>
+        /// <param name="handLength">The user's hand length.</param>
+        /// <returns>The instantiated hand GameObject.</returns>
         private static GameObject LoadHand(string handType, float upperArmLength, float lowerArmLength, float handLength)
         {
             // Need to attach to Forearm, so find that first and get its Rigidbody.
@@ -389,6 +445,57 @@ namespace VRProEP.GameEngineCore
 
             // Instantiate with prosthesis manager as parent.
             float handOffset = upperArmLength + lowerArmLength + (activeHandData.dimensions.x / 2.0f);
+            GameObject handGO = Object.Instantiate(handPrefab, new Vector3(handPrefab.transform.localPosition.x, -handOffset, handPrefab.transform.localPosition.z), handPrefab.transform.localRotation, prosthesisManagerGO.transform);
+
+            // Scale hand to fit user's hand
+            float scaleFactor = handLength / activeHandData.dimensions.x;
+            handGO.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+
+            // Attach the socket to the residual limb through a fixed joint.
+            FixedJoint handFixedJoint = handGO.GetComponent<FixedJoint>();
+            // If no fixed joint was found, then add it.
+            if (handFixedJoint == null)
+                handFixedJoint = forearmGO.AddComponent<FixedJoint>();
+            // Connect
+            handFixedJoint.connectedBody = forearmRB;
+
+            return forearmGO;
+        }
+
+        /// <summary>
+        /// Loads and instantiates a hand avatar prefab from Resources/Avatars/Hands.
+        /// The prefab must include the tag "Hand". Loads by name.
+        /// Use this in Transhumeral avatars.
+        /// </summary>
+        /// <param name="handType">The name of the prefab forearm avatar to be loaded.</param>
+        /// <param name="lowerArmLength">The user's lower-arm length.</param>
+        /// <param name="handLength">The user's hand length.</param>
+        /// <returns>The instantiated hand GameObject.</returns>
+        private static GameObject LoadHand(string handType, float lowerArmLength, float handLength)
+        {
+            // Need to attach to Forearm, so find that first and get its Rigidbody.
+            GameObject forearmGO = GameObject.FindGameObjectWithTag("Forearm");
+            Rigidbody forearmRB = forearmGO.GetComponent<Rigidbody>();
+
+            // Load hand from avatar folder and check whether successfully loaded.
+            GameObject handPrefab = Resources.Load<GameObject>("Avatars/Hands/" + handType);
+            if (handPrefab == null)
+                throw new System.Exception("The requested hand prefab was not found.");
+
+            // Get parent prosthesis manager
+            GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+
+            // Load hand object info
+            //string objectPath = resourcesDataPath + "/Hands/" + handType + ".json";
+            //string objectDataAsJson = File.ReadAllText(objectPath);
+            string objectPath = "Avatars/Hands/" + handType;
+            string objectDataAsJson = Resources.Load<TextAsset>(objectPath).text;
+            activeHandData = JsonUtility.FromJson<AvatarObjectData>(objectDataAsJson);
+            if (activeHandData == null)
+                throw new System.Exception("The requested hand information was not found.");
+
+            // Instantiate with prosthesis manager as parent.
+            float handOffset = lowerArmLength + (activeHandData.dimensions.x / 2.0f);
             GameObject handGO = Object.Instantiate(handPrefab, new Vector3(handPrefab.transform.localPosition.x, -handOffset, handPrefab.transform.localPosition.z), handPrefab.transform.localRotation, prosthesisManagerGO.transform);
 
             // Scale hand to fit user's hand

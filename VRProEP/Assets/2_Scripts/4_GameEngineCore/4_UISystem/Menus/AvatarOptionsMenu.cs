@@ -53,6 +53,27 @@ public class AvatarOptionsMenu : MonoBehaviour {
         }
     }
 
+    public void LoadTransradialAvatar()
+    {
+        try
+        {
+            AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.Transradial);
+            AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transradial);
+
+            //mainCamera.fieldOfView = 60;
+            KeepPlayerGameObjects();
+
+            StartCoroutine(ResetCamera());
+            StartCoroutine(DisplayInformationAndReturn(2.0f, "Successfully loaded transradial avatar."));
+
+            // Initialize prosthesis
+        }
+        catch (System.Exception e)
+        {
+            StartCoroutine(DisplayInformationAndReturn(10.0f, e.Message));
+        }
+    }
+
     public IEnumerator ResetCamera()
     {
         mainCamera.enabled = false;
