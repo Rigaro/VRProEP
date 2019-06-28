@@ -69,6 +69,15 @@ namespace VRProEP.GameEngineCore
             LoadSocket(avatarData.socketType);
             LoadForearm(avatarData.forearmType, userData.forearmLength);
             LoadHand(avatarData.handType, userData.forearmLength, userData.handLength);
+            
+            // Deactivate rendering of the markers
+            GameObject elbowMarkerGO = GameObject.Find("ElbowJointMarker");
+            if (elbowMarkerGO == null)
+                throw new System.Exception("The joint markers were not found.");
+            // Get their mesh renderer
+            MeshRenderer elbowMarkerMR = elbowMarkerGO.GetComponent<MeshRenderer>();
+            // Deactivate
+            elbowMarkerMR.enabled = false;
         }
 
         /// <summary>

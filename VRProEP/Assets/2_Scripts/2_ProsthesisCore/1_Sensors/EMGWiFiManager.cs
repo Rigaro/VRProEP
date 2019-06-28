@@ -27,6 +27,8 @@ namespace VRProEP.ProsthesisCore
                 movingAverageFilters.Add(new MovingAverageFilter(15));
             }
 
+            sensorType = SensorType.EMGWiFi;
+
             this.isRaw = isRaw;
         }
 

@@ -67,6 +67,9 @@ public class AvatarOptionsMenu : MonoBehaviour {
             StartCoroutine(DisplayInformationAndReturn(2.0f, "Successfully loaded transradial avatar."));
 
             // Initialize prosthesis
+            GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+            FakeEMGBoniHand prosthesisManager = prosthesisManagerGO.AddComponent<FakeEMGBoniHand>();
+            //prosthesisManager.InitializeProsthesis();
         }
         catch (System.Exception e)
         {
