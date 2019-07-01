@@ -23,4 +23,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/0_Scenes/Training/ProsthesisTraining.unity
     guid: 6ae0257ec68a4b34f99ee9de1a2a1609
+  - enabled: 1
+    path: Assets/0_Scenes/WorldTemplates/FantasyTemplate.unity
+    guid: 9d71ef4379887e747bef0e3717311a97
+  - enabled: 1
+    path: Assets/0_Scenes/Development/PhotoStage.unity
+    guid: 49c6755ec71d12a4699502ae77a2b052
   m_configObjects: {}

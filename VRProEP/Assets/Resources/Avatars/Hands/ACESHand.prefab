@@ -450,6 +450,10 @@ MonoBehaviour:
   dropOffVelocityThreshold: 0.03
   throwEnable: 0
   throwMultiplier: 1
+  interactionInputs:
+  - 0
+  interactionOutputs:
+  - 0
 --- !u!135 &135557139448756552
 SphereCollider:
   m_ObjectHideFlags: 0

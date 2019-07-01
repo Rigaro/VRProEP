@@ -11,6 +11,7 @@ public class ModeSelectionMenu : MonoBehaviour {
 
     public void LoadPlayground()
     {
+        /*
         // Load player and able bodied avatar (without adaptive tracker).
         SaveSystem.LoadUserData("MD1942");
         AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
@@ -23,6 +24,11 @@ public class ModeSelectionMenu : MonoBehaviour {
         KeepOnLoad();
         // Load level.
         SteamVR_LoadLevel.Begin("DemoPlayground");
+        */
+        KeepOnLoad();
+        // Load level.
+        SteamVR_LoadLevel.Begin("FantasyTemplate");
+        //SteamVR_LoadLevel.Begin("PhotoStage");
     }
 
     private void KeepOnLoad()

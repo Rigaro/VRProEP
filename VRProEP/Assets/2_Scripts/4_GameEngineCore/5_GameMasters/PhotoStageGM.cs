@@ -7,6 +7,7 @@ using Valve.VR;
 using VRProEP.ExperimentCore;
 using VRProEP.GameEngineCore;
 using VRProEP.ProsthesisCore;
+using VRProEP.Utilities;
 
 public class PhotoStageGM : GameMaster
 {
@@ -14,6 +15,7 @@ public class PhotoStageGM : GameMaster
     public Transform objectTransform;
     public Transform objectStart;
     public bool isAble = true;
+    public bool isEMG = false;
     public List<GameObject> dropOffLocations = new List<GameObject>();
     public float standOffset = 0.1f;
     public Transform subjectStandLocation;
@@ -23,9 +25,9 @@ public class PhotoStageGM : GameMaster
 
     private void Awake()
     {
-        if (isAble)
+        if (isAble && !isEMG)
             LoadAbleBodiedAvatar();
-        else
+        else if (!isAble && !isEMG)
             LoadTHAvatar();
     }
 
@@ -53,6 +55,9 @@ public class PhotoStageGM : GameMaster
             dropOffTransform.localPosition = new Vector3((subjectStandLocation.localPosition.x - (dropOffReachMultipliers[i] * subjectArmLength)), dropOffHeightMultipliers[i] * subjectHeight, dropOffTransform.localPosition.z);
             i++;
         }
+
+        if (isEMG)
+            InitExperimentSystem();
     }
 
     public void LoadAbleBodiedAvatar()
@@ -119,7 +124,24 @@ public class PhotoStageGM : GameMaster
         //
         // Create data loggers
         //
-
+        // Restart EMG readings
+        foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
+        {
+            if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
+            {
+                UDPSensorManager udpSensor = (UDPSensorManager)sensor;
+                //Debug.Log(wifiSensor.RunThread);
+                udpSensor.StartSensorReading();
+                //Debug.Log(wifiSensor.RunThread);
+            }
+        }
+        // Set EMG sensor and reference generator as active.
+        // Get prosthesis
+        GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+        ConfigurableElbowManager elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
+        // Set active sensor and reference generator to EMG.
+        elbowManager.ChangeSensor("VAL_SENSOR_SEMG");
+        elbowManager.ChangeReferenceGenerator("VAL_REFGEN_EMGPROP");
     }
 
     /// <summary>

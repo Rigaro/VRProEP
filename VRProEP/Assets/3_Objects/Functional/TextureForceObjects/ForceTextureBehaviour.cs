@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using VRProEP.GameEngineCore;
 
-public class ForceTextureBehaviour : MonoBehaviour
+public class ForceTextureBehaviour : MonoBehaviour, IInteractable
 {
     public bool enableColourFeedback = true;
     [SerializeField]

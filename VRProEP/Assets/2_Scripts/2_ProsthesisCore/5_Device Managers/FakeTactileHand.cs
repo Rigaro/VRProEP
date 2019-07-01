@@ -1,5 +1,7 @@
 ﻿//======= Copyright (c) Melbourne Robotics Lab, All rights reserved. ===============
+using System.Collections.Generic;
 using UnityEngine;
+using VRProEP.GameEngineCore;
 
 namespace VRProEP.ProsthesisCore
 {
@@ -7,6 +9,17 @@ namespace VRProEP.ProsthesisCore
     {
         private float force = 0.0f;
         private float roughness = 0.0f;
+        private GraspManager ingameGraspManager; // Handles game-world object interaction and inputs from prosthetic
+        private List<float> interactionInputs = new List<float>();
+        private List<float> interactionOutputs = new List<float>();
+
+        public FakeTactileHand(GraspManager ingameGraspManager)
+        {
+            this.ingameGraspManager = ingameGraspManager ?? throw new System.ArgumentNullException("The providede Grasp Manager is empty.");
+            interactionInputs.Add(force);
+            interactionOutputs.Add(roughness);
+        }
+
         /// <summary>
         /// Updates the state of the device for the given channel.
         /// Since it's 1DOF, only one channel available.
@@ -21,6 +34,11 @@ namespace VRProEP.ProsthesisCore
                 force = 1.0f;
             else
                 force = reference;
+
+            // Handle game-world interaction
+            interactionInputs[0] = force;
+            interactionOutputs = ingameGraspManager.HandleInteraction(interactionInputs);
+            roughness = interactionOutputs[0];
         }
 
         /// <summary>
@@ -36,28 +54,6 @@ namespace VRProEP.ProsthesisCore
 
             UpdateState(1, references[0]);
         }
-
-        /// <summary>
-        /// Updates the sensed roughness value.
-        /// </summary>
-        /// <param name="roughness">The roughness value [0,1].</param>
-        public void SenseRoughness(float roughness)
-        {
-            if (roughness > 1.0f)
-                roughness = 1.0f;
-            else
-                this.roughness = roughness;
-        }
-
-        /// <summary>
-        /// Applies a force on the object
-        /// </summary>
-        /// <returns></returns>
-        public float ApplyForce()
-        {
-            return force;
-        }
-
 
         /// <summary>
         /// Returns raw force and roughness.
@@ -89,7 +85,7 @@ namespace VRProEP.ProsthesisCore
             if (channel.ToLower() == "force")
                 channelNum = 0;
             else if (channel.ToLower() == "roughness")
-                channelNum = 0;
+                channelNum = 1;
 
             return GetRawData(channelNum);
         }

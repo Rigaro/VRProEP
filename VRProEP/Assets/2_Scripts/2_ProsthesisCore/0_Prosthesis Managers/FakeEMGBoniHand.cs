@@ -10,11 +10,13 @@ namespace VRProEP.ProsthesisCore
     {
         private SingleInputManager inputManager;
         private FakeTactileHand handManager;
+        private BoniManager boniManager;
 
         private bool isConfigured = false;
 
         private float handState = 0.0f;
-
+        private float roughnessValue = 0.0f;
+        
         /// <summary>
         /// Initializes the hand prosthesis with basic functionality.
         /// Must be called only after the avatar is available.
@@ -42,13 +44,21 @@ namespace VRProEP.ProsthesisCore
             float[] xMin = { 0.0f };
             float[] xMax = { 1.0f };
             List<float> emgGains = new List<float>(1);
-            emgGains.Add(0.015f);
+            emgGains.Add(-0.005f);
             EMGInterfaceReferenceGenerator emgRG = new EMGInterfaceReferenceGenerator(xBar, xMin, xMax, emgGains, EMGInterfaceType.dualSiteProportional);
 
             inputManager = new SingleInputManager(emgSensor, emgRG);
+            
+            // Configure the grasp manager
+            GameObject graspManagerGO = GameObject.FindGameObjectWithTag("GraspManager");
+            if (graspManagerGO == null)
+                throw new System.Exception("Grasp Manager not found.");
+            GraspManager graspManager = graspManagerGO.GetComponent<GraspManager>();
+            graspManager.managerType = GraspManager.GraspManagerType.Assisted;
+            graspManager.managerMode = GraspManager.GraspManagerMode.Restriced;
 
             // Create fake hand
-            handManager = new FakeTactileHand();
+            handManager = new FakeTactileHand(graspManager);
 
             isConfigured = true;
         }
@@ -60,8 +70,12 @@ namespace VRProEP.ProsthesisCore
             {
                 // Update references
                 handState = inputManager.GenerateReference(0);
+                Debug.Log("Hand state: " + handState);
                 // Update device state
                 handManager.UpdateState(0, handState);
+                // Get roughness data
+                roughnessValue = handManager.GetProcessedData("roughness");
+                Debug.Log("Roughness: " + roughnessValue);
             }
         }
     }
