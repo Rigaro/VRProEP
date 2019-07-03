@@ -603,7 +603,7 @@ MonoBehaviour:
   objectTransform: {fileID: 444952084}
   objectStart: {fileID: 444952084}
   isAble: 0
-  isEMG: 1
+  isEMG: 0
   dropOffLocations:
   - {fileID: 704021893}
   - {fileID: 1637033455}
