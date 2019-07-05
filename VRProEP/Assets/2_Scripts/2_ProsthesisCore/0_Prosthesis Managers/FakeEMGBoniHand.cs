@@ -13,6 +13,10 @@ namespace VRProEP.ProsthesisCore
         private BoniManager boniManager;
 
         private bool isConfigured = false;
+        private bool isEnabled = false;
+
+        public bool IsEnabled { get => isEnabled; }
+        public float RoughnessValue { get => roughnessValue; }
 
         private float handState = 0.0f;
         private float roughnessValue = 0.0f;
@@ -57,8 +61,9 @@ namespace VRProEP.ProsthesisCore
             graspManager.managerType = GraspManager.GraspManagerType.Assisted;
             graspManager.managerMode = GraspManager.GraspManagerMode.Restriced;
 
-            // Create fake hand
+            // Create fake hand and add as user sensor
             handManager = new FakeTactileHand(graspManager);
+            AvatarSystem.AddActiveSensor(handManager);
 
             isConfigured = true;
         }
@@ -70,12 +75,15 @@ namespace VRProEP.ProsthesisCore
             {
                 // Update references
                 handState = inputManager.GenerateReference(0);
-                Debug.Log("Hand state: " + handState);
+
                 // Update device state
                 handManager.UpdateState(0, handState);
+
                 // Get roughness data
                 roughnessValue = handManager.GetProcessedData("roughness");
-                Debug.Log("Roughness: " + roughnessValue);
+
+                // Set enable
+                isEnabled = inputManager.IsEnabled();
             }
         }
     }

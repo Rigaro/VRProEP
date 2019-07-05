@@ -34,14 +34,15 @@ namespace VRProEP.ProsthesisCore
             // Get enable
             float enableValue = enableControllerManager.GetProcessedData(1);
 
-            // Combine input
+            // Combine inputs
             List<float> input = new List<float>();
             input.Add(enableValue);
             foreach (float value in sensorData)
             {
                 input.Add(value);
-                //Debug.Log(emgState);
             }
+            // Update enable
+            isEnabled = referenceGenerator.IsEnabled();
 
             // Compute reference with that data
             return referenceGenerator.UpdateReference(channel, input.ToArray());

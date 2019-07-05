@@ -19,9 +19,11 @@ public class TouchyBallManager : MonoBehaviour
     private TouchyBallState ballState = TouchyBallState.Idle;
     private Renderer ballRenderer;
     private bool isWaiting = false;
+    private Coroutine resetCoroutine;
 
     public TouchyBallState BallState { get => ballState; }
 
+    /*
     // DEBUG
     public bool select = false;
     private void Update()
@@ -33,6 +35,7 @@ public class TouchyBallManager : MonoBehaviour
         }
     }
     // DEBUG
+    */
 
     private void Start()
     {
@@ -42,7 +45,7 @@ public class TouchyBallManager : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         // Check if touched by subject
-        if (other.tag == "GraspManager")
+        if (other.tag == "GraspManager" || other.tag == "Hand")
         {
             switch(ballState)
             {
@@ -68,14 +71,15 @@ public class TouchyBallManager : MonoBehaviour
     private void OnTriggerExit(Collider other)
     {
         // Check if hand is gone to return to idle.
-        if (other.tag == "GraspManager" && !isWaiting)
+        if ((other.tag == "GraspManager" || other.tag == "Hand") && !isWaiting)
         {
-            StartCoroutine(ReturnToIdle(2.0f));
+            resetCoroutine = StartCoroutine(ReturnToIdle(2.0f));
         }
     }
 
     /// <summary>
     /// Wait some seconds before returning to idle state.
+    /// If it was selected in the middle of the wait, then just stay selected.
     /// </summary>
     /// <param name="waitSeconds">The number of seconds to wait.</param>
     /// <returns>IEnumerator used for the Coroutine.</returns>
@@ -93,7 +97,18 @@ public class TouchyBallManager : MonoBehaviour
     /// </summary>
     public void SetSelected()
     {
+        if(resetCoroutine != null)
+            StopCoroutine(resetCoroutine);
+
         ballState = TouchyBallState.Selected;
         ballRenderer.material.color = selectedColour;
+    }
+
+    /// <summary>
+    /// Resets the selection to idle.
+    /// </summary>
+    public void ResetSelection()
+    {
+        resetCoroutine = StartCoroutine(ReturnToIdle(0.1f));
     }
 }
