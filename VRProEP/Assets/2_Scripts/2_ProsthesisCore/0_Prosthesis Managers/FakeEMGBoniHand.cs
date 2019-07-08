@@ -65,6 +65,13 @@ namespace VRProEP.ProsthesisCore
             handManager = new FakeTactileHand(graspManager);
             AvatarSystem.AddActiveSensor(handManager);
 
+            // Add Feedback
+            float[] xBarFB = new float[] { 0.0f, 0.0f };
+            BoneConductionController boniController = new BoneConductionController("192.168.137.56", 2380, 1, 1, 1);
+            BoneConductionCharacterization userBoniCharac = (BoneConductionCharacterization)SaveSystem.LoadFeedbackCharacterization(SaveSystem.ActiveUser.id, FeedbackType.BoneConduction);
+            BoneConductionReferenceGenerator boniRG = new BoneConductionReferenceGenerator(xBarFB, userBoniCharac);
+            boniManager = new BoniManager(boniController, boniRG);
+
             isConfigured = true;
         }
 
@@ -84,7 +91,30 @@ namespace VRProEP.ProsthesisCore
 
                 // Set enable
                 isEnabled = inputManager.IsEnabled();
+
+                // Update feedback
+                float[] sensorData = { roughnessValue, handState };
+                //Debug.Log("Force: " + handState + ", Roughness: " + roughnessValue);
+                boniManager.UpdateFeedback(0, sensorData);
             }
+        }
+
+        /// <summary>
+        /// Reset the Force applied by the hand back to 0.
+        /// </summary>
+        public void ResetForce()
+        {
+            inputManager.ResetReference(0);
+        }
+
+        public void StartBoniConnection()
+        {
+            boniManager.StartBoniConnection();
+        }
+
+        public void StopBoniConnection()
+        {
+            boniManager.StopBoniConnection();
         }
     }
 }

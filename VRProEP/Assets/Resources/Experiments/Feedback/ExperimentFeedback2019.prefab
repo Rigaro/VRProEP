@@ -423,7 +423,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &728265261
 Transform:
   m_ObjectHideFlags: 0
@@ -660,7 +660,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1504687035
 Transform:
   m_ObjectHideFlags: 0
@@ -1202,7 +1202,7 @@ MonoBehaviour:
   demoMode: 0
   restTime: 60
   skipInstructions: 0
-  debug: 1
+  debug: 0
   debugText: {fileID: 0}
   skipAll: 0
   skipTraining: 0
@@ -1220,7 +1220,7 @@ MonoBehaviour:
   - 0.2
   - 0.5
   - 0.8
-  iterationsPerSessionPerSetting: 050000000500000005000000050000000500000005000000
+  iterationsPerSessionPerSetting: 010000000100000001000000010000000100000001000000
   trainingPerSessionPerSetting: 010000000100000000000000010000000100000000000000
   sessionType: 000000000100000002000000000000000100000002000000
   visualFeedbackType: 010000000100000001000000000000000000000000000000
@@ -1301,7 +1301,8 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Hand
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 114000012051789102, guid: 6def53d002137b747aec0b29551e0e25, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 6def53d002137b747aec0b29551e0e25, type: 3}
 --- !u!4 &8322025924211212340 stripped
 Transform:
@@ -2120,7 +2121,8 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Hand
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 114000013038800862, guid: 638779290bce1af49b356f33dcc6fccf, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 638779290bce1af49b356f33dcc6fccf, type: 3}
 --- !u!4 &8322025925855230210 stripped
 Transform:

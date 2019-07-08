@@ -63,5 +63,10 @@ namespace VRProEP.ProsthesisCore
             }
             return references.ToArray();
         }
+
+        public void ResetReference(int channel)
+        {
+            referenceGenerator.SetReference(channel, 0.0f);
+        }
     }
 }

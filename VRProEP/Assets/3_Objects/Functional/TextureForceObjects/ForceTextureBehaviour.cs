@@ -72,6 +72,9 @@ public class ForceTextureBehaviour : MonoBehaviour, IInteractable
             objectMaterial.color = Color.Lerp(noForceColour, targetForceColour, force / forceTarget);
         else if (enableColourFeedback && force > forceTarget) // Interpolate between target and max colours.
             objectMaterial.color = Color.Lerp(targetForceColour, maxForceColour, (force - forceTarget) / (1 - forceTarget));
+
+        if (!enableColourFeedback)
+            objectMaterial.color = noForceColour;
     }
 
     /// <summary>

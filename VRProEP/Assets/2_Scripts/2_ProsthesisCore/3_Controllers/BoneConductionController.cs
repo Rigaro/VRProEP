@@ -10,9 +10,17 @@ namespace VRProEP.ProsthesisCore
     /// </summary>
     public class BoneConductionController : UDPWriter, IController
     {
-        public BoneConductionController(string ipAddress, int port, int channel, float amplitudeMax, int sampleRate) : base(ipAddress, port, "BoniRemote")
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ipAddress"></param>
+        /// <param name="port"></param>
+        /// <param name="channelNumber"></param>
+        /// <param name="amplitudeMax"></param>
+        /// <param name="sampleRate"></param>
+        public BoneConductionController(string ipAddress, int port, int channelNumber, float amplitudeMax, int sampleRate) : base(ipAddress, port, "BoniRemote")
         {
-            SetUpControlInput(channel);
+            SetUpControlInput(channelNumber);
         }
 
         /// <summary>

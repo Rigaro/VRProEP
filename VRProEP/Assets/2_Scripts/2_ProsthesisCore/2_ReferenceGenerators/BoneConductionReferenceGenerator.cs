@@ -102,8 +102,6 @@ namespace VRProEP.ProsthesisCore
             this.gains = bcCharac.gains;
             this.offset = bcCharac.offset;
             this.frequency = bcCharac.frequency;
-            if (xBar.Length != xMin.Length || xBar.Length != xMax.Length)
-                throw new System.ArgumentOutOfRangeException("The length of the parameters does not match.");
 
         }
 
@@ -132,8 +130,10 @@ namespace VRProEP.ProsthesisCore
             xBar[0] = offset[0] + input[0] * gains[0];
 
             //force to amplitude 
-            float[] Int = CalculateFrequencyDependendParameters(xBar[0],1);
-            xBar[1] = Int[0] + input[1] * Int[1];
+            float[] interpolatedReference = CalculateFrequencyDependendParameters(xBar[0]);
+            xBar[1] = interpolatedReference[1] + input[1] * interpolatedReference[0];
+
+            Debug.Log("F: " + xBar[0] + ", A: " + xBar[1]);
 
             return xBar;
         }
@@ -144,14 +144,18 @@ namespace VRProEP.ProsthesisCore
         /// <param name="freq">Gives the frequency at which the gain and offset has to be calculated</param>
         /// <param name="startindex">Gives the index at which the gain and offset are to be interpolated</param>
         /// <returns>returns the obtained gain [0] and offset [1] </returns>
-        private float[] CalculateFrequencyDependendParameters(float freq, int startindex)
+        private float[] CalculateFrequencyDependendParameters(float freq)
         {
             float[] interpolate = new float[2];
-         
-           //interpolate gain
-            interpolate[0] = LinearInterpolate(frequency,gains,freq, startindex);
+            List<float> gainsShort= new List<float>(gains);
+            List<float> offsetShort = new List<float>(offset);
+            gainsShort.RemoveAt(0);
+            offsetShort.RemoveAt(0);
+
+            //interpolate gain
+            interpolate[0] = LinearInterpolate(frequency, gainsShort.ToArray(), freq);
             //interpolate offset
-            interpolate[1] = LinearInterpolate(frequency, offset, freq, startindex);
+            interpolate[1] = LinearInterpolate(frequency, offsetShort.ToArray(), freq);
 
             return interpolate;
         }
@@ -162,9 +166,8 @@ namespace VRProEP.ProsthesisCore
         /// <param name="xVal">Gives the x parameters</param>
         /// <param name="yVal">Gives the y parameters</param>
         /// <param name="t">Gives the x Value to be interpolated</param>
-        /// <param name="startindex">Gives the index at which the gain and offset are to be interpolated</param>
         /// <returns>the y(t) is returned</returns>
-        private float LinearInterpolate(float[] xVal, float[] yVal, float t, int startindex)
+        private float LinearInterpolate(float[] xVal, float[] yVal, float t)
         {
             if(xVal.Length != yVal.Length)
                 throw new System.ArgumentOutOfRangeException("The input array length of x and y should be equal");
@@ -173,8 +176,8 @@ namespace VRProEP.ProsthesisCore
                 throw new System.ArgumentOutOfRangeException("No Extrapolation Method implemented in LinearInterpolation.");
 
             //find i for gap x[i-1]<= t <=x[i]
-            int index = startindex;
-            for(int i = startindex+1; i < (xVal.Length-1); i++)
+            int index = 1;
+            for(int i = 1; i <= (xVal.Length-1); i++)
             {
                 if(xVal[i-1] <= t && t <= xVal[i])
                 {

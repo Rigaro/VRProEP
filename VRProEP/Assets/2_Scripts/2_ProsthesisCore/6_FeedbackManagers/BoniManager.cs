@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using VRProEP.Utilities;
 
 namespace VRProEP.ProsthesisCore
 {
@@ -55,6 +56,24 @@ namespace VRProEP.ProsthesisCore
             if (input.Length % 2 != 0)
                 return false;
             else return true;
+        }
+
+        public void StartBoniConnection()
+        {
+            if (controller.GetType() == typeof(BoneConductionController))
+            {
+                BoneConductionController boniController = (BoneConductionController)controller;
+                boniController.StartListening();
+            }
+        }
+               
+        public void StopBoniConnection()
+        {
+            if (controller.GetType() == typeof(BoneConductionController))
+            {
+                BoneConductionController boniController = (BoneConductionController)controller;
+                boniController.StopListening();
+            }
         }
     }
 }

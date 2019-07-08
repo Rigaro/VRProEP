@@ -76,7 +76,7 @@ public class FeedbackExperiment2019GM : GameMaster
     // Data logging:
     private DataStreamLogger continuousLogger;
     private DataStreamLogger roughnessLogger;
-    private const string continuousDataFormat = "t,emgA,emgB,force,forceTarget";
+    private const string continuousDataFormat = "t,emgA,emgB,force,roughness,forceTarget";
     private const string roughnessDataFormat = "i,selRoughness,objRoughness";
 
     // Performance evaluation
@@ -164,10 +164,17 @@ public class FeedbackExperiment2019GM : GameMaster
                 //
                 // Give instructions
                 //
-                //if (!inInstructions)
-                //    StartCoroutine(InstructionsLoop());
+                if (!inInstructions)
+                    StartCoroutine(InstructionsLoop());
 
-                experimentState = ExperimentState.InitializingApplication;
+                //
+                // DEBUG
+                //
+                //experimentState = ExperimentState.InitializingApplication;
+                //
+                // DEBUG
+                //
+
                 //
                 // Go to Initializing Application
                 //
@@ -220,11 +227,17 @@ public class FeedbackExperiment2019GM : GameMaster
                 //
                 // Guide subject through training
                 //
-                //if (!inTraining)
-                //    StartCoroutine(TrainingLoop());
+                if (!inTraining)
+                    StartCoroutine(TrainingLoop());
 
-                experimentState = ExperimentState.GivingInstructions;
-                skipInstructions = true;
+                //
+                // DEBUG
+                //
+                //experimentState = ExperimentState.GivingInstructions;
+                //skipInstructions = true;
+                //
+                // DEBUG
+                //
 
                 //
                 // Go to instructions
@@ -277,7 +290,10 @@ public class FeedbackExperiment2019GM : GameMaster
                 instructionManager.DisplayText(infoText);
 
                 // DEBUG
-                experimentState = ExperimentState.PerformingTask;
+                // experimentState = ExperimentState.PerformingTask;
+                // DEBUG
+
+                startEnable = true;
 
                 // Check if pause requested
                 UpdatePause();
@@ -285,6 +301,7 @@ public class FeedbackExperiment2019GM : GameMaster
                 {
                     // Waiting for subject to get to start position.
                     case WaitState.Waiting:
+                        waitState = WaitState.Countdown;
                         break;
                     // HUD countdown for reaching action.
                     case WaitState.Countdown:
@@ -376,6 +393,10 @@ public class FeedbackExperiment2019GM : GameMaster
                 // Check whether the new session condition is met
                 else if (CheckNextSessionCondition())
                 {
+                    //iterations
+                    hudManager.DisplayText("Good job!", 2.0f);
+                    // Allow 3 seconds after task end to do calculations
+                    SetWaitFlag(3.0f);
                     experimentState = ExperimentState.InitializingNextSession;
                 }
                 else
@@ -400,13 +421,15 @@ public class FeedbackExperiment2019GM : GameMaster
                     //
                     iterationNumber++;
                     iterationNumberCounterTotal++;
+                    taskTime = 0.0f;
 
-                    // 
-                    // Update log requirements
+                    //
+                    // Initialize data logging
                     //
                     if (sessionType[sessionNumber - 1] == FeedbackExperiment.Force || sessionType[sessionNumber - 1] == FeedbackExperiment.Mixed)
                         continuousLogger.AddNewLogFile(sessionNumber, iterationNumber, continuousDataFormat);
-                    else if (sessionType[sessionNumber - 1] == FeedbackExperiment.Roughness || sessionType[sessionNumber - 1] == FeedbackExperiment.Mixed)
+
+                    if (sessionType[sessionNumber - 1] == FeedbackExperiment.Roughness || sessionType[sessionNumber - 1] == FeedbackExperiment.Mixed)
                         roughnessLogger.AddNewLogFile(sessionNumber, iterationNumber, roughnessDataFormat);
 
 
@@ -415,7 +438,7 @@ public class FeedbackExperiment2019GM : GameMaster
                     //
                     UpdateForceAndRoughnessTargets();
                     StartCoroutine(SpawnExperimentObject());
-
+                    handManager.ResetForce();
 
                     //
                     //
@@ -433,26 +456,37 @@ public class FeedbackExperiment2019GM : GameMaster
              *************************************************
              */
             case ExperimentState.InitializingNextSession:
-                //
-                // Perform session closure procedures
-                //
+                if (WaitFlag)
+                {
+                    //
+                    // Initialize new session variables and flow control
+                    //
+                    iterationNumber = 1;
+                    sessionNumber++;
+                    iterationNumberCounterTotal++;
+                    taskTime = 0.0f;
 
-                //
-                // Initialize new session variables and flow control
-                //
-                iterationNumber = 1;
-                sessionNumber++;
-                //
-                // Initialize data logging
-                //
-                if (sessionType[sessionNumber - 1] == FeedbackExperiment.Force || sessionType[sessionNumber - 1] == FeedbackExperiment.Mixed)
-                    continuousLogger.AddNewLogFile(sessionNumber, iterationNumber, continuousDataFormat);
-                else if (sessionType[sessionNumber - 1] == FeedbackExperiment.Roughness || sessionType[sessionNumber - 1] == FeedbackExperiment.Mixed)
-                    roughnessLogger.AddNewLogFile(sessionNumber, iterationNumber, roughnessDataFormat);
+                    //
+                    // Initialize data logging
+                    //
+                    if (sessionType[sessionNumber - 1] == FeedbackExperiment.Force || sessionType[sessionNumber - 1] == FeedbackExperiment.Mixed)
+                        continuousLogger.AddNewLogFile(sessionNumber, iterationNumber, continuousDataFormat);
 
-                // Start next session immediately
-                LaunchNextSession();
-                experimentState = ExperimentState.UpdatingApplication; // Initialize next session
+                    if (sessionType[sessionNumber - 1] == FeedbackExperiment.Roughness || sessionType[sessionNumber - 1] == FeedbackExperiment.Mixed)
+                        roughnessLogger.AddNewLogFile(sessionNumber, iterationNumber, roughnessDataFormat);
+
+                    // Start next session immediately
+                    LaunchNextSession();
+
+                    //
+                    // Update objects
+                    //
+                    UpdateForceAndRoughnessTargets();
+                    StartCoroutine(SpawnExperimentObject());
+                    handManager.ResetForce();
+
+                    experimentState = ExperimentState.WaitingForStart; // Initialize next session
+                }
                 break;
             /*
              *************************************************
@@ -598,6 +632,7 @@ public class FeedbackExperiment2019GM : GameMaster
                         logData = iterationNumber.ToString();
                         logData += "," + selectedRoughness.ToString();
                         logData += "," + activeRougnessTarget.ToString();
+                        //Debug.Log("Logging roughness: " + logData);
                         roughnessLogger.AppendData(logData);
                     }
 
@@ -606,7 +641,8 @@ public class FeedbackExperiment2019GM : GameMaster
                     //
                     if (sessionType[sessionNumber - 1] == FeedbackExperiment.Force || sessionType[sessionNumber - 1] == FeedbackExperiment.Mixed)
                         continuousLogger.CloseLog();
-                    else if (sessionType[sessionNumber - 1] == FeedbackExperiment.Roughness || sessionType[sessionNumber - 1] == FeedbackExperiment.Mixed)
+
+                    if (sessionType[sessionNumber - 1] == FeedbackExperiment.Roughness || sessionType[sessionNumber - 1] == FeedbackExperiment.Mixed)
                         roughnessLogger.CloseLog();
 
                     //
@@ -639,6 +675,8 @@ public class FeedbackExperiment2019GM : GameMaster
             }
         }
 
+        if (handManager != null) handManager.StopBoniConnection();
+
         //
         // Save and close all logs
         //
@@ -653,6 +691,7 @@ public class FeedbackExperiment2019GM : GameMaster
     {
         string Text;
         Text = "Status: " + experimentState.ToString() + ".\n";
+        Text += "Session type: " + sessionType[sessionNumber - 1].ToString() + ".\n";
         Text += "Progress: " + (iterationNumberCounterTotal) + "/" + iterationNumberTotal + ".\n";
         Text += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
         return Text;
@@ -695,7 +734,15 @@ public class FeedbackExperiment2019GM : GameMaster
 
         // Get hand object
         if(!debug)
+        {
+            prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
             handManager = prosthesisManagerGO.GetComponent<FakeEMGBoniHand>() ?? throw new System.NullReferenceException("Prosthesis manager not found.");
+            // Restart feedback connection
+            //handManager.StartBoniConnection();
+        }
+
+        // Clear object
+        experimentObject.gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -732,7 +779,7 @@ public class FeedbackExperiment2019GM : GameMaster
                     if (activeSelector.transform.GetChild(i).GetComponent<TouchyBallManager>().BallState == TouchyBallManager.TouchyBallState.Correct)
                     {
                         selectedRoughness = roughnessTargets[i]; // Set the selected roughness by the ball number
-                        Debug.Log("Selected roughness: " + selectedRoughness);
+                        //Debug.Log("Selected roughness: " + selectedRoughness);
                         // Reset the selectors
                         for (int j = 0; j < activeSelector.transform.childCount; j++)
                         {
@@ -752,9 +799,22 @@ public class FeedbackExperiment2019GM : GameMaster
                 return false;
             }
         }
+        else if(!debug && handManager.IsEnabled)
+        {
+            if (isSelecting) // If we havent disabled the balloons then do so.
+            {
+                isSelecting = false;
+                // Enable all balloons in active selector
+                for (int i = 0; i < activeSelector.transform.childCount; i++)
+                {
+                    activeSelector.transform.GetChild(i).GetComponent<TouchyBallManager>().ResetSelection();
+                }
+            }
+
+            return false;
+        }
         else
         {
-
             return false;
         }
     }
@@ -953,11 +1013,12 @@ public class FeedbackExperiment2019GM : GameMaster
                     instructionManager.DisplayText(defaultText + "The harder you grip the object the more the tactile feedback will vibrate." + continueText);
                     yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                     yield return new WaitForSeconds(0.5f);
-                    instructionManager.DisplayText("Get ready to start! Look forward towards the desk.");
-                    hudManager.DisplayText("Look forward.", 3.0f);
-                    yield return new WaitForSeconds(5.0f);
-                    HUDCountDown(3);
-                    yield return new WaitForSeconds(5.0f);
+
+                    //instructionManager.DisplayText("Get ready to start! Look forward towards the desk.");
+                    //hudManager.DisplayText("Look forward.", 3.0f);
+                    //yield return new WaitForSeconds(5.0f);
+                    //HUDCountDown(3);
+                    //yield return new WaitForSeconds(5.0f);
 
                     //present force level 1,2,3
                     
@@ -981,11 +1042,12 @@ public class FeedbackExperiment2019GM : GameMaster
                     instructionManager.DisplayText("Therefore after grasping the object, touch the suitable ballon: red:smooth yellow:middle  purple:rough " + continueText);
                     yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                     yield return new WaitForSeconds(0.5f);
-                    instructionManager.DisplayText("Get ready to start! Look forward towards the desk.");
-                    hudManager.DisplayText("Look forward.", 3.0f);
-                    yield return new WaitForSeconds(5.0f);
-                    HUDCountDown(3);
-                    yield return new WaitForSeconds(5.0f);
+                    
+                    //instructionManager.DisplayText("Get ready to start! Look forward towards the desk.");
+                    //hudManager.DisplayText("Look forward.", 3.0f);
+                    //yield return new WaitForSeconds(5.0f);
+                    //HUDCountDown(3);
+                    //yield return new WaitForSeconds(5.0f);
 
                     //present roughness level 1,2,3
 
@@ -1049,11 +1111,13 @@ public class FeedbackExperiment2019GM : GameMaster
             instructionManager.DisplayText(defaultText + "Your progress will be displayed here along with the current time." + continueText);
             yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
             yield return new WaitForSeconds(0.5f);
-            instructionManager.DisplayText("Get ready to start! Look forward towards the desk.");
-            hudManager.DisplayText("Look forward.", 3.0f);
-            yield return new WaitForSeconds(5.0f);
-            HUDCountDown(3);
-            yield return new WaitForSeconds(5.0f);
+
+
+            //instructionManager.DisplayText("Get ready to start! Look forward towards the desk.");
+            //hudManager.DisplayText("Look forward.", 3.0f);
+            //yield return new WaitForSeconds(5.0f);
+            //HUDCountDown(3);
+            //yield return new WaitForSeconds(5.0f);
 
             instructionsEnd = true;
     }
@@ -1107,11 +1171,11 @@ public class FeedbackExperiment2019GM : GameMaster
             default:
                 break;
         }
-        instructionManager.DisplayText("Get ready to start! Look forward towards the desk.");
-        hudManager.DisplayText("Look forward.", 3.0f);
-        yield return new WaitForSeconds(5.0f);
-        HUDCountDown(3);
-        yield return new WaitForSeconds(5.0f);
+        //instructionManager.DisplayText("Get ready to start! Look forward towards the desk.");
+        //hudManager.DisplayText("Look forward.", 3.0f);
+        //yield return new WaitForSeconds(5.0f);
+        //HUDCountDown(3);
+        //yield return new WaitForSeconds(5.0f);
 
         inSessionInstructionsEnd = true;
     }
@@ -1173,8 +1237,8 @@ public class FeedbackExperiment2019GM : GameMaster
             //1 5-9
             //2 10-14
             //...
-            activeForceTarget = forceTargets[iterationNumber / iterationsPerSessionPerSetting[sessionNumber - 1]];
-            activeForceColor = forceColours[iterationNumber / iterationsPerSessionPerSetting[sessionNumber - 1]];
+            activeForceTarget = forceTargets[(iterationNumber - 1) / iterationsPerSessionPerSetting[sessionNumber - 1]];
+            activeForceColor = forceColours[(iterationNumber - 1) / iterationsPerSessionPerSetting[sessionNumber - 1]];
         }
         else if (sessionType[sessionNumber - 1] == FeedbackExperiment.Roughness)
         {
@@ -1182,7 +1246,7 @@ public class FeedbackExperiment2019GM : GameMaster
             //1 5-9
             //2 10-14
             //...
-            activeRougnessTarget = roughnessTargets[iterationNumber / iterationsPerSessionPerSetting[sessionNumber - 1]];
+            activeRougnessTarget = roughnessTargets[(iterationNumber - 1) / iterationsPerSessionPerSetting[sessionNumber - 1]];
         }
         else if (sessionType[sessionNumber - 1] == FeedbackExperiment.Mixed)
         {
@@ -1190,8 +1254,8 @@ public class FeedbackExperiment2019GM : GameMaster
             //1 15-29
             //2 30-44
             //..
-            activeForceTarget = forceTargets[iterationNumber / (iterationsPerSessionPerSetting[sessionNumber - 1]*forceTargets.Count)];
-            activeForceColor = forceColours[iterationNumber / (iterationsPerSessionPerSetting[sessionNumber - 1] * forceTargets.Count)];
+            activeForceTarget = forceTargets[(iterationNumber - 1) / (iterationsPerSessionPerSetting[sessionNumber - 1]*forceTargets.Count)];
+            activeForceColor = forceColours[(iterationNumber - 1) / (iterationsPerSessionPerSetting[sessionNumber - 1] * forceTargets.Count)];
             //0- 0
             //1- 1
             //2- 2
@@ -1200,7 +1264,7 @@ public class FeedbackExperiment2019GM : GameMaster
             //5- 2
             //6- 0
             //..
-            activeRougnessTarget = roughnessTargets[iterationNumber % roughnessTargets.Count];
+            activeRougnessTarget = roughnessTargets[(iterationNumber - 1) % roughnessTargets.Count];
         }
     }
 
