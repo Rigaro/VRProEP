@@ -1167,9 +1167,41 @@ public class FeedbackExperiment2019GM : GameMaster
     /// </summary>
     private void UpdateForceAndRoughnessTargets()
     {
-        activeForceTarget = 0.5f; // Some function of iteration and session
-        activeRougnessTarget = 0.0f; // Some function of iteration and session
-        activeForceColor = forceColours[1];
+        if (sessionType[sessionNumber - 1] == FeedbackExperiment.Force)
+        {
+            //0 0-4
+            //1 5-9
+            //2 10-14
+            //...
+            activeForceTarget = forceTargets[iterationNumber / iterationsPerSessionPerSetting[sessionNumber - 1]];
+            activeForceColor = forceColours[iterationNumber / iterationsPerSessionPerSetting[sessionNumber - 1]];
+        }
+        else if (sessionType[sessionNumber - 1] == FeedbackExperiment.Roughness)
+        {
+            //0 0-4
+            //1 5-9
+            //2 10-14
+            //...
+            activeRougnessTarget = roughnessTargets[iterationNumber / iterationsPerSessionPerSetting[sessionNumber - 1]];
+        }
+        else if (sessionType[sessionNumber - 1] == FeedbackExperiment.Mixed)
+        {
+            //0 0-14
+            //1 15-29
+            //2 30-44
+            //..
+            activeForceTarget = forceTargets[iterationNumber / (iterationsPerSessionPerSetting[sessionNumber - 1]*forceTargets.Count)];
+            activeForceColor = forceColours[iterationNumber / (iterationsPerSessionPerSetting[sessionNumber - 1] * forceTargets.Count)];
+            //0- 0
+            //1- 1
+            //2- 2
+            //3- 0
+            //4- 1
+            //5- 2
+            //6- 0
+            //..
+            activeRougnessTarget = roughnessTargets[iterationNumber % roughnessTargets.Count];
+        }
     }
 
     /// <summary>
