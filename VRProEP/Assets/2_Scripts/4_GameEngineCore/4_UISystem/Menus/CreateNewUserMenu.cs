@@ -8,6 +8,7 @@ public class CreateNewUserMenu : MonoBehaviour {
 
     public GameObject mainMenu;
     public GameObject userOptionsMenu;
+    public GameObject experimentMenu;
     public LogManager logManager;
 
     private UserData userData = new UserData();
@@ -113,7 +114,7 @@ public class CreateNewUserMenu : MonoBehaviour {
 
                 // Return to main menu
                 mainMenu.GetComponent<MainMenu>().createdUser = true;
-                ReturnToMainMenu();
+                ReturnToExperimentMenu();
             }
             catch (Exception e)
             {
@@ -125,6 +126,13 @@ public class CreateNewUserMenu : MonoBehaviour {
     public void ReturnToUserOptionsMenu()
     {
         userOptionsMenu.SetActive(true);
+        gameObject.SetActive(false);
+    }
+
+    public void ReturnToExperimentMenu()
+    {
+        // Return to experiment menu
+        experimentMenu.SetActive(true);
         gameObject.SetActive(false);
     }
 

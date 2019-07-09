@@ -9,6 +9,7 @@ using VRProEP.ExperimentCore;
 public class SensorOptionsMenu : MonoBehaviour {
 
     public GameObject mainMenu;
+    public GameObject experimentMenu;
     public GameObject addUserSensorMenu;
     public GameObject configUserSensorMenu;
     public GameObject addExperimentSensorMenu;
@@ -66,6 +67,13 @@ public class SensorOptionsMenu : MonoBehaviour {
     {
         // Return to main menu
         mainMenu.SetActive(true);
+        gameObject.SetActive(false);
+    }
+
+
+    public void ReturnToExperimentMenu()
+    {
+        experimentMenu.SetActive(true);
         gameObject.SetActive(false);
     }
 }

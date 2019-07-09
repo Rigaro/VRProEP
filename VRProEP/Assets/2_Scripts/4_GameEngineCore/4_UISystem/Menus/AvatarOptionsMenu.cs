@@ -6,6 +6,8 @@ using VRProEP.ProsthesisCore;
 public class AvatarOptionsMenu : MonoBehaviour {
 
     public GameObject mainMenu;
+    public GameObject experimentMenu;
+    public GameObject transradialMenu;
     public LogManager logManager;
     public Camera mainCamera;
 
@@ -53,28 +55,10 @@ public class AvatarOptionsMenu : MonoBehaviour {
         }
     }
 
-    public void LoadTransradialAvatar()
+    public void LoadTransradialAvatarMenu()
     {
-        try
-        {
-            AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.Transradial);
-            AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transradial);
-
-            //mainCamera.fieldOfView = 60;
-            KeepPlayerGameObjects();
-
-            StartCoroutine(ResetCamera());
-            StartCoroutine(DisplayInformationAndReturn(2.0f, "Successfully loaded transradial avatar."));
-
-            // Initialize prosthesis
-            GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
-            FakeEMGBoniHand prosthesisManager = prosthesisManagerGO.AddComponent<FakeEMGBoniHand>();
-            //prosthesisManager.InitializeProsthesis();
-        }
-        catch (System.Exception e)
-        {
-            StartCoroutine(DisplayInformationAndReturn(10.0f, e.Message));
-        }
+        transradialMenu.SetActive(true);
+        gameObject.SetActive(false);
     }
 
     public IEnumerator ResetCamera()
@@ -89,7 +73,7 @@ public class AvatarOptionsMenu : MonoBehaviour {
     {
         logManager.DisplayInformationOnLog(time, info);
         yield return new WaitForSecondsRealtime(time);
-        ReturnToMainMenu();
+        ReturnToExperimentMenu();
     }
 
     public void ReturnToMainMenu()
@@ -99,6 +83,13 @@ public class AvatarOptionsMenu : MonoBehaviour {
 
         // Return to main menu
         mainMenu.SetActive(true);
+        gameObject.SetActive(false);
+    }
+
+    public void ReturnToExperimentMenu()
+    {
+        // Return to main menu
+        experimentMenu.SetActive(true);
         gameObject.SetActive(false);
     }
 

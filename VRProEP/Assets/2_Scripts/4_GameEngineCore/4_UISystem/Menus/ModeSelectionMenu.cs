@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR;
 using VRProEP.GameEngineCore;
+using VRProEP.ProsthesisCore;
 
 public class ModeSelectionMenu : MonoBehaviour {
     
@@ -11,7 +12,6 @@ public class ModeSelectionMenu : MonoBehaviour {
 
     public void LoadPlayground()
     {
-        /*
         // Load player and able bodied avatar (without adaptive tracker).
         SaveSystem.LoadUserData("MD1942");
         AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
@@ -24,10 +24,18 @@ public class ModeSelectionMenu : MonoBehaviour {
         KeepOnLoad();
         // Load level.
         SteamVR_LoadLevel.Begin("DemoPlayground");
-        */
+
+        /*
         KeepOnLoad();
         // Load level.
+        if (AvatarSystem.AvatarType == AvatarType.Transradial)
+        {
+            GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+            FakeEMGBoniHand prosthesisManager = prosthesisManagerGO.GetComponent<FakeEMGBoniHand>();
+            prosthesisManager.InitializeProsthesis();
+        }
         SteamVR_LoadLevel.Begin("FantasyTemplate");
+        */
         //SteamVR_LoadLevel.Begin("PhotoStage");
     }
 

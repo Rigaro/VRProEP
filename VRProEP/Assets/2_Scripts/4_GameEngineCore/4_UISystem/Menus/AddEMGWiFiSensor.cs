@@ -58,11 +58,12 @@ public class AddEMGWiFiSensor : MonoBehaviour {
                 ConfigurableElbowManager elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
                 elbowManager.AddSensor(emgSensor);
             }
+
             else if (AvatarSystem.AvatarType == AvatarType.Transradial)
             {
                 GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
                 FakeEMGBoniHand prosthesisManager = prosthesisManagerGO.GetComponent<FakeEMGBoniHand>();
-                prosthesisManager.InitializeProsthesis();
+                prosthesisManager.InitialiseInputSystem(emgSensor);
             }
             
             // Return to settings menu.

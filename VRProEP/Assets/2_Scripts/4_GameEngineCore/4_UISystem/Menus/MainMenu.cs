@@ -130,7 +130,7 @@ public class MainMenu : MonoBehaviour {
         gameObject.SetActive(false);
     }
 
-    public void LoadModeSelectionMenu()
+    public void LoadExperimentSelectionMenu()
     {
         // Clear log
         logManager.ClearLog();
