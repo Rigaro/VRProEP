@@ -24,9 +24,9 @@ public class FeedbackExperiment2019GM : GameMaster
     [Header("Experiment configuration")]
     public Transform experimentCentreTransform;
     public float experimentOrientation = 180.0f;
-    public List<float> forceTargets = new List<float> {0.2f, 0.5f, 0.8f };
+    public List<float> forceTargets = new List<float> {0.2f, 0.5f, 0.8f};
     public List<Color> forceColours;
-    public List<float> roughnessTargets = new List<float> { 0.2f, 0.5f, 0.8f };
+    public List<float> roughnessTargets = new List<float> { 0.0f, (300.0f/5900.0f), (650.0f/5900f)};
     public List<int> iterationsPerSessionPerSetting = new List<int> { 5, 5, 5, 5, 5, 5 };
     public List<int> trainingPerSessionPerSetting = new List<int> { 1, 1, 0, 1, 1, 0 };
     public List<FeedbackExperiment> sessionType = new List<FeedbackExperiment> { FeedbackExperiment.Force, FeedbackExperiment.Roughness, FeedbackExperiment.Mixed, FeedbackExperiment.Force, FeedbackExperiment.Roughness, FeedbackExperiment.Mixed }; //size 6 def.(Force Roughness Mixed Force Roughness Mixed)
@@ -982,55 +982,94 @@ public class FeedbackExperiment2019GM : GameMaster
             yield return new WaitForSeconds(3.0f);
                
             // Introduce experiment modality.
-            instructionManager.DisplayText("Welcome to prosthesis training." + continueText);
+            instructionManager.DisplayText("Welcome to the diamond factory training." + continueText);
             yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
             yield return new WaitForSeconds(0.5f);
 
             switch (sessionType[sessionNumber - 1])
             {
                 case FeedbackExperiment.Force://explain force limits X different once
-                    instructionManager.DisplayText(defaultText + "In this sessions' training you will use flexion and extension of your hand to control the grasp force of the hand." + continueText);
+                    instructionManager.DisplayText(defaultText + "In this sessions' training you will use flexion and extension of your hand to control the grasp force of the hand to produce diamonds." + continueText);
                     yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                     yield return new WaitForSeconds(0.5f);
-                    instructionManager.DisplayText(defaultText + "The object will be attached to your hand as soon as you touch it." + continueText);
+                    instructionManager.DisplayText(defaultText + "The stones will be attached to your hand as soon as you touch them." + continueText);
                     yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                     yield return new WaitForSeconds(0.5f);
-                    instructionManager.DisplayText(defaultText + "The objects' colour will indicate the level of grasp force required." + continueText);
+                    instructionManager.DisplayText(defaultText + "The stones colour will indicate the level of grasp force required to produce diamonds out of them." + continueText);
                     yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                     yield return new WaitForSeconds(0.5f);
-                    instructionManager.DisplayText(defaultText + "Grasp force for the objects' required is red:light yellow:middle  purple:hard." + continueText);
+                    instructionManager.DisplayText(defaultText + "Stones with blue colour need little grip force" + continueText);
+                    yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+                    yield return new WaitForSeconds(0.5f);
+                    //
+                    //show colour 1 force level low
+                    //
+                    instructionManager.DisplayText(defaultText + "Stones with yellow colour need medium grip force" + continueText);
+                    yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+                    yield return new WaitForSeconds(0.5f);
+                    //
+                    //show colour 2
+                    //
+                    instructionManager.DisplayText(defaultText + "Stones with pink colour need strong grip force" + continueText);
+                    yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+                    yield return new WaitForSeconds(0.5f);
+                    //
+                    //show colour 3
+                    //
+                    if (visualFeedbackType[sessionNumber - 1] == VisualFeebackType.On) //visual feedback
+                    {
+                        instructionManager.DisplayText(defaultText + "The stones colour will change according to the level of grasp force applied." + continueText);
+                        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+                        yield return new WaitForSeconds(0.5f);
+                        instructionManager.DisplayText(defaultText + "You should aim to change the stones colour into green." + continueText);
+                        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+                        yield return new WaitForSeconds(0.5f);
+                        instructionManager.DisplayText(defaultText + "If you squeeze to hard the diamon might brake and the colour turn red." + continueText);
+                        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+                        yield return new WaitForSeconds(0.5f);
+                    }
+                    instructionManager.DisplayText(defaultText + "To start the experiment press the button." + continueText);
+                    yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+                    yield return new WaitForSeconds(0.5f);
+                    instructionManager.DisplayText(defaultText + "Then adjust the grip force via extension/flexion of your hand." + continueText);
+                    yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+                    yield return new WaitForSeconds(0.5f);
+                    instructionManager.DisplayText(defaultText + "After adjusting the force confirm via button. " + continueText);
+                    yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+                    yield return new WaitForSeconds(0.5f);
+                    instructionManager.DisplayText(defaultText + "Touch the sphere to go to the next. " + continueText);
                     yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                     yield return new WaitForSeconds(0.5f);
                     if (visualFeedbackType[sessionNumber - 1] == VisualFeebackType.On) //visual feedback
                     {
-                        instructionManager.DisplayText(defaultText + "The colour of the object will change with the grasp force giving you visual feedback how close to the target force you are." + continueText);
+                        instructionManager.DisplayText(defaultText + "Lets train with little grasp force  " + continueText);
                         yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                         yield return new WaitForSeconds(0.5f);
+                        //
+                        //let them squeze with targetforclevel[0] + visual feedback
+                        //
+                        instructionManager.DisplayText(defaultText + "Lets train with medium grasp force  " + continueText);
+                        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+                        yield return new WaitForSeconds(0.5f);
+                        //
+                        //let them squeze with targetforclevel[1] + visual feedback
+                        //
+                        instructionManager.DisplayText(defaultText + "Lets train with strong grasp force  " + continueText);
+                        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+                        yield return new WaitForSeconds(0.5f);
+                        //
+                        //let them squeze with targetforclevel[2] + visual feedback
+                        //
                     }
-                    instructionManager.DisplayText(defaultText + "In addition the tactile feedback will indicate the grasp force." + continueText);
-                    yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
-                    yield return new WaitForSeconds(0.5f);
-                    instructionManager.DisplayText(defaultText + "The harder you grip the object the more the tactile feedback will vibrate." + continueText);
-                    yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
-                    yield return new WaitForSeconds(0.5f);
-
-                    //instructionManager.DisplayText("Get ready to start! Look forward towards the desk.");
-                    //hudManager.DisplayText("Look forward.", 3.0f);
-                    //yield return new WaitForSeconds(5.0f);
-                    //HUDCountDown(3);
-                    //yield return new WaitForSeconds(5.0f);
-
-                    //present force level 1,2,3
-                    
                     break;
                 case FeedbackExperiment.Roughness://roughness
-                    instructionManager.DisplayText("In this sessions' training you will get feedback about the objects surface roughness." + continueText);
+                    instructionManager.DisplayText("It is time to determine the quality of our diamonds by classifying them based on ther surface roughness." + continueText);
                     yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                     yield return new WaitForSeconds(0.5f);
-                    instructionManager.DisplayText("The object will be attached to your hand as soon as you touch it." + continueText);
+                    instructionManager.DisplayText("The stones will be attached to your hand as soon as you touch them." + continueText);
                     yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                     yield return new WaitForSeconds(0.5f);
-                    instructionManager.DisplayText("The tactile feedback will vibrate with different frequencies according to the surface roughness." + continueText);
+                    instructionManager.DisplayText("The tactile feedback will vibrate with different frequencies according to the surface roughness of the stones." + continueText);
                     yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                     yield return new WaitForSeconds(0.5f);
                     instructionManager.DisplayText("Low frequencies will indicate a smooth surface while high frequencies will indicate a rough surface" + continueText);
@@ -1039,18 +1078,27 @@ public class FeedbackExperiment2019GM : GameMaster
                     instructionManager.DisplayText("You will be asked to classify if the surface is smooth, medium or rough" + continueText);
                     yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                     yield return new WaitForSeconds(0.5f);
-                    instructionManager.DisplayText("Therefore after grasping the object, touch the suitable ballon: red:smooth yellow:middle  purple:rough " + continueText);
+                    instructionManager.DisplayText("Grasp a stone by flexing your hand, grip harder and softer to feel the surface roughness." + continueText);
                     yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                     yield return new WaitForSeconds(0.5f);
-                    
-                    //instructionManager.DisplayText("Get ready to start! Look forward towards the desk.");
-                    //hudManager.DisplayText("Look forward.", 3.0f);
-                    //yield return new WaitForSeconds(5.0f);
-                    //HUDCountDown(3);
-                    //yield return new WaitForSeconds(5.0f);
-
-                    //present roughness level 1,2,3
-
+                    instructionManager.DisplayText("A smooth stone feels like this and is classified as Smooth" + continueText);
+                    yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+                    yield return new WaitForSeconds(0.5f);
+                    //
+                    //present targertroughness[0] and let them classify
+                    //
+                    instructionManager.DisplayText("A medium rough stone feels like this and is classified as Mid" + continueText);
+                    yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+                    yield return new WaitForSeconds(0.5f);
+                    //
+                    //present targertroughness[1] and let them classify
+                    //
+                    instructionManager.DisplayText("A rough stone feels like this and is classified as sphere Rough" + continueText);
+                    yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+                    yield return new WaitForSeconds(0.5f);
+                    //
+                    //present targertroughness[2] and let them classify
+                    //
                     break;
                 case FeedbackExperiment.Mixed://mixed
                     throw new System.NotImplementedException();
@@ -1075,16 +1123,22 @@ public class FeedbackExperiment2019GM : GameMaster
             string defaultText = "Instructions:\n";
             string continueText = "\n\n...Press the Trigger to continue...";
 
-            instructionManager.DisplayText(defaultText + "Today we will be testing your grasping force capabilities when using different tactile feedback." + continueText);
+            instructionManager.DisplayText(defaultText + "Welcome on diamond range. Today we are going to produce some diamonds out of stones. Come on, we have to start." + continueText);
             yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
             yield return new WaitForSeconds(0.5f);
-            instructionManager.DisplayText(defaultText + "The experiment requires you to repeat the grasping task for " + iterationNumberTotal + " iterations." + continueText);
+            instructionManager.DisplayText(defaultText + "Therefore different coloured stones will be presented to you and you will have to squeeze them with different strenght." + continueText);
+            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+            yield return new WaitForSeconds(0.5f);
+            instructionManager.DisplayText(defaultText + "Furthermore the quality of the diamonds is determined by the vibrations of them and you therefore will have to put them in different categories." + continueText);
+            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+            yield return new WaitForSeconds(0.5f);
+            instructionManager.DisplayText(defaultText + "To earn or dinner today the we will produces " + iterationNumberTotal + " diamonds." + continueText);
             yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
             yield return new WaitForSeconds(0.5f);
             instructionManager.DisplayText(defaultText + "The grasping will be countrolled by your EMG activity controlling the grasping force via flexing/extending your hand." + continueText);
             yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
             yield return new WaitForSeconds(0.5f);
-            instructionManager.DisplayText(defaultText + "Different tactile feedback will be given to you, explained before the experiment." + continueText);
+            instructionManager.DisplayText(defaultText + "Different tactile feedback will be given to you, as explained before the experiment." + continueText);
             yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
             yield return new WaitForSeconds(0.5f);
             instructionManager.DisplayText(defaultText + "You will get " + restTime + " seconds rest every " + restIterations + " iterations." + continueText);
@@ -1112,13 +1166,6 @@ public class FeedbackExperiment2019GM : GameMaster
             yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
             yield return new WaitForSeconds(0.5f);
 
-
-            //instructionManager.DisplayText("Get ready to start! Look forward towards the desk.");
-            //hudManager.DisplayText("Look forward.", 3.0f);
-            //yield return new WaitForSeconds(5.0f);
-            //HUDCountDown(3);
-            //yield return new WaitForSeconds(5.0f);
-
             instructionsEnd = true;
     }
 
@@ -1137,7 +1184,7 @@ public class FeedbackExperiment2019GM : GameMaster
         switch (sessionType[sessionNumber - 1])
         {
             case FeedbackExperiment.Force:
-                instructionManager.DisplayText(defaultText + "In this session you will use flexion and extension of your hand to control the grasp force of the hand as shown in the training." + continueText);
+                instructionManager.DisplayText(defaultText + "In this session you will use flexion and extension of your hand to control the grasp force of the hand as shown in the training and produce diamonds." + continueText);
                 yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                 yield return new WaitForSeconds(0.5f);
                 instructionManager.DisplayText(defaultText + "Start the experiment by pressing the button" + continueText);
@@ -1149,13 +1196,16 @@ public class FeedbackExperiment2019GM : GameMaster
 
                 break;
             case FeedbackExperiment.Roughness://roughness
-                instructionManager.DisplayText(defaultText + "In this session you will get feedback about the objects surface roughness as shown in the training." + continueText);
+                instructionManager.DisplayText(defaultText + "In this session you will get feedback about the stones surface roughness." + continueText);
+                yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+                yield return new WaitForSeconds(0.5f);
+                instructionManager.DisplayText(defaultText + "Classify the stones according to ther surface roughness as shown in the training." + continueText);
                 yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                 yield return new WaitForSeconds(0.5f);
 
                 break;
             case FeedbackExperiment.Mixed://mixed
-                instructionManager.DisplayText(defaultText + "In this session you will use flexion and extension of your hand to control the grasp force of the hand and will get feedback about the objects surface roughness as shown in the training." + continueText);
+                instructionManager.DisplayText(defaultText + "In this session you will use flexion and extension of your hand to control the grasp force of the hand and will get feedback about the stones surface roughness as shown in the training." + continueText);
                 yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                 yield return new WaitForSeconds(0.5f);
                 instructionManager.DisplayText(defaultText + "Start the experiment by pressing the button" + continueText);
@@ -1164,19 +1214,13 @@ public class FeedbackExperiment2019GM : GameMaster
                 instructionManager.DisplayText(defaultText + "After adjusting the force you can stop the experiment by pressing the button" + continueText);
                 yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                 yield return new WaitForSeconds(0.5f);
-                instructionManager.DisplayText(defaultText + "Then you can touch the suitable ballon: red:smooth yellow:middle  purple:rough" + continueText);
+                instructionManager.DisplayText(defaultText + "Then you can touch the suitable ballon: Smooth-Mid-Rough" + continueText);
                 yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                 yield return new WaitForSeconds(0.5f);
                 break;
             default:
                 break;
         }
-        //instructionManager.DisplayText("Get ready to start! Look forward towards the desk.");
-        //hudManager.DisplayText("Look forward.", 3.0f);
-        //yield return new WaitForSeconds(5.0f);
-        //HUDCountDown(3);
-        //yield return new WaitForSeconds(5.0f);
-
         inSessionInstructionsEnd = true;
     }
 
