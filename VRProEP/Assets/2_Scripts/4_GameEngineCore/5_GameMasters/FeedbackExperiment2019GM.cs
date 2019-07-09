@@ -274,8 +274,10 @@ public class FeedbackExperiment2019GM : GameMaster
                 //
                 if (inSessionInstructionsEnd)
                 {
+                    startEnable = true;
                     inSessionInstructions = false;
                     hudManager.DisplayText("Ready to start!", 2.0f);
+                    waitState = WaitState.Waiting;
                     experimentState = ExperimentState.WaitingForStart;
                 }
                 break;
@@ -293,7 +295,6 @@ public class FeedbackExperiment2019GM : GameMaster
                 // experimentState = ExperimentState.PerformingTask;
                 // DEBUG
 
-                startEnable = true;
 
                 // Check if pause requested
                 UpdatePause();
@@ -318,7 +319,6 @@ public class FeedbackExperiment2019GM : GameMaster
                         // If all is good and haven't started counting, start.
                         if (!counting && !countdownDone)
                         {
-                            StopAllCoroutines();
                             counting = true;
                             HUDCountDown(3);
                         }
@@ -369,6 +369,7 @@ public class FeedbackExperiment2019GM : GameMaster
                 // System update
                 //
                 StartCoroutine(ClearObjectFromHandCoroutine());
+                experimentObject.SetForce(0.0f);
 
                 // 
                 // Data logging
@@ -1239,6 +1240,9 @@ public class FeedbackExperiment2019GM : GameMaster
             //...
             activeForceTarget = forceTargets[(iterationNumber - 1) / iterationsPerSessionPerSetting[sessionNumber - 1]];
             activeForceColor = forceColours[(iterationNumber - 1) / iterationsPerSessionPerSetting[sessionNumber - 1]];
+
+            // Set default roughness
+            activeRougnessTarget = roughnessTargets[0];
         }
         else if (sessionType[sessionNumber - 1] == FeedbackExperiment.Roughness)
         {
@@ -1247,6 +1251,10 @@ public class FeedbackExperiment2019GM : GameMaster
             //2 10-14
             //...
             activeRougnessTarget = roughnessTargets[(iterationNumber - 1) / iterationsPerSessionPerSetting[sessionNumber - 1]];
+
+            // Set default force
+            activeForceTarget = forceTargets[0];
+            activeForceColor = forceColours[0];
         }
         else if (sessionType[sessionNumber - 1] == FeedbackExperiment.Mixed)
         {
@@ -1300,7 +1308,6 @@ public class FeedbackExperiment2019GM : GameMaster
 
         // Send the object to the hand to automatically grab it.
         experimentObject.gameObject.SetActive(true);
-        experimentObject.SetForce(0.0f);
         experimentObject.transform.position = graspManager.transform.position;
     }
 

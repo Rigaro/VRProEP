@@ -15,25 +15,7 @@ namespace VRProEP.ProsthesisCore
         private float[] gains;
         private float[] offset;
         private float[] frequency;
-
-        /// <summary>
-        /// Autonomous reference generator that gives a linear relationship of input to output
-        /// Sets all gains to the default: 0.0.
-        /// Sets all offsets to the default: 0.0.
-        /// </summary>
-        /// <param name="xBar">The initial condition for the reference.</param>
-        public BoneConductionReferenceGenerator(float[] xBar)
-        {
-            if (xBar.Length != 1)
-                throw new System.ArgumentOutOfRangeException("The reference initial condition should be provided for a signle DOF.");
-
-            channelSize = xBar.Length;
-            this.xBar = xBar;
-            SetDefaultGains();
-            SetDefaultOffset();
-            generatorType = ReferenceGeneratorType.BoneConduction;
-        }
-
+        
         /// <summary>
         /// Autonomous reference generator that gives a linear relationship of input to output
         /// </summary>
@@ -42,7 +24,7 @@ namespace VRProEP.ProsthesisCore
         /// <param name="ofsset">The desired offset for each reference.</param>
         public BoneConductionReferenceGenerator(float[] xBar, float[] gains, float[] offset, float[] frequency)
         {
-            if (xBar.Length != gains.Length)
+            if (xBar.Length-1 != gains.Length)
                 throw new System.ArgumentOutOfRangeException("The length of the parameters does not match.");
 
             channelSize = xBar.Length;
@@ -123,8 +105,8 @@ namespace VRProEP.ProsthesisCore
         public override float[] UpdateAllReferences(float[] input)
         {
             // Check validity of the provided input
-            if (input.Length != 2)
-                throw new System.ArgumentOutOfRangeException("The input array length should be = 2.");
+            if (input.Length != 3)
+                throw new System.ArgumentOutOfRangeException("The input array length should be = 3.");
 
             //roughness to stimulation frequency
             xBar[0] = offset[0] + input[0] * gains[0];
@@ -132,9 +114,23 @@ namespace VRProEP.ProsthesisCore
             //force to amplitude 
             float[] interpolatedReference = CalculateFrequencyDependendParameters(xBar[0]);
             xBar[1] = interpolatedReference[1] + input[1] * interpolatedReference[0];
+            
+            // Clamp frequency
+            if (xBar[0] < xMin[0])
+                xBar[0] = xMin[0];
+            else if (xBar[0] > xMax[0])
+                xBar[0] = xMax[0];
 
-            Debug.Log("F: " + xBar[0] + ", A: " + xBar[1]);
+            // Clamp amplitude
+            if (xBar[1] < 0.0f)
+                xBar[1] = 0.0f;
+            else if (xBar[1] > 1.0f)
+                xBar[1] = 1.0f;
 
+            // Enable is just passed through
+            xBar[2] = input[2];
+
+            //Debug.Log("F: " + xBar[0] + ", A: " + xBar[1]);
             return xBar;
         }
 

@@ -14,12 +14,15 @@ namespace VRProEP.ProsthesisCore
 
         private bool isConfigured = false;
         private bool isEnabled = false;
+        private bool hasFeedback = false;
 
         public bool IsEnabled { get => isEnabled; }
         public float RoughnessValue { get => roughnessValue; }
+        public bool HasFeedback { get => hasFeedback; }
 
         private float handState = 0.0f;
         private float roughnessValue = 0.0f;
+        private float enableFeedback = 0.0f;
         
         /// <summary>
         /// Initializes the hand prosthesis with basic functionality.
@@ -27,32 +30,10 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         public void InitializeProsthesis()
         {
-            // Get available sensors from avatar system
-            List<ISensor> activeSensors = AvatarSystem.GetActiveSensors();
-            if (activeSensors == null || activeSensors.Count == 0)
-                throw new System.Exception("There are no user sensors available.");
+            // Make sure the input system has been initialised
+            if (inputManager == null)
+                throw new System.Exception("The input system has not been set. Do this by calling InitialiseInputSystem.");
 
-            // Extract EMG sensor
-            EMGWiFiManager emgSensor = null;
-            foreach (ISensor sensor in activeSensors)
-            {
-                //Debug.Log(sensor.GetSensorType());
-                if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
-                    emgSensor = (EMGWiFiManager)sensor;
-            }
-            if (emgSensor == null)
-                throw new System.Exception("No EMG sensor available.");
-
-            // Add an EMG reference generator
-            float[] xBar = { 0.0f };
-            float[] xMin = { 0.0f };
-            float[] xMax = { 1.0f };
-            List<float> emgGains = new List<float>(1);
-            emgGains.Add(-0.005f);
-            EMGInterfaceReferenceGenerator emgRG = new EMGInterfaceReferenceGenerator(xBar, xMin, xMax, emgGains, EMGInterfaceType.dualSiteProportional);
-
-            inputManager = new SingleInputManager(emgSensor, emgRG);
-            
             // Configure the grasp manager
             GameObject graspManagerGO = GameObject.FindGameObjectWithTag("GraspManager");
             if (graspManagerGO == null)
@@ -64,13 +45,6 @@ namespace VRProEP.ProsthesisCore
             // Create fake hand and add as user sensor
             handManager = new FakeTactileHand(graspManager);
             AvatarSystem.AddActiveSensor(handManager);
-
-            // Add Feedback
-            float[] xBarFB = new float[] { 0.0f, 0.0f };
-            BoneConductionController boniController = new BoneConductionController("192.168.137.56", 2380, 1, 1, 1);
-            BoneConductionCharacterization userBoniCharac = (BoneConductionCharacterization)SaveSystem.LoadFeedbackCharacterization(SaveSystem.ActiveUser.id, FeedbackType.BoneConduction);
-            BoneConductionReferenceGenerator boniRG = new BoneConductionReferenceGenerator(xBarFB, userBoniCharac);
-            boniManager = new BoniManager(boniController, boniRG);
 
             isConfigured = true;
         }
@@ -92,10 +66,18 @@ namespace VRProEP.ProsthesisCore
                 // Set enable
                 isEnabled = inputManager.IsEnabled();
 
-                // Update feedback
-                float[] sensorData = { roughnessValue, handState };
-                //Debug.Log("Force: " + handState + ", Roughness: " + roughnessValue);
-                boniManager.UpdateFeedback(0, sensorData);
+                if (handState > 0)
+                    enableFeedback = 1.0f;
+                else
+                    enableFeedback = 0.0f;
+
+                // Update feedback when available
+                if (hasFeedback)
+                {
+                    float[] sensorData = { roughnessValue, handState, enableFeedback };
+                    //Debug.Log("Force: " + handState + ", Roughness: " + roughnessValue);
+                    boniManager.UpdateFeedback(0, sensorData);
+                }
             }
         }
 
@@ -106,15 +88,51 @@ namespace VRProEP.ProsthesisCore
         {
             inputManager.ResetReference(0);
         }
-
-        public void StartBoniConnection()
-        {
-            boniManager.StartBoniConnection();
-        }
-
+        
+        /// <summary>
+        /// Stops connection to Boni when available.
+        /// </summary>
         public void StopBoniConnection()
         {
-            boniManager.StopBoniConnection();
+            if (hasFeedback)
+                boniManager.StopBoniConnection();
+        }
+
+        /// <summary>
+        /// Initialised the prosthesis' input system.
+        /// </summary>
+        /// <param name="emgSensor">The EMG sensor to initialise the input system with.</param>
+        public void InitialiseInputSystem(EMGWiFiManager emgSensor)
+        {
+            // Check that the sensor a valid sensor is provided
+            if (emgSensor == null)
+                throw new System.Exception("No EMG sensor available.");
+
+            // Add an EMG reference generator
+            float[] xBar = { 0.0f };
+            float[] xMin = { 0.0f };
+            float[] xMax = { 1.0f };
+            List<float> emgGains = new List<float>(1);
+            emgGains.Add(-0.005f);
+            EMGInterfaceReferenceGenerator emgRG = new EMGInterfaceReferenceGenerator(xBar, xMin, xMax, emgGains, EMGInterfaceType.dualSiteProportional);
+
+            inputManager = new SingleInputManager(emgSensor, emgRG);
+        }
+
+        /// <summary>
+        /// Initialises the Boni feedback system.
+        /// </summary>
+        /// <param name="ipAddress"></param>
+        /// <param name="port"></param>
+        public void InitialiseFeedbackSystem(string ipAddress, int port)
+        {
+            // Add Feedback
+            float[] xBarFB = new float[] { 100.0f, 0.0f, 0.0f };
+            BoneConductionController boniController = new BoneConductionController(ipAddress, port, 1, 1, 1);
+            BoneConductionCharacterization userBoniCharac = (BoneConductionCharacterization)SaveSystem.LoadFeedbackCharacterization(SaveSystem.ActiveUser.id, FeedbackType.BoneConduction);
+            BoneConductionReferenceGenerator boniRG = new BoneConductionReferenceGenerator(xBarFB, userBoniCharac);
+            boniManager = new BoniManager(boniController, boniRG);
+            hasFeedback = true;
         }
     }
 }

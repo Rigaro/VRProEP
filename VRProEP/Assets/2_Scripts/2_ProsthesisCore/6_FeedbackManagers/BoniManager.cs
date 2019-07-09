@@ -20,10 +20,14 @@ namespace VRProEP.ProsthesisCore
 
         /// <summary>
         /// Updates the feedback provided to the user for the given channel.
+        /// Sensor data should be:
+        /// [0] Roughness
+        /// [1] Force
+        /// [2] Enable
         /// Should only be called during Physics updates, Monobehaviour : FixedUpdate.
         /// </summary>
         /// <param name="channel">The channel number.</param>
-        /// <param name="sensorData">The sensor data from the device.</param>
+        /// <param name="sensorData">The sensor data from the device. [0] Roughness, [1] Force, [2] Enable.</param>
         public override void UpdateFeedback(int channel, float[] sensorData)
         {
             if (!CheckInput(sensorData))
@@ -53,20 +57,11 @@ namespace VRProEP.ProsthesisCore
         /// <returns>True if the input passes the check.</returns>
         private bool CheckInput(float[] input)
         {
-            if (input.Length % 2 != 0)
+            if (input.Length % 3 != 0)
                 return false;
             else return true;
         }
-
-        public void StartBoniConnection()
-        {
-            if (controller.GetType() == typeof(BoneConductionController))
-            {
-                BoneConductionController boniController = (BoneConductionController)controller;
-                boniController.StartListening();
-            }
-        }
-               
+                       
         public void StopBoniConnection()
         {
             if (controller.GetType() == typeof(BoneConductionController))
