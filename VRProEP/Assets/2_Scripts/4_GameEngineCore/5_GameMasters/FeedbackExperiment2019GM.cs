@@ -827,7 +827,7 @@ public class FeedbackExperiment2019GM : GameMaster
                         for (int j = 0; j < activeSelector.transform.childCount; j++)
                         {
                             if(j != i)
-                                activeSelector.transform.GetChild(j).GetComponent<TouchyBallManager>().ResetSelection();
+                                activeSelector.transform.GetChild(j).GetComponent<TouchyBallManager>().ClearSelection();
                         }
 
                         // Debug stuff
@@ -850,7 +850,7 @@ public class FeedbackExperiment2019GM : GameMaster
                 // Enable all balloons in active selector
                 for (int i = 0; i < activeSelector.transform.childCount; i++)
                 {
-                    activeSelector.transform.GetChild(i).GetComponent<TouchyBallManager>().ResetSelection();
+                    activeSelector.transform.GetChild(i).GetComponent<TouchyBallManager>().ClearSelection();
                 }
             }
 

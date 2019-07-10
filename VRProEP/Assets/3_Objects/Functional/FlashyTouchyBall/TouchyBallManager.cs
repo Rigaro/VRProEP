@@ -107,7 +107,7 @@ public class TouchyBallManager : MonoBehaviour
     /// <summary>
     /// Resets the selection to idle.
     /// </summary>
-    public void ResetSelection()
+    public void ClearSelection()
     {
         resetCoroutine = StartCoroutine(ReturnToIdle(0.1f));
     }
