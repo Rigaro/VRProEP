@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class BallGridManager : MonoBehaviour
 {
+    // Config variables
     [SerializeField]
     private GameObject touchyBallPrefab;
     [SerializeField]
@@ -13,9 +14,15 @@ public class BallGridManager : MonoBehaviour
     [SerializeField]
     private float spacing;
 
-    private List<TouchyBallManager> balls = new List<TouchyBallManager>();
+    // Management variables
+    private List<TouchyBallManager> balls = new List<TouchyBallManager>();// The list of spawned balls
+    private bool hasSelected = false; // Whether a ball has been selected
+    private int selectedIndex = 0;
+    private bool selectedTouched = false;
 
+    // DEBUG
     private bool run = true;
+    // DEBUG
 
     // Start is called before the first frame update
     void Start()
@@ -80,8 +87,10 @@ public class BallGridManager : MonoBehaviour
         ResetBallSelection();
 
         // Set selection index
-        int index = (row * rows) + col;
-        balls[index].SetSelected();
+        selectedIndex = (row * rows) + col;
+        balls[selectedIndex].SetSelected();
+        hasSelected = true;
+        selectedTouched = false;
     }
 
     /// <summary>
@@ -93,15 +102,21 @@ public class BallGridManager : MonoBehaviour
         {
             ball.ClearSelection();
         }
+        hasSelected = false;
+        selectedTouched = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (run)
+        // Check if the selected ball has been touched
+        if (hasSelected)
         {
-            SelectBall(4, 4);
-            run = false;
+            if (balls[selectedIndex].BallState == TouchyBallManager.TouchyBallState.Correct)
+                selectedTouched = true;
+            else
+                selectedTouched = false;
         }
+
     }
 }

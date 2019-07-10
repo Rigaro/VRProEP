@@ -1032,7 +1032,7 @@ GameObject:
   - component: {fileID: 8319260673236699376}
   - component: {fileID: 8319260672528337615}
   m_Layer: 0
-  m_Name: ExperimentFeedback2019
+  m_Name: Feedback2019
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1076,10 +1076,10 @@ MonoBehaviour:
   skipInstructions: 0
   debug: 0
   debugText: {fileID: 0}
+  worldOrientation: 180
+  experimentCenter: {fileID: 1496852521280133188}
   skipAll: 0
   skipTraining: 0
-  experimentCentreTransform: {fileID: 8319260673236699376}
-  experimentOrientation: 180
   forceTargets:
   - 0.2
   - 0.5
@@ -1095,7 +1095,7 @@ MonoBehaviour:
   iterationsPerSessionPerSetting: 010000000100000001000000010000000100000001000000
   trainingPerSessionPerSetting: 010000000100000000000000010000000100000000000000
   sessionType: 000000000100000002000000000000000100000002000000
-  visualFeedbackType: 010000000000000001000000000000000000000000000000
+  visualFeedbackType: 010000000100000001000000000000000000000000000000
   restIterations: 25
   experimentObject: {fileID: 5806838228210032964}
   dropOffTransform: {fileID: 3014191614670997562}
@@ -1456,11 +1456,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: SubjectPositionMarker
       objectReference: {fileID: 0}
-    - target: {fileID: 7473179249313783679, guid: 0c31051c9c8054747ab339e8d45285f6,
-        type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 7473179249313783618, guid: 0c31051c9c8054747ab339e8d45285f6,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1565,6 +1560,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7473179249313783679, guid: 0c31051c9c8054747ab339e8d45285f6,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0c31051c9c8054747ab339e8d45285f6, type: 3}

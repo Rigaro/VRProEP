@@ -1,11 +1,20 @@
-﻿using System.Collections;
+﻿// System
+using System.Collections;
 using System.Collections.Generic;
+
+// Unity
 using UnityEngine;
 using TMPro;
+
+// SteamVR
+using Valve.VR;
+using Valve.VR.InteractionSystem;
 
 // GameMaster includes
 using VRProEP.ExperimentCore;
 using VRProEP.GameEngineCore;
+using VRProEP.ProsthesisCore;
+using VRProEP.Utilities;
 
 public abstract class GameMaster : MonoBehaviour
 {
@@ -23,7 +32,12 @@ public abstract class GameMaster : MonoBehaviour
     [Header("Debug enable:")]
     public bool debug;
     public TextMeshPro debugText;
-    
+
+    [Header("World configuration:")]
+    [SerializeField]
+    protected float worldOrientation = 180.0f;
+    public Transform experimentCenter;
+
     // Subject group management
     public enum SubjectGroup
     {
@@ -306,6 +320,30 @@ public abstract class GameMaster : MonoBehaviour
         }
         hudManager.DisplayText("Go!", 1.0f);
         countdownDone = true;
+    }
+
+    /// <summary>
+    /// Teleports the player to the experiment center position and orients experiment assets to fit the world.
+    /// </summary>
+    protected void TeleportToStartPosition()
+    {
+        // Get player object
+        GameObject playerGO = GameObject.FindGameObjectWithTag("Player");
+        if (playerGO == null)
+            throw new System.NullReferenceException("Player GameObject not found.");
+
+        Player player = playerGO.GetComponent<Player>();
+        if (player == null)
+            throw new System.NullReferenceException("Player Component not found.");
+
+        // Teleport to the start position
+        Vector3 playerFeetOffset = player.trackingOriginTransform.position - player.feetPositionGuess;
+        player.trackingOriginTransform.position = player.transform.position + playerFeetOffset;
+        player.trackingOriginTransform.Rotate(new Vector3(0.0f, 1.0f, 0.0f), worldOrientation);
+        player.transform.position = experimentCenter.position - player.transform.position;
+
+        // Rotate experiment assets.
+        this.transform.Rotate(new Vector3(0.0f, 1.0f, 0.0f), worldOrientation);
     }
 
     #endregion

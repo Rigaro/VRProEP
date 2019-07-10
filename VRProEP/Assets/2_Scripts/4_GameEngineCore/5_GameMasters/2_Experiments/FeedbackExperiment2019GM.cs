@@ -12,18 +12,14 @@ using VRProEP.Utilities;
 public class FeedbackExperiment2019GM : GameMaster
 {
 
-
-    public bool skipAll = false;
-    public bool skipTraining = false;
-
     private float taskTime = 0.0f;
         
     // Experiment configuration
     public enum FeedbackExperiment { Force, Roughness, Mixed }
     public enum VisualFeebackType {None, On }
     [Header("Experiment configuration")]
-    public Transform experimentCentreTransform;
-    public float experimentOrientation = 180.0f;
+    public bool skipAll = false;
+    public bool skipTraining = false;
     public List<float> forceTargets = new List<float> {0.2f, 0.5f, 0.8f};
     public List<Color> forceColours;
     public List<float> roughnessTargets = new List<float> { 0.0f, (300.0f/5900.0f), (650.0f/5900f)};
@@ -224,6 +220,17 @@ public class FeedbackExperiment2019GM : GameMaster
              */
             // Perform initialization functions before starting experiment.
             case ExperimentState.Training:
+                if (skipTraining)
+                {
+                    // Make sure everything is re-set
+                    LaunchNextSession();
+                    StartCoroutine(ClearObjectFromHandCoroutine());
+                    UpdateForceAndRoughnessTargets();
+                    StartCoroutine(SpawnExperimentObject());
+                    // Go to instructions
+                    experimentState = ExperimentState.GivingInstructions;
+                    break;
+                }
                 //
                 // Guide subject through training
                 //
@@ -309,6 +316,7 @@ public class FeedbackExperiment2019GM : GameMaster
                 {
                     // Waiting for subject to get to start position.
                     case WaitState.Waiting:
+                        StartCoroutine(SpawnExperimentObject()); // Make sure object is in-hand
                         waitState = WaitState.Countdown;
                         break;
                     // HUD countdown for reaching action.
@@ -490,6 +498,7 @@ public class FeedbackExperiment2019GM : GameMaster
                     //
                     // Update objects
                     //
+                    LaunchNextSession();
                     UpdateForceAndRoughnessTargets();
                     StartCoroutine(SpawnExperimentObject());
                     handManager.ResetForce();
@@ -590,28 +599,17 @@ public class FeedbackExperiment2019GM : GameMaster
         //
         // Update HUD state
         //
-        if (experimentType != ExperimentType.TypeOne)
+        if (experimentState == ExperimentState.Resting || experimentState == ExperimentState.End)
         {
-            if (experimentState == ExperimentState.Resting || experimentState == ExperimentState.End)
-            {
-                hudManager.colour = HUDManager.HUDColour.Green;
-            }
-            else
-            {
-                if (handManager.IsEnabled)
-                    hudManager.colour = HUDManager.HUDColour.Blue;
-                else
-                    hudManager.colour = HUDManager.HUDColour.Red;
-            }
+            hudManager.colour = HUDManager.HUDColour.Green;
         }
         else
         {
-            if (experimentState == ExperimentState.Resting || experimentState == ExperimentState.End)
-                hudManager.colour = HUDManager.HUDColour.Green;
+            if (handManager.IsEnabled)
+                hudManager.colour = HUDManager.HUDColour.Red;
             else
                 hudManager.colour = HUDManager.HUDColour.Blue;
         }
-
         //
         // Update information displayed for debugging purposes
         //
@@ -929,8 +927,12 @@ public class FeedbackExperiment2019GM : GameMaster
             experimentObject.enableColourFeedback = false;
         }
 
+        // Clear visual feedback for Roughness type
+        if (sessionType[sessionNumber - 1] == FeedbackExperiment.Roughness)
+            experimentObject.enableColourFeedback = false;
+
         //check which feedback
-        switch(sessionType[sessionNumber - 1])
+        switch (sessionType[sessionNumber - 1])
         {
             //load force feedback assets
             case FeedbackExperiment.Force:
@@ -1152,6 +1154,11 @@ public class FeedbackExperiment2019GM : GameMaster
                         hudManager.DisplayText("Good job!", 2.0f);
                         yield return new WaitForSeconds(3.0f);
                     }
+
+                    instructionManager.DisplayText("Well done! With this your training ends." + continueText);
+                    StartCoroutine(ClearObjectFromHandCoroutine());
+                    yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+                    yield return new WaitForSeconds(0.5f);
                     break;
                 case FeedbackExperiment.Roughness://roughness
 
@@ -1220,6 +1227,11 @@ public class FeedbackExperiment2019GM : GameMaster
                     handManager.ResetForce();
                     hudManager.DisplayText("Good job!", 2.0f);
                     yield return new WaitForSeconds(3.0f);
+
+                    instructionManager.DisplayText("Well done! With this your training ends." + continueText);
+                    StartCoroutine(ClearObjectFromHandCoroutine());
+                    yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+                    yield return new WaitForSeconds(0.5f);
                     break;
                 case FeedbackExperiment.Mixed://mixed
                     throw new System.NotImplementedException();
@@ -1228,11 +1240,6 @@ public class FeedbackExperiment2019GM : GameMaster
                     break;
             }
         }
-
-        instructionManager.DisplayText("Well done! With this your training ends." + continueText);
-        StartCoroutine(ClearObjectFromHandCoroutine());
-        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
-        yield return new WaitForSeconds(0.5f);
 
         trainingEnd = true;
     }
@@ -1255,7 +1262,7 @@ public class FeedbackExperiment2019GM : GameMaster
             instructionManager.DisplayText(defaultText + "Different coloured stones will be presented to you and you will have to squeeze them with different strength." + continueText);
             yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
             yield return new WaitForSeconds(0.5f);
-            instructionManager.DisplayText(defaultText + "Furthermore the quality of the diamonds is determined by the vibrations of them and you therefore will have to put them in different categories." + continueText);
+            instructionManager.DisplayText(defaultText + "Furthermore the quality of the diamonds is determined by the surface roughness of them and you therefore will have to put them in different categories." + continueText);
             yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
             yield return new WaitForSeconds(0.5f);
             instructionManager.DisplayText(defaultText + "To earn our dinner today we need to produce " + iterationNumberTotal + " diamonds." + continueText);
@@ -1369,28 +1376,7 @@ public class FeedbackExperiment2019GM : GameMaster
 
     #endregion
 
-
-    private void TeleportToStartPosition()
-    {
-        // Get player object
-        GameObject playerGO = GameObject.FindGameObjectWithTag("Player");
-        if (playerGO == null)
-            throw new System.NullReferenceException("Player GameObject not found.");
-
-        Player player = playerGO.GetComponent<Player>();
-        if (player == null)
-            throw new System.NullReferenceException("Player component not found.");
-
-        // Teleport to the start position
-        Vector3 playerFeetOffset = player.trackingOriginTransform.position - player.feetPositionGuess;
-        player.trackingOriginTransform.position = player.transform.position + playerFeetOffset;
-        player.trackingOriginTransform.Rotate(new Vector3(0.0f, 1.0f, 0.0f), experimentOrientation);
-        player.transform.position = experimentCentreTransform.position - player.transform.position;
-
-        // Rotate experiment assets.
-        this.transform.Rotate(new Vector3(0.0f, 1.0f, 0.0f), experimentOrientation);
-    }
-
+    
     private void SpawnOffHand()
     {
         // Get hand
@@ -1511,7 +1497,7 @@ public class FeedbackExperiment2019GM : GameMaster
     {
         // Move the drop-off to hand to trigger release
         dropOffTransform.position = graspManager.transform.position;
-        yield return new WaitForSecondsRealtime(1.0f);
+        yield return new WaitForSecondsRealtime(0.5f);
         dropOffTransform.position = Vector3.zero; // Reset it to avoid issues
         // Hide object
         experimentObject.SetForce(0.0f);
