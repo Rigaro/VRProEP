@@ -196,7 +196,7 @@ public class FeedbackExperiment2019GM : GameMaster
                 // Perform experiment initialization procedures
                 //
                 LaunchNextSession();
-                StartCoroutine(ClearObjectFromHandCoroutine());
+                //StartCoroutine(ClearObjectFromHandCoroutine());
                 UpdateForceAndRoughnessTargets();
                 StartCoroutine(SpawnExperimentObject());
 
@@ -754,7 +754,6 @@ public class FeedbackExperiment2019GM : GameMaster
         // Set the experiment type and ID
         //
         experimentType = ExperimentType.TypeOne;
-        ExperimentSystem.SetActiveExperimentID("Feedback2019");
 
         //
         // Create data loggers
@@ -1017,7 +1016,7 @@ public class FeedbackExperiment2019GM : GameMaster
         inTraining = true;
         trainingEnd = false;
 
-        string defaultText = "Instructions:\n";
+        string defaultText = "Training:\n";
         string continueText = "\n\n...Press the Trigger to continue...";
 
         if (!skipTraining && trainingPerSession[sessionNumber - 1] >= 1)
@@ -1104,7 +1103,7 @@ public class FeedbackExperiment2019GM : GameMaster
                     instructionManager.DisplayText(defaultText + "This will turn the sphere blue, which means you can now touch it. " + continueText);
                     yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                     yield return new WaitForSeconds(0.5f);
-                    instructionManager.DisplayText(defaultText + "Touch the sphere with your hand to go to continue.");
+                    instructionManager.DisplayText(defaultText + "Touch the sphere with your hand to continue.");
                     yield return new WaitUntil(() => CheckTaskCompletion());
                     yield return new WaitForSeconds(0.5f);
                     if (visualFeedbackType[sessionNumber - 1] == VisualFeebackType.On) //visual feedback
@@ -1292,8 +1291,11 @@ public class FeedbackExperiment2019GM : GameMaster
             instructionManager.DisplayText(defaultText + "Your progress will be displayed here along with the current time." + continueText);
             yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
             yield return new WaitForSeconds(0.5f);
+            instructionManager.DisplayText(defaultText + "Get ready to start training!" + continueText);
+            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+            yield return new WaitForSeconds(0.5f);
 
-            instructionsEnd = true;
+        instructionsEnd = true;
     }
 
     /// <summary>
@@ -1311,7 +1313,10 @@ public class FeedbackExperiment2019GM : GameMaster
         switch (sessionType[sessionNumber - 1])
         {
             case FeedbackExperiment.Force:
-                instructionManager.DisplayText(defaultText + "In this session you will use flexion and extension of your wrist to control the grasp force of the prosthetic hand as shown in the training and produce diamonds." + continueText);
+                instructionManager.DisplayText(defaultText + "In this session you will use flexion and extension of your wrist..." + continueText);
+                yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+                yield return new WaitForSeconds(0.5f);
+                instructionManager.DisplayText(defaultText + "...to control the grasp force of the prosthetic hand as shown in the training and produce diamonds." + continueText);
                 yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                 yield return new WaitForSeconds(0.5f);
                 instructionManager.DisplayText(defaultText + "Start the experiment by pressing the button" + continueText);
@@ -1332,7 +1337,10 @@ public class FeedbackExperiment2019GM : GameMaster
 
                 break;
             case FeedbackExperiment.Mixed://mixed
-                instructionManager.DisplayText(defaultText + "In this session you will use flexion and extension of your hand to control the grasp force of the prosthetic hand and will get feedback about the stones surface roughness as shown in the training." + continueText);
+                instructionManager.DisplayText(defaultText + "In this session you will use flexion and extension of your hand to control..." + continueText);
+                yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+                yield return new WaitForSeconds(0.5f);
+                instructionManager.DisplayText(defaultText + "...the grasp force of the prosthetic hand and will get feedback about the stones surface roughness as shown in the training." + continueText);
                 yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                 yield return new WaitForSeconds(0.5f);
                 instructionManager.DisplayText(defaultText + "Start the experiment by pressing the button" + continueText);
@@ -1349,7 +1357,7 @@ public class FeedbackExperiment2019GM : GameMaster
                 break;
         }
 
-        instructionManager.DisplayText("Get ready to start! Look forward towards the desk.");
+        instructionManager.DisplayText("Get ready to start! Look forward towards the prosthetic hand.");
         hudManager.DisplayText("Look forward.", 3.0f);
         yield return new WaitForSeconds(5.0f);
         HUDCountDown(3);
@@ -1378,6 +1386,9 @@ public class FeedbackExperiment2019GM : GameMaster
         player.trackingOriginTransform.position = player.transform.position + playerFeetOffset;
         player.trackingOriginTransform.Rotate(new Vector3(0.0f, 1.0f, 0.0f), experimentOrientation);
         player.transform.position = experimentCentreTransform.position - player.transform.position;
+
+        // Rotate experiment assets.
+        this.transform.Rotate(new Vector3(0.0f, 1.0f, 0.0f), experimentOrientation);
     }
 
     private void SpawnOffHand()

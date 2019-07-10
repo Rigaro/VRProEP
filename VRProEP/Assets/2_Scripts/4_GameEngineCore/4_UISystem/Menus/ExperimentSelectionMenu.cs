@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using VRProEP.GameEngineCore;
 using VRProEP.ProsthesisCore;
+using VRProEP.ExperimentCore;
 using Valve.VR;
 using System;
 
@@ -25,6 +26,8 @@ public class ExperimentSelectionMenu : MonoBehaviour
 
     private int experimentNumber = 0;
     private int optionNumber = 0;
+
+    // Add method to update option List given the experiments available in the Resources folder.
 
     public void SelectExperimentDropdown(int experimentNumber)
     {
@@ -63,7 +66,7 @@ public class ExperimentSelectionMenu : MonoBehaviour
     /// <summary>
     /// Checks that all the required components have been loaded and starts experiment.
     /// </summary>
-    public void LaunchExperiment()
+    public void InitialiseExperiment()
     {
         bool EMGAvailable = false;
 
@@ -154,9 +157,6 @@ public class ExperimentSelectionMenu : MonoBehaviour
                     logManager.DisplayInformationOnLog(3.0f, "Please configure the Transradial avatar.");
                 else
                 {
-                    // Make sure we keep everything on load
-                    KeepOnLoad();
-
                     //  Initialise the prosthesis
                     try
                     {
@@ -164,8 +164,8 @@ public class ExperimentSelectionMenu : MonoBehaviour
                         FakeEMGBoniHand prosthesisManager = prosthesisManagerGO.GetComponent<FakeEMGBoniHand>();
                         prosthesisManager.InitializeProsthesis();
 
-                        // Load level
-                        SteamVR_LoadLevel.Begin("FantasyTemplate");
+                        // Set the name from the selected dropdown!
+                        ExperimentSystem.SetActiveExperimentID("Feedback2019");
                     }
                     catch (Exception e)
                     {
@@ -196,6 +196,31 @@ public class ExperimentSelectionMenu : MonoBehaviour
                     logManager.DisplayInformationOnLog(3.0f, "Please add and configure an EMG sensor.");
                 break;
         }
+    }
+
+    public void LoadForestWorld()
+    {
+        // Initialise experiment data
+        InitialiseExperiment();
+
+        // Make sure we keep everything on load
+        KeepOnLoad();
+
+        // Load level
+        SteamVR_LoadLevel.Begin("ForestWorld");
+    }
+
+
+    public void LoadSpaceWorld()
+    {
+        // Initialise experiment data
+        InitialiseExperiment();
+
+        // Make sure we keep everything on load
+        KeepOnLoad();
+
+        // Load level
+        SteamVR_LoadLevel.Begin("SpaceWorld");
     }
 
     public void ReturnToExperimentConfigMenu()
