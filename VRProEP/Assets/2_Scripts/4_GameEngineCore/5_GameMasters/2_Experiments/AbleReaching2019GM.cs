@@ -17,23 +17,63 @@ using VRProEP.Utilities;
 public class AbleReaching2019GM : GameMaster
 {
     [Header("Experiment configuration:")]
+
     [SerializeField]
     [Tooltip("The number of rows for the reaching grid.")]
+    [Range(1,10)]
     private int gridRows = 5;
+
     [SerializeField]
     [Tooltip("The number of columns for the reaching grid.")]
+    [Range(1, 10)]
     private int gridColumns = 5;
+
+    [SerializeField]
+    [Tooltip("The spacing between the balls in the grid.")]
+    [Range(0.05f, 1.0f)]
+    private float gridSpacing = 0.15f;
+
+    [SerializeField]
+    [Tooltip("The percentage of the subject's height where the grid centre will be placed.")]
+    [Range(0.0f, 1.0f)]
+    private float gridHeightMultiplier = 0.6f;
+
+    [SerializeField]
+    [Tooltip("The percentage of the subject's arm length where the grid centre will be placed.")]
+    [Range(0.0f, 1.0f)]
+    private float gridReachMultiplier = 0.6f;
+
     [SerializeField]
     private BallGridManager gridManager;
 
+    // Add start position tolerance.
+
+    // Motion tracking for experiment management (check for start position)
+    private VIVETrackerManager upperArmTracker;
+    private VIVETrackerManager lowerArmTracker;
+
+    //
+    // Data logging
+    //
     private float taskTime = 0.0f;
+    private DataStreamLogger motionLogger;
+    private const string motionDataAbleFormat = "loc,t,aDotUA,bDotUA,gDotUA,aUA,bUA,gUA,xUA,yUA,zUA,aDotE,bDotE,gDotE,aE,bE,gE,xE,yE,zE,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,xHand,yHand,zHand,aHand,bHand,gHand";
 
 
     // Start is called before the first frame update
     void Start()
     {
+        // Initialize ExperimentSystem
         InitExperimentSystem();
+
+        // Initialize UI.
         InitializeUI();
+
+        // Spawn grid
+        gridManager.SpawnGrid(gridRows, gridColumns, gridSpacing);
+
+        // Wait for 5 seconds at HelloWorld
+        SetWaitFlag(5.0f);
     }
 
     // Update is called once per frame
@@ -48,6 +88,16 @@ public class AbleReaching2019GM : GameMaster
              */
             // Welcome subject to the virtual world.
             case ExperimentState.HelloWorld:
+                if (WaitFlag)
+                {
+                    hudManager.ClearText();
+                    experimentState = ExperimentState.InitializingApplication;
+                }
+                else
+                {
+                    hudManager.DisplayText("Welcome!");
+                    instructionManager.DisplayText("Hello world!");
+                }
                 break;
             /*
              *************************************************
@@ -435,23 +485,80 @@ public class AbleReaching2019GM : GameMaster
     /// </summary>
     protected override void InitExperimentSystem()
     {
+        sessionNumber = 1;
         //
-        // Set the experiment type and ID
+        // Set the experiment type configuration
         //
-        experimentType = ExperimentType.TypeOne;
-        ExperimentSystem.SetActiveExperimentID("template");
+        experimentType = ExperimentType.TypeOne; // Able-bodied experiment type
+
+        //
+        // Initialize world positioning
+        //
+        // Get user physiological data.
+        float subjectHeight = SaveSystem.ActiveUser.height;
+        float subjectArmLength = SaveSystem.ActiveUser.upperArmLength + SaveSystem.ActiveUser.forearmLength + (SaveSystem.ActiveUser.handLength / 2);
+        // Set the grid distance from subject
+        gridManager.transform.position = new Vector3(gridReachMultiplier * subjectArmLength, gridHeightMultiplier * subjectHeight, 0.0f);
 
         //
         // Create data loggers
         //
+        motionLogger = new DataStreamLogger("Motion");
+        ExperimentSystem.AddExperimentLogger(motionLogger);
 
+
+        //
+        // Add arm and body motion trackers.
+        //
+        if (!debug)
+        {
+            // Upper limb motion tracker
+            GameObject ulMotionTrackerGO = AvatarSystem.AddMotionTracker();
+            upperArmTracker = new VIVETrackerManager(ulMotionTrackerGO.transform);
+            ExperimentSystem.AddSensor(upperArmTracker);
+
+            // Lower limb motion tracker
+            GameObject llMotionTrackerGO = GameObject.FindGameObjectWithTag("ForearmTracker");
+            lowerArmTracker = new VIVETrackerManager(llMotionTrackerGO.transform);
+            ExperimentSystem.AddSensor(lowerArmTracker);
+
+            // Shoulder acromium head tracker
+            GameObject motionTrackerGO1 = AvatarSystem.AddMotionTracker();
+            VIVETrackerManager shoulderTracker = new VIVETrackerManager(motionTrackerGO1.transform);
+            ExperimentSystem.AddSensor(shoulderTracker);
+            // C7 tracker
+            GameObject motionTrackerGO2 = AvatarSystem.AddMotionTracker();
+            VIVETrackerManager c7Tracker = new VIVETrackerManager(motionTrackerGO2.transform);
+            ExperimentSystem.AddSensor(c7Tracker);
+        }
+
+        //
+        // Hand tracking sensor
+        //
+        GameObject handGO = GameObject.FindGameObjectWithTag("Hand");
+        VirtualPositionTracker handTracker = new VirtualPositionTracker(handGO.transform);
+        ExperimentSystem.AddSensor(handTracker);
+
+    }
+
+
+    /// <summary>
+    /// Checks whether the subject is ready to start performing the task.
+    /// </summary>
+    /// <returns>True if ready to start.</returns>
+    protected override bool CheckReadyToStart()
+    {
+        // Check that upper arm is in -90 degrees (down) and lower arm in 90 degrees (flexed)
+        float qShoulder = upperArmTracker.GetProcessedData(5) + Mathf.PI / 2; // Offsetting to horizontal position being 0.
+        float qElbow = lowerArmTracker.GetProcessedData(5) + Mathf.PI / 2; // Offsetting to horizontal position being 0.
+        throw new System.NotImplementedException();
     }
 
     /// <summary>
     /// Checks whether the task has be successfully completed or not.
     /// </summary>
     /// <returns>True if the task has been successfully completed.</returns>
-    public override bool CheckTaskCompletion()
+    protected override bool CheckTaskCompletion()
     {
         //
         // Perform some condition testing
@@ -460,17 +567,13 @@ public class AbleReaching2019GM : GameMaster
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
     }
 
     /// <summary>
     /// Checks if the condition for the rest period has been reached.
     /// </summary>
     /// <returns>True if the rest condition has been reached.</returns>
-    public override bool CheckRestCondition()
+    protected override bool CheckRestCondition()
     {
         throw new System.NotImplementedException();
     }
@@ -479,7 +582,7 @@ public class AbleReaching2019GM : GameMaster
     /// Checks if the condition for changing experiment session has been reached.
     /// </summary>
     /// <returns>True if the condition for changing sessions has been reached.</returns>
-    public override bool CheckNextSessionCondition()
+    protected override bool CheckNextSessionCondition()
     {
         throw new System.NotImplementedException();
     }
@@ -488,7 +591,7 @@ public class AbleReaching2019GM : GameMaster
     /// Checks if the condition for ending the experiment has been reached.
     /// </summary>
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
-    public override bool CheckEndCondition()
+    protected override bool CheckEndCondition()
     {
         throw new System.NotImplementedException();
     }
@@ -496,7 +599,7 @@ public class AbleReaching2019GM : GameMaster
     /// <summary>
     /// Launches the next session. Performs all the required preparations.
     /// </summary>
-    public override void LaunchNextSession()
+    protected override void LaunchNextSession()
     {
         throw new System.NotImplementedException();
     }
@@ -504,7 +607,7 @@ public class AbleReaching2019GM : GameMaster
     /// <summary>
     /// Finishes the experiment. Performs all the required procedures.
     /// </summary>
-    public override void EndExperiment()
+    protected override void EndExperiment()
     {
         throw new System.NotImplementedException();
     }

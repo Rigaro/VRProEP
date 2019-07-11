@@ -456,29 +456,31 @@ public class PlaygroundGM : GameMaster
     }
 
     /// <summary>
+    /// Checks whether the subject is ready to start performing the task.
+    /// </summary>
+    /// <returns>True if ready to start.</returns>
+    protected override bool CheckReadyToStart()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    /// <summary>
     /// Checks whether the task has be successfully completed or not.
     /// </summary>
     /// <returns>True if the task has been successfully completed.</returns>
-    public override bool CheckTaskCompletion()
+    protected override bool CheckTaskCompletion()
     {
         //
         // Perform some condition testing
         //
-        if (false)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     /// <summary>
     /// Checks if the condition for the rest period has been reached.
     /// </summary>
     /// <returns>True if the rest condition has been reached.</returns>
-    public override bool CheckRestCondition()
+    protected override bool CheckRestCondition()
     {
         throw new System.NotImplementedException();
     }
@@ -487,7 +489,7 @@ public class PlaygroundGM : GameMaster
     /// Checks if the condition for changing experiment session has been reached.
     /// </summary>
     /// <returns>True if the condition for changing sessions has been reached.</returns>
-    public override bool CheckNextSessionCondition()
+    protected override bool CheckNextSessionCondition()
     {
         throw new System.NotImplementedException();
     }
@@ -496,7 +498,7 @@ public class PlaygroundGM : GameMaster
     /// Checks if the condition for ending the experiment has been reached.
     /// </summary>
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
-    public override bool CheckEndCondition()
+    protected override bool CheckEndCondition()
     {
         throw new System.NotImplementedException();
     }
@@ -504,7 +506,7 @@ public class PlaygroundGM : GameMaster
     /// <summary>
     /// Launches the next session. Performs all the required preparations.
     /// </summary>
-    public override void LaunchNextSession()
+    protected override void LaunchNextSession()
     {
         throw new System.NotImplementedException();
     }
@@ -512,7 +514,7 @@ public class PlaygroundGM : GameMaster
     /// <summary>
     /// Finishes the experiment. Performs all the required procedures.
     /// </summary>
-    public override void EndExperiment()
+    protected override void EndExperiment()
     {
         throw new System.NotImplementedException();
     }
@@ -594,21 +596,5 @@ public class PlaygroundGM : GameMaster
         yield return new WaitForSeconds(1.0f);
         TeleportToStartPosition();
         SteamVR_Fade.Start(Color.clear, 1.0f);
-    }
-
-    private void TeleportToStartPosition()
-    {
-        // Get player object
-        GameObject playerGO = GameObject.FindGameObjectWithTag("Player");
-        if (playerGO == null)
-            throw new System.NullReferenceException("Player GameObject not found.");
-
-        Player player = playerGO.GetComponent<Player>();
-        if (player == null)
-            throw new System.NullReferenceException("Player component not found.");
-
-        // Teleport to the start position
-        Vector3 playerFeetOffset = player.trackingOriginTransform.position - player.feetPositionGuess;
-        player.trackingOriginTransform.position = startTransform.position + playerFeetOffset;
     }
 }

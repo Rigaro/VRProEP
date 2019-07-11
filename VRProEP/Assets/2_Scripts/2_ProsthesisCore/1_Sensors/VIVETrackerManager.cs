@@ -232,6 +232,8 @@ namespace VRProEP.ProsthesisCore
         /// Converts from world coordinates to local residual limb coordinates.
         /// Angular velocity given radians per second, world coordinates.
         /// Angular displacement given in Euler angles in radians, world coordinates.
+        /// 0: angular velocity for rotation.
+        /// 5: tracker rotation
         /// </summary>
         /// <param name="channel">The channel number.</param>
         /// <returns>Pre-processed sensor data for the given channel.</returns>

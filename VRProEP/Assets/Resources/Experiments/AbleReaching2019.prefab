@@ -55,6 +55,7 @@ MonoBehaviour:
   experimentCenter: {fileID: 1887047862402091588}
   gridRows: 5
   gridColumns: 5
+  gridSpacing: 0.15
   gridManager: {fileID: 9044975067194370354}
 --- !u!1001 &5916067502469450487
 PrefabInstance:
@@ -67,6 +68,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: BallGrid
+      objectReference: {fileID: 0}
+    - target: {fileID: 3430666402997871557, guid: 37af2cf7f39a0af4a9ebba2ac74e0d0d,
+        type: 3}
+      propertyPath: cols
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3430666402997871557, guid: 37af2cf7f39a0af4a9ebba2ac74e0d0d,
+        type: 3}
+      propertyPath: rows
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3430666402997871556, guid: 37af2cf7f39a0af4a9ebba2ac74e0d0d,
         type: 3}
@@ -122,16 +133,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3430666402997871557, guid: 37af2cf7f39a0af4a9ebba2ac74e0d0d,
-        type: 3}
-      propertyPath: cols
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 3430666402997871557, guid: 37af2cf7f39a0af4a9ebba2ac74e0d0d,
-        type: 3}
-      propertyPath: rows
-      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 37af2cf7f39a0af4a9ebba2ac74e0d0d, type: 3}

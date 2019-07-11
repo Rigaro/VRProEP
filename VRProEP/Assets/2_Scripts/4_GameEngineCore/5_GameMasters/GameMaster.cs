@@ -107,38 +107,44 @@ public abstract class GameMaster : MonoBehaviour
     protected abstract void InitExperimentSystem();
 
     /// <summary>
+    /// Checks whether the subject is ready to start performing the task.
+    /// </summary>
+    /// <returns>True if ready to start.</returns>
+    protected abstract bool CheckReadyToStart();
+
+    /// <summary>
     /// Checks whether the task has be successfully completed or not.
     /// </summary>
     /// <returns>True if the task has been successfully completed.</returns>
-    public abstract bool CheckTaskCompletion();
+    protected abstract bool CheckTaskCompletion();
 
     /// <summary>
     /// Checks if the condition for the rest period has been reached.
     /// </summary>
     /// <returns>True if the rest condition has been reached.</returns>
-    public abstract bool CheckRestCondition();
+    protected abstract bool CheckRestCondition();
 
     /// <summary>
     /// Checks if the condition for changing experiment session has been reached.
     /// </summary>
     /// <returns>True if the condition for changing sessions has been reached.</returns>
-    public abstract bool CheckNextSessionCondition();
+    protected abstract bool CheckNextSessionCondition();
 
     /// <summary>
     /// Checks if the condition for ending the experiment has been reached.
     /// </summary>
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
-    public abstract bool CheckEndCondition();
+    protected abstract bool CheckEndCondition();
 
     /// <summary>
     /// Launches the next session. Performs all the required preparations.
     /// </summary>
-    public abstract void LaunchNextSession();
+    protected abstract void LaunchNextSession();
 
     /// <summary>
     /// Finishes the experiment. Performs all the required procedures.
     /// </summary>
-    public abstract void EndExperiment();
+    protected abstract void EndExperiment();
 
     #endregion
 
