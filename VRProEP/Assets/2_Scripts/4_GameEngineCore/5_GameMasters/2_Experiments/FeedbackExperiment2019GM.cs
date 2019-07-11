@@ -226,7 +226,6 @@ public class FeedbackExperiment2019GM : GameMaster
                     LaunchNextSession();
                     StartCoroutine(ClearObjectFromHandCoroutine());
                     UpdateForceAndRoughnessTargets();
-                    StartCoroutine(SpawnExperimentObject());
                     // Go to instructions
                     experimentState = ExperimentState.GivingInstructions;
                     break;
@@ -787,10 +786,19 @@ public class FeedbackExperiment2019GM : GameMaster
     }
 
     /// <summary>
+    /// Checks whether the subject is ready to start performing the task.
+    /// </summary>
+    /// <returns>True if ready to start.</returns>
+    protected override bool CheckReadyToStart()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    /// <summary>
     /// Checks whether the task has be successfully completed or not.
     /// </summary>
     /// <returns>True if the task has been successfully completed.</returns>
-    public override bool CheckTaskCompletion()
+    protected override bool CheckTaskCompletion()
     {
         //
         // Task is completed when EMG is disabled and the subject has selected a balloon
@@ -864,7 +872,7 @@ public class FeedbackExperiment2019GM : GameMaster
     /// Checks if the condition for the rest period has been reached.
     /// </summary>
     /// <returns>True if the rest condition has been reached.</returns>
-    public override bool CheckRestCondition()
+    protected override bool CheckRestCondition()
     {
         if (iterationNumberCounterTotal % restIterations == 0)
         {
@@ -878,7 +886,7 @@ public class FeedbackExperiment2019GM : GameMaster
     /// Checks if the condition for changing experiment session has been reached.
     /// </summary>
     /// <returns>True if the condition for changing sessions has been reached.</returns>
-    public override bool CheckNextSessionCondition()
+    protected override bool CheckNextSessionCondition()
     {
         if (iterationNumber >= iterationsPerSession[sessionNumber - 1])
         {
@@ -894,7 +902,7 @@ public class FeedbackExperiment2019GM : GameMaster
     /// Checks if the condition for ending the experiment has been reached.
     /// </summary>
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
-    public override bool CheckEndCondition()
+    protected override bool CheckEndCondition()
     {
         if (sessionNumber >= iterationsPerSession.Count && iterationNumber >= iterationsPerSession[sessionNumber - 1])
             return true;
@@ -905,7 +913,7 @@ public class FeedbackExperiment2019GM : GameMaster
     /// <summary>
     /// Launches the next session. Performs all the required preparations.
     /// </summary>
-    public override void LaunchNextSession()
+    protected override void LaunchNextSession()
     {
         //No training in Session: Mixed or no Visual Feedback
         if (sessionType[sessionNumber - 1] == FeedbackExperiment.Mixed || visualFeedbackType[sessionNumber - 1] == VisualFeebackType.None)
@@ -969,7 +977,7 @@ public class FeedbackExperiment2019GM : GameMaster
     /// <summary>
     /// Finishes the experiment. Performs all the required procedures.
     /// </summary>
-    public override void EndExperiment()
+    protected override void EndExperiment()
     {
         //
         // Update log data and close logs.
@@ -1070,7 +1078,7 @@ public class FeedbackExperiment2019GM : GameMaster
                     yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                     yield return new WaitForSeconds(0.5f);
 
-                    // High force: yellow
+                    // High force: pink
                     instructionManager.DisplayText(defaultText + "Stones with pink colour need strong grip force" + continueText);
                     hudManager.DisplayText("See, it's pink!");
                     // Set colour
@@ -1089,6 +1097,16 @@ public class FeedbackExperiment2019GM : GameMaster
                         instructionManager.DisplayText(defaultText + "You should aim to change the stones colour into green." + continueText);
                         yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                         yield return new WaitForSeconds(0.5f);
+
+                        // Target force: green
+                        instructionManager.DisplayText(defaultText + "This is the colour you should aim for!" + continueText);
+                        hudManager.DisplayText("See, it's green!");
+                        // Set colour
+                        experimentObject.SetRestColour(forceColours[3]);
+                        // Wait for acknowledge
+                        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+                        yield return new WaitForSeconds(0.5f);
+
                         instructionManager.DisplayText(defaultText + "If you squeeze too hard the diamond might break and the stone colour will turn red." + continueText);
                         yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                         yield return new WaitForSeconds(0.5f);
@@ -1235,7 +1253,6 @@ public class FeedbackExperiment2019GM : GameMaster
                     break;
                 case FeedbackExperiment.Mixed://mixed
                     throw new System.NotImplementedException();
-                    break;
                 default:
                     break;
             }
