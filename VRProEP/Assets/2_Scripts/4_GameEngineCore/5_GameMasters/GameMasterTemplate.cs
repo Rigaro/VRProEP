@@ -11,6 +11,7 @@ using VRProEP.Utilities;
 public class GameMasterTemplate : GameMaster
 {
     private float taskTime = 0.0f;
+    private string infoText;
 
     // Start is called before the first frame update
     void Start()
@@ -101,6 +102,9 @@ public class GameMasterTemplate : GameMaster
              *************************************************
              */
             case ExperimentState.WaitingForStart:
+                // Show status to subject
+                infoText = GetInfoText();
+                instructionManager.DisplayText(infoText);
 
                 // Check if pause requested
                 UpdatePause();
@@ -109,35 +113,42 @@ public class GameMasterTemplate : GameMaster
                     // Waiting for subject to get to start position.
                     case WaitState.Waiting:
                         if (CheckReadyToStart())
+                        {
+                            startEnable = true;
                             waitState = WaitState.Countdown;
+                        }
                         break;
                     // HUD countdown for reaching action.
                     case WaitState.Countdown:
-                        // If hand goes out of target reset countdown and wait for position
-                        if (!startEnable && !countdownDone)
-                        {
-                            counting = false;
-                            countdownDone = false;
-                            // Indicate to move back
-                            hudManager.DisplayText("Move to start", 2.0f);
-                            waitState = WaitState.Waiting;
-                            break;
-                        }
                         // If all is good and haven't started counting, start.
-                        if (!counting && !countdownDone)
+                        if (startEnable && !counting && !countdownDone)
                         {
-                            StopAllCoroutines();
+                            hudManager.ClearText();
+                            StopHUDCountDown();
                             counting = true;
                             HUDCountDown(3);
                         }
                         // If all is good and the countdownDone flag is raised, switch to reaching.
-                        if (countdownDone)
+                        else if (countdownDone)
                         {
                             // Reset flags
+                            startEnable = false;
                             counting = false;
                             countdownDone = false;
                             // Continue
                             experimentState = ExperimentState.PerformingTask;
+                            waitState = WaitState.Waiting;
+                            break;
+                        }
+                        // If hand goes out of target reset countdown and wait for position
+                        else if (!CheckReadyToStart() && !countdownDone)
+                        {
+                            StopHUDCountDown();
+                            startEnable = false;
+                            counting = false;
+                            countdownDone = false;
+                            // Indicate to move back
+                            hudManager.DisplayText("Move to start", 2.0f);
                             waitState = WaitState.Waiting;
                             break;
                         }
@@ -152,6 +163,9 @@ public class GameMasterTemplate : GameMaster
              *************************************************
              */
             case ExperimentState.PerformingTask:
+                // Show status to subject
+                infoText = GetInfoText();
+                instructionManager.DisplayText(infoText);
                 // Task performance is handled deterministically in FixedUpdate.
                 break;
             /*
@@ -160,6 +174,9 @@ public class GameMasterTemplate : GameMaster
              *************************************************
              */
             case ExperimentState.AnalizingResults:
+                // Show status to subject
+                infoText = GetInfoText();
+                instructionManager.DisplayText(infoText);
                 // Allow 3 seconds after task end to do calculations
                 SetWaitFlag(3.0f);
 
@@ -249,6 +266,9 @@ public class GameMasterTemplate : GameMaster
              *************************************************
              */
             case ExperimentState.Resting:
+                // Show status to subject
+                infoText = GetInfoText();
+                instructionManager.DisplayText(infoText);
                 //
                 // Check for session change or end request from experimenter
                 //
@@ -279,6 +299,9 @@ public class GameMasterTemplate : GameMaster
              *************************************************
              */
             case ExperimentState.Paused:
+                // Show status to subject
+                infoText = GetInfoText();
+                instructionManager.DisplayText(infoText);
                 //
                 // Check for session change or end request from experimenter
                 //
@@ -497,4 +520,16 @@ public class GameMasterTemplate : GameMaster
     }
 
     #endregion
+
+    /// <summary>
+    /// Returns the progress update String
+    /// </summary>
+    /// <returns></returns>
+    private string GetInfoText()
+    {
+        string Text;
+        Text = "Status: " + experimentState.ToString() + ".\n";
+        Text += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
+        return Text;
+    }
 }

@@ -37,6 +37,8 @@ public abstract class GameMaster : MonoBehaviour
     [SerializeField]
     protected float worldOrientation = 180.0f;
     public Transform experimentCenter;
+    [SerializeField]
+    protected float playerOrientation = 0.0f;
 
     // Subject group management
     public enum SubjectGroup
@@ -91,10 +93,15 @@ public abstract class GameMaster : MonoBehaviour
         Waiting,
         Countdown
     }
+    // Countdown management
     protected bool counting = false;
     protected bool countdownDone = false;
+    private Coroutine countdownCoroutine;
+
+    // Waiting
     private bool waitFlag = false;
     protected bool WaitFlag { get => waitFlag; set => waitFlag = value; }
+
 
     #endregion
 
@@ -305,7 +312,16 @@ public abstract class GameMaster : MonoBehaviour
     /// <param name="seconds"></param>
     protected void HUDCountDown(int seconds)
     {
-        StartCoroutine(CountDownCoroutine(seconds));
+        countdownCoroutine = StartCoroutine(CountDownCoroutine(seconds));
+    }
+
+    /// <summary>
+    /// Stops the current countdown.
+    /// </summary>
+    protected void StopHUDCountDown()
+    {
+        if (countdownCoroutine != null)
+            StopCoroutine(countdownCoroutine);
     }
 
     /// <summary>
@@ -341,15 +357,20 @@ public abstract class GameMaster : MonoBehaviour
         Player player = playerGO.GetComponent<Player>();
         if (player == null)
             throw new System.NullReferenceException("Player Component not found.");
-
-        // Teleport to the start position
-        Vector3 playerFeetOffset = player.trackingOriginTransform.position - player.feetPositionGuess;
-        player.trackingOriginTransform.position = player.transform.position + playerFeetOffset;
-        player.trackingOriginTransform.Rotate(new Vector3(0.0f, 1.0f, 0.0f), worldOrientation);
-        player.transform.position = experimentCenter.position - player.transform.position;
-
+        
         // Rotate experiment assets.
         this.transform.Rotate(new Vector3(0.0f, 1.0f, 0.0f), worldOrientation);
+
+        // Get the player position on floor
+        Vector3 playerFeetOffset = player.trackingOriginTransform.position - player.feetPositionGuess;
+        // Set the new tracking origin as that place
+        player.trackingOriginTransform.position = player.transform.position + playerFeetOffset;
+        player.trackingOriginTransform.Rotate(new Vector3(0.0f, 1.0f, 0.0f), playerOrientation);
+        // Teleport to the start position
+        if (playerOrientation == 180.0f)
+            player.transform.position = experimentCenter.position - player.trackingOriginTransform.position;
+        else
+            player.transform.position = experimentCenter.position + player.trackingOriginTransform.position;
     }
 
     #endregion

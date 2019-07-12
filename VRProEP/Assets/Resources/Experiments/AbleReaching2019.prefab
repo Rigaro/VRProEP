@@ -51,12 +51,18 @@ MonoBehaviour:
   skipInstructions: 0
   debug: 0
   debugText: {fileID: 0}
-  worldOrientation: 0
+  worldOrientation: -90
   experimentCenter: {fileID: 1887047862402091588}
+  playerOrientation: 0
   gridRows: 5
   gridColumns: 5
   gridSpacing: 0.15
+  gridHeightMultiplier: 0.8
+  gridReachMultiplier: 0.8
   gridManager: {fileID: 9044975067194370354}
+  startShoulderAngle: -90
+  startElbowAngle: 90
+  startTolerance: 5
 --- !u!1001 &5916067502469450487
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -16,8 +16,7 @@ using VRProEP.Utilities;
 
 public class AbleReaching2019GM : GameMaster
 {
-    [Header("Experiment configuration:")]
-
+    [Header("Experiment configuration: Grid")]
     [SerializeField]
     [Tooltip("The number of rows for the reaching grid.")]
     [Range(1,10)]
@@ -46,7 +45,25 @@ public class AbleReaching2019GM : GameMaster
     [SerializeField]
     private BallGridManager gridManager;
 
+    [Header("Experiment configuration: Start position")]
     // Add start position tolerance.
+    [SerializeField]
+    [Tooltip("The subject's shoulder start angle in degrees.")]
+    [Range(-180.0f, 180.0f)]
+    private float startShoulderAngle = -90.0f;
+
+    [SerializeField]
+    [Tooltip("The subject's elbow start angle in degrees.")]
+    [Range(-180.0f, 180.0f)]
+    private float startElbowAngle = 90.0f;
+
+    [SerializeField]
+    [Tooltip("The start angle tolerance in degrees.")]
+    [Range(0.0f, 10.0f)]
+    private float startTolerance = 2.0f;
+
+    // Instructions management
+    private string infoText;
 
     // Motion tracking for experiment management (check for start position)
     private VIVETrackerManager upperArmTracker;
@@ -60,7 +77,21 @@ public class AbleReaching2019GM : GameMaster
     private const string motionDataAbleFormat = "loc,t,aDotUA,bDotUA,gDotUA,aUA,bUA,gUA,xUA,yUA,zUA,aDotE,bDotE,gDotE,aE,bE,gE,xE,yE,zE,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,xHand,yHand,zHand,aHand,bHand,gHand";
 
 
-    // Start is called before the first frame update
+    private void Awake()
+    {
+        if (debug)
+        {
+            SaveSystem.LoadUserData("MD1942");
+            //SaveSystem.LoadUserData("RG1988");
+            //
+            // Debug Able
+            //
+            AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
+            AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
+
+        }
+    }
+            // Start is called before the first frame update
     void Start()
     {
         // Initialize ExperimentSystem
@@ -71,6 +102,10 @@ public class AbleReaching2019GM : GameMaster
 
         // Spawn grid
         gridManager.SpawnGrid(gridRows, gridColumns, gridSpacing);
+
+        // Move subject to the centre of the experiment space
+        if (!debug)
+            TeleportToStartPosition();
 
         // Wait for 5 seconds at HelloWorld
         SetWaitFlag(5.0f);
@@ -90,6 +125,8 @@ public class AbleReaching2019GM : GameMaster
             case ExperimentState.HelloWorld:
                 if (WaitFlag)
                 {
+                    if (debug)
+                        TeleportToStartPosition();
                     hudManager.ClearText();
                     experimentState = ExperimentState.InitializingApplication;
                 }
@@ -168,6 +205,9 @@ public class AbleReaching2019GM : GameMaster
              *************************************************
              */
             case ExperimentState.WaitingForStart:
+                // Show status to subject
+                infoText = GetInfoText();
+                instructionManager.DisplayText(infoText);
 
                 // Check if pause requested
                 UpdatePause();
@@ -175,34 +215,48 @@ public class AbleReaching2019GM : GameMaster
                 {
                     // Waiting for subject to get to start position.
                     case WaitState.Waiting:
+                        if (CheckReadyToStart())
+                        {
+                            startEnable = true;
+                            waitState = WaitState.Countdown;
+                        }
                         break;
                     // HUD countdown for reaching action.
                     case WaitState.Countdown:
-                        // If hand goes out of target reset countdown and wait for position
-                        if (!startEnable && !countdownDone)
-                        {
-                            counting = false;
-                            countdownDone = false;
-                            // Indicate to move back
-                            hudManager.DisplayText("Move to start", 2.0f);
-                            waitState = WaitState.Waiting;
-                            break;
-                        }
                         // If all is good and haven't started counting, start.
-                        if (!counting && !countdownDone)
+                        if (startEnable && !counting && !countdownDone)
                         {
-                            StopAllCoroutines();
+                            // Manage countdown
+                            hudManager.ClearText();
+                            StopHUDCountDown();
                             counting = true;
                             HUDCountDown(3);
+                            // Select target
+                            gridManager.SelectBall(2, 2);
                         }
                         // If all is good and the countdownDone flag is raised, switch to reaching.
-                        if (countdownDone)
+                        else if (countdownDone)
                         {
                             // Reset flags
+                            startEnable = false;
                             counting = false;
                             countdownDone = false;
                             // Continue
                             experimentState = ExperimentState.PerformingTask;
+                            waitState = WaitState.Waiting;
+                            break;
+                        }
+                        // If hand goes out of target reset countdown and wait for position
+                        else if (!CheckReadyToStart() && !countdownDone)
+                        {
+                            StopHUDCountDown();
+                            startEnable = false;
+                            counting = false;
+                            countdownDone = false;
+                            // Clear ball
+                            gridManager.ResetBallSelection();
+                            // Indicate to move back
+                            hudManager.DisplayText("Move to start", 2.0f);
                             waitState = WaitState.Waiting;
                             break;
                         }
@@ -388,6 +442,10 @@ public class AbleReaching2019GM : GameMaster
             debugText.text = experimentState.ToString() + "\n";
             if (experimentState == ExperimentState.WaitingForStart)
                 debugText.text += waitState.ToString() + "\n";
+            float qShoulder = Mathf.Rad2Deg*(upperArmTracker.GetProcessedData(5) + Mathf.PI); // Offsetting to horizontal position being 0.
+            float qElbow = Mathf.Rad2Deg * (lowerArmTracker.GetProcessedData(5)) - qShoulder; // Offsetting to horizontal position being 0.
+            debugText.text += qShoulder.ToString() + "\n";
+            debugText.text += qElbow.ToString() + "\n";
         }
     }
 
@@ -427,7 +485,7 @@ public class AbleReaching2019GM : GameMaster
                 //
                 // Log current data
                 //
-                ExperimentSystem.GetActiveLogger(1).AppendData(logData);
+                //motionLogger.AppendData(logData);
 
                 //
                 // Save log and reset flags when successfully compeleted task
@@ -441,7 +499,7 @@ public class AbleReaching2019GM : GameMaster
                     //
                     // Save logger for current experiment and change to data analysis
                     //
-                    ExperimentSystem.GetActiveLogger(1).CloseLog();
+                    //motionLogger.CloseLog();
 
                     //
                     // Clear data management buffers
@@ -490,6 +548,8 @@ public class AbleReaching2019GM : GameMaster
         // Set the experiment type configuration
         //
         experimentType = ExperimentType.TypeOne; // Able-bodied experiment type
+        if (debug)
+            ExperimentSystem.SetActiveExperimentID("AbleReaching2019");
 
         //
         // Initialize world positioning
@@ -498,7 +558,7 @@ public class AbleReaching2019GM : GameMaster
         float subjectHeight = SaveSystem.ActiveUser.height;
         float subjectArmLength = SaveSystem.ActiveUser.upperArmLength + SaveSystem.ActiveUser.forearmLength + (SaveSystem.ActiveUser.handLength / 2);
         // Set the grid distance from subject
-        gridManager.transform.position = new Vector3(gridReachMultiplier * subjectArmLength, gridHeightMultiplier * subjectHeight, 0.0f);
+        gridManager.transform.position = new Vector3(0.0f, gridHeightMultiplier * subjectHeight, gridReachMultiplier * subjectArmLength);
 
         //
         // Create data loggers
@@ -510,18 +570,18 @@ public class AbleReaching2019GM : GameMaster
         //
         // Add arm and body motion trackers.
         //
+        // Upper limb motion tracker
+        GameObject ulMotionTrackerGO = AvatarSystem.AddMotionTracker();
+        upperArmTracker = new VIVETrackerManager(ulMotionTrackerGO.transform);
+        ExperimentSystem.AddSensor(upperArmTracker);
+
+        // Lower limb motion tracker
+        GameObject llMotionTrackerGO = GameObject.FindGameObjectWithTag("ForearmTracker");
+        lowerArmTracker = new VIVETrackerManager(llMotionTrackerGO.transform);
+        ExperimentSystem.AddSensor(lowerArmTracker);
+
         if (!debug)
         {
-            // Upper limb motion tracker
-            GameObject ulMotionTrackerGO = AvatarSystem.AddMotionTracker();
-            upperArmTracker = new VIVETrackerManager(ulMotionTrackerGO.transform);
-            ExperimentSystem.AddSensor(upperArmTracker);
-
-            // Lower limb motion tracker
-            GameObject llMotionTrackerGO = GameObject.FindGameObjectWithTag("ForearmTracker");
-            lowerArmTracker = new VIVETrackerManager(llMotionTrackerGO.transform);
-            ExperimentSystem.AddSensor(lowerArmTracker);
-
             // Shoulder acromium head tracker
             GameObject motionTrackerGO1 = AvatarSystem.AddMotionTracker();
             VIVETrackerManager shoulderTracker = new VIVETrackerManager(motionTrackerGO1.transform);
@@ -548,10 +608,32 @@ public class AbleReaching2019GM : GameMaster
     /// <returns>True if ready to start.</returns>
     protected override bool CheckReadyToStart()
     {
-        // Check that upper arm is in -90 degrees (down) and lower arm in 90 degrees (flexed)
-        float qShoulder = upperArmTracker.GetProcessedData(5) + Mathf.PI / 2; // Offsetting to horizontal position being 0.
-        float qElbow = lowerArmTracker.GetProcessedData(5) + Mathf.PI / 2; // Offsetting to horizontal position being 0.
-        throw new System.NotImplementedException();
+        // Check that upper and lower arms are within the tolerated start position.
+        float qShoulder = Mathf.Rad2Deg * (upperArmTracker.GetProcessedData(5) + Mathf.PI); // Offsetting to horizontal position being 0.
+        float qElbow = Mathf.Rad2Deg * (lowerArmTracker.GetProcessedData(5)) - qShoulder; // Offsetting to horizontal position being 0.
+        // The difference to the start position
+        float qSDiff = qShoulder - startShoulderAngle;
+        float qEDiff = qElbow - startElbowAngle;
+        
+        if (Mathf.Abs(qSDiff) < startTolerance && Mathf.Abs(qEDiff) < startTolerance)
+            return true;
+        // Provide instructions when not there yet
+        else
+        {
+            string helpText = "";
+            if (qSDiff < 0 && Mathf.Abs(qSDiff) > startTolerance)
+                helpText += "Raise your upper-arm.\n";
+            else if (qSDiff > 0 && Mathf.Abs(qSDiff) > startTolerance)
+                helpText += "Lower your upper-arm.\n";
+
+            if (qEDiff < 0 && Mathf.Abs(qEDiff) > startTolerance)
+                helpText += "Raise your lower-arm.\n";
+            else if (qEDiff > 0 && Mathf.Abs(qEDiff) > startTolerance)
+                helpText += "Lower your lower-arm.\n";
+
+            hudManager.DisplayText(helpText);
+            return false;
+        }
     }
 
     /// <summary>
@@ -561,12 +643,9 @@ public class AbleReaching2019GM : GameMaster
     protected override bool CheckTaskCompletion()
     {
         //
-        // Perform some condition testing
+        // Check that the selected ball has been touched.
         //
-        if (true)
-        {
-            return true;
-        }
+        return gridManager.SelectedTouched;
     }
 
     /// <summary>
@@ -575,7 +654,7 @@ public class AbleReaching2019GM : GameMaster
     /// <returns>True if the rest condition has been reached.</returns>
     protected override bool CheckRestCondition()
     {
-        throw new System.NotImplementedException();
+        return false;
     }
 
     /// <summary>
@@ -584,7 +663,7 @@ public class AbleReaching2019GM : GameMaster
     /// <returns>True if the condition for changing sessions has been reached.</returns>
     protected override bool CheckNextSessionCondition()
     {
-        throw new System.NotImplementedException();
+        return false;
     }
 
     /// <summary>
@@ -593,7 +672,7 @@ public class AbleReaching2019GM : GameMaster
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
     protected override bool CheckEndCondition()
     {
-        throw new System.NotImplementedException();
+        return false;
     }
 
     /// <summary>
@@ -613,4 +692,17 @@ public class AbleReaching2019GM : GameMaster
     }
 
     #endregion
+
+
+    /// <summary>
+    /// Returns the progress update String
+    /// </summary>
+    /// <returns></returns>
+    private string GetInfoText()
+    {
+        string Text;
+        Text = "Status: " + experimentState.ToString() + ".\n";
+        Text += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
+        return Text;
+    }
 }

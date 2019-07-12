@@ -19,16 +19,9 @@ public class BallGridManager : MonoBehaviour
     private bool hasSelected = false; // Whether a ball has been selected
     private int selectedIndex = 0;
     private bool selectedTouched = false;
+    
+    public bool SelectedTouched { get => selectedTouched; }
 
-    // DEBUG
-    private bool run = true;
-    // DEBUG
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        SpawnGrid(rows, cols, spacing);
-    }
 
     /// <summary>
     /// Spawns a new grid of touchy balls.
@@ -69,7 +62,7 @@ public class BallGridManager : MonoBehaviour
         }
         // Check that the right number of balls have been added
         if (balls.Count != rows * cols)
-            throw new System.Exception("The number of spawned balls do not match the requested balls.");
+            throw new System.Exception("The number of spawned balls do not match the requested balls. Balls: " + balls.Count);
 
     }
 
