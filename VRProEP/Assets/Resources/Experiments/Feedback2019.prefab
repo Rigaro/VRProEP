@@ -1078,6 +1078,7 @@ MonoBehaviour:
   debugText: {fileID: 0}
   worldOrientation: 180
   experimentCenter: {fileID: 1496852521280133188}
+  playerOrientation: 180
   skipAll: 0
   skipTraining: 0
   forceTargets:

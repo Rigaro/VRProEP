@@ -375,7 +375,7 @@ public class FeedbackExperiment2019GM : GameMaster
                         if (!counting && !countdownDone)
                         {
                             counting = true;
-                            HUDCountDown(3);
+                            HUDCountDown(0);
                         }
                         // If all is good and the countdownDone flag is raised, switch to reaching.
                         if (countdownDone)
@@ -645,10 +645,13 @@ public class FeedbackExperiment2019GM : GameMaster
         }
         else
         {
-            if (handManager.IsEnabled)
-                hudManager.colour = HUDManager.HUDColour.Red;
-            else
-                hudManager.colour = HUDManager.HUDColour.Blue;
+            if (!debug)
+            {
+                if (handManager.IsEnabled)
+                    hudManager.colour = HUDManager.HUDColour.Red;
+                else
+                    hudManager.colour = HUDManager.HUDColour.Blue;
+            }
         }
         //
         // Update information displayed for debugging purposes
@@ -792,6 +795,8 @@ public class FeedbackExperiment2019GM : GameMaster
         // Set the experiment type and ID
         //
         experimentType = ExperimentType.TypeOne;
+        if (debug)
+            ExperimentSystem.SetActiveExperimentID("Feedback2019");
 
         //
         // Create data loggers
@@ -1173,7 +1178,7 @@ public class FeedbackExperiment2019GM : GameMaster
                         //let them squeze with targetforclevel[0] + visual feedback
                         //
                         hudManager.DisplayText("Look at the screen.", 3.0f);
-                        instructionManager.DisplayText(defaultText + "Lets train with little grasp force.");
+                        instructionManager.DisplayText(defaultText + "Lets train with little grasp force. Squeeze until it is green, you should feel some vibrations.");
                         // Set force and colour
                         experimentObject.SetTargetForce(forceTargets[0]);
                         experimentObject.SetRestColour(forceColours[0]);
@@ -1188,7 +1193,7 @@ public class FeedbackExperiment2019GM : GameMaster
                         //let them squeze with targetforclevel[1] + visual feedback
                         //
                         hudManager.DisplayText("Look at the screen.", 3.0f);
-                        instructionManager.DisplayText(defaultText + "Lets train with medium grasp force.");
+                        instructionManager.DisplayText(defaultText + "Lets train with medium grasp force. Squeeze until it is green, you should feel some vibrations.");
                         // Set force and colour
                         experimentObject.SetTargetForce(forceTargets[1]);
                         experimentObject.SetRestColour(forceColours[1]);
@@ -1202,7 +1207,7 @@ public class FeedbackExperiment2019GM : GameMaster
                         //let them squeze with targetforclevel[2] + visual feedback
                         //
                         hudManager.DisplayText("Look at the screen.", 3.0f);
-                        instructionManager.DisplayText(defaultText + "Lets train with strong grasp force.");
+                        instructionManager.DisplayText(defaultText + "Lets train with strong grasp force. Squeeze until it is green, you should feel some vibrations.");
                         // Set force and colour
                         experimentObject.SetTargetForce(forceTargets[2]);
                         experimentObject.SetRestColour(forceColours[2]);
@@ -1254,7 +1259,7 @@ public class FeedbackExperiment2019GM : GameMaster
                     experimentObject.SetTargetForce(forceTargets[1]);
                     experimentObject.SetRoughness(roughnessTargets[0]);
                     //
-                    instructionManager.DisplayText("A smooth stone feels like this and is classified as Smooth.");
+                    instructionManager.DisplayText("A smooth stone feels like this and is classified as Smooth. If you do not feel it, squeeze harder (flex wrist).");
                     hudManager.DisplayText("Squeeze it!", 3.0f);
                     yield return new WaitUntil(() => CheckTaskCompletion());
                     yield return new WaitForSeconds(0.5f);
@@ -1266,7 +1271,7 @@ public class FeedbackExperiment2019GM : GameMaster
                     //present targertroughness[1] and let them classify
                     experimentObject.SetRoughness(roughnessTargets[1]);
                     //
-                    instructionManager.DisplayText("A medium rough stone feels like this and is classified as Mid.");
+                    instructionManager.DisplayText("A medium rough stone feels like this and is classified as Mid. If you do not feel it, squeeze harder (flex wrist).");
                     hudManager.DisplayText("Squeeze it!", 3.0f);
                     yield return new WaitUntil(() => CheckTaskCompletion());
                     yield return new WaitForSeconds(0.5f);
@@ -1278,7 +1283,7 @@ public class FeedbackExperiment2019GM : GameMaster
                     //present targertroughness[2] and let them classify
                     experimentObject.SetRoughness(roughnessTargets[2]);
                     //
-                    instructionManager.DisplayText("A rough stone feels like this and is classified as sphere Rough.");
+                    instructionManager.DisplayText("A rough stone feels like this and is classified as sphere Rough. If you do not feel it, squeeze harder (flex wrist).");
                     hudManager.DisplayText("Squeeze it!", 3.0f);
                     yield return new WaitUntil(() => CheckTaskCompletion());
                     yield return new WaitForSeconds(0.5f);
@@ -1464,15 +1469,18 @@ public class FeedbackExperiment2019GM : GameMaster
     /// </summary>
     private void UpdateForceAndRoughnessTargets()
     {
-        //random value in Range of List at certain session
-        randIndex = r.Next(experimentTargetList[sessionNumber - 1].Count - 1);
-        //select targets via indeces stored in TargetList
-        activeForceTarget = forceTargets[experimentTargetList[sessionNumber - 1][randIndex][0]];
-        //activeForceColor = forceColours[experimentTargetList[sessionNumber - 1][randIndex][0]];
-        activeRougnessTarget = roughnessTargets[experimentTargetList[sessionNumber - 1][randIndex][1]];
+        if (experimentTargetList[sessionNumber - 1].Count - 1 >= 0)
+        {
+            //random value in Range of List at certain session
+            randIndex = r.Next(experimentTargetList[sessionNumber - 1].Count - 1);
+            //select targets via indeces stored in TargetList
+            activeForceTarget = forceTargets[experimentTargetList[sessionNumber - 1][randIndex][0]];
+            activeForceColor = forceColours[experimentTargetList[sessionNumber - 1][randIndex][0]];
+            activeRougnessTarget = roughnessTargets[experimentTargetList[sessionNumber - 1][randIndex][1]];
 
-        //delete Target from List
-        experimentTargetList[sessionNumber - 1].Remove(experimentTargetList[sessionNumber - 1][randIndex]);
+            //delete Target from List
+            experimentTargetList[sessionNumber - 1].Remove(experimentTargetList[sessionNumber - 1][randIndex]);
+        }
     }
 
     /// <summary>
