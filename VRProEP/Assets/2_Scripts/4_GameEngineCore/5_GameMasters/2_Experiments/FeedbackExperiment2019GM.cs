@@ -28,6 +28,9 @@ public class FeedbackExperiment2019GM : GameMaster
     public List<FeedbackExperiment> sessionType = new List<FeedbackExperiment> { FeedbackExperiment.Force, FeedbackExperiment.Roughness, FeedbackExperiment.Mixed, FeedbackExperiment.Force, FeedbackExperiment.Roughness, FeedbackExperiment.Mixed }; //size 6 def.(Force Roughness Mixed Force Roughness Mixed)
     public List<VisualFeebackType> visualFeedbackType = new List<VisualFeebackType> { VisualFeebackType.On, VisualFeebackType.On, VisualFeebackType.On, VisualFeebackType.None, VisualFeebackType.None, VisualFeebackType.None }; // size 6 def.(on on on none none none)
     public int restIterations = 25;
+    List<List<int[]>> experimentTargetList = new List<List<int[]>>();
+    System.Random r = new System.Random();
+    private int randIndex;
 
     [Header("Experiment objects")]
     public ForceTextureBehaviour experimentObject;
@@ -112,19 +115,57 @@ public class FeedbackExperiment2019GM : GameMaster
                 case FeedbackExperiment.Force:
                     iterationsPerSession.Add(iterationsPerSessionPerSetting[i] * forceTargets.Count);
                     trainingPerSession.Add(trainingPerSessionPerSetting[i] * forceTargets.Count);
+                    //add targets for each iteration
+                    List<int[]> forceTargetList = new List<int[]>();
+                    for (int u = 0; u < iterationsPerSessionPerSetting[i]; u++)
+                    {
+                        for (int r = 0; r < forceTargets.Count; r++)
+                        {
+                            int[] parameterTarget = new int[2] { r, 0 };
+                            forceTargetList.Add(parameterTarget);
+                        }
+                    }
+                    experimentTargetList.Add(forceTargetList);
                     break;
                 case FeedbackExperiment.Roughness:
                     iterationsPerSession.Add(iterationsPerSessionPerSetting[i] * roughnessTargets.Count);
                     trainingPerSession.Add(trainingPerSessionPerSetting[i] * roughnessTargets.Count);
+                    //add targets for each iteration
+                    List<int[]> roughnessTargetList = new List<int[]>();
+                    for (int u = 0; u < iterationsPerSessionPerSetting[i]; u++)
+                    {
+                        for (int z = 0; z < roughnessTargets.Count; z++)
+                        {
+                            int[] parameterTarget = new int[2] { 0, z };
+                            roughnessTargetList.Add(parameterTarget);
+                        }
+                    }
+                    experimentTargetList.Add(roughnessTargetList);
+
                     break;
                 case FeedbackExperiment.Mixed:
                     iterationsPerSession.Add(iterationsPerSessionPerSetting[i] * forceTargets.Count * roughnessTargets.Count);
                     trainingPerSession.Add(trainingPerSessionPerSetting[i] * forceTargets.Count * roughnessTargets.Count);
+                    //add targets for each iteration
+                    List<int[]> mixedTargetList = new List<int[]>();
+                    for (int u = 0; u < iterationsPerSessionPerSetting[i]; u++)
+                    {
+                        for (int z = 0; z < roughnessTargets.Count; z++)
+                        {
+                            for (int r = 0; r < forceTargets.Count; r++)
+                            {
+                                int[] parameterTarget = new int[2] { r, z };
+                                mixedTargetList.Add(parameterTarget);
+                            }
+                        }
+                    }
+                    experimentTargetList.Add(mixedTargetList);
+
                     break;
                 default:
                     break;
             }
-            iterationNumberTotal += iterationsPerSession[i]; 
+            iterationNumberTotal += iterationsPerSession[i];
         }
         iterationNumberCounterTotal = 1;
 
@@ -1423,48 +1464,15 @@ public class FeedbackExperiment2019GM : GameMaster
     /// </summary>
     private void UpdateForceAndRoughnessTargets()
     {
-        if (sessionType[sessionNumber - 1] == FeedbackExperiment.Force)
-        {
-            //0 0-4
-            //1 5-9
-            //2 10-14
-            //...
-            activeForceTarget = forceTargets[(iterationNumber - 1) / iterationsPerSessionPerSetting[sessionNumber - 1]];
-            activeForceColor = forceColours[(iterationNumber - 1) / iterationsPerSessionPerSetting[sessionNumber - 1]];
+        //random value in Range of List at certain session
+        randIndex = r.Next(experimentTargetList[sessionNumber - 1].Count - 1);
+        //select targets via indeces stored in TargetList
+        activeForceTarget = forceTargets[experimentTargetList[sessionNumber - 1][randIndex][0]];
+        //activeForceColor = forceColours[experimentTargetList[sessionNumber - 1][randIndex][0]];
+        activeRougnessTarget = roughnessTargets[experimentTargetList[sessionNumber - 1][randIndex][1]];
 
-            // Set default roughness
-            activeRougnessTarget = roughnessTargets[0];
-        }
-        else if (sessionType[sessionNumber - 1] == FeedbackExperiment.Roughness)
-        {
-            //0 0-4
-            //1 5-9
-            //2 10-14
-            //...
-            activeRougnessTarget = roughnessTargets[(iterationNumber - 1) / iterationsPerSessionPerSetting[sessionNumber - 1]];
-
-            // Set default force
-            activeForceTarget = forceTargets[0];
-            activeForceColor = forceColours[0];
-        }
-        else if (sessionType[sessionNumber - 1] == FeedbackExperiment.Mixed)
-        {
-            //0 0-14
-            //1 15-29
-            //2 30-44
-            //..
-            activeForceTarget = forceTargets[(iterationNumber - 1) / (iterationsPerSessionPerSetting[sessionNumber - 1]*forceTargets.Count)];
-            activeForceColor = forceColours[(iterationNumber - 1) / (iterationsPerSessionPerSetting[sessionNumber - 1] * forceTargets.Count)];
-            //0- 0
-            //1- 1
-            //2- 2
-            //3- 0
-            //4- 1
-            //5- 2
-            //6- 0
-            //..
-            activeRougnessTarget = roughnessTargets[(iterationNumber - 1) % roughnessTargets.Count];
-        }
+        //delete Target from List
+        experimentTargetList[sessionNumber - 1].Remove(experimentTargetList[sessionNumber - 1][randIndex]);
     }
 
     /// <summary>
