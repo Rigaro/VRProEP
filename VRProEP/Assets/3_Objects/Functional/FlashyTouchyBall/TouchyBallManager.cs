@@ -73,7 +73,7 @@ public class TouchyBallManager : MonoBehaviour
         // Check if hand is gone to return to idle.
         if ((other.tag == "GraspManager" || other.tag == "Hand") && !isWaiting)
         {
-            resetCoroutine = StartCoroutine(ReturnToIdle(2.0f));
+            resetCoroutine = StartCoroutine(ReturnToIdle(3.0f));
         }
     }
 

@@ -29,7 +29,8 @@ public abstract class GameMaster : MonoBehaviour
     protected ConsoleManager instructionManager;
     protected ConsoleManager monitorManager;
 
-    [Header("Debug enable:")]
+    [Header("Debug:")]
+    [Tooltip("The debug enable variable.")]
     public bool debug;
     public TextMeshPro debugText;
 

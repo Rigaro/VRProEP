@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 9044975066999247918}
   - component: {fileID: 9044975066999247905}
   m_Layer: 0
-  m_Name: AbleReaching2019
+  m_Name: GridReaching2019
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -63,6 +63,8 @@ MonoBehaviour:
   startShoulderAngle: -90
   startElbowAngle: 90
   startTolerance: 5
+  iterationsPerTarget: 1
+  sessions: 1
 --- !u!1001 &5916067502469450487
 PrefabInstance:
   m_ObjectHideFlags: 0

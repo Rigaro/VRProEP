@@ -87,6 +87,23 @@ public class BallGridManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Selects a ball in the grid by the given index.
+    /// </summary>
+    /// <param name="index">The ball index [0, rows*cols - 1]</param>
+    public void SelectBall(int index)
+    {
+        if (index < 0 || index >= rows*cols) throw new System.ArgumentOutOfRangeException("The requested location is out of range. Index: [0, " + ((rows*cols) - 1) + "].");
+
+        // Reset previous selections
+        ResetBallSelection();
+
+        // Select ball
+        balls[index].SetSelected();
+        hasSelected = true;
+        selectedTouched = false;
+    }
+
+    /// <summary>
     /// Clears the ball selection
     /// </summary>
     public void ResetBallSelection()

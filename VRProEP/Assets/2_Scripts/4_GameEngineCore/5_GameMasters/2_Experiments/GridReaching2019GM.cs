@@ -14,7 +14,7 @@ using VRProEP.GameEngineCore;
 using VRProEP.ProsthesisCore;
 using VRProEP.Utilities;
 
-public class AbleReaching2019GM : GameMaster
+public class GridReaching2019GM : GameMaster
 {
     [Header("Experiment configuration: Grid")]
     [SerializeField]
@@ -44,9 +44,12 @@ public class AbleReaching2019GM : GameMaster
 
     [SerializeField]
     private BallGridManager gridManager;
+    
+    // Target management variables
+    private int targetNumber; // The total number of targets
+    private List<int> targetOrder = new List<int>(); // A list of target indexes ordered for selection over iterations in a session.
 
     [Header("Experiment configuration: Start position")]
-    // Add start position tolerance.
     [SerializeField]
     [Tooltip("The subject's shoulder start angle in degrees.")]
     [Range(-180.0f, 180.0f)]
@@ -61,6 +64,22 @@ public class AbleReaching2019GM : GameMaster
     [Tooltip("The start angle tolerance in degrees.")]
     [Range(0.0f, 10.0f)]
     private float startTolerance = 2.0f;
+    
+    [Header("Experiment configuration: Reps and Sets")]
+    [SerializeField]
+    [Tooltip("The number of iterations per target.")]
+    [Range(1, 100)]
+    private int iterationsPerTarget = 1;
+
+    [SerializeField]
+    [Tooltip("The number of sessions for the experiment.")]
+    [Range(1, 100)]
+    private int sessions = 1;
+
+    // iteration management variables
+    private int iterationsPerSession;
+    private int maxIterations;
+    private int completedIterations = 0;
 
     // Instructions management
     private string infoText;
@@ -232,7 +251,7 @@ public class AbleReaching2019GM : GameMaster
                             counting = true;
                             HUDCountDown(3);
                             // Select target
-                            gridManager.SelectBall(2, 2);
+                            gridManager.SelectBall(iterationNumber - 1);
                         }
                         // If all is good and the countdownDone flag is raised, switch to reaching.
                         else if (countdownDone)
@@ -327,6 +346,8 @@ public class AbleReaching2019GM : GameMaster
                     //
                     // Update iterations and flow control
                     //
+                    iterationNumber++;
+                    completedIterations++;
 
                     // 
                     // Update log requirements
@@ -543,13 +564,30 @@ public class AbleReaching2019GM : GameMaster
     /// </summary>
     protected override void InitExperimentSystem()
     {
-        sessionNumber = 1;
         //
         // Set the experiment type configuration
         //
         experimentType = ExperimentType.TypeOne; // Able-bodied experiment type
         if (debug)
-            ExperimentSystem.SetActiveExperimentID("AbleReaching2019");
+            ExperimentSystem.SetActiveExperimentID("GridReaching2019");
+
+        //
+        // Iterations configuration
+        //
+        // Make sure flow control is initialised
+        sessionNumber = 1;
+        iterationNumber = 1;
+        // Set iterations variables for flow control.
+        targetNumber = gridRows * gridColumns;
+        iterationsPerSession = targetNumber * iterationsPerTarget;
+        maxIterations = iterationsPerSession * sessions;
+        // Create the list of target indexes and shuffle it.
+        for (int i = 0; i < targetNumber; i++)
+        {
+            for (int j = 0; j < iterationsPerTarget; j++)
+                targetOrder.Add(i);
+        }
+        targetOrder.Shuffle();
 
         //
         // Initialize world positioning
@@ -570,15 +608,15 @@ public class AbleReaching2019GM : GameMaster
         //
         // Add arm and body motion trackers.
         //
-        // Upper limb motion tracker
-        GameObject ulMotionTrackerGO = AvatarSystem.AddMotionTracker();
-        upperArmTracker = new VIVETrackerManager(ulMotionTrackerGO.transform);
-        ExperimentSystem.AddSensor(upperArmTracker);
-
         // Lower limb motion tracker
         GameObject llMotionTrackerGO = GameObject.FindGameObjectWithTag("ForearmTracker");
         lowerArmTracker = new VIVETrackerManager(llMotionTrackerGO.transform);
         ExperimentSystem.AddSensor(lowerArmTracker);
+
+        // Upper limb motion tracker
+        GameObject ulMotionTrackerGO = AvatarSystem.AddMotionTracker();
+        upperArmTracker = new VIVETrackerManager(ulMotionTrackerGO.transform);
+        ExperimentSystem.AddSensor(upperArmTracker);
 
         if (!debug)
         {
@@ -672,7 +710,7 @@ public class AbleReaching2019GM : GameMaster
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
     protected override bool CheckEndCondition()
     {
-        return false;
+        return completedIterations >= maxIterations;
     }
 
     /// <summary>
@@ -702,6 +740,7 @@ public class AbleReaching2019GM : GameMaster
     {
         string Text;
         Text = "Status: " + experimentState.ToString() + ".\n";
+        Text = "Progress: " + completedIterations + "/" + maxIterations + ".\n";
         Text += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
         return Text;
     }
