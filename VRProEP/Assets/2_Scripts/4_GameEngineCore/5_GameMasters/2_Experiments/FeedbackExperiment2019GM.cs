@@ -434,18 +434,18 @@ public class FeedbackExperiment2019GM : GameMaster
                 //
                 // Flow managment
                 //
+                // Check whether the experiment end condition is met
+                if (CheckEndCondition())
+                {
+                    hudManager.DisplayText("Experiment end. Thank you!", 6.0f);
+                    experimentState = ExperimentState.End;
+                }
                 // Rest for some time when required
-                if (CheckRestCondition())
+                else if (CheckRestCondition())
                 {
                     hudManager.DisplayText("Take a " + restTime + " seconds rest.", 6.0f);
                     SetWaitFlag(restTime);
                     experimentState = ExperimentState.Resting;
-                }
-                // Check whether the experiment end condition is met
-                else if (CheckEndCondition())
-                {
-                    hudManager.DisplayText("Experiment end. Thank you!", 6.0f);
-                    experimentState = ExperimentState.End;
                 }
                 // Check whether the new session condition is met
                 else if (CheckNextSessionCondition())
@@ -572,7 +572,12 @@ public class FeedbackExperiment2019GM : GameMaster
                 //
                 if (WaitFlag)
                 {
-                    if (CheckNextSessionCondition())
+                    if (CheckEndCondition())
+                    {
+                        hudManager.DisplayText("Experiment end. Thank you!", 6.0f);
+                        experimentState = ExperimentState.End;
+                    }
+                    else if (CheckNextSessionCondition())
                     {
                         //iterations
                         hudManager.DisplayText("Good job!", 2.0f);
