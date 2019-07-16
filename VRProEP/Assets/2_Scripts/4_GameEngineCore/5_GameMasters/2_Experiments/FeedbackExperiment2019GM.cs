@@ -437,12 +437,14 @@ public class FeedbackExperiment2019GM : GameMaster
                 // Check whether the experiment end condition is met
                 if (CheckEndCondition())
                 {
+                    handManager.ResetForce();
                     hudManager.DisplayText("Experiment end. Thank you!", 6.0f);
                     experimentState = ExperimentState.End;
                 }
                 // Rest for some time when required
                 else if (CheckRestCondition())
                 {
+                    handManager.ResetForce();
                     hudManager.DisplayText("Take a " + restTime + " seconds rest.", 6.0f);
                     SetWaitFlag(restTime);
                     experimentState = ExperimentState.Resting;
@@ -1076,6 +1078,7 @@ public class FeedbackExperiment2019GM : GameMaster
     {
         inTraining = true;
         trainingEnd = false;
+        handManager.ResetForce();
 
         string defaultText = "Training:\n";
         string continueText = "\n\n...Press the Trigger to continue...";

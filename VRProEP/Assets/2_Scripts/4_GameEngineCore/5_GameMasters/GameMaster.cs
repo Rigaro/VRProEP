@@ -102,6 +102,7 @@ public abstract class GameMaster : MonoBehaviour
     // Waiting
     private bool waitFlag = false;
     protected bool WaitFlag { get => waitFlag; set => waitFlag = value; }
+    private Coroutine waitCoroutine;
 
 
     #endregion
@@ -291,8 +292,9 @@ public abstract class GameMaster : MonoBehaviour
     /// <param name="seconds">The time in seconds to wait to set flag.</param>
     protected void SetWaitFlag(float seconds)
     {
-        StopCoroutine("SetWaitFlagCoroutine");
-        StartCoroutine(SetWaitFlagCoroutine(seconds));
+        if (waitCoroutine != null)
+            StopCoroutine(waitCoroutine);
+        waitCoroutine = StartCoroutine(SetWaitFlagCoroutine(seconds));
     }
 
     /// <summary>
