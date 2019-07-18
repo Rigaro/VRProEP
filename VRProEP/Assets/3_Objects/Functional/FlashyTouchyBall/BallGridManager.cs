@@ -21,8 +21,7 @@ public class BallGridManager : MonoBehaviour
     private bool selectedTouched = false;
     
     public bool SelectedTouched { get => selectedTouched; }
-
-
+    
     /// <summary>
     /// Spawns a new grid of touchy balls.
     /// </summary>
@@ -123,10 +122,12 @@ public class BallGridManager : MonoBehaviour
         if (hasSelected)
         {
             if (balls[selectedIndex].BallState == TouchyBallManager.TouchyBallState.Correct)
+            {
                 selectedTouched = true;
+                hasSelected = false;
+            }
             else
                 selectedTouched = false;
         }
-
     }
 }

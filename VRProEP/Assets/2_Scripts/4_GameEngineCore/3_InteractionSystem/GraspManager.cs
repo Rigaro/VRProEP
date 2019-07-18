@@ -211,6 +211,12 @@ public class GraspManager : MonoBehaviour {
             if (SteamVR_Input.GetAction<SteamVR_Action_Boolean>("ObjectInteractButton").GetStateDown(SteamVR_Input_Sources.Any) && objectInHand != null && (managerMode == GraspManagerMode.Open || (managerMode == GraspManagerMode.Restriced && inDropOff)))
             {
                 ReleaseObjectInHand();
+
+                // If object is interactable then reset forces.
+                if (isInteractable && interactionInputs != null && interactionOutputs != null)
+                {
+                    objectInteraction.SetForce(0.0f);
+                }
             }
         }
         else if (managerType == GraspManagerType.Assisted)
@@ -224,6 +230,12 @@ public class GraspManager : MonoBehaviour {
             if (HasHandStopped() && objectInHand != null && !releasing)
             {
                 ReleaseObjectInHand();
+
+                // If object is interactable then reset forces.
+                if (isInteractable && interactionInputs != null && interactionOutputs != null)
+                {
+                    objectInteraction.SetForce(0.0f);
+                }
             }
         }
     }

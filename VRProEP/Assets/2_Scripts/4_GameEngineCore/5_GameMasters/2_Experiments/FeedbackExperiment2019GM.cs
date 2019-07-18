@@ -380,6 +380,7 @@ public class FeedbackExperiment2019GM : GameMaster
                         // If all is good and the countdownDone flag is raised, switch to reaching.
                         if (countdownDone)
                         {
+                            experimentObject.SetForce(0.0f);
                             handManager.ResetForce();
                             // Reset flags
                             counting = false;
@@ -426,6 +427,7 @@ public class FeedbackExperiment2019GM : GameMaster
                 //
                 StartCoroutine(ClearObjectFromHandCoroutine());
                 experimentObject.SetForce(0.0f);
+                handManager.ResetForce();
 
                 // 
                 // Data logging
@@ -437,6 +439,7 @@ public class FeedbackExperiment2019GM : GameMaster
                 // Check whether the experiment end condition is met
                 if (CheckEndCondition())
                 {
+                    experimentObject.SetForce(0.0f);
                     handManager.ResetForce();
                     hudManager.DisplayText("Experiment end. Thank you!", 6.0f);
                     experimentState = ExperimentState.End;
@@ -444,6 +447,7 @@ public class FeedbackExperiment2019GM : GameMaster
                 // Rest for some time when required
                 else if (CheckRestCondition())
                 {
+                    experimentObject.SetForce(0.0f);
                     handManager.ResetForce();
                     hudManager.DisplayText("Take a " + restTime + " seconds rest.", 6.0f);
                     SetWaitFlag(restTime);
@@ -497,6 +501,7 @@ public class FeedbackExperiment2019GM : GameMaster
                     //
                     UpdateForceAndRoughnessTargets();
                     StartCoroutine(SpawnExperimentObject());
+                    experimentObject.SetForce(0.0f);
                     handManager.ResetForce();
 
                     //
@@ -543,6 +548,7 @@ public class FeedbackExperiment2019GM : GameMaster
                     LaunchNextSession();
                     UpdateForceAndRoughnessTargets();
                     StartCoroutine(SpawnExperimentObject());
+                    experimentObject.SetForce(0.0f);
                     handManager.ResetForce();
 
                     experimentState = ExperimentState.Training; // Go to training to check if needed
@@ -1078,6 +1084,7 @@ public class FeedbackExperiment2019GM : GameMaster
     {
         inTraining = true;
         trainingEnd = false;
+        experimentObject.SetForce(0.0f);
         handManager.ResetForce();
 
         string defaultText = "Training:\n";
@@ -1229,6 +1236,8 @@ public class FeedbackExperiment2019GM : GameMaster
 
                     instructionManager.DisplayText("Well done! With this your training ends." + continueText);
                     StartCoroutine(ClearObjectFromHandCoroutine());
+                    experimentObject.SetForce(0.0f);
+                    handManager.ResetForce();
                     yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                     yield return new WaitForSeconds(0.5f);
                     break;
@@ -1263,6 +1272,8 @@ public class FeedbackExperiment2019GM : GameMaster
 
                     //
                     //present targertroughness[0] and let them classify
+                    experimentObject.SetForce(0.0f);
+                    handManager.ResetForce();
                     // Set force and colour
                     experimentObject.SetTargetForce(forceTargets[1]);
                     experimentObject.SetRoughness(roughnessTargets[0]);
@@ -1302,6 +1313,8 @@ public class FeedbackExperiment2019GM : GameMaster
 
                     instructionManager.DisplayText("Well done! With this your training ends." + continueText);
                     StartCoroutine(ClearObjectFromHandCoroutine());
+                    experimentObject.SetForce(0.0f);
+                    handManager.ResetForce();
                     yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                     yield return new WaitForSeconds(0.5f);
                     break;
@@ -1321,57 +1334,59 @@ public class FeedbackExperiment2019GM : GameMaster
     /// <returns></returns>
     private IEnumerator InstructionsLoop()
     {
-            inInstructions = true;
-            instructionsEnd = false;
+        experimentObject.SetForce(0.0f);
+        handManager.ResetForce();
+        inInstructions = true;
+        instructionsEnd = false;
 
-            string defaultText = "Instructions:\n";
-            string continueText = "\n\n...Press the Trigger to continue...";
+        string defaultText = "Instructions:\n";
+        string continueText = "\n\n...Press the Trigger to continue...";
 
-            instructionManager.DisplayText(defaultText + "Welcome on diamond range. Today we are going to produce some diamonds out of stones. Come on, we have to start." + continueText);
-            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
-            yield return new WaitForSeconds(0.5f);
-            instructionManager.DisplayText(defaultText + "Different coloured stones will be presented to you and you will have to squeeze them with different strength." + continueText);
-            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
-            yield return new WaitForSeconds(0.5f);
-            instructionManager.DisplayText(defaultText + "Furthermore the quality of the diamonds is determined by the surface roughness of them and you therefore will have to put them in different categories." + continueText);
-            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
-            yield return new WaitForSeconds(0.5f);
-            instructionManager.DisplayText(defaultText + "To earn our dinner today we need to produce " + iterationNumberTotal + " diamonds." + continueText);
-            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
-            yield return new WaitForSeconds(0.5f);
-            instructionManager.DisplayText(defaultText + "The grasping will be controlled by your EMG activity controlling the grasping force via flexing/extending your hand." + continueText);
-            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
-            yield return new WaitForSeconds(0.5f);
-            instructionManager.DisplayText(defaultText + "Different tactile feedback will be given to you, as explained before the experiment." + continueText);
-            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
-            yield return new WaitForSeconds(0.5f);
-            instructionManager.DisplayText(defaultText + "You will get " + restTime + " seconds rest every " + restIterations + " iterations." + continueText);
-            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
-            yield return new WaitForSeconds(0.5f);
-            instructionManager.DisplayText(defaultText + "Your HUD will indicate when it is time to rest by turning green." + continueText);
-            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
-            yield return new WaitForSeconds(0.5f);
-            instructionManager.DisplayText(defaultText + "Your progress will be displayed here along with the status of the experiment." + continueText);
-            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
-            yield return new WaitForSeconds(0.5f);
-            instructionManager.DisplayText(defaultText + "If you need any rest please request it to the experimenter." + continueText);
-            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
-            yield return new WaitForSeconds(0.5f);
-            instructionManager.DisplayText(defaultText + "If you feel dizzy or want to stop the experiment please let the experimenter know immediately." + continueText);
-            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
-            yield return new WaitForSeconds(0.5f);
-            instructionManager.DisplayText(defaultText + "Remember that objects in VR are not physical so do not try to lean or support on them, particularly on the virtual desk in front of you while performing the task." + continueText);
-            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
-            yield return new WaitForSeconds(0.5f);
-            instructionManager.DisplayText(defaultText + "All the information regarding the task will be displayed on your HUD." + continueText);
-            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
-            yield return new WaitForSeconds(0.5f);
-            instructionManager.DisplayText(defaultText + "Your progress will be displayed here along with the current time." + continueText);
-            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
-            yield return new WaitForSeconds(0.5f);
-            instructionManager.DisplayText(defaultText + "Get ready to start training!" + continueText);
-            yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
-            yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "Welcome on diamond range. Today we are going to produce some diamonds out of stones. Come on, we have to start." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "Different coloured stones will be presented to you and you will have to squeeze them with different strength." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "Furthermore the quality of the diamonds is determined by the surface roughness of them and you therefore will have to put them in different categories." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "To earn our dinner today we need to produce " + iterationNumberTotal + " diamonds." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "The grasping will be controlled by your EMG activity controlling the grasping force via flexing/extending your hand." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "Different tactile feedback will be given to you, as explained before the experiment." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "You will get " + restTime + " seconds rest every " + restIterations + " iterations." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "Your HUD will indicate when it is time to rest by turning green." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "Your progress will be displayed here along with the status of the experiment." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "If you need any rest please request it to the experimenter." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "If you feel dizzy or want to stop the experiment please let the experimenter know immediately." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "Remember that objects in VR are not physical so do not try to lean or support on them, particularly on the virtual desk in front of you while performing the task." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "All the information regarding the task will be displayed on your HUD." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "Your progress will be displayed here along with the current time." + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+        instructionManager.DisplayText(defaultText + "Get ready to start training!" + continueText);
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
 
         instructionsEnd = true;
     }
@@ -1382,6 +1397,8 @@ public class FeedbackExperiment2019GM : GameMaster
     /// <returns></returns>
     private IEnumerator SessionInstructionLoop()
     {
+        experimentObject.SetForce(0.0f);
+        handManager.ResetForce();
         inSessionInstructions = true;
         inSessionInstructionsEnd = false;
 
