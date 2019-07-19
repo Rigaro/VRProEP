@@ -113,7 +113,7 @@ public class CreateNewUserMenu : MonoBehaviour {
                 AvatarSystem.CreateAvatarCustomizationData(userID, "ResidualLimbUpperDefault", "UpperSocketDefault", "ElbowCustom", "ForearmCustom", "ACESHand");
 
                 // Return to main menu
-                mainMenu.GetComponent<MainMenu>().createdUser = true;
+                experimentMenu.GetComponent<MainMenu>().createdUser = true;
                 ReturnToExperimentMenu();
             }
             catch (Exception e)
