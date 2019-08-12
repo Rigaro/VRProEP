@@ -91,10 +91,18 @@ public class FeedbackExperiment2019GM : GameMaster
             SaveSystem.LoadUserData("MD1942");
 
             //
-            // Debug Able
+            // Debug Full
             //
-            AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
-            AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
+            AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.Transradial);
+            AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transradial);
+
+            // Set the name from the selected dropdown!
+            ExperimentSystem.SetActiveExperimentID("Feedback2019");
+            //  Initialise the prosthesis
+            prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+            handManager = prosthesisManagerGO.AddComponent<FakeEMGBoniHand>();
+            handManager.InitialiseInputSystem(new EMGWiFiManager("192.168.137.51", 2390, 2));
+            handManager.InitializeProsthesis();
 
             //sessionNumber++;
         }
@@ -108,64 +116,84 @@ public class FeedbackExperiment2019GM : GameMaster
 
         // Initialize iteration management.
         iterationNumberTotal = 0;
-        for (int i = 0; i < sessionType.Count; i++)
+        // Cycle through all requested sessions
+        for (int sessionNum = 0; sessionNum < sessionType.Count; sessionNum++)
         {
-            switch (sessionType[i])
+            switch (sessionType[sessionNum])
             {
                 case FeedbackExperiment.Force:
-                    iterationsPerSession.Add(iterationsPerSessionPerSetting[i] * forceTargets.Count);
-                    trainingPerSession.Add(trainingPerSessionPerSetting[i] * forceTargets.Count);
+                    // Add the number of iterations in this session and whether to run training
+                    iterationsPerSession.Add(iterationsPerSessionPerSetting[sessionNum] * forceTargets.Count);
+                    trainingPerSession.Add(trainingPerSessionPerSetting[sessionNum] * forceTargets.Count);
                     //add targets for each iteration
+                    // Create the list with target roughness and force indexes
                     List<int[]> forceTargetList = new List<int[]>();
-                    for (int u = 0; u < iterationsPerSessionPerSetting[i]; u++)
+                    // Cycle through all the iterations per setting 
+                    for (int u = 0; u < iterationsPerSessionPerSetting[sessionNum]; u++)
                     {
-                        for (int r = 0; r < forceTargets.Count; r++)
+                        // Cycle through all the settings
+                        for (int forceIndex = 0; forceIndex < forceTargets.Count; forceIndex++)
                         {
-                            int[] parameterTarget = new int[2] { r, 0 };
+                            // Set force indexes and default roughness.
+                            int[] parameterTarget = new int[2] { forceIndex, 0 };
+                            // Add to target list.
                             forceTargetList.Add(parameterTarget);
                         }
                     }
+                    // Randomise the order of targets
+                    forceTargetList.Shuffle();
+                    // Add force target list to the experiment configuration
                     experimentTargetList.Add(forceTargetList);
                     break;
                 case FeedbackExperiment.Roughness:
-                    iterationsPerSession.Add(iterationsPerSessionPerSetting[i] * roughnessTargets.Count);
-                    trainingPerSession.Add(trainingPerSessionPerSetting[i] * roughnessTargets.Count);
+                    // Add the number of iterations in this session and whether to run training
+                    iterationsPerSession.Add(iterationsPerSessionPerSetting[sessionNum] * roughnessTargets.Count);
+                    trainingPerSession.Add(trainingPerSessionPerSetting[sessionNum] * roughnessTargets.Count);
                     //add targets for each iteration
+                    // Create the list with target roughness and force indexes
                     List<int[]> roughnessTargetList = new List<int[]>();
-                    for (int u = 0; u < iterationsPerSessionPerSetting[i]; u++)
+                    // Cycle through all the iterations per setting 
+                    for (int u = 0; u < iterationsPerSessionPerSetting[sessionNum]; u++)
                     {
-                        for (int z = 0; z < roughnessTargets.Count; z++)
+                        for (int roughnessIndex = 0; roughnessIndex < roughnessTargets.Count; roughnessIndex++)
                         {
-                            int[] parameterTarget = new int[2] { 0, z };
+                            // Set default force and roughness indexes.
+                            int[] parameterTarget = new int[2] { 0, roughnessIndex };
                             roughnessTargetList.Add(parameterTarget);
                         }
                     }
+                    // Randomise the order of targets
+                    roughnessTargetList.Shuffle();
+                    // Add roughness target list to the experiment configuration
                     experimentTargetList.Add(roughnessTargetList);
 
                     break;
                 case FeedbackExperiment.Mixed:
-                    iterationsPerSession.Add(iterationsPerSessionPerSetting[i] * forceTargets.Count * roughnessTargets.Count);
-                    trainingPerSession.Add(trainingPerSessionPerSetting[i] * forceTargets.Count * roughnessTargets.Count);
+                    iterationsPerSession.Add(iterationsPerSessionPerSetting[sessionNum] * forceTargets.Count * roughnessTargets.Count);
+                    trainingPerSession.Add(trainingPerSessionPerSetting[sessionNum] * forceTargets.Count * roughnessTargets.Count);
                     //add targets for each iteration
                     List<int[]> mixedTargetList = new List<int[]>();
-                    for (int u = 0; u < iterationsPerSessionPerSetting[i]; u++)
+                    for (int u = 0; u < iterationsPerSessionPerSetting[sessionNum]; u++)
                     {
-                        for (int z = 0; z < roughnessTargets.Count; z++)
+                        for (int roughnessIndex = 0; roughnessIndex < roughnessTargets.Count; roughnessIndex++)
                         {
-                            for (int r = 0; r < forceTargets.Count; r++)
+                            for (int forceIndex = 0; forceIndex < forceTargets.Count; forceIndex++)
                             {
-                                int[] parameterTarget = new int[2] { r, z };
+                                int[] parameterTarget = new int[2] { forceIndex, roughnessIndex };
                                 mixedTargetList.Add(parameterTarget);
                             }
                         }
                     }
+                    // Randomise the order of targets
+                    mixedTargetList.Shuffle();
+                    // Add force and roughness target list to the experiment configuration
                     experimentTargetList.Add(mixedTargetList);
 
                     break;
                 default:
                     break;
             }
-            iterationNumberTotal += iterationsPerSession[i];
+            iterationNumberTotal += iterationsPerSession[sessionNum];
         }
         iterationNumberCounterTotal = 1;
 
@@ -978,21 +1006,25 @@ public class FeedbackExperiment2019GM : GameMaster
             skipTraining = false;
         }
 
-        //check visual feedback on
-        if(visualFeedbackType[sessionNumber - 1] == VisualFeebackType.On)
-        {
-            experimentObject.enableColourFeedback = true;
-        }
-        else if(visualFeedbackType[sessionNumber - 1] == VisualFeebackType.None)
-        {
-            experimentObject.enableColourFeedback = false;
-        }
-
         // Clear visual feedback for Roughness type
         if (sessionType[sessionNumber - 1] == FeedbackExperiment.Roughness)
+        {
             experimentObject.enableColourFeedback = false;
+        }
+        else
+        {
+            //check visual feedback on
+            if (visualFeedbackType[sessionNumber - 1] == VisualFeebackType.On)
+            {
+                experimentObject.enableColourFeedback = true;
+            }
+            else if (visualFeedbackType[sessionNumber - 1] == VisualFeebackType.None)
+            {
+                experimentObject.enableColourFeedback = false;
+            }
+        }
 
-        //check which feedback
+        // Configure with session type
         switch (sessionType[sessionNumber - 1])
         {
             //load force feedback assets
@@ -1003,6 +1035,9 @@ public class FeedbackExperiment2019GM : GameMaster
                 activeSelector = selectors[0];
                 selectors[1].SetActive(false);
 
+                // Disable constant grasp force
+                handManager.DisableConstantForce();
+
                 break;
             //load Roughness feedback assets
             case FeedbackExperiment.Roughness:
@@ -1012,6 +1047,9 @@ public class FeedbackExperiment2019GM : GameMaster
                 activeSelector = selectors[1];
                 selectors[0].SetActive(false);
 
+                // Enable constant grasp force
+                handManager.EnableConstantForce(0.8f);
+
                 break;
             //load mixed feedback assets
             case FeedbackExperiment.Mixed:
@@ -1020,6 +1058,9 @@ public class FeedbackExperiment2019GM : GameMaster
                 selectors[1].SetActive(true);
                 activeSelector = selectors[1];
                 selectors[0].SetActive(false);
+
+                // Disable constant grasp force
+                handManager.DisableConstantForce();
 
                 break;
             default:
@@ -1190,6 +1231,7 @@ public class FeedbackExperiment2019GM : GameMaster
                         // Set force and colour
                         experimentObject.SetTargetForce(forceTargets[0]);
                         experimentObject.SetRestColour(forceColours[0]);
+                        experimentObject.SetRoughness(roughnessTargets[0]);
                         yield return new WaitUntil(() => CheckTaskCompletion());
                         yield return new WaitForSeconds(0.5f);
                         experimentObject.SetForce(0.0f);
@@ -1205,6 +1247,7 @@ public class FeedbackExperiment2019GM : GameMaster
                         // Set force and colour
                         experimentObject.SetTargetForce(forceTargets[1]);
                         experimentObject.SetRestColour(forceColours[1]);
+                        experimentObject.SetRoughness(roughnessTargets[0]);
                         yield return new WaitUntil(() => CheckTaskCompletion());
                         yield return new WaitForSeconds(0.5f);
                         experimentObject.SetForce(0.0f);
@@ -1219,6 +1262,7 @@ public class FeedbackExperiment2019GM : GameMaster
                         // Set force and colour
                         experimentObject.SetTargetForce(forceTargets[2]);
                         experimentObject.SetRestColour(forceColours[2]);
+                        experimentObject.SetRoughness(roughnessTargets[0]);
                         yield return new WaitUntil(() => CheckTaskCompletion());
                         yield return new WaitForSeconds(0.5f);
                         experimentObject.SetForce(0.0f);
@@ -1264,7 +1308,8 @@ public class FeedbackExperiment2019GM : GameMaster
                     //
                     //present targertroughness[0] and let them classify
                     // Set force and colour
-                    experimentObject.SetTargetForce(forceTargets[1]);
+                    experimentObject.SetTargetForce(forceTargets[0]);
+                    experimentObject.SetRestColour(forceColours[0]);
                     experimentObject.SetRoughness(roughnessTargets[0]);
                     //
                     instructionManager.DisplayText("A smooth stone feels like this and is classified as Smooth. If you do not feel it, squeeze harder (flex wrist).");
@@ -1277,6 +1322,8 @@ public class FeedbackExperiment2019GM : GameMaster
                     yield return new WaitForSeconds(3.0f);
                     //
                     //present targertroughness[1] and let them classify
+                    experimentObject.SetTargetForce(forceTargets[0]);
+                    experimentObject.SetRestColour(forceColours[0]);
                     experimentObject.SetRoughness(roughnessTargets[1]);
                     //
                     instructionManager.DisplayText("A medium rough stone feels like this and is classified as Mid. If you do not feel it, squeeze harder (flex wrist).");
@@ -1289,6 +1336,8 @@ public class FeedbackExperiment2019GM : GameMaster
                     yield return new WaitForSeconds(3.0f);
                     //
                     //present targertroughness[2] and let them classify
+                    experimentObject.SetTargetForce(forceTargets[0]);
+                    experimentObject.SetRestColour(forceColours[0]);
                     experimentObject.SetRoughness(roughnessTargets[2]);
                     //
                     instructionManager.DisplayText("A rough stone feels like this and is classified as sphere Rough. If you do not feel it, squeeze harder (flex wrist).");
@@ -1479,15 +1528,10 @@ public class FeedbackExperiment2019GM : GameMaster
     {
         if (experimentTargetList[sessionNumber - 1].Count - 1 >= 0)
         {
-            //random value in Range of List at certain session
-            randIndex = r.Next(experimentTargetList[sessionNumber - 1].Count - 1);
             //select targets via indeces stored in TargetList
-            activeForceTarget = forceTargets[experimentTargetList[sessionNumber - 1][randIndex][0]];
-            activeForceColor = forceColours[experimentTargetList[sessionNumber - 1][randIndex][0]];
-            activeRougnessTarget = roughnessTargets[experimentTargetList[sessionNumber - 1][randIndex][1]];
-
-            //delete Target from List
-            experimentTargetList[sessionNumber - 1].Remove(experimentTargetList[sessionNumber - 1][randIndex]);
+            activeForceTarget = forceTargets[experimentTargetList[sessionNumber - 1][iterationNumber - 1][0]];
+            activeForceColor = forceColours[experimentTargetList[sessionNumber - 1][iterationNumber - 1][0]];
+            activeRougnessTarget = roughnessTargets[experimentTargetList[sessionNumber - 1][iterationNumber - 1][1]];
         }
     }
 
@@ -1503,11 +1547,21 @@ public class FeedbackExperiment2019GM : GameMaster
             // Set the target force and rest colour
             experimentObject.SetTargetForce(activeForceTarget);
             experimentObject.SetRestColour(activeForceColor);
+
+            // Set default roughness
+            //activeRougnessTarget = roughnessTargets[0];
+            experimentObject.SetRoughness(activeRougnessTarget);
         }
         else if (sessionType[sessionNumber - 1] == FeedbackExperiment.Roughness)
         {
             // Set the object roughness
             experimentObject.SetRoughness(activeRougnessTarget);
+
+            // Set default force
+            //activeForceTarget = forceTargets[0];
+            //activeForceColor = forceColours[0];
+            experimentObject.SetTargetForce(activeForceTarget);
+            experimentObject.SetRestColour(activeForceColor);
         }
         else if (sessionType[sessionNumber - 1] == FeedbackExperiment.Mixed)
         {

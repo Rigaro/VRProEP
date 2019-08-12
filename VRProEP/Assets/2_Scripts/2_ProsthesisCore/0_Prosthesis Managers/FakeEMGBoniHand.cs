@@ -15,6 +15,8 @@ namespace VRProEP.ProsthesisCore
         private bool isConfigured = false;
         private bool isEnabled = false;
         private bool hasFeedback = false;
+        private bool constantForceEnable = false;
+        private float constantForceValue = 0.0f;
 
         public bool IsEnabled { get => isEnabled; }
         public float RoughnessValue { get => roughnessValue; }
@@ -55,7 +57,14 @@ namespace VRProEP.ProsthesisCore
             if (isConfigured)
             {
                 // Update references
-                handState = inputManager.GenerateReference(0);
+                if (constantForceEnable)
+                {
+                    handState = constantForceValue;
+                }
+                else
+                {
+                    handState = inputManager.GenerateReference(0);
+                }
 
                 // Update device state
                 handManager.UpdateState(0, handState);
@@ -88,6 +97,29 @@ namespace VRProEP.ProsthesisCore
         {
             inputManager.ResetReference(0);
         }
+
+        /// <summary>
+        /// Enables the hand force management system at a given force.
+        /// </summary>
+        /// <param name="force">The given grasp force.</param>
+        public void EnableConstantForce(float force)
+        {
+            if (force < 0)
+                throw new System.ArgumentOutOfRangeException("Force should be >= 0.");
+
+            constantForceEnable = true;
+            constantForceValue = force;
+        }
+
+        /// <summary>
+        /// Disables the hand force management system.
+        /// </summary>
+        public void DisableConstantForce()
+        {
+            constantForceEnable = false;
+        }
+
+
         
         /// <summary>
         /// Stops connection to Boni when available.
