@@ -889,10 +889,25 @@ public class FeedbackExperiment2019GM : GameMaster
             if (!isSelecting) // If we haven't enabled the balloons, do so.
             {
                 isSelecting = true;
-                // Enable all balloons in active selector
+                // Enable relevant balloons in active selector
                 for( int i = 0; i < activeSelector.transform.childCount; i++)
                 {
-                    activeSelector.transform.GetChild(i).GetComponent<TouchyBallManager>().SetSelected();
+                    // Select the active roughness selector when roughness training
+                    if (experimentState == ExperimentState.Training && sessionType[sessionNumber - 1] == FeedbackExperiment.Roughness)
+                    {
+                        // Only the one selected from the target index list
+                        if (i == roughnessTargets.IndexOf(experimentObject.GetRoughness()))
+                            activeSelector.transform.GetChild(i).GetComponent<TouchyBallManager>().SetSelected();
+                    }
+                    // Activate the correct one when roughness and visual feedback is on.
+                    else if (sessionType[sessionNumber - 1] == FeedbackExperiment.Roughness && visualFeedbackType[sessionNumber - 1] == VisualFeebackType.On)
+                    {
+                        // Only the one selected from the target index list
+                        if (i == experimentTargetList[sessionNumber - 1][iterationNumber - 1][1])
+                            activeSelector.transform.GetChild(i).GetComponent<TouchyBallManager>().SetSelected();
+                    }
+                    else // Other cases select all
+                        activeSelector.transform.GetChild(i).GetComponent<TouchyBallManager>().SetSelected();
                 }
 
                 // Debug stuff
