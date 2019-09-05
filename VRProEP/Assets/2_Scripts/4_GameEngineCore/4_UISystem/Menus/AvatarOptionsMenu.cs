@@ -6,6 +6,8 @@ using VRProEP.ProsthesisCore;
 public class AvatarOptionsMenu : MonoBehaviour {
 
     public GameObject mainMenu;
+    public GameObject experimentMenu;
+    public GameObject transradialMenu;
     public LogManager logManager;
     public Camera mainCamera;
 
@@ -53,6 +55,12 @@ public class AvatarOptionsMenu : MonoBehaviour {
         }
     }
 
+    public void LoadTransradialAvatarMenu()
+    {
+        transradialMenu.SetActive(true);
+        gameObject.SetActive(false);
+    }
+
     public IEnumerator ResetCamera()
     {
         mainCamera.enabled = false;
@@ -65,7 +73,7 @@ public class AvatarOptionsMenu : MonoBehaviour {
     {
         logManager.DisplayInformationOnLog(time, info);
         yield return new WaitForSecondsRealtime(time);
-        ReturnToMainMenu();
+        ReturnToExperimentMenu();
     }
 
     public void ReturnToMainMenu()
@@ -75,6 +83,13 @@ public class AvatarOptionsMenu : MonoBehaviour {
 
         // Return to main menu
         mainMenu.SetActive(true);
+        gameObject.SetActive(false);
+    }
+
+    public void ReturnToExperimentMenu()
+    {
+        // Return to main menu
+        experimentMenu.SetActive(true);
         gameObject.SetActive(false);
     }
 

@@ -1,11 +1,20 @@
-﻿using System.Collections;
+﻿// System
+using System.Collections;
 using System.Collections.Generic;
+
+// Unity
 using UnityEngine;
 using TMPro;
+
+// SteamVR
+using Valve.VR;
+using Valve.VR.InteractionSystem;
 
 // GameMaster includes
 using VRProEP.ExperimentCore;
 using VRProEP.GameEngineCore;
+using VRProEP.ProsthesisCore;
+using VRProEP.Utilities;
 
 public abstract class GameMaster : MonoBehaviour
 {
@@ -20,10 +29,18 @@ public abstract class GameMaster : MonoBehaviour
     protected ConsoleManager instructionManager;
     protected ConsoleManager monitorManager;
 
-    [Header("Debug enable:")]
+    [Header("Debug:")]
+    [Tooltip("The debug enable variable.")]
     public bool debug;
     public TextMeshPro debugText;
-    
+
+    [Header("World configuration:")]
+    [SerializeField]
+    protected float worldOrientation = 180.0f;
+    public Transform experimentCenter;
+    [SerializeField]
+    protected float playerOrientation = 0.0f;
+
     // Subject group management
     public enum SubjectGroup
     {
@@ -77,10 +94,16 @@ public abstract class GameMaster : MonoBehaviour
         Waiting,
         Countdown
     }
+    // Countdown management
     protected bool counting = false;
     protected bool countdownDone = false;
+    private Coroutine countdownCoroutine;
+
+    // Waiting
     private bool waitFlag = false;
     protected bool WaitFlag { get => waitFlag; set => waitFlag = value; }
+    private Coroutine waitCoroutine;
+
 
     #endregion
 
@@ -93,38 +116,44 @@ public abstract class GameMaster : MonoBehaviour
     protected abstract void InitExperimentSystem();
 
     /// <summary>
+    /// Checks whether the subject is ready to start performing the task.
+    /// </summary>
+    /// <returns>True if ready to start.</returns>
+    protected abstract bool CheckReadyToStart();
+
+    /// <summary>
     /// Checks whether the task has be successfully completed or not.
     /// </summary>
     /// <returns>True if the task has been successfully completed.</returns>
-    public abstract bool CheckTaskCompletion();
+    protected abstract bool CheckTaskCompletion();
 
     /// <summary>
     /// Checks if the condition for the rest period has been reached.
     /// </summary>
     /// <returns>True if the rest condition has been reached.</returns>
-    public abstract bool CheckRestCondition();
+    protected abstract bool CheckRestCondition();
 
     /// <summary>
     /// Checks if the condition for changing experiment session has been reached.
     /// </summary>
     /// <returns>True if the condition for changing sessions has been reached.</returns>
-    public abstract bool CheckNextSessionCondition();
+    protected abstract bool CheckNextSessionCondition();
 
     /// <summary>
     /// Checks if the condition for ending the experiment has been reached.
     /// </summary>
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
-    public abstract bool CheckEndCondition();
+    protected abstract bool CheckEndCondition();
 
     /// <summary>
     /// Launches the next session. Performs all the required preparations.
     /// </summary>
-    public abstract void LaunchNextSession();
+    protected abstract void LaunchNextSession();
 
     /// <summary>
     /// Finishes the experiment. Performs all the required procedures.
     /// </summary>
-    public abstract void EndExperiment();
+    protected abstract void EndExperiment();
 
     #endregion
 
@@ -263,8 +292,9 @@ public abstract class GameMaster : MonoBehaviour
     /// <param name="seconds">The time in seconds to wait to set flag.</param>
     protected void SetWaitFlag(float seconds)
     {
-        StopCoroutine("SetWaitFlagCoroutine");
-        StartCoroutine(SetWaitFlagCoroutine(seconds));
+        if (waitCoroutine != null)
+            StopCoroutine(waitCoroutine);
+        waitCoroutine = StartCoroutine(SetWaitFlagCoroutine(seconds));
     }
 
     /// <summary>
@@ -285,7 +315,16 @@ public abstract class GameMaster : MonoBehaviour
     /// <param name="seconds"></param>
     protected void HUDCountDown(int seconds)
     {
-        StartCoroutine(CountDownCoroutine(seconds));
+        countdownCoroutine = StartCoroutine(CountDownCoroutine(seconds));
+    }
+
+    /// <summary>
+    /// Stops the current countdown.
+    /// </summary>
+    protected void StopHUDCountDown()
+    {
+        if (countdownCoroutine != null)
+            StopCoroutine(countdownCoroutine);
     }
 
     /// <summary>
@@ -306,6 +345,35 @@ public abstract class GameMaster : MonoBehaviour
         }
         hudManager.DisplayText("Go!", 1.0f);
         countdownDone = true;
+    }
+
+    /// <summary>
+    /// Teleports the player to the experiment center position and orients experiment assets to fit the world.
+    /// </summary>
+    protected void TeleportToStartPosition()
+    {
+        // Get player object
+        GameObject playerGO = GameObject.FindGameObjectWithTag("Player");
+        if (playerGO == null)
+            throw new System.NullReferenceException("Player GameObject not found.");
+
+        Player player = playerGO.GetComponent<Player>();
+        if (player == null)
+            throw new System.NullReferenceException("Player Component not found.");
+        
+        // Rotate experiment assets.
+        this.transform.Rotate(new Vector3(0.0f, 1.0f, 0.0f), worldOrientation);
+
+        // Get the player position on floor
+        Vector3 playerFeetOffset = player.trackingOriginTransform.position - player.feetPositionGuess;
+        // Set the new tracking origin as that place
+        player.trackingOriginTransform.position = player.transform.position + playerFeetOffset;
+        player.trackingOriginTransform.Rotate(new Vector3(0.0f, 1.0f, 0.0f), playerOrientation);
+        // Teleport to the start position
+        if (playerOrientation == 180.0f)
+            player.transform.position = experimentCenter.position - player.trackingOriginTransform.position;
+        else
+            player.transform.position = experimentCenter.position + player.trackingOriginTransform.position;
     }
 
     #endregion

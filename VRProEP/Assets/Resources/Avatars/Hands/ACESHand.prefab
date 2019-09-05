@@ -120,7 +120,7 @@ MeshRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c98e9094c74d1ab49b1368076ec60a57, type: 2}
+  - {fileID: 2100000, guid: 00d589b39d1a37043a83047e9673d402, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -427,10 +427,10 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_Enabled: 1
-  m_Radius: 0.011375843
-  m_Height: 0.035
+  m_Radius: 0.016757857
+  m_Height: 0.060365185
   m_Direction: 2
-  m_Center: {x: 1.4172337e-11, y: -0.0013758428, z: 2.0448976e-11}
+  m_Center: {x: -0.0016447235, y: -0.005113132, z: 0.0018537976}
 --- !u!114 &114420207846201496
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -450,6 +450,10 @@ MonoBehaviour:
   dropOffVelocityThreshold: 0.03
   throwEnable: 0
   throwMultiplier: 1
+  interactionInputs:
+  - 0
+  interactionOutputs:
+  - 0
 --- !u!135 &135557139448756552
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -461,8 +465,8 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.009531838
-  m_Center: {x: -0.022295764, y: -0.026673883, z: 0.049607668}
+  m_Radius: 0.011750655
+  m_Center: {x: -0.022295756, y: -0.028892677, z: 0.04960765}
 --- !u!135 &135081369098783736
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -474,8 +478,8 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.008259638
-  m_Center: {x: 0.00031691528, y: -0.066451825, z: 0.042029675}
+  m_Radius: 0.009381457
+  m_Center: {x: -0.0008048949, y: -0.06645179, z: 0.042029653}
 --- !u!135 &135236878774665802
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -487,8 +491,8 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.008002578
-  m_Center: {x: 0.0022055642, y: -0.076073006, z: 0.017376283}
+  m_Radius: 0.011113538
+  m_Center: {x: 0.0003596508, y: -0.07480789, z: 0.017376252}
 --- !u!1 &1813325682600496
 GameObject:
   m_ObjectHideFlags: 0

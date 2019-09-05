@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR;
 using VRProEP.GameEngineCore;
+using VRProEP.ProsthesisCore;
 
 public class ModeSelectionMenu : MonoBehaviour {
     
@@ -23,6 +24,19 @@ public class ModeSelectionMenu : MonoBehaviour {
         KeepOnLoad();
         // Load level.
         SteamVR_LoadLevel.Begin("DemoPlayground");
+
+        /*
+        KeepOnLoad();
+        // Load level.
+        if (AvatarSystem.AvatarType == AvatarType.Transradial)
+        {
+            GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+            FakeEMGBoniHand prosthesisManager = prosthesisManagerGO.GetComponent<FakeEMGBoniHand>();
+            prosthesisManager.InitializeProsthesis();
+        }
+        SteamVR_LoadLevel.Begin("FantasyTemplate");
+        */
+        //SteamVR_LoadLevel.Begin("PhotoStage");
     }
 
     private void KeepOnLoad()

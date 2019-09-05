@@ -6,10 +6,12 @@ using UnityEngine;
 using VRProEP.ExperimentCore;
 using VRProEP.GameEngineCore;
 using VRProEP.ProsthesisCore;
+using VRProEP.Utilities;
 
 public class GameMasterTemplate : GameMaster
 {
     private float taskTime = 0.0f;
+    private string infoText;
 
     // Start is called before the first frame update
     void Start()
@@ -100,6 +102,9 @@ public class GameMasterTemplate : GameMaster
              *************************************************
              */
             case ExperimentState.WaitingForStart:
+                // Show status to subject
+                infoText = GetInfoText();
+                instructionManager.DisplayText(infoText);
 
                 // Check if pause requested
                 UpdatePause();
@@ -107,34 +112,43 @@ public class GameMasterTemplate : GameMaster
                 {
                     // Waiting for subject to get to start position.
                     case WaitState.Waiting:
+                        if (CheckReadyToStart())
+                        {
+                            startEnable = true;
+                            waitState = WaitState.Countdown;
+                        }
                         break;
                     // HUD countdown for reaching action.
                     case WaitState.Countdown:
-                        // If hand goes out of target reset countdown and wait for position
-                        if (!startEnable && !countdownDone)
-                        {
-                            counting = false;
-                            countdownDone = false;
-                            // Indicate to move back
-                            hudManager.DisplayText("Move to start", 2.0f);
-                            waitState = WaitState.Waiting;
-                            break;
-                        }
                         // If all is good and haven't started counting, start.
-                        if (!counting && !countdownDone)
+                        if (startEnable && !counting && !countdownDone)
                         {
-                            StopAllCoroutines();
+                            hudManager.ClearText();
+                            StopHUDCountDown();
                             counting = true;
                             HUDCountDown(3);
                         }
                         // If all is good and the countdownDone flag is raised, switch to reaching.
-                        if (countdownDone)
+                        else if (countdownDone)
                         {
                             // Reset flags
+                            startEnable = false;
                             counting = false;
                             countdownDone = false;
                             // Continue
                             experimentState = ExperimentState.PerformingTask;
+                            waitState = WaitState.Waiting;
+                            break;
+                        }
+                        // If hand goes out of target reset countdown and wait for position
+                        else if (!CheckReadyToStart() && !countdownDone)
+                        {
+                            StopHUDCountDown();
+                            startEnable = false;
+                            counting = false;
+                            countdownDone = false;
+                            // Indicate to move back
+                            hudManager.DisplayText("Move to start", 2.0f);
                             waitState = WaitState.Waiting;
                             break;
                         }
@@ -149,6 +163,9 @@ public class GameMasterTemplate : GameMaster
              *************************************************
              */
             case ExperimentState.PerformingTask:
+                // Show status to subject
+                infoText = GetInfoText();
+                instructionManager.DisplayText(infoText);
                 // Task performance is handled deterministically in FixedUpdate.
                 break;
             /*
@@ -157,6 +174,9 @@ public class GameMasterTemplate : GameMaster
              *************************************************
              */
             case ExperimentState.AnalizingResults:
+                // Show status to subject
+                infoText = GetInfoText();
+                instructionManager.DisplayText(infoText);
                 // Allow 3 seconds after task end to do calculations
                 SetWaitFlag(3.0f);
 
@@ -246,6 +266,9 @@ public class GameMasterTemplate : GameMaster
              *************************************************
              */
             case ExperimentState.Resting:
+                // Show status to subject
+                infoText = GetInfoText();
+                instructionManager.DisplayText(infoText);
                 //
                 // Check for session change or end request from experimenter
                 //
@@ -276,6 +299,9 @@ public class GameMasterTemplate : GameMaster
              *************************************************
              */
             case ExperimentState.Paused:
+                // Show status to subject
+                infoText = GetInfoText();
+                instructionManager.DisplayText(infoText);
                 //
                 // Check for session change or end request from experimenter
                 //
@@ -393,13 +419,13 @@ public class GameMasterTemplate : GameMaster
         //
         // Handle application quit procedures.
         //
-        // Check if WiFi sensors are available
+        // Check if UDP sensors are available
         foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
         {
             if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
             {
-                WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
-                wifiSensor.StopSensorReading();
+                UDPSensorManager udpSensor = (UDPSensorManager)sensor;
+                udpSensor.StopSensorReading();
             }
         }
 
@@ -430,29 +456,31 @@ public class GameMasterTemplate : GameMaster
     }
 
     /// <summary>
+    /// Checks whether the subject is ready to start performing the task.
+    /// </summary>
+    /// <returns>True if ready to start.</returns>
+    protected override bool CheckReadyToStart()
+    {
+        return true;
+    }
+
+    /// <summary>
     /// Checks whether the task has be successfully completed or not.
     /// </summary>
     /// <returns>True if the task has been successfully completed.</returns>
-    public override bool CheckTaskCompletion()
+    protected override bool CheckTaskCompletion()
     {
         //
         // Perform some condition testing
         //
-        if (true)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return true;
     }
 
     /// <summary>
     /// Checks if the condition for the rest period has been reached.
     /// </summary>
     /// <returns>True if the rest condition has been reached.</returns>
-    public override bool CheckRestCondition()
+    protected override bool CheckRestCondition()
     {
         throw new System.NotImplementedException();
     }
@@ -461,7 +489,7 @@ public class GameMasterTemplate : GameMaster
     /// Checks if the condition for changing experiment session has been reached.
     /// </summary>
     /// <returns>True if the condition for changing sessions has been reached.</returns>
-    public override bool CheckNextSessionCondition()
+    protected override bool CheckNextSessionCondition()
     {
         throw new System.NotImplementedException();
     }
@@ -470,7 +498,7 @@ public class GameMasterTemplate : GameMaster
     /// Checks if the condition for ending the experiment has been reached.
     /// </summary>
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
-    public override bool CheckEndCondition()
+    protected override bool CheckEndCondition()
     {
         throw new System.NotImplementedException();
     }
@@ -478,7 +506,7 @@ public class GameMasterTemplate : GameMaster
     /// <summary>
     /// Launches the next session. Performs all the required preparations.
     /// </summary>
-    public override void LaunchNextSession()
+    protected override void LaunchNextSession()
     {
         throw new System.NotImplementedException();
     }
@@ -486,10 +514,22 @@ public class GameMasterTemplate : GameMaster
     /// <summary>
     /// Finishes the experiment. Performs all the required procedures.
     /// </summary>
-    public override void EndExperiment()
+    protected override void EndExperiment()
     {
         throw new System.NotImplementedException();
     }
 
     #endregion
+
+    /// <summary>
+    /// Returns the progress update String
+    /// </summary>
+    /// <returns></returns>
+    private string GetInfoText()
+    {
+        string Text;
+        Text = "Status: " + experimentState.ToString() + ".\n";
+        Text += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
+        return Text;
+    }
 }

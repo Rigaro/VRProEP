@@ -1,5 +1,5 @@
 ﻿//======= Copyright (c) Melbourne Robotics Lab, All rights reserved. ===============
-namespace VRProEP.ProsthesisCore
+namespace VRProEP.Utilities
 {
     /// <summary>
     /// Interface for managing extrenal communications.
@@ -9,19 +9,17 @@ namespace VRProEP.ProsthesisCore
     public interface ICommunicationsManager
     {
         /// <summary>
-        /// Transfers data of type "T" through the selected device.
+        /// Processes a set of data and sends it to the remote device.
         /// </summary>
-        /// <param name="device">The device to use for data transmission.</param>
         /// <param name="data">The data to be transmitted.</param>
-        /// <returns></returns>
-        bool TransferData(string device, dynamic data);
+        /// <returns>True if successful.</returns>
+        void SendData(dynamic data);
 
         /// <summary>
-        /// Receives requested data of type "T" through the selected device.
+        /// Receives requested data (dynamic type) for the given command.
         /// </summary>
-        /// <param name="device">The device to use for data transmission.</param>
         /// <param name="command">The command to request data from device.</param>
         /// <returns>The requested data</returns>
-        dynamic ReceiveData(string device, string command);
+        dynamic GetData(string command);
     }
 }

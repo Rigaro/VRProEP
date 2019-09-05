@@ -3703,11 +3703,6 @@ PrefabInstance:
       propertyPath: m_RootOrder
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 114836213841134098, guid: bd8bcb4b3a795ea4fa543f4a53fbbc77,
-        type: 3}
-      propertyPath: origin
-      value: 
-      objectReference: {fileID: 1745397445}
     - target: {fileID: 114922601162491082, guid: bd8bcb4b3a795ea4fa543f4a53fbbc77,
         type: 3}
       propertyPath: managerType
@@ -3718,6 +3713,11 @@ PrefabInstance:
       propertyPath: managerMode
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114836213841134098, guid: bd8bcb4b3a795ea4fa543f4a53fbbc77,
+        type: 3}
+      propertyPath: origin
+      value: 
+      objectReference: {fileID: 1745397445}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bd8bcb4b3a795ea4fa543f4a53fbbc77, type: 3}
 --- !u!4 &1238496936 stripped
@@ -4729,6 +4729,9 @@ MonoBehaviour:
   skipInstructions: 0
   debug: 0
   debugText: {fileID: 1387695021}
+  worldOrientation: 180
+  experimentCenter: {fileID: 1728189945}
+  playerOrientation: 0
   avatarType: 2
   startTransform: {fileID: 1455511796}
 --- !u!4 &1728189945

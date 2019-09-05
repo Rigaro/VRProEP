@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR;
 using VRProEP.AdaptationCore;
+using VRProEP.GameEngineCore;
 
 /// <summary>
 /// Manages object grasping behavior for VRProEP platform.
@@ -49,8 +50,15 @@ public class GraspManager : MonoBehaviour {
     public bool throwEnable = false;
     public float throwMultiplier = 1.0f;
 
+    [Header("Interaction setttings")]
+    [SerializeField]
+    private List<float> interactionInputs;
+    [SerializeField]
+    private List<float> interactionOutputs;
+
     private GameObject handGO;
     private Rigidbody handRB;
+    // Object handling
     private GameObject objectInHand = null;
     private ObjectGraspHandle oIHHandTracker = null;
     private GameObject objectGraspable = null;
@@ -59,6 +67,9 @@ public class GraspManager : MonoBehaviour {
     private bool releasing = false;
     private float handVelocity = 0.0f;
     private Vector3 prevHandPosition;
+    // Interaction
+    private bool isInteractable = false;
+    private IInteractable objectInteraction;
 
     private MovingAverageFilter averageFilter;
 
@@ -108,7 +119,7 @@ public class GraspManager : MonoBehaviour {
     // When leaving a drop-off point, disable drop-off.
     private void OnTriggerExit(Collider other)
     {
-        // If the object was not holding anything and left a graspable object, clear flag and handle.
+        // If the hand was not holding anything and left a graspable object, clear flag and handle.
         if (objectInHand == null && other.CompareTag("Graspable"))
         {
             inGrasp = false;
@@ -128,10 +139,35 @@ public class GraspManager : MonoBehaviour {
         else if (((managerMode == GraspManagerMode.Restriced && inDropOff) || managerMode == GraspManagerMode.Open) && objectInHand != null)
             HandleDropOff();
 
+        // Handle tracked object
         if (isTrackedObject)
         {
             EstimateHandVelocityMagnitude();
         }
+
+        // Set interaction variables
+        if (isInteractable && interactionInputs != null && interactionOutputs != null)
+        {
+            objectInteraction.SetForce(interactionInputs[0]);
+            interactionOutputs[0] = objectInteraction.GetRoughness();
+        }
+    }
+
+    /// <summary>
+    /// Handles object interaction by setting the inputs and returning interaction results.
+    /// </summary>
+    /// <param name="interactionInputs">The input to apply to the interaction.</param>
+    /// <returns>The list of interaction outputs.</returns>
+    public List<float> HandleInteraction(List<float> interactionInputs)
+    {
+        if (interactionInputs != null && interactionOutputs != null)
+        {
+            // Copy inputs and outputs to avoid leaks
+            this.interactionInputs = new List<float>(interactionInputs);
+            return new List<float>(interactionOutputs);
+        }
+        else
+            throw new System.ArgumentNullException("The interaction inputs or outputs are empty.");
     }
 
     /// <summary>
@@ -149,6 +185,13 @@ public class GraspManager : MonoBehaviour {
             objectInHand = objectGraspable;
             oIHHandTracker = objectInHand.AddComponent<ObjectGraspHandle>();
             oIHHandTracker.handTransform = attachmentPoint;
+            // Check whether the object is interactable and set if so.
+            IInteractable interactionScript = objectInHand.GetComponent<IInteractable>();
+            if(interactionScript != null)
+            {
+                isInteractable = true;
+                objectInteraction = interactionScript;
+            }
             // clear flag and handle
             inGrasp = false;
             objectGraspable = null;
@@ -178,7 +221,7 @@ public class GraspManager : MonoBehaviour {
                 handVelocity = handRB.velocity.magnitude;
             }
             // Get hand velocity and compare to threshold.
-            if (handVelocity < dropOffVelocityThreshold && objectInHand != null && !releasing)
+            if (HasHandStopped() && objectInHand != null && !releasing)
             {
                 ReleaseObjectInHand();
             }
@@ -212,6 +255,9 @@ public class GraspManager : MonoBehaviour {
                     objectInHand.GetComponent<Rigidbody>().velocity = throwMultiplier * EstiamteHandVelocity();
                 }
             }
+            // Clear interaction
+            isInteractable = false;
+            objectInteraction = null;
             // Start release and cool-off period.
             inDropOff = false;
             releasing = true;
@@ -258,5 +304,13 @@ public class GraspManager : MonoBehaviour {
             oIHHandTracker = null;
             StartCoroutine(EnableObjectGraspability(1.0f));
         }
+    }
+
+    public bool HasHandStopped()
+    {
+        if (handVelocity < dropOffVelocityThreshold)
+            return true;
+        else
+            return false;
     }
 }

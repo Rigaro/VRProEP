@@ -2,19 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 using VRProEP.AdaptationCore;
+using VRProEP.Utilities;
 
 namespace VRProEP.ProsthesisCore
 {
 
-    public class EMGWiFiManager : WiFiSensorManager
+    public class EMGWiFiManager : UDPSensorManager, ISensor
     {
         private List<float> gains = new List<float>();
         private List<float> lowerLimits = new List<float>();
         private List<FOLPDFilter> lowPassFilters = new List<FOLPDFilter>();
         private List<MovingAverageFilter> movingAverageFilters = new List<MovingAverageFilter>();
         private bool isRaw = false;
+        private SensorType sensorType;
 
-        public EMGWiFiManager(string ipAddress, int port, int channelSize, bool isRaw = false) : base(ipAddress, port, channelSize, SensorType.EMGWiFi, UDPType.UDP_Async)
+        public EMGWiFiManager(string ipAddress, int port, int channelSize, bool isRaw = false) : base(ipAddress, port, channelSize, "EMGWiFi", UDPType.UDP_Async)
         {
             // Set the default gains and initialize filters
             for (int i = 0; i < channelSize; i++)
@@ -24,6 +26,8 @@ namespace VRProEP.ProsthesisCore
                 lowPassFilters.Add( new FOLPDFilter(2*Mathf.PI*3.0f, 1.17f, Time.fixedDeltaTime) );
                 movingAverageFilters.Add(new MovingAverageFilter(15));
             }
+
+            sensorType = SensorType.EMGWiFi;
 
             this.isRaw = isRaw;
         }
@@ -54,7 +58,7 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <param name="channel">The channel number.</param>
         /// <returns>EMG amplitude data for the given channel.</returns>
-        public override float GetRawData(int channel)
+        public float GetRawData(int channel)
         {
             if (channel >= ChannelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels. The number of available channels is: " + ChannelSize + ".");
@@ -69,7 +73,7 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <param name="channel">The channel/data identifier.</param>
         /// <returns>EMG amplitude data for the given channel.</returns>
-        public override float GetRawData(string channel)
+        public float GetRawData(string channel)
         {
             throw new System.NotImplementedException("Not implemented, use int version.");
         }
@@ -78,7 +82,7 @@ namespace VRProEP.ProsthesisCore
         /// Returns EMG amplitude data for all channels in a 0-1023 range.
         /// </summary>
         /// <returns>The array with all EMG amplitude data.</returns>
-        public override float[] GetAllRawData()
+        public float[] GetAllRawData()
         {
             // Get current sensor data from memory.
             float[] sensorValues = GetCurrentSensorValues();
@@ -93,7 +97,7 @@ namespace VRProEP.ProsthesisCore
                     //float shiftRect = sensorValues[i] - 512.0f;
                     float shiftRect = Mathf.Abs(sensorValues[i] - 512.0f);
                     filteredValues[i] = lowPassFilters[i].Update(shiftRect);
-                    averagedValues[i] = (float)Math.Round(movingAverageFilters[i].Update(filteredValues[i]), 1);
+                    averagedValues[i] = (float)System.Math.Round(movingAverageFilters[i].Update(filteredValues[i]), 1);
                 }
                 return averagedValues;
             }
@@ -109,7 +113,7 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <param name="channel">The channel number.</param>
         /// <returns>EMG amplitude data for the given channel.</returns>
-        public override float GetProcessedData(int channel)
+        public float GetProcessedData(int channel)
         {
             if (channel >= ChannelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels. The number of available channels is: " + ChannelSize + ".");
@@ -124,7 +128,7 @@ namespace VRProEP.ProsthesisCore
         /// </summary>
         /// <param name="channel">The channel/data identifier.</param>
         /// <returns>Pre-processed sensor data for the given channel.</returns>
-        public override float GetProcessedData(string channel)
+        public float GetProcessedData(string channel)
         {
             throw new System.NotImplementedException("Not implemented, use int version.");
         }
@@ -133,7 +137,7 @@ namespace VRProEP.ProsthesisCore
         /// Returns EMG amplitude data for all channels in a 0-100 range.
         /// </summary>
         /// <returns>The array with all EMG amplitude data.</returns>
-        public override float[] GetAllProcessedData()
+        public float[] GetAllProcessedData()
         {
             // Get current sensor data from memory.
             float[] sensorValues = GetCurrentSensorValues();
@@ -149,7 +153,7 @@ namespace VRProEP.ProsthesisCore
                     // Shift and rectify
                     float shiftRect = Mathf.Abs(sensorValues[i] - 512.0f);
                     filteredValues[i] = lowPassFilters[i].Update(shiftRect);
-                    averagedValues[i] = (float)Math.Round(movingAverageFilters[i].Update(filteredValues[i]), 1);
+                    averagedValues[i] = (float)System.Math.Round(movingAverageFilters[i].Update(filteredValues[i]), 1);
                     normalizedValues[i] = gains[i] * (averagedValues[i] - lowerLimits[i]);
                     if (normalizedValues[i] > 100.0f)
                         normalizedValues[i] = 100.0f;
@@ -165,7 +169,7 @@ namespace VRProEP.ProsthesisCore
                 for (int i = 0; i < sensorValues.Length; i++)
                 {
                     // Shift and rectify
-                    normalizedValues[i] = (float)Math.Round(gains[i] * (sensorValues[i] - lowerLimits[i]), 1);
+                    normalizedValues[i] = (float)System.Math.Round(gains[i] * (sensorValues[i] - lowerLimits[i]), 1);
                     if (normalizedValues[i] > 100.0f)
                         normalizedValues[i] = 100.0f;
                     if (normalizedValues[i] < 0.0f)
@@ -175,26 +179,10 @@ namespace VRProEP.ProsthesisCore
             }
         }
 
-        /// <summary>
-        /// Updates the configuration of a parameter defined by the "command" parameter to the provided "value".
-        /// </summary>
-        /// <remarks>Commands are defined by the implementing class.</remarks>
-        /// <param name="command">The configuration command as established by the implementing class.</param>
-        /// <param name="value">The value to update the configuration parameter determined by "command".</param>
-        public override void Configure(string command, dynamic value)
+
+        public SensorType GetSensorType()
         {
-
-        }
-
-        /// <summary>
-        /// Updates the configuration of a parameter defined by the "command" parameter to the provided "value".
-        /// </summary>
-        /// <remarks>Commands are defined by the implementing class.</remarks>
-        /// <param name="command">The configuration command as established by the implementing class.</param>
-        /// <param name="value">The value to update the configuration parameter determined by "command".</param>
-        public override void Configure(string command, string value)
-        {
-
+            return sensorType;
         }
     }
 

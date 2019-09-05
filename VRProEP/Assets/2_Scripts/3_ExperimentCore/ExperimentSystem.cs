@@ -25,6 +25,8 @@ namespace VRProEP.ExperimentCore
             if (id == null)
                 throw new System.ArgumentNullException("The provided experiment ID is empty.");
 
+            // Check resources for available experiments.
+
             activeExperimentID = id;
         }
 

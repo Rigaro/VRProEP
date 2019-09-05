@@ -4,6 +4,7 @@ using UnityEngine;
 using VRProEP.GameEngineCore;
 using VRProEP.ProsthesisCore;
 using VRProEP.ExperimentCore;
+using VRProEP.Utilities;
 
 public class MainMenu : MonoBehaviour {
 
@@ -93,11 +94,11 @@ public class MainMenu : MonoBehaviour {
     {
         foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
         {
-            // Stop all wifi sensors
+            // Stop all UDP sensors
             if (sensor.GetSensorType() == SensorType.EMGWiFi)
             {
-                WiFiSensorManager wifiSensor = (WiFiSensorManager)sensor;
-                wifiSensor.StopSensorReading();
+                UDPSensorManager udpSensor = (UDPSensorManager)sensor;
+                udpSensor.StopSensorReading();
             }
         }
     }
@@ -129,7 +130,7 @@ public class MainMenu : MonoBehaviour {
         gameObject.SetActive(false);
     }
 
-    public void LoadModeSelectionMenu()
+    public void LoadExperimentSelectionMenu()
     {
         // Clear log
         logManager.ClearLog();

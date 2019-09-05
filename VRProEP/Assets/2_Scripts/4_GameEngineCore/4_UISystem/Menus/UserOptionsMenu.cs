@@ -5,6 +5,7 @@ using UnityEngine;
 public class UserOptionsMenu : MonoBehaviour {
 
     public GameObject mainMenu;
+    public GameObject experimentMenu;
     public GameObject createUserMenu;
     public GameObject loadUserMenu;
 
@@ -20,6 +21,13 @@ public class UserOptionsMenu : MonoBehaviour {
     {
         // Switch
         loadUserMenu.SetActive(true);
+        gameObject.SetActive(false);
+    }
+
+    public void ReturnToExperimentMenu()
+    {
+        // Return to experiment menu
+        experimentMenu.SetActive(true);
         gameObject.SetActive(false);
     }
 

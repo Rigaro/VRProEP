@@ -64,10 +64,10 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         /// <param name="userID">The user id of the user whose avatar wants to be loaded.</param>
         /// <returns>The loaded avatar customization data.</returns>
-        public static AvatarData LoadAvatarCustomizationData(string userID)
+        public static AvatarData LoadAvatarCustomizationData(string userID, AvatarType avatarType = AvatarType.Transhumeral)
         {
             AvatarData loadedAvatarData;
-            string loadFilePath = dataFolder + userID + "/avatarInfo.json";
+            string loadFilePath = dataFolder + userID + "/avatarInfo_" + avatarType.ToString() + ".json";
 
             if (File.Exists(loadFilePath))
             {
@@ -125,7 +125,7 @@ namespace VRProEP.GameEngineCore
             }
 
             // Get avatar data for user
-            activeAvatarData = LoadAvatarCustomizationData(userData.id);
+            activeAvatarData = LoadAvatarCustomizationData(userData.id, avatarType);
 
             // Load avatar holder object prefab and check validity
             GameObject avatarPrefab = Resources.Load<GameObject>("Avatars/Avatar");
@@ -183,7 +183,13 @@ namespace VRProEP.GameEngineCore
             }
             else if (avatarType == AvatarType.Transradial)
             {
-                throw new System.NotImplementedException("Transradial avatars not yet implemented.");
+                // Load elbow location and check.
+                GameObject elbowLocation = GameObject.FindGameObjectWithTag("ElbowLocation");
+                if (elbowLocation == null)
+                    throw new System.Exception("The residual limb frame has not been loaded.");
+
+                // Modify the location of the elbowLocation
+                elbowLocation.transform.position = new Vector3(elbowLocation.transform.position.x, -userData.forearmLength / 2.0f, elbowLocation.transform.position.z);
             }
         }
 
@@ -249,6 +255,17 @@ namespace VRProEP.GameEngineCore
                             // Make sure the correct VIVE Tracker is selected for the upper arm
                             isPlayerAvailable = true;
                             break;
+                        case AvatarType.Transradial:
+                            // Load prefab and check validity
+                            GameObject playerAbleTRPrefab = Resources.Load<GameObject>("Players/PlayerAbleTR");
+                            if (playerAbleTRPrefab == null)
+                                throw new System.Exception("The requested player prefab was not found.");
+
+                            // Instantiate
+                            Object.Instantiate(playerAbleTRPrefab);
+                            // Make sure the correct VIVE Tracker is selected for the upper arm
+                            isPlayerAvailable = true;
+                            break;
                         default:
                             throw new System.Exception("The given user and avatar type combination is not available.");
                     }
@@ -273,15 +290,31 @@ namespace VRProEP.GameEngineCore
             if (trackerGO == null)
                 throw new System.Exception("The residual limb traker GameObject was not found.");
 
+            //
+            // Able-bodied subject with transhumeral frame
+            //
             if (userType == UserType.AbleBodied && avatarType == AvatarType.Transhumeral)
             {
-                // Load residual limb from avatar folder and check whether successfully loaded.
+                // Load TH tracking frame from Frames folder and check whether successfully loaded.
                 GameObject ableBodiedTHFramePrefab = Resources.Load<GameObject>("Frames/AbleBodiedFrameTH");
                 if (ableBodiedTHFramePrefab == null)
                     throw new System.Exception("The requested tracker frame prefab was not found.");
 
                 //GameObject residualLimbGO = Object.Instantiate(ableBodiedTHFramePrefab, trackerGO.transform, false);
                 Object.Instantiate(ableBodiedTHFramePrefab, trackerGO.transform, false);
+            }
+            //
+            // Able-bodied subject with transradial frame
+            //
+            else if (userType == UserType.AbleBodied && avatarType == AvatarType.Transradial)
+            {
+                // Load TR tracking frame from Frames folder and check whether successfully loaded.
+                GameObject ableBodiedTRFramePrefab = Resources.Load<GameObject>("Frames/AbleBodiedFrameTR");
+                if (ableBodiedTRFramePrefab == null)
+                    throw new System.Exception("The requested tracker frame prefab was not found.");
+
+                //GameObject residualLimbGO = Object.Instantiate(ableBodiedTHFramePrefab, trackerGO.transform, false);
+                Object.Instantiate(ableBodiedTRFramePrefab, trackerGO.transform, false);
             }
         }
         
