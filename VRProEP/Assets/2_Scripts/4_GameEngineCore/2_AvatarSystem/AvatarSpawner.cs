@@ -32,7 +32,7 @@ namespace VRProEP.GameEngineCore
         public static void SpawnTranshumeralAvatar(UserData userData, AvatarData avatarData)
         {
             // Load the different parts of the avatar
-            LoadResidualLimb(avatarData.residualLimbType);
+            LoadResidualLimb(avatarData.residualLimbType, AvatarType.Transhumeral);
             LoadSocket(avatarData.socketType);
             LoadElbow(avatarData.elbowType, userData.upperArmLength);
             LoadForearm(avatarData.forearmType, userData.upperArmLength, userData.forearmLength);
@@ -65,7 +65,7 @@ namespace VRProEP.GameEngineCore
         public static void SpawnTransradialAvatar(UserData userData, AvatarData avatarData)
         {
             // Load
-            LoadResidualLimb(avatarData.residualLimbType);
+            LoadResidualLimb(avatarData.residualLimbType, AvatarType.Transradial);
             LoadSocket(avatarData.socketType);
             LoadForearm(avatarData.forearmType, userData.forearmLength);
             LoadHand(avatarData.handType, userData.forearmLength, userData.handLength);
@@ -141,7 +141,7 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         /// <param name="rlType">The name of the prefab residual limb avatar to be loaded.</param>
         /// <returns>The instantiated residual limb GameObject.</returns>
-        private static GameObject LoadResidualLimb(string rlType)
+        private static GameObject LoadResidualLimb(string rlType, AvatarType avatarType)
         {
             // Load Avatar object to set as parent.
             GameObject avatarGO = GameObject.FindGameObjectWithTag("Avatar");
@@ -169,6 +169,7 @@ namespace VRProEP.GameEngineCore
             if (follower == null)
                 follower = residualLimbGO.AddComponent<LimbFollower>();
 
+            follower.avatarType = avatarType;
             follower.offset = new Vector3(0.0f, -activeResidualLimbData.dimensions.x / 1.0f, 0.0f);
 
             return residualLimbGO;

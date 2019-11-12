@@ -11,7 +11,8 @@ namespace VRProEP.ProsthesisCore
         VirtualEncoder,
         EMGWiFi,
         VirtualPositionTracker,
-        Tactile
+        Tactile,
+        ThalmicMyo
     }
     /// <summary>
     /// Interface for sensor hardware the will provide input to the prosthesis system.
