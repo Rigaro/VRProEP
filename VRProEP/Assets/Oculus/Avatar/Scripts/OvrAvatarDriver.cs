@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System;
 using Oculus.Avatar;
@@ -11,12 +11,12 @@ public abstract class OvrAvatarDriver : MonoBehaviour {
         Unity
     };
 
-
     public PacketMode Mode;
     protected PoseFrame CurrentPose;
     public PoseFrame GetCurrentPose() { return CurrentPose; }
     public abstract void UpdateTransforms(IntPtr sdkAvatar);
 
+    private ovrAvatarControllerType ControllerType =  ovrAvatarControllerType.Quest;
     public struct ControllerPose
     {
         public ovrAvatarButton buttons;
@@ -70,7 +70,36 @@ public abstract class OvrAvatarDriver : MonoBehaviour {
         }
     };
 
-    protected void UpdateTransformsFromPose(IntPtr sdkAvatar)
+    void Start()
+    {
+        var headsetType = OVRPlugin.GetSystemHeadsetType();
+        switch (headsetType)
+        {
+            case OVRPlugin.SystemHeadset.GearVR_R320:
+            case OVRPlugin.SystemHeadset.GearVR_R321:
+            case OVRPlugin.SystemHeadset.GearVR_R322:
+            case OVRPlugin.SystemHeadset.GearVR_R323:
+            case OVRPlugin.SystemHeadset.GearVR_R324:
+            case OVRPlugin.SystemHeadset.GearVR_R325:
+                ControllerType = ovrAvatarControllerType.Malibu;
+                break;
+            case OVRPlugin.SystemHeadset.Oculus_Go:
+                ControllerType = ovrAvatarControllerType.Go;
+                break;
+            case OVRPlugin.SystemHeadset.Oculus_Quest:
+            case OVRPlugin.SystemHeadset.Rift_S:
+                ControllerType = ovrAvatarControllerType.Quest;
+                break;
+            case OVRPlugin.SystemHeadset.Rift_DK1:
+            case OVRPlugin.SystemHeadset.Rift_DK2:
+            case OVRPlugin.SystemHeadset.Rift_CV1:
+            default:
+                ControllerType = ovrAvatarControllerType.Touch;
+                break;
+        }
+    }
+
+    public void UpdateTransformsFromPose(IntPtr sdkAvatar)
     {
         if (sdkAvatar != IntPtr.Zero)
         {
@@ -79,25 +108,12 @@ public abstract class OvrAvatarDriver : MonoBehaviour {
             ovrAvatarHandInputState inputStateRight = OvrAvatar.CreateInputState(OvrAvatar.CreateOvrAvatarTransform(CurrentPose.handRightPosition, CurrentPose.handRightRotation), CurrentPose.controllerRightPose);
 
             CAPI.ovrAvatarPose_UpdateBody(sdkAvatar, bodyTransform);
-
-            if (GetIsTrackedRemote())
-            {
-                CAPI.ovrAvatarPose_UpdateSDK3DofHands(sdkAvatar, inputStateLeft, inputStateRight, GetRemoteControllerType());
-            }
-            else
-            {
-                CAPI.ovrAvatarPose_UpdateHands(sdkAvatar, inputStateLeft, inputStateRight);
-            }
+            CAPI.ovrAvatarPose_UpdateHandsWithType(sdkAvatar, inputStateLeft, inputStateRight, ControllerType);
         }
     }
 
     public static bool GetIsTrackedRemote()
     {
         return OVRInput.IsControllerConnected(OVRInput.Controller.RTrackedRemote) || OVRInput.IsControllerConnected(OVRInput.Controller.LTrackedRemote);
-    }
-
-    private ovrAvatarControllerType GetRemoteControllerType()
-    {
-        return OVRPlugin.productName == "Oculus Go" ? ovrAvatarControllerType.Go : ovrAvatarControllerType.Malibu;
     }
 }

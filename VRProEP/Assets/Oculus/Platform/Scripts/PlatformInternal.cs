@@ -17,6 +17,12 @@ namespace Oculus.Platform
       Application_ExecuteCoordinatedLaunch          = 0x267DB4F4,
       Application_GetInstalledApplications          = 0x520F744C,
       Avatar_UpdateMetaData                         = 0x7BCFD98E,
+      Cal_FinalizeApplication                       = 0x1DA9CBD5,
+      Cal_GetSuggestedApplications                  = 0x56707015,
+      Cal_ProposeApplication                        = 0x4E83F2DD,
+      Colocation_GetCurrentMapUuid                  = 0x34557EB2,
+      Colocation_RequestMap                         = 0x3215666D,
+      Colocation_ShareMap                           = 0x186DC4DD,
       GraphAPI_Get                                  = 0x30FF006E,
       GraphAPI_Post                                 = 0x76A5A7C4,
       HTTP_Get                                      = 0x6FB63223,
@@ -46,13 +52,15 @@ namespace Oculus.Platform
       User_GetLinkedAccounts                        = 0x5793F456,
       User_LaunchBlockFlow                          = 0x6FD62528,
       User_LaunchReportFlow                         = 0x5662A011,
+      User_LaunchReportFlow2                        = 0x7F835863,
       User_LaunchUnblockFlow                        = 0x14A22A97,
       User_NewEntitledTestUser                      = 0x11741F03,
       User_NewTestUser                              = 0x36E84F8C,
       User_NewTestUserFriends                       = 0x1ED726C7,
       User_StartRecordingForReportFlow              = 0x6C6E33E3,
       User_StopRecordingAndLaunchReportFlow         = 0x60788C8B,
-      User_StopRecordingAndLaunchReportFlow2        = 0x19C2B32B
+      User_StopRecordingAndLaunchReportFlow2        = 0x19C2B32B,
+      User_TestUserCreateDeviceManifest             = 0x6570B2BD
     };
 
     public static void CrashApplication() {
@@ -68,11 +76,23 @@ namespace Oculus.Platform
           message = new MessageWithAbuseReportRecording(messageHandle);
           break;
 
+        case MessageTypeInternal.Cal_FinalizeApplication:
+          message = new MessageWithCalApplicationFinalized(messageHandle);
+          break;
+
+        case MessageTypeInternal.Cal_GetSuggestedApplications:
+          message = new MessageWithCalApplicationSuggestionList(messageHandle);
+          break;
+
         case MessageTypeInternal.Application_ExecuteCoordinatedLaunch:
+        case MessageTypeInternal.Cal_ProposeApplication:
+        case MessageTypeInternal.Colocation_RequestMap:
+        case MessageTypeInternal.Colocation_ShareMap:
         case MessageTypeInternal.Livestreaming_StopPartyStream:
         case MessageTypeInternal.Livestreaming_UpdateMicStatus:
         case MessageTypeInternal.Party_Leave:
         case MessageTypeInternal.User_CancelRecordingForReportFlow:
+        case MessageTypeInternal.User_TestUserCreateDeviceManifest:
           message = new Message(messageHandle);
           break;
 
@@ -82,6 +102,10 @@ namespace Oculus.Platform
 
         case MessageTypeInternal.User_LaunchBlockFlow:
           message = new MessageWithLaunchBlockFlowResult(messageHandle);
+          break;
+
+        case MessageTypeInternal.User_LaunchReportFlow2:
+          message = new MessageWithLaunchReportFlowResult(messageHandle);
           break;
 
         case MessageTypeInternal.User_LaunchUnblockFlow:
@@ -134,6 +158,7 @@ namespace Oculus.Platform
           break;
 
         case MessageTypeInternal.Avatar_UpdateMetaData:
+        case MessageTypeInternal.Colocation_GetCurrentMapUuid:
         case MessageTypeInternal.GraphAPI_Get:
         case MessageTypeInternal.GraphAPI_Post:
         case MessageTypeInternal.HTTP_Get:
@@ -172,5 +197,39 @@ namespace Oculus.Platform
       }
     }
 
+    public static Request<Models.PlatformInitialize> InitializeStandaloneAsync(ulong appID, string accessToken)
+    {
+      var platform = new StandalonePlatform();
+      var initRequest = platform.AsyncInitialize(appID, accessToken);
+
+      if (initRequest == null)
+      {
+        throw new UnityException("Oculus Platform failed to initialize.");
+      }
+
+      // This function is not named well.  Actually means that we have called platform init.
+      // Async initialization may not have finished at this point.
+      Platform.Core.ForceInitialized();
+      (new GameObject("Oculus.Platform.CallbackRunner")).AddComponent<CallbackRunner>();
+      return initRequest;
+    }
+
+    public static class Users
+    {
+      public static Request<Models.LinkedAccountList> GetLinkedAccounts(ServiceProvider[] providers)
+      {
+        if (Core.IsInitialized())
+        {
+          UserOptions userOpts = new UserOptions();
+          foreach (ServiceProvider provider in providers)
+          {
+            userOpts.AddServiceProvider(provider);
+          }
+          return new Request<Models.LinkedAccountList>(CAPI.ovr_User_GetLinkedAccounts((IntPtr)userOpts));
+        }
+
+        return null;
+      }
+    }
   }
 }

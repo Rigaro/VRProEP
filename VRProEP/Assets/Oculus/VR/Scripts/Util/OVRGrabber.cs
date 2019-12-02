@@ -1,22 +1,17 @@
 /************************************************************************************
+Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
 
-Copyright   :   Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Licensed under the Oculus SDK License Version 3.4.1 (the "License");
-you may not use the Oculus SDK except in compliance with the License,
-which is provided at the time of installation or download, or which
-otherwise accompanies this software in either electronic or hard copy form.
+Licensed under the Oculus Utilities SDK License Version 1.31 (the "License"); you may not use
+the Utilities SDK except in compliance with the License, which is provided at the time of installation
+or download, or which otherwise accompanies this software in either electronic or hard copy form.
 
 You may obtain a copy of the License at
+https://developer.oculus.com/licenses/utilities-1.31
 
-https://developer.oculus.com/licenses/sdk-3.4.1
-
-Unless required by applicable law or agreed to in writing, the Oculus SDK
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
+Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+ANY KIND, either express or implied. See the License for the specific language governing
+permissions and limitations under the License.
 ************************************************************************************/
 
 using System.Collections.Generic;
@@ -33,7 +28,7 @@ public class OVRGrabber : MonoBehaviour
     public float grabEnd = 0.35f;
 
     // Demonstrates parenting the held object to the hand's transform when grabbed.
-    // When false, the grabbed object is moved every FixedUpdate using MovePosition. 
+    // When false, the grabbed object is moved every FixedUpdate using MovePosition.
     // Note that MovePosition is required for proper physics simulation. If you set this to true, you can
     // easily observe broken physics simulation by, for example, moving the bottom cube of a stacked
     // tower and noting a complete loss of friction.
@@ -55,7 +50,10 @@ public class OVRGrabber : MonoBehaviour
     [SerializeField]
     protected Transform m_parentTransform;
 
-    protected bool m_grabVolumeEnabled = true;
+    [SerializeField]
+    protected GameObject m_player;
+
+	protected bool m_grabVolumeEnabled = true;
     protected Vector3 m_lastPos;
     protected Quaternion m_lastRot;
     protected Quaternion m_anchorOffsetRotation;
@@ -97,7 +95,7 @@ public class OVRGrabber : MonoBehaviour
 		OVRCameraRig rig = null;
 		if (transform.parent != null && transform.parent.parent != null)
 			rig = transform.parent.parent.GetComponent<OVRCameraRig>();
-		
+
 		if (rig != null)
 		{
 			rig.UpdatedAnchors += (r) => {OnUpdatedAnchors();};
@@ -131,7 +129,7 @@ public class OVRGrabber : MonoBehaviour
 	}
 
     // Hands follow the touch anchors by calling MovePosition each frame to reach the anchor.
-    // This is done instead of parenting to achieve workable physics. If you don't require physics on 
+    // This is done instead of parenting to achieve workable physics. If you don't require physics on
     // your hands or held objects, you may wish to switch to parenting.
     void OnUpdatedAnchors()
     {
@@ -293,7 +291,8 @@ public class OVRGrabber : MonoBehaviour
             // speed and sends them flying. The grabbed object may still teleport inside of other objects, but fixing that
             // is beyond the scope of this demo.
             MoveGrabbedObject(m_lastPos, m_lastRot, true);
-            if(m_parentHeldObject)
+            SetPlayerIgnoreCollision(m_grabbedObj.gameObject, true);
+            if (m_parentHeldObject)
             {
                 m_grabbedObj.transform.parent = transform;
             }
@@ -346,6 +345,7 @@ public class OVRGrabber : MonoBehaviour
     {
         m_grabbedObj.GrabEnd(linearVelocity, angularVelocity);
         if(m_parentHeldObject) m_grabbedObj.transform.parent = null;
+        SetPlayerIgnoreCollision(m_grabbedObj.gameObject, false);
         m_grabbedObj = null;
     }
 
@@ -376,4 +376,20 @@ public class OVRGrabber : MonoBehaviour
             GrabbableRelease(Vector3.zero, Vector3.zero);
         }
     }
+
+	protected void SetPlayerIgnoreCollision(GameObject grabbable, bool ignore)
+	{
+		if (m_player != null)
+		{
+			Collider playerCollider = m_player.GetComponent<Collider>();
+			if (playerCollider != null)
+			{
+				Collider[] colliders = grabbable.GetComponents<Collider>();
+				foreach (Collider c in colliders)
+				{
+					Physics.IgnoreCollision(c, playerCollider, ignore);
+				}
+			}
+		}
+	}
 }

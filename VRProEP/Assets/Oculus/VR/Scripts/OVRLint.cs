@@ -222,7 +222,7 @@ public class OVRLint : EditorWindow
 
 	static void AddFix(string category, string message, FixMethodDelegate method, UnityEngine.Object target, params string[] buttons)
 	{
-		mRecords.Add(new FixRecord(category, message, method, target, buttons));
+		//mRecords.Add(new FixRecord(category, message, method, target, buttons));
 	}
 
 	static void CheckStaticCommonIssues()
