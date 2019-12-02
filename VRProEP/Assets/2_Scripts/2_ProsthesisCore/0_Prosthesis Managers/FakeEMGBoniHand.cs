@@ -13,6 +13,7 @@ namespace VRProEP.ProsthesisCore
         private BoniManager boniManager;
 
         private bool isConfigured = false;
+        [SerializeField]
         private bool isEnabled = false;
         private bool hasFeedback = false;
         private bool constantForceEnable = false;
@@ -134,11 +135,13 @@ namespace VRProEP.ProsthesisCore
         /// Initialised the prosthesis' input system.
         /// </summary>
         /// <param name="emgSensor">The EMG sensor to initialise the input system with.</param>
-        public void InitialiseInputSystem(EMGWiFiManager emgSensor)
+        public void InitialiseInputSystem(ISensor emgSensor)
         {
             // Check that the sensor a valid sensor is provided
-            if (emgSensor == null)
+            if (emgSensor == null) // Not null
                 throw new System.Exception("No EMG sensor available.");
+            if (!(emgSensor is EMGWiFiManager || emgSensor is ThalmicMyobandManager)) // Actually an EMG sensor
+                throw new System.ArgumentException("The provided sensor is not an EMG sensor.");
 
             // Add an EMG reference generator
             float[] xBar = { 0.0f };

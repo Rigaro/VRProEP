@@ -12,6 +12,8 @@ namespace VRProEP.ProsthesisCore
         private ISensor activeSensor;
         private IReferenceGenerator activeGenerator;
 
+        private SensorType emgSensorType;
+        
         public const string CMD_SET_ACTIVE_SENSOR = "CMD_SET_ACTIVE_SENSOR";
         public const string CMD_SET_ACTIVE_REFGEN = "CMD_SET_ACTIVE_REFGEN";
         public const string CMD_ADD_SENSOR = "CMD_ADD_SENSOR";
@@ -22,6 +24,7 @@ namespace VRProEP.ProsthesisCore
         public const string VAL_SENSOR_OCULUSTOUCH = "VAL_SENSOR_OCULUSTOUCH";
         public const string VAL_SENSOR_VIRTUALENCODER = "VAL_SENSOR_VIRTUALENCODER";
         public const string VAL_SENSOR_SEMG = "VAL_SENSOR_SEMG";
+        public const string VAL_SENSOR_THALMYO = "VAL_SENSOR_THALMYO";
         public const string VAL_REFGEN_LINKINSYN = "VAL_REFGEN_LINKINSYN";
         public const string VAL_REFGEN_JACOBIANSYN = "VAL_REFGEN_JACOBIANSYN";
         public const string VAL_REFGEN_INTEGRATOR = "VAL_REFGEN_INTEGRATOR";
@@ -176,7 +179,7 @@ namespace VRProEP.ProsthesisCore
                 // Save currently active sensor
                 SensorType prevSensorType = activeSensor.GetSensorType();
                 // Get EMG status
-                Configure("CMD_SET_ACTIVE_SENSOR", SensorType.EMGWiFi);
+                Configure("CMD_SET_ACTIVE_SENSOR", emgSensorType);
                 float[] emgStatus = activeSensor.GetAllProcessedData();
                 // Get enable
                 Configure("CMD_SET_ACTIVE_SENSOR", SensorType.VIVEController);
@@ -259,7 +262,13 @@ namespace VRProEP.ProsthesisCore
             {
                 case CMD_ADD_SENSOR:
                     if (value is ISensor)
+                    {
                         AddSensor(value);
+                        if (value is EMGWiFiManager)
+                            emgSensorType = SensorType.EMGWiFi;
+                        else if (value is ThalmicMyobandManager)
+                            emgSensorType = SensorType.ThalmicMyo;
+                    }
                     else
                         throw new System.ArgumentException("Invalid value provided.");
                     break;
@@ -324,6 +333,9 @@ namespace VRProEP.ProsthesisCore
                             break;
                         case VAL_SENSOR_SEMG:
                             SetActiveSensor(SensorType.EMGWiFi);
+                            break;
+                        case VAL_SENSOR_THALMYO:
+                            SetActiveSensor(SensorType.ThalmicMyo);
                             break;
                         default:
                             throw new System.ArgumentException("Invalid value provided.");

@@ -11,6 +11,7 @@ public class AddSensorMenu : MonoBehaviour {
     public GameObject settingsMenu;
     public Dropdown sensorDropdown;
     public GameObject EMGWiFiMenu;
+    public GameObject ThalmicMyoMenu;
 
     private List<string> sensorList = new List<string>();
     private int selectedSensor = 0;
@@ -46,8 +47,11 @@ public class AddSensorMenu : MonoBehaviour {
 
         if (selectedSensor == ((int)SensorType.EMGWiFi + 1))
             EMGWiFiMenu.SetActive(true);
+        else if (selectedSensor == ((int)SensorType.ThalmicMyo + 1))
+            ThalmicMyoMenu.SetActive(true);
         else
         {
+            ThalmicMyoMenu.SetActive(false);
             EMGWiFiMenu.SetActive(false);
         }
     }
