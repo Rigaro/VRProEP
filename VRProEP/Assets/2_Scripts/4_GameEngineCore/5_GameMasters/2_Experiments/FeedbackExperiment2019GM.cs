@@ -1319,6 +1319,10 @@ public class FeedbackExperiment2019GM : GameMaster
                     yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                     yield return new WaitForSeconds(0.5f);
 
+                    // Set the active balloon set
+                    selectors[1].SetActive(true);
+                    activeSelector = selectors[1];
+                    selectors[0].SetActive(false);
 
                     //
                     //present targertroughness[0] and let them classify

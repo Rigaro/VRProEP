@@ -13,6 +13,7 @@ namespace VRProEP.ProsthesisCore
         private BoniManager boniManager;
 
         private bool isConfigured = false;
+        [SerializeField]
         private bool isEnabled = false;
         private bool hasFeedback = false;
         private bool constantForceEnable = false;
