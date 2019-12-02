@@ -10,7 +10,7 @@ Wiki: https://github.com/Rigaro/VRProEP/wiki
 - Human-prosthetic interfaces: Allows the implementation of different interfaces. Currently implemented: sEMG proportional, Motion-based.
 - Object interaction: Allows interaction with objects through a VR controller (able-bodied) or through the virtual prosthetic devices and interfaces.
 - Mixed reality: Allows recording of the user and virtual reality environment in Mixed Reality by placing the user in the virtual world.
-- External hardware: Allows the integration of external hardware devices. Currently implemented: bone conduction feedback device, myoware sEMG electrode system.
+- External hardware: Allows the integration of external hardware devices. Currently implemented: bone conduction feedback device, myoware sEMG electrode system, Thalmic Labs Myoband.
 
 ## RA-L 2019 Paper
 The following platform and Unity versions were used for the experiments included in the paper submitted to IEEE Robotics and Automation Letters in 2019.
