@@ -124,11 +124,43 @@ public class PhotoStageGM : GameMaster
 
     #region Inherited methods overrides
 
+    public override void InitialiseExperiment()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override IEnumerator WelcomeLoop()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override IEnumerator InstructionsLoop()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override IEnumerator TrainingLoop()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    /// <summary>
+    /// Gets the progress text to be displayed to the subject.
+    /// </summary>
+    /// <returns>The text to be displayed as a string.</returns>
+    public override string GetDisplayInfoText()
+    {
+        string Text;
+        Text = "Status: " + experimentState.ToString() + ".\n";
+        Text += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
+        return Text;
+    }
+
     /// <summary>
     /// Initializes the ExperimentSystem and its components.
     /// Verifies that all components needed for the experiment are available.
     /// </summary>
-    protected override void InitExperimentSystem()
+    public override void InitExperimentSystem()
     {
         //
         // Set the experiment type and ID
@@ -163,7 +195,7 @@ public class PhotoStageGM : GameMaster
     /// Checks whether the task has be successfully completed or not.
     /// </summary>
     /// <returns>True if the task has been successfully completed.</returns>
-    protected override bool CheckTaskCompletion()
+    public override bool CheckTaskCompletion()
     {
         //
         // Perform some condition testing
@@ -178,7 +210,7 @@ public class PhotoStageGM : GameMaster
     /// Checks whether the subject is ready to start performing the task.
     /// </summary>
     /// <returns>True if ready to start.</returns>
-    protected override bool CheckReadyToStart()
+    public override bool CheckReadyToStart()
     {
         throw new System.NotImplementedException();
     }
@@ -187,7 +219,7 @@ public class PhotoStageGM : GameMaster
     /// Checks if the condition for the rest period has been reached.
     /// </summary>
     /// <returns>True if the rest condition has been reached.</returns>
-    protected override bool CheckRestCondition()
+    public override bool CheckRestCondition()
     {
         throw new System.NotImplementedException();
     }
@@ -196,7 +228,7 @@ public class PhotoStageGM : GameMaster
     /// Checks if the condition for changing experiment session has been reached.
     /// </summary>
     /// <returns>True if the condition for changing sessions has been reached.</returns>
-    protected override bool CheckNextSessionCondition()
+    public override bool CheckNextSessionCondition()
     {
         throw new System.NotImplementedException();
     }
@@ -205,7 +237,7 @@ public class PhotoStageGM : GameMaster
     /// Checks if the condition for ending the experiment has been reached.
     /// </summary>
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
-    protected override bool CheckEndCondition()
+    public override bool CheckEndCondition()
     {
         throw new System.NotImplementedException();
     }
@@ -213,7 +245,7 @@ public class PhotoStageGM : GameMaster
     /// <summary>
     /// Launches the next session. Performs all the required preparations.
     /// </summary>
-    protected override void LaunchNextSession()
+    public override void ConfigureNextSession()
     {
         throw new System.NotImplementedException();
     }
@@ -221,7 +253,7 @@ public class PhotoStageGM : GameMaster
     /// <summary>
     /// Finishes the experiment. Performs all the required procedures.
     /// </summary>
-    protected override void EndExperiment()
+    public override void EndExperiment()
     {
         throw new System.NotImplementedException();
     }

@@ -42,7 +42,7 @@ public class TestGM : GameMaster
              *************************************************
              */
             // Welcome subject to the virtual world.
-            case ExperimentState.HelloWorld:
+            case ExperimentState.Welcome:
                 // Load avatar
                 if (avatarType == AvatarType.AbleBodied)
                 {
@@ -75,7 +75,7 @@ public class TestGM : GameMaster
                     }
                 }
 
-                experimentState = ExperimentState.InitializingApplication;
+                experimentState = ExperimentState.Initialising;
                 break;
             /*
              *************************************************
@@ -83,7 +83,7 @@ public class TestGM : GameMaster
              *************************************************
              */
             // Perform initialization functions before starting experiment.
-            case ExperimentState.InitializingApplication:
+            case ExperimentState.Initialising:
                 //
                 // Perform experiment initialization procedures
                 //
@@ -111,18 +111,18 @@ public class TestGM : GameMaster
                 //
                 // Go to instructions
                 //
-                experimentState = ExperimentState.GivingInstructions;
+                experimentState = ExperimentState.Instructions;
                 break;
             /*
              *************************************************
              *  GivingInstructions
              *************************************************
              */
-            case ExperimentState.GivingInstructions:
+            case ExperimentState.Instructions:
                 // Skip instructions when repeating sessions
-                if (skipInstructions)
+                if (SkipInstructions)
                 {
-                    hudManager.DisplayText("Move to start", 2.0f);
+                    HudManager.DisplayText("Move to start", 2.0f);
                     // Turn targets clear
                     experimentState = ExperimentState.WaitingForStart;
                     break;
@@ -135,7 +135,7 @@ public class TestGM : GameMaster
                 //
                 // Go to waiting for start
                 //
-                hudManager.DisplayText("Move to start", 2.0f);
+                HudManager.DisplayText("Move to start", 2.0f);
                 // Turn targets clear
                 experimentState = ExperimentState.WaitingForStart;
 
@@ -199,13 +199,13 @@ public class TestGM : GameMaster
                 // Rest for some time when required
                 if (CheckRestCondition())
                 {
-                    SetWaitFlag(restTime);
+                    SetWaitFlag(RestTime);
                     experimentState = ExperimentState.Resting;
                 }
                 // Check whether the new session condition is met
                 else if (CheckNextSessionCondition())
                 {
-                    experimentState = ExperimentState.InitializingNextSession;
+                    experimentState = ExperimentState.InitializingNext;
                 }
                 // Check whether the experiment end condition is met
                 else if (CheckEndCondition())
@@ -242,7 +242,7 @@ public class TestGM : GameMaster
              *  InitializingNext
              *************************************************
              */
-            case ExperimentState.InitializingNextSession:
+            case ExperimentState.InitializingNext:
                 //
                 // Perform session closure procedures
                 //
@@ -259,7 +259,7 @@ public class TestGM : GameMaster
                 //
                 //ExperimentSystem.GetActiveLogger(1).AddNewLogFile(sessionNumber, iterationNumber, "Data format");
 
-                experimentState = ExperimentState.InitializingApplication; // Initialize next session
+                experimentState = ExperimentState.Initialising; // Initialize next session
                 break;
             /*
              *************************************************
@@ -272,7 +272,7 @@ public class TestGM : GameMaster
                 //
                 if (UpdateNext())
                 {
-                    LaunchNextSession();
+                    ConfigureNextSession();
                     break;
                 }
                 else if (UpdateEnd())
@@ -285,7 +285,7 @@ public class TestGM : GameMaster
                 //
                 if (WaitFlag)
                 {
-                    hudManager.DisplayText("Get ready to restart!", 3.0f);
+                    HudManager.DisplayText("Get ready to restart!", 3.0f);
                     SetWaitFlag(5.0f);
                     experimentState = ExperimentState.UpdatingApplication;
                     break;
@@ -303,7 +303,7 @@ public class TestGM : GameMaster
                 UpdatePause();
                 if (UpdateNext())
                 {
-                    LaunchNextSession();
+                    ConfigureNextSession();
                     break;
                 }
                 else if (UpdateEnd())
@@ -374,7 +374,7 @@ public class TestGM : GameMaster
                         logData += "\n" + element.ToString();
                 }
 
-                hudManager.DisplayText(logData);
+                HudManager.DisplayText(logData);
 
                 //
                 // Append data to lists
@@ -436,11 +436,36 @@ public class TestGM : GameMaster
 
     #region Inherited methods overrides
 
+    public override void InitialiseExperiment()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override IEnumerator WelcomeLoop()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override IEnumerator InstructionsLoop()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override IEnumerator TrainingLoop()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override string GetDisplayInfoText()
+    {
+        throw new System.NotImplementedException();
+    }
+
     /// <summary>
     /// Initializes the ExperimentSystem and its components.
     /// Verifies that all components needed for the experiment are available.
     /// </summary>
-    protected override void InitExperimentSystem()
+    public override void InitExperimentSystem()
     {
         //
         // Set the experiment type and ID
@@ -457,7 +482,7 @@ public class TestGM : GameMaster
     /// Checks whether the subject is ready to start performing the task.
     /// </summary>
     /// <returns>True if ready to start.</returns>
-    protected override bool CheckReadyToStart()
+    public override bool CheckReadyToStart()
     {
         throw new System.NotImplementedException();
     }
@@ -466,7 +491,7 @@ public class TestGM : GameMaster
     /// Checks whether the task has be successfully completed or not.
     /// </summary>
     /// <returns>True if the task has been successfully completed.</returns>
-    protected override bool CheckTaskCompletion()
+    public override bool CheckTaskCompletion()
     {
         //
         // Perform some condition testing
@@ -478,7 +503,7 @@ public class TestGM : GameMaster
     /// Checks if the condition for the rest period has been reached.
     /// </summary>
     /// <returns>True if the rest condition has been reached.</returns>
-    protected override bool CheckRestCondition()
+    public override bool CheckRestCondition()
     {
         throw new System.NotImplementedException();
     }
@@ -487,7 +512,7 @@ public class TestGM : GameMaster
     /// Checks if the condition for changing experiment session has been reached.
     /// </summary>
     /// <returns>True if the condition for changing sessions has been reached.</returns>
-    protected override bool CheckNextSessionCondition()
+    public override bool CheckNextSessionCondition()
     {
         throw new System.NotImplementedException();
     }
@@ -496,7 +521,7 @@ public class TestGM : GameMaster
     /// Checks if the condition for ending the experiment has been reached.
     /// </summary>
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
-    protected override bool CheckEndCondition()
+    public override bool CheckEndCondition()
     {
         throw new System.NotImplementedException();
     }
@@ -504,7 +529,7 @@ public class TestGM : GameMaster
     /// <summary>
     /// Launches the next session. Performs all the required preparations.
     /// </summary>
-    protected override void LaunchNextSession()
+    public override void ConfigureNextSession()
     {
         throw new System.NotImplementedException();
     }
@@ -512,7 +537,7 @@ public class TestGM : GameMaster
     /// <summary>
     /// Finishes the experiment. Performs all the required procedures.
     /// </summary>
-    protected override void EndExperiment()
+    public override void EndExperiment()
     {
         throw new System.NotImplementedException();
     }

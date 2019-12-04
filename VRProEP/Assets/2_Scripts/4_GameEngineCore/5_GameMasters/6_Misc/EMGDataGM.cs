@@ -64,15 +64,15 @@ public class EMGDataGM : GameMaster
              *************************************************
              */
             // Welcome subject to the virtual world.
-            case ExperimentState.HelloWorld:
+            case ExperimentState.Welcome:
                 if (WaitFlag)
                 {
-                    hudManager.ClearText();
-                    experimentState = ExperimentState.InitializingApplication;
+                    HudManager.ClearText();
+                    experimentState = ExperimentState.Initialising;
                 }
                 else
                 {
-                    hudManager.DisplayText("Welcome!");
+                    HudManager.DisplayText("Welcome!");
                 }
                 break;
             /*
@@ -81,7 +81,7 @@ public class EMGDataGM : GameMaster
              *************************************************
              */
             // Perform initialization functions before starting experiment.
-            case ExperimentState.InitializingApplication:
+            case ExperimentState.Initialising:
                 //
                 // Perform experiment initialization procedures
                 //
@@ -115,17 +115,17 @@ public class EMGDataGM : GameMaster
                 //
                 // Go to instructions
                 //
-                experimentState = ExperimentState.GivingInstructions;
+                experimentState = ExperimentState.Instructions;
                 break;
             /*
              *************************************************
              *  GivingInstructions
              *************************************************
              */
-            case ExperimentState.GivingInstructions:
-                hudManager.DisplayText(movementTimeList[timeNumber - 1] + " sec. movement.", 2.0f);
+            case ExperimentState.Instructions:
+                HudManager.DisplayText(movementTimeList[timeNumber - 1] + " sec. movement.", 2.0f);
                 // Skip instructions when repeating sessions
-                if (skipInstructions)
+                if (SkipInstructions)
                 {
                     //hudManager.DisplayText("Move to guide", 2.0f);
                     experimentState = ExperimentState.WaitingForStart;
@@ -157,7 +157,7 @@ public class EMGDataGM : GameMaster
                         if (guideManager.StartGuiding())
                         {
                             //StopAllCoroutines();
-                            hudManager.ClearText();
+                            HudManager.ClearText();
                             taskTime = 0.0f;
                             HUDCountDown(3);
                             experimentState = ExperimentState.PerformingTask;
@@ -181,7 +181,7 @@ public class EMGDataGM : GameMaster
              *************************************************
              */
             case ExperimentState.AnalizingResults:
-                hudManager.DisplayText("Rest your arm.", 5.0f);
+                HudManager.DisplayText("Rest your arm.", 5.0f);
                 // Allow 3 seconds after task end to do calculations
                 SetWaitFlag(5.0f);
 
@@ -205,9 +205,9 @@ public class EMGDataGM : GameMaster
                 // Rest for some time when required
                 if (CheckRestCondition())
                 {
-                    hudManager.ClearText();
-                    hudManager.DisplayText("Rest your arm.", 2.0f);
-                    SetWaitFlag(restTime);
+                    HudManager.ClearText();
+                    HudManager.DisplayText("Rest your arm.", 2.0f);
+                    SetWaitFlag(RestTime);
                     experimentState = ExperimentState.Resting;
                     break;
                 }
@@ -226,7 +226,7 @@ public class EMGDataGM : GameMaster
                     timeIterations++;
                     totalIterations++;
                     // Go to next
-                    experimentState = ExperimentState.InitializingNextSession;
+                    experimentState = ExperimentState.InitializingNext;
                     break;
                 }
                 else
@@ -262,7 +262,7 @@ public class EMGDataGM : GameMaster
                     //
                     // Go to start of next iteration
                     //
-                    hudManager.DisplayText("Move to guide", 2.0f);
+                    HudManager.DisplayText("Move to guide", 2.0f);
                     experimentState = ExperimentState.WaitingForStart;
                 }
                 break;
@@ -271,7 +271,7 @@ public class EMGDataGM : GameMaster
              *  InitializingNext
              *************************************************
              */
-            case ExperimentState.InitializingNextSession:
+            case ExperimentState.InitializingNext:
                 if (WaitFlag)
                 {
                     //
@@ -304,7 +304,7 @@ public class EMGDataGM : GameMaster
                     // Initialize data logging
                     //
 
-                    experimentState = ExperimentState.InitializingApplication; // Initialize next session
+                    experimentState = ExperimentState.Initialising; // Initialize next session
                 }
                 break;
             /*
@@ -318,7 +318,7 @@ public class EMGDataGM : GameMaster
                 //
                 if (UpdateNext())
                 {
-                    LaunchNextSession();
+                    ConfigureNextSession();
                     break;
                 }
                 else if (UpdateEnd())
@@ -346,12 +346,12 @@ public class EMGDataGM : GameMaster
                         timeIterations++;
                         totalIterations++;
                         // Go to next
-                        experimentState = ExperimentState.InitializingNextSession;
+                        experimentState = ExperimentState.InitializingNext;
                         break;
                     }
                     else
                     {
-                        hudManager.DisplayText("Get ready!", 3.0f);
+                        HudManager.DisplayText("Get ready!", 3.0f);
                         SetWaitFlag(3.0f);
                         experimentState = ExperimentState.UpdatingApplication;
                     }
@@ -370,7 +370,7 @@ public class EMGDataGM : GameMaster
                 UpdatePause();
                 if (UpdateNext())
                 {
-                    LaunchNextSession();
+                    ConfigureNextSession();
                     break;
                 }
                 else if (UpdateEnd())
@@ -389,7 +389,7 @@ public class EMGDataGM : GameMaster
                 // Update log data and close logs.
                 //
 
-                hudManager.DisplayText("Experiment end, thanks!", 5.0f);
+                HudManager.DisplayText("Experiment end, thanks!", 5.0f);
                 //
                 // Return to main menu
                 //
@@ -404,7 +404,7 @@ public class EMGDataGM : GameMaster
         string experimentInfoText = "Experiment info: \n";
         experimentInfoText += "Iteration: " + iterationNumber + "/" + iterationsPerAngle + ".\n";
         experimentInfoText += "Session: " + sessionNumber + "/" + startAngleList.Count * movementTimeList.Count + ".\n";
-        instructionManager.DisplayText(experimentInfoText);
+        InstructionManager.DisplayText(experimentInfoText);
 
         //
         // Update information displayed for debugging purposes
@@ -417,7 +417,7 @@ public class EMGDataGM : GameMaster
                 debugText += waitState.ToString() + ".\n";
             debugText += "Angle number:" + angleNumber + ".\n";
             debugText += "Time iterations:" + timeIterations + ".\n";
-            instructionManager.DisplayText(debugText + "\n" + experimentInfoText);
+            InstructionManager.DisplayText(debugText + "\n" + experimentInfoText);
         }
     }
 
@@ -507,11 +507,28 @@ public class EMGDataGM : GameMaster
 
     #region Inherited methods overrides
 
+    public override void InitialiseExperiment()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    /// <summary>
+    /// Gets the progress text to be displayed to the subject.
+    /// </summary>
+    /// <returns>The text to be displayed as a string.</returns>
+    public override string GetDisplayInfoText()
+    {
+        string Text;
+        Text = "Status: " + experimentState.ToString() + ".\n";
+        Text += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
+        return Text;
+    }
+
     /// <summary>
     /// Initializes the ExperimentSystem and its components.
     /// Verifies that all components needed for the experiment are available.
     /// </summary>
-    protected override void InitExperimentSystem()
+    public override void InitExperimentSystem()
     {
         // Check the experiment parameters
         if (startAngleList.Count <= 0 || endAngleList.Count <= 0 || movementTimeList.Count <= 0)
@@ -592,7 +609,7 @@ public class EMGDataGM : GameMaster
     /// Checks whether the subject is ready to start performing the task.
     /// </summary>
     /// <returns>True if ready to start.</returns>
-    protected override bool CheckReadyToStart()
+    public override bool CheckReadyToStart()
     {
         throw new System.NotImplementedException();
     }
@@ -601,7 +618,7 @@ public class EMGDataGM : GameMaster
     /// Checks whether the task has be successfully completed or not.
     /// </summary>
     /// <returns>True if the task has been successfully completed.</returns>
-    protected override bool CheckTaskCompletion()
+    public override bool CheckTaskCompletion()
     {
         //
         // Perform some condition testing
@@ -620,7 +637,7 @@ public class EMGDataGM : GameMaster
     /// Checks if the condition for the rest period has been reached.
     /// </summary>
     /// <returns>True if the rest condition has been reached.</returns>
-    protected override bool CheckRestCondition()
+    public override bool CheckRestCondition()
     {
         return false;
     }
@@ -629,7 +646,7 @@ public class EMGDataGM : GameMaster
     /// Checks if the condition for changing experiment session has been reached.
     /// </summary>
     /// <returns>True if the condition for changing sessions has been reached.</returns>
-    protected override bool CheckNextSessionCondition()
+    public override bool CheckNextSessionCondition()
     {
         if (iterationNumber >= iterationsPerAngle)
             return true;
@@ -641,7 +658,7 @@ public class EMGDataGM : GameMaster
     /// Checks if the condition for ending the experiment has been reached.
     /// </summary>
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
-    protected override bool CheckEndCondition()
+    public override bool CheckEndCondition()
     {
         if (totalIterations >= totalIterationLimit)
             return true;
@@ -652,7 +669,7 @@ public class EMGDataGM : GameMaster
     /// <summary>
     /// Launches the next session. Performs all the required preparations.
     /// </summary>
-    protected override void LaunchNextSession()
+    public override void ConfigureNextSession()
     {
         throw new System.NotImplementedException();
     }
@@ -660,11 +677,25 @@ public class EMGDataGM : GameMaster
     /// <summary>
     /// Finishes the experiment. Performs all the required procedures.
     /// </summary>
-    protected override void EndExperiment()
+    public override void EndExperiment()
+    {
+        throw new System.NotImplementedException();
+    }
+    
+    public override IEnumerator WelcomeLoop()
     {
         throw new System.NotImplementedException();
     }
 
+    public override IEnumerator InstructionsLoop()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override IEnumerator TrainingLoop()
+    {
+        throw new System.NotImplementedException();
+    }
 
     #endregion
 }

@@ -18,28 +18,59 @@ using VRProEP.Utilities;
 
 public abstract class GameMaster : MonoBehaviour
 {
-    [Header("Control Variables:")]
-    public bool enableStart = false;
-    public bool demoMode = false;
-    public float restTime = 60.0f;
-    public bool skipInstructions = false;
+    [Header("Flow Control:")]
+    // Serialised
+    [SerializeField]
+    protected bool enableStart = false;
+    [SerializeField]
+    protected bool demoMode = false;
+    [SerializeField]
+    protected bool skipInstructions = false;
+    [SerializeField]
+    protected bool skipTraining = false;
+    protected State currentState;
+    // Accessors
+    public bool EnableStart { get => enableStart; set => enableStart = value; }
+    public bool DemoMode { get => demoMode; }
+    public bool SkipInstructions { get => skipInstructions; }
 
-    // UI
-    protected HUDManager hudManager;
-    protected ConsoleManager instructionManager;
-    protected ConsoleManager monitorManager;
+    // UI Management
+    private HUDManager hudManager;
+    private ConsoleManager instructionManager;
+    private ConsoleManager monitorManager;
+    protected string infoText;
+    // Accessors
+    public HUDManager HudManager { get => hudManager; }
+    protected ConsoleManager InstructionManager { get => instructionManager; }
+    protected ConsoleManager MonitorManager { get => monitorManager; }
 
     [Header("Debug:")]
     [Tooltip("The debug enable variable.")]
-    public bool debug;
-    public TextMeshPro debugText;
+    [SerializeField]
+    protected bool debug;
+    [SerializeField]
+    protected TextMeshPro debugText;
 
-    [Header("World configuration:")]
+    [Header("World Configuration:")]
     [SerializeField]
     protected float worldOrientation = 180.0f;
-    public Transform experimentCenter;
+    [SerializeField]
+    protected Transform experimentCenter;
     [SerializeField]
     protected float playerOrientation = 0.0f;
+
+    [Header("Experiment Configuration:")]
+    [SerializeField]
+    private float restTime = 60.0f;
+    [SerializeField]
+    private int restIterations = 100;
+    [SerializeField]
+    protected List<int> iterationsPerSession = new List<int>();
+    [SerializeField]
+    protected List<int> trainingPerSession = new List<int>();
+    // Accessors
+    public float RestTime { get => restTime; }
+    public int RestIterations { get => restIterations; }
 
     // Subject group management
     public enum SubjectGroup
@@ -64,24 +95,41 @@ public abstract class GameMaster : MonoBehaviour
 
     #region Flow control variables
 
+    //
     // Flow control
+    //
+    protected float taskTime = 0.0f;
     protected bool startEnable = false;
     protected int sessionNumber = 1;
     protected int iterationNumber = 1;
+    protected bool inWelcome = false;
+    protected bool welcomeDone = false;
+    protected bool inInstructions = false;
+    protected bool instructionsDone = false;
+    protected bool inTraining = false;
+    protected bool trainingDone = false;
+    protected SteamVR_Action_Boolean buttonAction = SteamVR_Input.GetAction<SteamVR_Action_Boolean>("ObjectInteractButton");
+    // Accessors
+    public bool InWelcome { get => inWelcome; set => inWelcome = value; }
+    public bool WelcomeDone { get => welcomeDone; set => welcomeDone = value; }
+    public bool InInstructions { get => inInstructions; set => inInstructions = value; }
+    public bool InstructionsDone { get => instructionsDone; }
+    public bool InTraining { get => inTraining; }
+    public bool TrainingDone { get => trainingDone; }
 
     // Experiment state management
-    protected ExperimentState experimentState = ExperimentState.HelloWorld;
+    protected ExperimentState experimentState = ExperimentState.Welcome;
     public enum ExperimentState
     {
-        HelloWorld,
-        InitializingApplication,
-        GivingInstructions,
+        Welcome,
+        Initialising,
+        Instructions,
         Training,
         WaitingForStart,
         PerformingTask,
         AnalizingResults,
         UpdatingApplication,
-        InitializingNextSession,
+        InitializingNext,
         Resting,
         Paused,
         End
@@ -102,58 +150,91 @@ public abstract class GameMaster : MonoBehaviour
     // Waiting
     private bool waitFlag = false;
     protected bool WaitFlag { get => waitFlag; set => waitFlag = value; }
-    private Coroutine waitCoroutine;
 
+    private Coroutine waitCoroutine;
 
     #endregion
 
     #region Abstract methods to be implemented
 
     /// <summary>
+    /// Gets the progress text to be displayed to the subject.
+    /// </summary>
+    /// <returns>The text to be displayed as a string.</returns>
+    public abstract string GetDisplayInfoText();
+
+    /// <summary>
     /// Initializes the ExperimentSystem and its components.
     /// Verifies that all components needed for the experiment are available.
+    /// This must be done in Start.
     /// </summary>
-    protected abstract void InitExperimentSystem();
+    public abstract void InitExperimentSystem();
+
+    /// <summary>
+    /// Performs initialisation procedures for the experiment. Sets variables to their zero state.
+    /// </summary>
+    public abstract void InitialiseExperiment();
 
     /// <summary>
     /// Checks whether the subject is ready to start performing the task.
     /// </summary>
     /// <returns>True if ready to start.</returns>
-    protected abstract bool CheckReadyToStart();
+    public abstract bool CheckReadyToStart();
 
     /// <summary>
     /// Checks whether the task has be successfully completed or not.
     /// </summary>
     /// <returns>True if the task has been successfully completed.</returns>
-    protected abstract bool CheckTaskCompletion();
+    public abstract bool CheckTaskCompletion();
 
     /// <summary>
     /// Checks if the condition for the rest period has been reached.
     /// </summary>
     /// <returns>True if the rest condition has been reached.</returns>
-    protected abstract bool CheckRestCondition();
+    public abstract bool CheckRestCondition();
 
     /// <summary>
     /// Checks if the condition for changing experiment session has been reached.
     /// </summary>
     /// <returns>True if the condition for changing sessions has been reached.</returns>
-    protected abstract bool CheckNextSessionCondition();
+    public abstract bool CheckNextSessionCondition();
 
     /// <summary>
     /// Checks if the condition for ending the experiment has been reached.
     /// </summary>
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
-    protected abstract bool CheckEndCondition();
+    public abstract bool CheckEndCondition();
 
     /// <summary>
-    /// Launches the next session. Performs all the required preparations.
+    /// Configures the next session. Performs all the configurations required when starting a new experiment session.
     /// </summary>
-    protected abstract void LaunchNextSession();
+    public abstract void ConfigureNextSession();
 
     /// <summary>
     /// Finishes the experiment. Performs all the required procedures.
     /// </summary>
-    protected abstract void EndExperiment();
+    public abstract void EndExperiment();
+
+    /// <summary>
+    /// Coroutine for the welcome text.
+    /// Implement your welcome loop here.
+    /// </summary>
+    /// <returns>Yield instruction</returns>
+    public abstract IEnumerator WelcomeLoop();
+
+    /// <summary>
+    /// Coroutine for the experiment instructions.
+    /// Implement your instructions loop here.
+    /// </summary>
+    /// <returns>Yield instruction</returns>
+    public abstract IEnumerator InstructionsLoop();
+
+    /// <summary>
+    /// Coroutine for the experiment training.
+    /// Implement your training loop here.
+    /// </summary>
+    /// <returns>Yield instruction</returns>
+    public abstract IEnumerator TrainingLoop();
 
     #endregion
 
@@ -179,7 +260,7 @@ public abstract class GameMaster : MonoBehaviour
             throw new System.Exception("Monitor GameObject not found.");
 
         monitorManager = monitorGO.GetComponent<ConsoleManager>();
-        if (monitorManager == null)
+        if (MonitorManager == null)
             throw new System.Exception("Monitor Manager not found.");
     }
 
@@ -190,14 +271,14 @@ public abstract class GameMaster : MonoBehaviour
     {
         GameObject hudGO = GameObject.FindGameObjectWithTag("HUD");
         if (hudGO == null)
-            monitorManager.DisplayError(1, "HUD GameObject not found.");
+            MonitorManager.DisplayError(1, "HUD GameObject not found.");
 
         hudManager = hudGO.GetComponent<HUDManager>();
         if (hudManager == null)
-            monitorManager.DisplayError(2, "HUD Manager not found.");
+            MonitorManager.DisplayError(2, "HUD Manager not found.");
 
         // Clear HUD
-        hudManager.DisplayText("...", 1.0f);
+        HudManager.DisplayText("...", 1.0f);
     }
 
     /// <summary>
@@ -207,11 +288,11 @@ public abstract class GameMaster : MonoBehaviour
     {
         GameObject consoleGO = GameObject.FindGameObjectWithTag("Console");
         if (consoleGO == null)
-            monitorManager.DisplayError(1, "Console GameObject not found.");
+            MonitorManager.DisplayError(1, "Console GameObject not found.");
 
         instructionManager = consoleGO.GetComponent<ConsoleManager>();
-        if (instructionManager == null)
-            monitorManager.DisplayError(2, "Console Manager not found.");
+        if (InstructionManager == null)
+            MonitorManager.DisplayError(2, "Console Manager not found.");
     }
 
     #endregion
@@ -228,15 +309,15 @@ public abstract class GameMaster : MonoBehaviour
         {
             if (experimentState == ExperimentState.Paused)
             {
-                hudManager.DisplayText("Resuming experiment!", 3.0f);
-                instructionManager.DisplayText("Resuming experiment!", 3.0f);
+                HudManager.DisplayText("Resuming experiment!", 3.0f);
+                InstructionManager.DisplayText("Resuming experiment!", 3.0f);
                 //monitorManager.DisplayText("Resuming experiment!", 3.0f);
                 experimentState = ExperimentState.WaitingForStart;
             }
             else if (experimentState == ExperimentState.WaitingForStart)
             {
-                hudManager.DisplayText("Pausing experiment...", 3.0f);
-                instructionManager.DisplayText("Pausing experiment!", 3.0f);
+                HudManager.DisplayText("Pausing experiment...", 3.0f);
+                InstructionManager.DisplayText("Pausing experiment!", 3.0f);
                 //monitorManager.DisplayText("Pausing experiment!", 3.0f);
                 experimentState = ExperimentState.Paused;
             }
@@ -250,9 +331,9 @@ public abstract class GameMaster : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            hudManager.DisplayText("Ending experiment...", 3.0f);
-            instructionManager.DisplayText("Ending experiment...", 3.0f);
-            monitorManager.DisplayText("Ending experiment...", 3.0f);
+            HudManager.DisplayText("Ending experiment...", 3.0f);
+            InstructionManager.DisplayText("Ending experiment...", 3.0f);
+            MonitorManager.DisplayText("Ending experiment...", 3.0f);
             experimentState = ExperimentState.End;
             return true;
         }
@@ -272,10 +353,10 @@ public abstract class GameMaster : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.N))
         {
-            hudManager.DisplayText("Preparing next session...", 3.0f);
-            instructionManager.DisplayText("Preparing next session...", 3.0f);
-            monitorManager.DisplayText("Preparing next session...", 3.0f);
-            experimentState = ExperimentState.InitializingNextSession;
+            HudManager.DisplayText("Preparing next session...", 3.0f);
+            InstructionManager.DisplayText("Preparing next session...", 3.0f);
+            MonitorManager.DisplayText("Preparing next session...", 3.0f);
+            experimentState = ExperimentState.InitializingNext;
             return true;
         }
         else
@@ -287,10 +368,50 @@ public abstract class GameMaster : MonoBehaviour
     #region Support methods
 
     /// <summary>
+    /// Resets the iteration counter back to one.
+    /// </summary>
+    public void ResetIterationCounter()
+    {
+        iterationNumber = 1;
+    }
+
+    /// <summary>
+    /// Increases the iteration counter by one.
+    /// </summary>
+    public void IncreaseIterationCounter()
+    {
+        iterationNumber++;
+    }
+
+    /// <summary>
+    /// Resets the session counter back to one.
+    /// </summary>
+    public void ResetSessionNumber()
+    {
+        sessionNumber = 1;
+    }
+
+    /// <summary>
+    /// Increases the session counter by one.
+    /// </summary>
+    public void IncreaseSessionNumber()
+    {
+        sessionNumber++;
+    }
+
+    /// <summary>
+    /// Resets the task time back to zero.
+    /// </summary>
+    public void ResetTaskTime()
+    {
+        taskTime = 0;
+    }
+    
+    /// <summary>
     /// Sets the waitFlag after X seconds .
     /// </summary>
     /// <param name="seconds">The time in seconds to wait to set flag.</param>
-    protected void SetWaitFlag(float seconds)
+    public void SetWaitFlag(float seconds)
     {
         if (waitCoroutine != null)
             StopCoroutine(waitCoroutine);
@@ -313,7 +434,7 @@ public abstract class GameMaster : MonoBehaviour
     /// Displays a count-down on the HUD
     /// </summary>
     /// <param name="seconds"></param>
-    protected void HUDCountDown(int seconds)
+    public void HUDCountDown(int seconds)
     {
         countdownCoroutine = StartCoroutine(CountDownCoroutine(seconds));
     }
@@ -321,7 +442,7 @@ public abstract class GameMaster : MonoBehaviour
     /// <summary>
     /// Stops the current countdown.
     /// </summary>
-    protected void StopHUDCountDown()
+    public void StopHUDCountDown()
     {
         if (countdownCoroutine != null)
             StopCoroutine(countdownCoroutine);
@@ -336,21 +457,21 @@ public abstract class GameMaster : MonoBehaviour
     {
         if (seconds < 0)
             throw new System.Exception("Countdown time must be greater or equal to 0 seconds.");
-        hudManager.DisplayText("Ready?", 1.0f);
+        HudManager.DisplayText("Ready?", 1.0f);
         yield return new WaitForSecondsRealtime(1.0f);
         for (int i = seconds; i >= 1; i--)
         {
-            hudManager.DisplayText(i.ToString(), 1.0f);
+            HudManager.DisplayText(i.ToString(), 1.0f);
             yield return new WaitForSecondsRealtime(1.0f);
         }
-        hudManager.DisplayText("Go!", 1.0f);
+        HudManager.DisplayText("Go!", 1.0f);
         countdownDone = true;
     }
 
     /// <summary>
     /// Teleports the player to the experiment center position and orients experiment assets to fit the world.
     /// </summary>
-    protected void TeleportToStartPosition()
+    public void TeleportToStartPosition()
     {
         // Get player object
         GameObject playerGO = GameObject.FindGameObjectWithTag("Player");

@@ -68,7 +68,7 @@ public class ProsthesisTrainingGM : GameMaster
              *************************************************
              */
             // Welcome subject to the virtual world.
-            case ExperimentState.HelloWorld:
+            case ExperimentState.Welcome:
                 if (debug)
                 {
                     LoadDebugAvatar();
@@ -76,8 +76,8 @@ public class ProsthesisTrainingGM : GameMaster
                     InitializeUI();
                 }
 
-                monitorManager.DisplayText("Instructions:\n" + instructionsText);
-                experimentState = ExperimentState.InitializingApplication;
+                MonitorManager.DisplayText("Instructions:\n" + instructionsText);
+                experimentState = ExperimentState.Initialising;
                 break;
             /*
              *************************************************
@@ -85,7 +85,7 @@ public class ProsthesisTrainingGM : GameMaster
              *************************************************
              */
             // Perform initialization functions before starting experiment.
-            case ExperimentState.InitializingApplication:
+            case ExperimentState.Initialising:
                 //
                 // Perform experiment initialization procedures
                 //
@@ -113,18 +113,18 @@ public class ProsthesisTrainingGM : GameMaster
                 //
                 // Go to instructions
                 //
-                experimentState = ExperimentState.GivingInstructions;
+                experimentState = ExperimentState.Instructions;
                 break;
             /*
              *************************************************
              *  GivingInstructions
              *************************************************
              */
-            case ExperimentState.GivingInstructions:
+            case ExperimentState.Instructions:
                 //
                 // Go to waiting for start
                 //
-                hudManager.DisplayText("Loading...", 2.0f);
+                HudManager.DisplayText("Loading...", 2.0f);
                 // Turn targets clear
                 experimentState = ExperimentState.WaitingForStart;
 
@@ -192,13 +192,13 @@ public class ProsthesisTrainingGM : GameMaster
                 // Rest for some time when required
                 if (CheckRestCondition())
                 {
-                    SetWaitFlag(restTime);
+                    SetWaitFlag(RestTime);
                     experimentState = ExperimentState.Resting;
                 }
                 // Check whether the new session condition is met
                 else if (CheckNextSessionCondition())
                 {
-                    experimentState = ExperimentState.InitializingNextSession;
+                    experimentState = ExperimentState.InitializingNext;
                 }
                 // Check whether the experiment end condition is met
                 else if (CheckEndCondition())
@@ -235,7 +235,7 @@ public class ProsthesisTrainingGM : GameMaster
              *  InitializingNext
              *************************************************
              */
-            case ExperimentState.InitializingNextSession:
+            case ExperimentState.InitializingNext:
                 //
                 // Perform session closure procedures
                 //
@@ -252,7 +252,7 @@ public class ProsthesisTrainingGM : GameMaster
                 //
                 //ExperimentSystem.GetActiveLogger(1).AddNewLogFile(sessionNumber, iterationNumber, "Data format");
 
-                experimentState = ExperimentState.InitializingApplication; // Initialize next session
+                experimentState = ExperimentState.Initialising; // Initialize next session
                 break;
             /*
              *************************************************
@@ -265,7 +265,7 @@ public class ProsthesisTrainingGM : GameMaster
                 //
                 if (UpdateNext())
                 {
-                    LaunchNextSession();
+                    ConfigureNextSession();
                     break;
                 }
                 else if (UpdateEnd())
@@ -278,7 +278,7 @@ public class ProsthesisTrainingGM : GameMaster
                 //
                 if (WaitFlag)
                 {
-                    hudManager.DisplayText("Get ready to restart!", 3.0f);
+                    HudManager.DisplayText("Get ready to restart!", 3.0f);
                     SetWaitFlag(5.0f);
                     experimentState = ExperimentState.UpdatingApplication;
                     break;
@@ -296,7 +296,7 @@ public class ProsthesisTrainingGM : GameMaster
                 UpdatePause();
                 if (UpdateNext())
                 {
-                    LaunchNextSession();
+                    ConfigureNextSession();
                     break;
                 }
                 else if (UpdateEnd())
@@ -375,7 +375,7 @@ public class ProsthesisTrainingGM : GameMaster
 
 
 
-                instructionManager.DisplayText(displayData);
+                InstructionManager.DisplayText(displayData);
                 //hudManager.DisplayText(logData);
 
                 //
@@ -495,7 +495,7 @@ public class ProsthesisTrainingGM : GameMaster
         GameObject avatarGO = GameObject.FindGameObjectWithTag("Avatar");
         if (playerGO == null || avatarGO == null)
         {
-            monitorManager.DisplayText("The user or avatar has not been loaded.");
+            MonitorManager.DisplayText("The user or avatar has not been loaded.");
             throw new System.Exception("The player or avatar has not been loaded.");
         }
         DontDestroyOnLoad(playerGO);
@@ -504,11 +504,28 @@ public class ProsthesisTrainingGM : GameMaster
 
     #region Inherited methods overrides
 
+    public override void InitialiseExperiment()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    /// <summary>
+    /// Gets the progress text to be displayed to the subject.
+    /// </summary>
+    /// <returns>The text to be displayed as a string.</returns>
+    public override string GetDisplayInfoText()
+    {
+        string Text;
+        Text = "Status: " + experimentState.ToString() + ".\n";
+        Text += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
+        return Text;
+    }
+
     /// <summary>
     /// Initializes the ExperimentSystem and its components.
     /// Verifies that all components needed for the experiment are available.
     /// </summary>
-    protected override void InitExperimentSystem()
+    public override void InitExperimentSystem()
     {
         //
         // Set the experiment type and ID
@@ -516,7 +533,7 @@ public class ProsthesisTrainingGM : GameMaster
         if (AvatarSystem.AvatarType == AvatarType.AbleBodied)
         {
             experimentType = ExperimentType.TypeOne;
-            monitorManager.DisplayText("Wrong avatar used. Please use a Transhumeral avatar.");
+            MonitorManager.DisplayText("Wrong avatar used. Please use a Transhumeral avatar.");
             throw new System.Exception("Able-bodied avatar not suitable for prosthesis training.");
         }
         else if (AvatarSystem.AvatarType == AvatarType.Transhumeral)
@@ -593,7 +610,7 @@ public class ProsthesisTrainingGM : GameMaster
     /// Checks whether the subject is ready to start performing the task.
     /// </summary>
     /// <returns>True if ready to start.</returns>
-    protected override bool CheckReadyToStart()
+    public override bool CheckReadyToStart()
     {
         throw new System.NotImplementedException();
     }
@@ -602,7 +619,7 @@ public class ProsthesisTrainingGM : GameMaster
     /// Checks whether the task has be successfully completed or not.
     /// </summary>
     /// <returns>True if the task has been successfully completed.</returns>
-    protected override bool CheckTaskCompletion()
+    public override bool CheckTaskCompletion()
     {
         //
         // Perform some condition testing
@@ -614,7 +631,7 @@ public class ProsthesisTrainingGM : GameMaster
     /// Checks if the condition for the rest period has been reached.
     /// </summary>
     /// <returns>True if the rest condition has been reached.</returns>
-    protected override bool CheckRestCondition()
+    public override bool CheckRestCondition()
     {
         throw new System.NotImplementedException();
     }
@@ -623,7 +640,7 @@ public class ProsthesisTrainingGM : GameMaster
     /// Checks if the condition for changing experiment session has been reached.
     /// </summary>
     /// <returns>True if the condition for changing sessions has been reached.</returns>
-    protected override bool CheckNextSessionCondition()
+    public override bool CheckNextSessionCondition()
     {
         throw new System.NotImplementedException();
     }
@@ -632,7 +649,7 @@ public class ProsthesisTrainingGM : GameMaster
     /// Checks if the condition for ending the experiment has been reached.
     /// </summary>
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
-    protected override bool CheckEndCondition()
+    public override bool CheckEndCondition()
     {
         throw new System.NotImplementedException();
     }
@@ -640,7 +657,7 @@ public class ProsthesisTrainingGM : GameMaster
     /// <summary>
     /// Launches the next session. Performs all the required preparations.
     /// </summary>
-    protected override void LaunchNextSession()
+    public override void ConfigureNextSession()
     {
         throw new System.NotImplementedException();
     }
@@ -648,7 +665,7 @@ public class ProsthesisTrainingGM : GameMaster
     /// <summary>
     /// Finishes the experiment. Performs all the required procedures.
     /// </summary>
-    protected override void EndExperiment()
+    public override void EndExperiment()
     {
         if (!debug)
         {
@@ -660,6 +677,21 @@ public class ProsthesisTrainingGM : GameMaster
             // Load experiment.
             SteamVR_LoadLevel.Begin("JacobianSynergyExperiment");
         }
+    }
+
+    public override IEnumerator WelcomeLoop()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override IEnumerator InstructionsLoop()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override IEnumerator TrainingLoop()
+    {
+        throw new System.NotImplementedException();
     }
 
     #endregion
