@@ -40,7 +40,7 @@ public class GameMasterTemplate_deprecated : GameMaster
     // Start is called before the first frame update
     void Start()
     {
-        InitExperimentSystem();
+        InitialiseExperimentSystems();
         InitializeUI();
     }
 
@@ -136,7 +136,7 @@ public class GameMasterTemplate_deprecated : GameMaster
                 {
                     // Waiting for subject to get to start position.
                     case WaitState.Waiting:
-                        if (CheckReadyToStart())
+                        if (IsReadyToStart())
                         {
                             startEnable = true;
                             waitState = WaitState.Countdown;
@@ -153,7 +153,7 @@ public class GameMasterTemplate_deprecated : GameMaster
                             HUDCountDown(3);
                         }
                         // If all is good and the countdownDone flag is raised, switch to reaching.
-                        else if (countdownDone)
+                        else if (CountdownDone)
                         {
                             // Reset flags
                             startEnable = false;
@@ -165,7 +165,7 @@ public class GameMasterTemplate_deprecated : GameMaster
                             break;
                         }
                         // If hand goes out of target reset countdown and wait for position
-                        else if (!CheckReadyToStart() && !countdownDone)
+                        else if (!IsReadyToStart() && !countdownDone)
                         {
                             StopHUDCountDown();
                             startEnable = false;
@@ -220,18 +220,18 @@ public class GameMasterTemplate_deprecated : GameMaster
                 // Flow managment
                 //
                 // Rest for some time when required
-                if (CheckRestCondition())
+                if (IsRestTime())
                 {
                     SetWaitFlag(RestTime);
                     experimentState = ExperimentState.Resting;
                 }
                 // Check whether the new session condition is met
-                else if (CheckNextSessionCondition())
+                else if (IsEndOfSession())
                 {
                     experimentState = ExperimentState.InitializingNext;
                 }
                 // Check whether the experiment end condition is met
-                else if (CheckEndCondition())
+                else if (IsEndOfExperiment())
                 {
                     experimentState = ExperimentState.End;
                 }
@@ -414,7 +414,7 @@ public class GameMasterTemplate_deprecated : GameMaster
                 //
                 // Save log and reset flags when successfully compeleted task
                 //
-                if (CheckTaskCompletion())
+                if (IsTaskDone())
                 {
                     //
                     // Perform data management, such as appending data to lists for analysis
@@ -461,6 +461,29 @@ public class GameMasterTemplate_deprecated : GameMaster
 
     #region Inherited methods overrides
 
+    public override void HandleResultAnalysis()
+    {
+        throw new System.NotImplementedException();
+    }
+    public override bool HandleInTaskBehaviour()
+    {
+        throw new System.NotImplementedException();
+    }
+    public override void HandleTaskCompletion()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void PrepareForStart()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void StartFailureReset()
+    {
+        throw new System.NotImplementedException();
+    }
+
     public override void InitialiseExperiment()
     {
         throw new System.NotImplementedException();
@@ -482,7 +505,7 @@ public class GameMasterTemplate_deprecated : GameMaster
     /// Initializes the ExperimentSystem and its components.
     /// Verifies that all components needed for the experiment are available.
     /// </summary>
-    public override void InitExperimentSystem()
+    public override void InitialiseExperimentSystems()
     {
         //
         // Set the experiment type and ID
@@ -500,7 +523,7 @@ public class GameMasterTemplate_deprecated : GameMaster
     /// Checks whether the subject is ready to start performing the task.
     /// </summary>
     /// <returns>True if ready to start.</returns>
-    public override bool CheckReadyToStart()
+    public override bool IsReadyToStart()
     {
         return true;
     }
@@ -509,7 +532,7 @@ public class GameMasterTemplate_deprecated : GameMaster
     /// Checks whether the task has be successfully completed or not.
     /// </summary>
     /// <returns>True if the task has been successfully completed.</returns>
-    public override bool CheckTaskCompletion()
+    public override bool IsTaskDone()
     {
         //
         // Perform some condition testing
@@ -521,7 +544,7 @@ public class GameMasterTemplate_deprecated : GameMaster
     /// Checks if the condition for the rest period has been reached.
     /// </summary>
     /// <returns>True if the rest condition has been reached.</returns>
-    public override bool CheckRestCondition()
+    public override bool IsRestTime()
     {
         throw new System.NotImplementedException();
     }
@@ -530,7 +553,7 @@ public class GameMasterTemplate_deprecated : GameMaster
     /// Checks if the condition for changing experiment session has been reached.
     /// </summary>
     /// <returns>True if the condition for changing sessions has been reached.</returns>
-    public override bool CheckNextSessionCondition()
+    public override bool IsEndOfSession()
     {
         throw new System.NotImplementedException();
     }
@@ -539,7 +562,7 @@ public class GameMasterTemplate_deprecated : GameMaster
     /// Checks if the condition for ending the experiment has been reached.
     /// </summary>
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
-    public override bool CheckEndCondition()
+    public override bool IsEndOfExperiment()
     {
         throw new System.NotImplementedException();
     }

@@ -15,8 +15,8 @@ namespace VRProEP.GameEngineCore
             WAITING_FOR_START,
             PERFORMING_TASK,
             ANALYSING_RESULTS,
-            UPDATING_APPLICATION,
-            INITIALISING_SESSION,
+            INITIALISING_NEXT_ITERATION,
+            INITIALISING_NEXT_SESSION,
             RESTING,
             PAUSED,
             END
@@ -32,6 +32,8 @@ namespace VRProEP.GameEngineCore
         protected EVENT stateStage;
         protected State nextState;
         protected State previousState;
+
+        public STATE StateName { get => stateName; }
 
         public State(GameMaster gm)
         {

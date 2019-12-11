@@ -21,7 +21,7 @@ public abstract class GameMaster : MonoBehaviour
     [Header("Flow Control:")]
     // Serialised
     [SerializeField]
-    protected bool enableStart = false;
+    protected bool startEnable = false;
     [SerializeField]
     protected bool demoMode = false;
     [SerializeField]
@@ -30,9 +30,10 @@ public abstract class GameMaster : MonoBehaviour
     protected bool skipTraining = false;
     protected State currentState;
     // Accessors
-    public bool EnableStart { get => enableStart; set => enableStart = value; }
+    public bool StartEnable { get => startEnable; set => startEnable = value; }
     public bool DemoMode { get => demoMode; }
     public bool SkipInstructions { get => skipInstructions; }
+    public bool SkipTraining { get => skipTraining; }
 
     // UI Management
     private HUDManager hudManager;
@@ -41,8 +42,8 @@ public abstract class GameMaster : MonoBehaviour
     protected string infoText;
     // Accessors
     public HUDManager HudManager { get => hudManager; }
-    protected ConsoleManager InstructionManager { get => instructionManager; }
-    protected ConsoleManager MonitorManager { get => monitorManager; }
+    public ConsoleManager InstructionManager { get => instructionManager; }
+    public ConsoleManager MonitorManager { get => monitorManager; }
 
     [Header("Debug:")]
     [Tooltip("The debug enable variable.")]
@@ -72,6 +73,15 @@ public abstract class GameMaster : MonoBehaviour
     public float RestTime { get => restTime; }
     public int RestIterations { get => restIterations; }
 
+
+    #region Data Logging
+    // Task Data logging
+    private DataStreamLogger taskDataLogger;
+    [SerializeField]
+    protected const string taskDataFormat = "";
+    protected string logData = "";
+    #endregion
+
     // Subject group management
     public enum SubjectGroup
     {
@@ -99,7 +109,6 @@ public abstract class GameMaster : MonoBehaviour
     // Flow control
     //
     protected float taskTime = 0.0f;
-    protected bool startEnable = false;
     protected int sessionNumber = 1;
     protected int iterationNumber = 1;
     protected bool inWelcome = false;
@@ -108,15 +117,23 @@ public abstract class GameMaster : MonoBehaviour
     protected bool instructionsDone = false;
     protected bool inTraining = false;
     protected bool trainingDone = false;
+    protected bool countdownDone = false;
+    private bool waitFlag = false;
+    private Coroutine countdownCoroutine;
     protected SteamVR_Action_Boolean buttonAction = SteamVR_Input.GetAction<SteamVR_Action_Boolean>("ObjectInteractButton");
     // Accessors
     public bool InWelcome { get => inWelcome; set => inWelcome = value; }
-    public bool WelcomeDone { get => welcomeDone; set => welcomeDone = value; }
+    public bool WelcomeDone { get => welcomeDone; }
     public bool InInstructions { get => inInstructions; set => inInstructions = value; }
     public bool InstructionsDone { get => instructionsDone; }
-    public bool InTraining { get => inTraining; }
+    public bool InTraining { get => inTraining; set => inTraining = value; }
     public bool TrainingDone { get => trainingDone; }
+    public bool CountdownDone { get => countdownDone; }
+    public bool WaitFlag { get => waitFlag; }
 
+    //
+    // THESE VARIABLES ARE NOW OBSOLETE, THEY WILL BE REMOVED IN A FUTURE VERSION
+    //
     // Experiment state management
     protected ExperimentState experimentState = ExperimentState.Welcome;
     public enum ExperimentState
@@ -144,14 +161,21 @@ public abstract class GameMaster : MonoBehaviour
     }
     // Countdown management
     protected bool counting = false;
-    protected bool countdownDone = false;
-    private Coroutine countdownCoroutine;
-
-    // Waiting
-    private bool waitFlag = false;
-    protected bool WaitFlag { get => waitFlag; set => waitFlag = value; }
 
     private Coroutine waitCoroutine;
+    //
+    // THESE VARIABLES ARE NOW OBSOLETE, THEY WILL BE REMOVED IN A FUTURE VERSION
+    //
+
+    #endregion
+
+    #region Unity MonoBehavior methods
+
+    private void OnApplicationQuit()
+    {
+        // Make sure things are closed properly.
+        EndExperiment();
+    }
 
     #endregion
 
@@ -159,16 +183,79 @@ public abstract class GameMaster : MonoBehaviour
 
     /// <summary>
     /// Gets the progress text to be displayed to the subject.
+    /// Displays status, current time, experiment progress (session), and session progress (iteration) by default.
     /// </summary>
     /// <returns>The text to be displayed as a string.</returns>
-    public abstract string GetDisplayInfoText();
+    public virtual string GetDisplayInfoText()
+    {
+        string Text;
+        Text = "Status: " + currentState.StateName.ToString() + ".\n";
+        Text += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
+        Text += "Experiment Progress: " + sessionNumber + "/" + iterationsPerSession.Count + ".\n";
+        Text += "Session Progress: " + iterationNumber + "/" + iterationsPerSession[sessionNumber - 1] + ".\n";
+        return Text;
+    }
+
+    /// <summary>
+    /// Default implementation of HUD colour behaviour.
+    /// Green: When state is "Paused", "Resting" or "End".
+    /// Red: Any other state and !setActive.
+    /// Blue: Any other state and setActive.
+    /// Can be overriden to specify a different colour behaviour.
+    /// </summary>
+    /// <param name="setActive">Sets the HUD colour as active (Blue).</param>
+    public virtual void HandleHUDColour(bool setActive = false)
+    {
+        if (currentState is Resting || currentState is End || currentState is Paused)
+        {
+            HudManager.colour = HUDManager.HUDColour.Green;
+        }
+        else
+        {
+            if (setActive)
+                HudManager.colour = HUDManager.HUDColour.Blue;
+            else
+                HudManager.colour = HUDManager.HUDColour.Red;
+        }
+    }
 
     /// <summary>
     /// Initializes the ExperimentSystem and its components.
     /// Verifies that all components needed for the experiment are available.
     /// This must be done in Start.
+    /// Extend this method by doing your own implementation, with base.InitExperimentSystem() being called at the start.
     /// </summary>
-    public abstract void InitExperimentSystem();
+    public virtual void InitialiseExperimentSystems()
+    {
+        //
+        // Set the experiment name only when debugging. Take  the name from the gameobject + Debug
+        //
+        if (debug)
+            ExperimentSystem.SetActiveExperimentID(this.gameObject.name + "_Debug");
+
+
+        //
+        // Create the default data loggers
+        //
+        taskDataLogger = new DataStreamLogger("TaskData");
+        ExperimentSystem.AddExperimentLogger(taskDataLogger);
+
+
+        // Make sure flow control is initialised
+        sessionNumber = 1;
+        iterationNumber = 1;
+
+        // Restart UDP threads
+        foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
+        {
+            if (sensor is UDPSensorManager udpSensor )
+            {
+                //Debug.Log(wifiSensor.RunThread);
+                udpSensor.StartSensorReading();
+                //Debug.Log(wifiSensor.RunThread);
+            }
+        }
+    }
 
     /// <summary>
     /// Performs initialisation procedures for the experiment. Sets variables to their zero state.
@@ -179,31 +266,137 @@ public abstract class GameMaster : MonoBehaviour
     /// Checks whether the subject is ready to start performing the task.
     /// </summary>
     /// <returns>True if ready to start.</returns>
-    public abstract bool CheckReadyToStart();
+    public abstract bool IsReadyToStart();
+
+    /// <summary>
+    /// Prepares variables and performs any procedures needed when the subject has succeded in the preparation
+    /// to start performing the task.
+    /// </summary>
+    public abstract void PrepareForStart();
+
+    /// <summary>
+    /// Performs a procedure needed when the subject fails to start the task (goes out of the start condition).
+    /// This can be: display some information, reset variables, change something in the experiment.
+    /// </summary>
+    public abstract void StartFailureReset();
+
+    /// <summary>
+    /// Handles task data logging which runs on FixedUpdate.
+    /// Logs data from sensors registered in the AvatarSystem and ExperimentSystem by default.
+    /// Can be exteded to add more data by implementing an override method in the derived class which first adds data
+    /// to the logData string (e.g. logData += myDataString), and then calls base.HandleTaskDataLogging().
+    /// </summary>
+    public virtual void HandleTaskDataLogging()
+    {
+        //
+        // Gather data while experiment is in progress
+        //
+        logData += taskTime.ToString();
+        // Read from all user sensors
+        foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
+        {
+            float[] sensorData = sensor.GetAllProcessedData();
+            foreach (float element in sensorData)
+                logData += "," + element.ToString();
+        }
+        // Read from all experiment sensors
+        foreach (ISensor sensor in ExperimentSystem.GetActiveSensors())
+        {
+            float[] sensorData = sensor.GetAllProcessedData();
+            foreach (float element in sensorData)
+                logData += "," + element.ToString();
+        }
+
+        //
+        // Append data to lists
+        //
+        taskTime += Time.fixedDeltaTime;
+
+        //
+        // Log current data and clear before next run.
+        //
+        taskDataLogger.AppendData(logData);
+        logData = "";
+    }
+
+    /// <summary>
+    /// Handles procedures that occurs while the task is being executed (and not related to data logging).
+    /// </summary>
+    /// <returns></returns>
+    public abstract bool HandleInTaskBehaviour();
 
     /// <summary>
     /// Checks whether the task has be successfully completed or not.
     /// </summary>
     /// <returns>True if the task has been successfully completed.</returns>
-    public abstract bool CheckTaskCompletion();
+    public abstract bool IsTaskDone();
+
+    /// <summary>
+    /// Handles procedures that occur as soon as the task is completed.
+    /// </summary>
+    public abstract void HandleTaskCompletion();
+
+    /// <summary>
+    /// Handles the procedures performed when analysing results.
+    /// </summary>
+    public abstract void HandleResultAnalysis();
+
+    /// <summary>
+    /// Handles procedures performed when initialising the next iteration.
+    /// Updates iteration number, resets the task time, and starts a new data log by default.
+    /// Extend this method by doing your own implementation, with base.HandleIterationInitialisation() being called at the start.
+    /// </summary>
+    public virtual void HandleIterationInitialisation()
+    {
+        //
+        // Update iteration number and flow control
+        //
+        iterationNumber++;
+        taskTime = 0.0f;
+
+        // 
+        // Update log
+        //
+        taskDataLogger.AddNewLogFile(sessionNumber, iterationNumber, taskDataFormat);
+    }
+
+    /// <summary>
+    /// Handles procedures performed when initialising the next iteration.
+    /// Updates iteration number, session number, resets the task time, and starts a new data log by default.
+    /// Extend this method by doing your own implementation, with base.HandleSessionInitialisation() being called at the start.
+    /// </summary>
+    public virtual void HandleSessionInitialisation()
+    {
+        //
+        // Initialize new session variables and flow control
+        //
+        iterationNumber = 1;
+        sessionNumber++;
+        taskTime = 0.0f;
+
+        // 
+        // Update log
+        //
+        taskDataLogger.AddNewLogFile(sessionNumber, iterationNumber, taskDataFormat);
+    }
 
     /// <summary>
     /// Checks if the condition for the rest period has been reached.
     /// </summary>
     /// <returns>True if the rest condition has been reached.</returns>
-    public abstract bool CheckRestCondition();
+    public abstract bool IsRestTime();
 
     /// <summary>
     /// Checks if the condition for changing experiment session has been reached.
     /// </summary>
     /// <returns>True if the condition for changing sessions has been reached.</returns>
-    public abstract bool CheckNextSessionCondition();
+    public abstract bool IsEndOfSession();
 
     /// <summary>
     /// Checks if the condition for ending the experiment has been reached.
     /// </summary>
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
-    public abstract bool CheckEndCondition();
+    public abstract bool IsEndOfExperiment();
 
     /// <summary>
     /// Configures the next session. Performs all the configurations required when starting a new experiment session.
@@ -211,9 +404,28 @@ public abstract class GameMaster : MonoBehaviour
     public abstract void ConfigureNextSession();
 
     /// <summary>
-    /// Finishes the experiment. Performs all the required procedures.
+    /// Performs all the required procedures to end the experiment.
+    /// Closes all UPD Sensors and all logs by default.
+    /// Extend this method by doing your own implementation, with base.EndExperiment() being called at the start.
     /// </summary>
-    public abstract void EndExperiment();
+    public virtual void EndExperiment()
+    {
+        //
+        // Stop UDP threads
+        //
+        foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
+        {
+            if (sensor is UDPSensorManager udpSensor)
+            {
+                udpSensor.StopSensorReading();
+            }
+        }
+
+        //
+        // Save and close all logs
+        //
+        ExperimentSystem.CloseAllExperimentLoggers();
+    }
 
     /// <summary>
     /// Coroutine for the welcome text.
@@ -302,54 +514,78 @@ public abstract class GameMaster : MonoBehaviour
     /// <summary>
     /// Handle pause state transfer between WaitingForStart and Paused. Transition to pause should only happen in waiting state.
     /// </summary>
-    protected void UpdatePause()
+    public bool UpdatePause()
     {
         // Check if pause input has been provided and toggle between paused and waiting for start.
         if (Input.GetKeyDown(KeyCode.P))
         {
-            if (experimentState == ExperimentState.Paused)
-            {
-                HudManager.DisplayText("Resuming experiment!", 3.0f);
-                InstructionManager.DisplayText("Resuming experiment!", 3.0f);
-                //monitorManager.DisplayText("Resuming experiment!", 3.0f);
-                experimentState = ExperimentState.WaitingForStart;
-            }
-            else if (experimentState == ExperimentState.WaitingForStart)
-            {
-                HudManager.DisplayText("Pausing experiment...", 3.0f);
-                InstructionManager.DisplayText("Pausing experiment!", 3.0f);
-                //monitorManager.DisplayText("Pausing experiment!", 3.0f);
-                experimentState = ExperimentState.Paused;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Transfers to experiment End state when directly requested by experimenter by pression 'E' key.
-    /// </summary>
-    protected bool UpdateEnd()
-    {
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            HudManager.DisplayText("Ending experiment...", 3.0f);
-            InstructionManager.DisplayText("Ending experiment...", 3.0f);
-            MonitorManager.DisplayText("Ending experiment...", 3.0f);
-            experimentState = ExperimentState.End;
+            //if (experimentState == ExperimentState.Paused)
+            //{
+            //    HudManager.DisplayText("Resuming experiment!", 3.0f);
+            //    InstructionManager.DisplayText("Resuming experiment!", 3.0f);
+            //    //monitorManager.DisplayText("Resuming experiment!", 3.0f);
+            //    experimentState = ExperimentState.WaitingForStart;
+            //}
+            //else if (experimentState == ExperimentState.WaitingForStart)
+            //{
+            //    HudManager.DisplayText("Pausing experiment...", 3.0f);
+            //    InstructionManager.DisplayText("Pausing experiment!", 3.0f);
+            //    //monitorManager.DisplayText("Pausing experiment!", 3.0f);
+            //    experimentState = ExperimentState.Paused;
+            //}
             return true;
         }
         else
             return false;
     }
 
-    protected void UpdateCloseApplication()
+    /// <summary>
+    /// Transfers to experiment End state when directly requested by experimenter by pressing 'E' key.
+    /// </summary>
+    public bool UpdateEnd()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            //HudManager.DisplayText("Ending experiment...", 3.0f);
+            //InstructionManager.DisplayText("Ending experiment...", 3.0f);
+            //MonitorManager.DisplayText("Ending experiment...", 3.0f);
+            //experimentState = ExperimentState.End;
+            return true;
+        }
+        else
+            return false;
+    }
+
+    /// <summary>
+    /// Handles closing the application at the end of the experiment
+    /// </summary>
+    public void UpdateCloseApplication()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Application.Quit();
         }
+        else if (Input.GetKeyDown(KeyCode.M))
+        {
+            // Destroy player and avatar objects
+            GameObject playerGO = GameObject.FindGameObjectWithTag("Player");
+            GameObject avatarGO = GameObject.FindGameObjectWithTag("Avatar");
+            if (playerGO == null || avatarGO == null)
+                throw new System.Exception("The player or avatar has not been loaded.");
+
+            Destroy(playerGO);
+            Destroy(avatarGO);
+
+            // Load main menu
+            SteamVR_LoadLevel.Begin("MainMenu");
+        }
     }
 
-    protected bool UpdateNext()
+    /// <summary>
+    /// Handles experimenter input to request the skipping to the next session.
+    /// </summary>
+    /// <returns></returns>
+    public bool UpdateNext()
     {
         if (Input.GetKeyDown(KeyCode.N))
         {
@@ -370,42 +606,42 @@ public abstract class GameMaster : MonoBehaviour
     /// <summary>
     /// Resets the iteration counter back to one.
     /// </summary>
-    public void ResetIterationCounter()
-    {
-        iterationNumber = 1;
-    }
+    //public void ResetIterationCounter()
+    //{
+    //    iterationNumber = 1;
+    //}
 
-    /// <summary>
-    /// Increases the iteration counter by one.
-    /// </summary>
-    public void IncreaseIterationCounter()
-    {
-        iterationNumber++;
-    }
+    ///// <summary>
+    ///// Increases the iteration counter by one.
+    ///// </summary>
+    //public void IncreaseIterationCounter()
+    //{
+    //    iterationNumber++;
+    //}
 
-    /// <summary>
-    /// Resets the session counter back to one.
-    /// </summary>
-    public void ResetSessionNumber()
-    {
-        sessionNumber = 1;
-    }
+    ///// <summary>
+    ///// Resets the session counter back to one.
+    ///// </summary>
+    //public void ResetSessionNumber()
+    //{
+    //    sessionNumber = 1;
+    //}
 
-    /// <summary>
-    /// Increases the session counter by one.
-    /// </summary>
-    public void IncreaseSessionNumber()
-    {
-        sessionNumber++;
-    }
+    ///// <summary>
+    ///// Increases the session counter by one.
+    ///// </summary>
+    //public void IncreaseSessionNumber()
+    //{
+    //    sessionNumber++;
+    //}
 
-    /// <summary>
-    /// Resets the task time back to zero.
-    /// </summary>
-    public void ResetTaskTime()
-    {
-        taskTime = 0;
-    }
+    ///// <summary>
+    ///// Resets the task time back to zero.
+    ///// </summary>
+    //public void ResetTaskTime()
+    //{
+    //    taskTime = 0;
+    //}
     
     /// <summary>
     /// Sets the waitFlag after X seconds .
@@ -425,9 +661,9 @@ public abstract class GameMaster : MonoBehaviour
     /// <returns></returns>
     private IEnumerator SetWaitFlagCoroutine(float seconds)
     {
-        WaitFlag = false;
+        waitFlag = false;
         yield return new WaitForSecondsRealtime(seconds);
-        WaitFlag = true;
+        waitFlag = true;
     }
 
     /// <summary>
@@ -436,6 +672,7 @@ public abstract class GameMaster : MonoBehaviour
     /// <param name="seconds"></param>
     public void HUDCountDown(int seconds)
     {
+        countdownDone = false;
         countdownCoroutine = StartCoroutine(CountDownCoroutine(seconds));
     }
 
@@ -446,6 +683,8 @@ public abstract class GameMaster : MonoBehaviour
     {
         if (countdownCoroutine != null)
             StopCoroutine(countdownCoroutine);
+
+        countdownDone = false;
     }
 
     /// <summary>

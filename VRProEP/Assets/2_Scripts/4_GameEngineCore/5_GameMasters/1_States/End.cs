@@ -13,12 +13,18 @@ namespace VRProEP.GameEngineCore
 
         protected override void Enter()
         {
+            gm.HandleHUDColour(); // Make HUD Green
+            // Handle experiment end
+            gm.EndExperiment();
             base.Enter();
         }
 
         protected override void Update()
         {
-
+            // Display status to user
+            gm.InstructionManager.DisplayText(gm.GetDisplayInfoText());
+            // Handle closing the application (return to main menu or quit).
+            gm.UpdateCloseApplication();
         }
 
         protected override void Exit()

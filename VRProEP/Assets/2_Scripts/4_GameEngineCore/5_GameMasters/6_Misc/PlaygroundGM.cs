@@ -37,7 +37,7 @@ public class PlaygroundGM : GameMaster
     void Start()
     {
         // Initialize ExperimentSystem
-        InitExperimentSystem();
+        InitialiseExperimentSystems();
 
         // Initialize UI.
         InitializeUI();
@@ -220,18 +220,18 @@ public class PlaygroundGM : GameMaster
                 // Flow managment
                 //
                 // Rest for some time when required
-                if (CheckRestCondition())
+                if (IsRestTime())
                 {
                     SetWaitFlag(RestTime);
                     experimentState = ExperimentState.Resting;
                 }
                 // Check whether the new session condition is met
-                else if (CheckNextSessionCondition())
+                else if (IsEndOfSession())
                 {
                     experimentState = ExperimentState.InitializingNext;
                 }
                 // Check whether the experiment end condition is met
-                else if (CheckEndCondition())
+                else if (IsEndOfExperiment())
                 {
                     experimentState = ExperimentState.End;
                 }
@@ -391,7 +391,7 @@ public class PlaygroundGM : GameMaster
                 //
                 // Save log and reset flags when successfully compeleted task
                 //
-                if (CheckTaskCompletion())
+                if (IsTaskDone())
                 {
                     //
                     // Perform data management, such as appending data to lists for analysis
@@ -438,6 +438,26 @@ public class PlaygroundGM : GameMaster
 
     #region Inherited methods overrides
 
+    public override void HandleResultAnalysis()
+    {
+        throw new System.NotImplementedException();
+    }
+    public override bool HandleInTaskBehaviour()
+    {
+        throw new System.NotImplementedException();
+    }
+    public override void HandleTaskCompletion()
+    {
+        throw new System.NotImplementedException();
+    }
+    public override void PrepareForStart()
+    {
+        throw new System.NotImplementedException();
+    }
+    public override void StartFailureReset()
+    {
+        throw new System.NotImplementedException();
+    }
     public override void InitialiseExperiment()
     {
         throw new System.NotImplementedException();
@@ -462,7 +482,7 @@ public class PlaygroundGM : GameMaster
     /// Initializes the ExperimentSystem and its components.
     /// Verifies that all components needed for the experiment are available.
     /// </summary>
-    public override void InitExperimentSystem()
+    public override void InitialiseExperimentSystems()
     {
         //
         // Set the experiment type and ID
@@ -479,7 +499,7 @@ public class PlaygroundGM : GameMaster
     /// Checks whether the subject is ready to start performing the task.
     /// </summary>
     /// <returns>True if ready to start.</returns>
-    public override bool CheckReadyToStart()
+    public override bool IsReadyToStart()
     {
         throw new System.NotImplementedException();
     }
@@ -488,7 +508,7 @@ public class PlaygroundGM : GameMaster
     /// Checks whether the task has be successfully completed or not.
     /// </summary>
     /// <returns>True if the task has been successfully completed.</returns>
-    public override bool CheckTaskCompletion()
+    public override bool IsTaskDone()
     {
         //
         // Perform some condition testing
@@ -500,7 +520,7 @@ public class PlaygroundGM : GameMaster
     /// Checks if the condition for the rest period has been reached.
     /// </summary>
     /// <returns>True if the rest condition has been reached.</returns>
-    public override bool CheckRestCondition()
+    public override bool IsRestTime()
     {
         throw new System.NotImplementedException();
     }
@@ -509,7 +529,7 @@ public class PlaygroundGM : GameMaster
     /// Checks if the condition for changing experiment session has been reached.
     /// </summary>
     /// <returns>True if the condition for changing sessions has been reached.</returns>
-    public override bool CheckNextSessionCondition()
+    public override bool IsEndOfSession()
     {
         throw new System.NotImplementedException();
     }
@@ -518,7 +538,7 @@ public class PlaygroundGM : GameMaster
     /// Checks if the condition for ending the experiment has been reached.
     /// </summary>
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
-    public override bool CheckEndCondition()
+    public override bool IsEndOfExperiment()
     {
         throw new System.NotImplementedException();
     }

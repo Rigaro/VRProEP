@@ -114,7 +114,7 @@ public class GridReaching2019GM : GameMaster
     void Start()
     {
         // Initialize ExperimentSystem
-        InitExperimentSystem();
+        InitialiseExperimentSystems();
 
         // Initialize UI.
         InitializeUI();
@@ -234,27 +234,27 @@ public class GridReaching2019GM : GameMaster
                 {
                     // Waiting for subject to get to start position.
                     case WaitState.Waiting:
-                        if (CheckReadyToStart())
+                        if (IsReadyToStart())
                         {
                             startEnable = true;
+                            // Select target
+                            gridManager.SelectBall(iterationNumber - 1);
                             waitState = WaitState.Countdown;
                         }
                         break;
                     // HUD countdown for reaching action.
                     case WaitState.Countdown:
                         // If all is good and haven't started counting, start.
-                        if (startEnable && !counting && !countdownDone)
+                        if (startEnable && !counting && !CountdownDone)
                         {
                             // Manage countdown
                             HudManager.ClearText();
                             StopHUDCountDown();
                             counting = true;
                             HUDCountDown(3);
-                            // Select target
-                            gridManager.SelectBall(iterationNumber - 1);
                         }
                         // If all is good and the countdownDone flag is raised, switch to reaching.
-                        else if (countdownDone)
+                        else if (CountdownDone)
                         {
                             // Reset flags
                             startEnable = false;
@@ -266,7 +266,7 @@ public class GridReaching2019GM : GameMaster
                             break;
                         }
                         // If hand goes out of target reset countdown and wait for position
-                        else if (!CheckReadyToStart() && !countdownDone)
+                        else if (!IsReadyToStart() && !CountdownDone)
                         {
                             StopHUDCountDown();
                             startEnable = false;
@@ -317,18 +317,18 @@ public class GridReaching2019GM : GameMaster
                 // Flow managment
                 //
                 // Rest for some time when required
-                if (CheckRestCondition())
+                if (IsRestTime())
                 {
                     SetWaitFlag(RestTime);
                     experimentState = ExperimentState.Resting;
                 }
                 // Check whether the new session condition is met
-                else if (CheckNextSessionCondition())
+                else if (IsEndOfSession())
                 {
                     experimentState = ExperimentState.InitializingNext;
                 }
                 // Check whether the experiment end condition is met
-                else if (CheckEndCondition())
+                else if (IsEndOfExperiment())
                 {
                     experimentState = ExperimentState.End;
                 }
@@ -511,7 +511,7 @@ public class GridReaching2019GM : GameMaster
                 //
                 // Save log and reset flags when successfully compeleted task
                 //
-                if (CheckTaskCompletion())
+                if (IsTaskDone())
                 {
                     //
                     // Perform data management, such as appending data to lists for analysis
@@ -558,6 +558,28 @@ public class GridReaching2019GM : GameMaster
 
     #region Inherited methods overrides
 
+    public override void HandleResultAnalysis()
+    {
+        throw new System.NotImplementedException();
+    }
+    public override bool HandleInTaskBehaviour()
+    {
+        throw new System.NotImplementedException();
+    }
+    public override void HandleTaskCompletion()
+    {
+        throw new System.NotImplementedException();
+    }
+    public override void PrepareForStart()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void StartFailureReset()
+    {
+        throw new System.NotImplementedException();
+    }
+
     public override void InitialiseExperiment()
     {
         throw new System.NotImplementedException();
@@ -578,7 +600,7 @@ public class GridReaching2019GM : GameMaster
     /// Initializes the ExperimentSystem and its components.
     /// Verifies that all components needed for the experiment are available.
     /// </summary>
-    public override void InitExperimentSystem()
+    public override void InitialiseExperimentSystems()
     {
         //
         // Set the experiment type configuration
@@ -660,7 +682,7 @@ public class GridReaching2019GM : GameMaster
     /// Checks whether the subject is ready to start performing the task.
     /// </summary>
     /// <returns>True if ready to start.</returns>
-    public override bool CheckReadyToStart()
+    public override bool IsReadyToStart()
     {
         // Check that upper and lower arms are within the tolerated start position.
         float qShoulder = Mathf.Rad2Deg * (upperArmTracker.GetProcessedData(5) + Mathf.PI); // Offsetting to horizontal position being 0.
@@ -694,7 +716,7 @@ public class GridReaching2019GM : GameMaster
     /// Checks whether the task has be successfully completed or not.
     /// </summary>
     /// <returns>True if the task has been successfully completed.</returns>
-    public override bool CheckTaskCompletion()
+    public override bool IsTaskDone()
     {
         //
         // Check that the selected ball has been touched.
@@ -706,7 +728,7 @@ public class GridReaching2019GM : GameMaster
     /// Checks if the condition for the rest period has been reached.
     /// </summary>
     /// <returns>True if the rest condition has been reached.</returns>
-    public override bool CheckRestCondition()
+    public override bool IsRestTime()
     {
         return false;
     }
@@ -715,7 +737,7 @@ public class GridReaching2019GM : GameMaster
     /// Checks if the condition for changing experiment session has been reached.
     /// </summary>
     /// <returns>True if the condition for changing sessions has been reached.</returns>
-    public override bool CheckNextSessionCondition()
+    public override bool IsEndOfSession()
     {
         return false;
     }
@@ -724,7 +746,7 @@ public class GridReaching2019GM : GameMaster
     /// Checks if the condition for ending the experiment has been reached.
     /// </summary>
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
-    public override bool CheckEndCondition()
+    public override bool IsEndOfExperiment()
     {
         return completedIterations >= maxIterations;
     }

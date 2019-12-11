@@ -111,7 +111,7 @@ public class FeedbackExperiment2019GM : GameMaster
     // Start is called before the first frame update
     void Start()
     {
-        InitExperimentSystem();
+        InitialiseExperimentSystems();
         InitializeUI();
 
         // Initialize iteration management.
@@ -390,7 +390,7 @@ public class FeedbackExperiment2019GM : GameMaster
                     // HUD countdown for reaching action.
                     case WaitState.Countdown:
                         // If hand goes out of target reset countdown and wait for position
-                        if (!startEnable && !countdownDone)
+                        if (!startEnable && !CountdownDone)
                         {
                             counting = false;
                             countdownDone = false;
@@ -400,13 +400,13 @@ public class FeedbackExperiment2019GM : GameMaster
                             break;
                         }
                         // If all is good and haven't started counting, start.
-                        if (!counting && !countdownDone)
+                        if (!counting && !CountdownDone)
                         {
                             counting = true;
                             HUDCountDown(0);
                         }
                         // If all is good and the countdownDone flag is raised, switch to reaching.
-                        if (countdownDone)
+                        if (CountdownDone)
                         {
                             handManager.ResetForce();
                             // Reset flags
@@ -463,14 +463,14 @@ public class FeedbackExperiment2019GM : GameMaster
                 // Flow managment
                 //
                 // Check whether the experiment end condition is met
-                if (CheckEndCondition())
+                if (IsEndOfExperiment())
                 {
                     handManager.ResetForce();
                     HudManager.DisplayText("Experiment end. Thank you!", 6.0f);
                     experimentState = ExperimentState.End;
                 }
                 // Rest for some time when required
-                else if (CheckRestCondition())
+                else if (IsRestTime())
                 {
                     handManager.ResetForce();
                     HudManager.DisplayText("Take a " + RestTime + " seconds rest.", 6.0f);
@@ -478,7 +478,7 @@ public class FeedbackExperiment2019GM : GameMaster
                     experimentState = ExperimentState.Resting;
                 }
                 // Check whether the new session condition is met
-                else if (CheckNextSessionCondition())
+                else if (IsEndOfSession())
                 {
                     //iterations
                     HudManager.DisplayText("Good job!", 2.0f);
@@ -602,12 +602,12 @@ public class FeedbackExperiment2019GM : GameMaster
                 //
                 if (WaitFlag)
                 {
-                    if (CheckEndCondition())
+                    if (IsEndOfExperiment())
                     {
                         HudManager.DisplayText("Experiment end. Thank you!", 6.0f);
                         experimentState = ExperimentState.End;
                     }
-                    else if (CheckNextSessionCondition())
+                    else if (IsEndOfSession())
                     {
                         //iterations
                         HudManager.DisplayText("Good job!", 2.0f);
@@ -742,7 +742,7 @@ public class FeedbackExperiment2019GM : GameMaster
                 //
                 // Save log and reset flags when successfully compeleted task
                 //
-                if (CheckTaskCompletion())
+                if (IsTaskDone())
                 {
                     //
                     // Log current data for roughness type
@@ -820,6 +820,18 @@ public class FeedbackExperiment2019GM : GameMaster
 
     #region Inherited methods overrides
 
+    public override void HandleResultAnalysis()
+    {
+        throw new System.NotImplementedException();
+    }
+    public override bool HandleInTaskBehaviour()
+    {
+        throw new System.NotImplementedException();
+    }
+    public override void HandleTaskCompletion()
+    {
+        throw new System.NotImplementedException();
+    }
     public override void InitialiseExperiment()
     {
         throw new System.NotImplementedException();
@@ -829,7 +841,7 @@ public class FeedbackExperiment2019GM : GameMaster
     /// Initializes the ExperimentSystem and its components.
     /// Verifies that all components needed for the experiment are available.
     /// </summary>
-    public override void InitExperimentSystem()
+    public override void InitialiseExperimentSystems()
     {
         //
         // Set the experiment type and ID
@@ -871,11 +883,21 @@ public class FeedbackExperiment2019GM : GameMaster
         experimentObject.gameObject.SetActive(false);
     }
 
+    public override void PrepareForStart()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void StartFailureReset()
+    {
+        throw new System.NotImplementedException();
+    }
+
     /// <summary>
     /// Checks whether the subject is ready to start performing the task.
     /// </summary>
     /// <returns>True if ready to start.</returns>
-    public override bool CheckReadyToStart()
+    public override bool IsReadyToStart()
     {
         throw new System.NotImplementedException();
     }
@@ -884,7 +906,7 @@ public class FeedbackExperiment2019GM : GameMaster
     /// Checks whether the task has be successfully completed or not.
     /// </summary>
     /// <returns>True if the task has been successfully completed.</returns>
-    public override bool CheckTaskCompletion()
+    public override bool IsTaskDone()
     {
         //
         // Task is completed when EMG is disabled and the subject has selected a balloon
@@ -973,7 +995,7 @@ public class FeedbackExperiment2019GM : GameMaster
     /// Checks if the condition for the rest period has been reached.
     /// </summary>
     /// <returns>True if the rest condition has been reached.</returns>
-    public override bool CheckRestCondition()
+    public override bool IsRestTime()
     {
         if (iterationNumberCounterTotal % restIterations == 0)
         {
@@ -987,7 +1009,7 @@ public class FeedbackExperiment2019GM : GameMaster
     /// Checks if the condition for changing experiment session has been reached.
     /// </summary>
     /// <returns>True if the condition for changing sessions has been reached.</returns>
-    public override bool CheckNextSessionCondition()
+    public override bool IsEndOfSession()
     {
         if (iterationNumber >= iterationsPerSession[sessionNumber - 1])
         {
@@ -1003,7 +1025,7 @@ public class FeedbackExperiment2019GM : GameMaster
     /// Checks if the condition for ending the experiment has been reached.
     /// </summary>
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
-    public override bool CheckEndCondition()
+    public override bool IsEndOfExperiment()
     {
         if (sessionNumber >= iterationsPerSession.Count && iterationNumber >= iterationsPerSession[sessionNumber - 1])
             return true;
@@ -1101,6 +1123,7 @@ public class FeedbackExperiment2019GM : GameMaster
             // Check if UDP sensors are available
             foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
             {
+                // Try using keyword "is UDPSensorManager" instead of GetSensorType.
                 if (sensor != null && sensor.GetSensorType().Equals(SensorType.Tactile) && sensor.GetSensorType().Equals(SensorType.EMGWiFi))
                 {
                     UDPSensorManager udpSensor = (UDPSensorManager)sensor;
@@ -1245,7 +1268,7 @@ public class FeedbackExperiment2019GM : GameMaster
                     yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                     yield return new WaitForSeconds(0.5f);
                     InstructionManager.DisplayText(defaultText + "Touch the sphere with your hand to continue.");
-                    yield return new WaitUntil(() => CheckTaskCompletion());
+                    yield return new WaitUntil(() => IsTaskDone());
                     yield return new WaitForSeconds(0.5f);
                     if (visualFeedbackType[sessionNumber - 1] == VisualFeebackType.On) //visual feedback
                     {
@@ -1258,7 +1281,7 @@ public class FeedbackExperiment2019GM : GameMaster
                         experimentObject.SetTargetForce(forceTargets[0]);
                         experimentObject.SetRestColour(forceColours[0]);
                         experimentObject.SetRoughness(roughnessTargets[0]);
-                        yield return new WaitUntil(() => CheckTaskCompletion());
+                        yield return new WaitUntil(() => IsTaskDone());
                         yield return new WaitForSeconds(0.5f);
                         experimentObject.SetForce(0.0f);
                         handManager.ResetForce();
@@ -1274,7 +1297,7 @@ public class FeedbackExperiment2019GM : GameMaster
                         experimentObject.SetTargetForce(forceTargets[1]);
                         experimentObject.SetRestColour(forceColours[1]);
                         experimentObject.SetRoughness(roughnessTargets[0]);
-                        yield return new WaitUntil(() => CheckTaskCompletion());
+                        yield return new WaitUntil(() => IsTaskDone());
                         yield return new WaitForSeconds(0.5f);
                         experimentObject.SetForce(0.0f);
                         handManager.ResetForce();
@@ -1289,7 +1312,7 @@ public class FeedbackExperiment2019GM : GameMaster
                         experimentObject.SetTargetForce(forceTargets[2]);
                         experimentObject.SetRestColour(forceColours[2]);
                         experimentObject.SetRoughness(roughnessTargets[0]);
-                        yield return new WaitUntil(() => CheckTaskCompletion());
+                        yield return new WaitUntil(() => IsTaskDone());
                         yield return new WaitForSeconds(0.5f);
                         experimentObject.SetForce(0.0f);
                         handManager.ResetForce();
@@ -1344,7 +1367,7 @@ public class FeedbackExperiment2019GM : GameMaster
                     //
                     InstructionManager.DisplayText("A smooth stone feels like this and is classified as Smooth. If you do not feel it, squeeze harder (flex wrist).");
                     HudManager.DisplayText("Squeeze it!", 3.0f);
-                    yield return new WaitUntil(() => CheckTaskCompletion());
+                    yield return new WaitUntil(() => IsTaskDone());
                     yield return new WaitForSeconds(0.5f);
                     experimentObject.SetForce(0.0f);
                     handManager.ResetForce();
@@ -1358,7 +1381,7 @@ public class FeedbackExperiment2019GM : GameMaster
                     //
                     InstructionManager.DisplayText("A medium rough stone feels like this and is classified as Mid. If you do not feel it, squeeze harder (flex wrist).");
                     HudManager.DisplayText("Squeeze it!", 3.0f);
-                    yield return new WaitUntil(() => CheckTaskCompletion());
+                    yield return new WaitUntil(() => IsTaskDone());
                     yield return new WaitForSeconds(0.5f);
                     experimentObject.SetForce(0.0f);
                     handManager.ResetForce();
@@ -1372,7 +1395,7 @@ public class FeedbackExperiment2019GM : GameMaster
                     //
                     InstructionManager.DisplayText("A rough stone feels like this and is classified as sphere Rough. If you do not feel it, squeeze harder (flex wrist).");
                     HudManager.DisplayText("Squeeze it!", 3.0f);
-                    yield return new WaitUntil(() => CheckTaskCompletion());
+                    yield return new WaitUntil(() => IsTaskDone());
                     yield return new WaitForSeconds(0.5f);
                     experimentObject.SetForce(0.0f);
                     handManager.ResetForce();

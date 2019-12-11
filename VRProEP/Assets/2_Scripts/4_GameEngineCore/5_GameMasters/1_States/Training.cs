@@ -16,7 +16,14 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         protected override void Enter()
         {
-            base.Enter();
+
+            if (gm.SkipTraining)
+                stateStage = EVENT.EXIT;
+            else
+            {
+                gm.InTraining = false;
+                base.Enter();
+            }
         }
 
         /// <summary>
@@ -24,7 +31,16 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         protected override void Update()
         {
+            // Make sure the coroutine is only started once.
+            if (!gm.InTraining)
+            {
+                gm.InTraining = true;
+                StartCoroutine(gm.TrainingLoop());
+            }
 
+            // Once the GM has flagged the end, we can move on.
+            if (gm.TrainingDone)
+                stateStage = EVENT.EXIT;
         }
 
         /// <summary>
@@ -32,6 +48,9 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         protected override void Exit()
         {
+            gm.InTraining = false; // Reset flag
+            gm.HudManager.DisplayText("Ready to start!", 3.0f); // Prompt user
+            nextState = new WaitingForStart(gm); // Set next state
             base.Exit();
         }
     }

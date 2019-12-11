@@ -96,7 +96,7 @@ public class JacobianExperimentGM : GameMaster
     void Start()
     {
         // Initialize ExperimentSystem
-        InitExperimentSystem();
+        InitialiseExperimentSystems();
         
         // Initialize UI.
         InitializeUI();
@@ -331,18 +331,18 @@ public class JacobianExperimentGM : GameMaster
                 //
                 successTriggered = false;
                 remainingDropOffIterations[activeDropOffNumber]--;
-                if (CheckEndCondition())
+                if (IsEndOfExperiment())
                 {
                     HudManager.DisplayText("Experiment end. Thank you!", 6.0f);
                     experimentState = ExperimentState.End;
                 }
                 // Check whether the new session condition is met
-                else if (CheckNextSessionCondition())
+                else if (IsEndOfSession())
                 {
                     experimentState = ExperimentState.InitializingNext;
                 }
                 // Rest for some time when required
-                else if (CheckRestCondition())
+                else if (IsRestTime())
                 {
                     HudManager.DisplayText("Take a " + RestTime + " seconds rest.", 6.0f);
                     SetWaitFlag(RestTime);
@@ -599,7 +599,7 @@ public class JacobianExperimentGM : GameMaster
                 //
                 // Save log and reset flags when successfully compeleted task
                 //
-                if (CheckTaskCompletion() && !successTriggered)
+                if (IsTaskDone() && !successTriggered)
                 {
                     //
                     // Perform data management, such as appending data to lists for analysis
@@ -653,6 +653,28 @@ public class JacobianExperimentGM : GameMaster
 
     #region Inherited methods overrides
 
+    public override void HandleResultAnalysis()
+    {
+        throw new System.NotImplementedException();
+    }
+    public override bool HandleInTaskBehaviour()
+    {
+        throw new System.NotImplementedException();
+    }
+    public override void HandleTaskCompletion()
+    {
+        throw new System.NotImplementedException();
+    }
+    public override void PrepareForStart()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void StartFailureReset()
+    {
+        throw new System.NotImplementedException();
+    }
+
     public override void InitialiseExperiment()
     {
         throw new System.NotImplementedException();
@@ -674,7 +696,7 @@ public class JacobianExperimentGM : GameMaster
     /// Initializes the ExperimentSystem and its components.
     /// Verifies that all components needed for the experiment are available.
     /// </summary>
-    public override void InitExperimentSystem()
+    public override void InitialiseExperimentSystems()
     {
         sessionNumber = 1;
         //
@@ -831,7 +853,7 @@ public class JacobianExperimentGM : GameMaster
     /// Checks whether the subject is ready to start performing the task.
     /// </summary>
     /// <returns>True if ready to start.</returns>
-    public override bool CheckReadyToStart()
+    public override bool IsReadyToStart()
     {
         throw new System.NotImplementedException();
     }
@@ -840,7 +862,7 @@ public class JacobianExperimentGM : GameMaster
     /// Checks whether the task has be successfully completed or not.
     /// </summary>
     /// <returns>True if the task has been successfully completed.</returns>
-    public override bool CheckTaskCompletion()
+    public override bool IsTaskDone()
     {
         //
         // Perform some condition testing
@@ -859,7 +881,7 @@ public class JacobianExperimentGM : GameMaster
     /// Checks if the condition for the rest period has been reached.
     /// </summary>
     /// <returns>True if the rest condition has been reached.</returns>
-    public override bool CheckRestCondition()
+    public override bool IsRestTime()
     {
         if (iterationNumber % restIterations == 0)
         {
@@ -873,7 +895,7 @@ public class JacobianExperimentGM : GameMaster
     /// Checks if the condition for changing experiment session has been reached.
     /// </summary>
     /// <returns>True if the condition for changing sessions has been reached.</returns>
-    public override bool CheckNextSessionCondition()
+    public override bool IsEndOfSession()
     {
         if (iterationNumber >= iterationLimit)
         {
@@ -887,7 +909,7 @@ public class JacobianExperimentGM : GameMaster
     /// Checks if the condition for ending the experiment has been reached.
     /// </summary>
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
-    public override bool CheckEndCondition()
+    public override bool IsEndOfExperiment()
     {
         if (sessionNumber >= numberOfSessions && iterationNumber >= iterationLimit)
             return true;
