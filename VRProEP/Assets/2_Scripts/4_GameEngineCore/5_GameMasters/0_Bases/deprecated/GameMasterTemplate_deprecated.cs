@@ -465,7 +465,7 @@ public class GameMasterTemplate_deprecated : GameMaster
     {
         throw new System.NotImplementedException();
     }
-    public override bool HandleInTaskBehaviour()
+    public override void HandleInTaskBehaviour()
     {
         throw new System.NotImplementedException();
     }
@@ -570,7 +570,7 @@ public class GameMasterTemplate_deprecated : GameMaster
     /// <summary>
     /// Launches the next session. Performs all the required preparations.
     /// </summary>
-    public override void ConfigureNextSession()
+    public void ConfigureNextSession()
     {
         throw new System.NotImplementedException();
     }

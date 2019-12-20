@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace VRProEP.GameEngineCore
 {
-    public class State : MonoBehaviour
+    public class State
     {
         public enum STATE
         {

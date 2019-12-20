@@ -16,6 +16,7 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         protected override void Enter()
         {
+            Debug.Log("InitialisingExperiment State");
             base.Enter();
         }
 

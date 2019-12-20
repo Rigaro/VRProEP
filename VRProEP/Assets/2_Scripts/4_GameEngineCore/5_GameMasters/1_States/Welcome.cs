@@ -17,6 +17,7 @@ namespace VRProEP.GameEngineCore
         protected override void Enter()
         {
             gm.InWelcome = false; // Make sure we reset the inWelcome variable to start coroutine
+            gm.SetWaitFlag(3.0f);
             base.Enter();
         }
 
@@ -26,10 +27,10 @@ namespace VRProEP.GameEngineCore
         protected override void Update()
         {
             // Make sure the coroutine is only started once.
-            if (!gm.InWelcome)
+            if (gm.WaitFlag && !gm.InWelcome)
             {
                 gm.InWelcome = true;
-                StartCoroutine(gm.WelcomeLoop());
+                gm.StartWelcomeLoop();
             }
 
             // Once the user has flagged the end, we can move on.

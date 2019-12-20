@@ -21,7 +21,7 @@ public class PhotoStageGM : GameMaster
     public Transform subjectStandLocation;
 
     private ConfigurableElbowManager elbowManager;
-    private SteamVR_Action_Boolean buttonAction = SteamVR_Input.GetAction<SteamVR_Action_Boolean>("ObjectInteractButton");
+    //private SteamVR_Action_Boolean buttonAction = SteamVR_Input.GetAction<SteamVR_Action_Boolean>("ObjectInteractButton");
     private float theta = 0.5f;
 
 
@@ -128,7 +128,7 @@ public class PhotoStageGM : GameMaster
     {
         throw new System.NotImplementedException();
     }
-    public override bool HandleInTaskBehaviour()
+    public override void HandleInTaskBehaviour()
     {
         throw new System.NotImplementedException();
     }
@@ -265,7 +265,7 @@ public class PhotoStageGM : GameMaster
     /// <summary>
     /// Launches the next session. Performs all the required preparations.
     /// </summary>
-    public override void ConfigureNextSession()
+    public void ConfigureNextSession()
     {
         throw new System.NotImplementedException();
     }

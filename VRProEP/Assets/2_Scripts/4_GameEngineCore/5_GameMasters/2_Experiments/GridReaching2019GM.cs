@@ -77,12 +77,12 @@ public class GridReaching2019GM : GameMaster
     private int sessions = 1;
 
     // iteration management variables
-    private int iterationsPerSession;
+    //private int iterationsPerSession;
     private int maxIterations;
     private int completedIterations = 0;
 
     // Instructions management
-    private string infoText;
+    //private string infoText;
 
     // Motion tracking for experiment management (check for start position)
     private VIVETrackerManager upperArmTracker;
@@ -91,7 +91,7 @@ public class GridReaching2019GM : GameMaster
     //
     // Data logging
     //
-    private float taskTime = 0.0f;
+    //private float taskTime = 0.0f;
     private DataStreamLogger motionLogger;
     private const string motionDataAbleFormat = "loc,t,aDotUA,bDotUA,gDotUA,aUA,bUA,gUA,xUA,yUA,zUA,aDotE,bDotE,gDotE,aE,bE,gE,xE,yE,zE,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,xHand,yHand,zHand,aHand,bHand,gHand";
 
@@ -562,7 +562,7 @@ public class GridReaching2019GM : GameMaster
     {
         throw new System.NotImplementedException();
     }
-    public override bool HandleInTaskBehaviour()
+    public override void HandleInTaskBehaviour()
     {
         throw new System.NotImplementedException();
     }
@@ -617,8 +617,8 @@ public class GridReaching2019GM : GameMaster
         iterationNumber = 1;
         // Set iterations variables for flow control.
         targetNumber = gridRows * gridColumns;
-        iterationsPerSession = targetNumber * iterationsPerTarget;
-        maxIterations = iterationsPerSession * sessions;
+        iterationsPerSession[sessionNumber] = targetNumber * iterationsPerTarget;
+        maxIterations = iterationsPerSession[sessionNumber] * sessions;
         // Create the list of target indexes and shuffle it.
         for (int i = 0; i < targetNumber; i++)
         {
@@ -754,7 +754,7 @@ public class GridReaching2019GM : GameMaster
     /// <summary>
     /// Launches the next session. Performs all the required preparations.
     /// </summary>
-    public override void ConfigureNextSession()
+    public void ConfigureNextSession()
     {
         throw new System.NotImplementedException();
     }

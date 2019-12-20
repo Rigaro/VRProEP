@@ -18,6 +18,8 @@ using VRProEP.Utilities;
 
 public abstract class GameMaster : MonoBehaviour
 {
+    //protected GameMaster instance;
+
     [Header("Flow Control:")]
     // Serialised
     [SerializeField]
@@ -28,7 +30,6 @@ public abstract class GameMaster : MonoBehaviour
     protected bool skipInstructions = false;
     [SerializeField]
     protected bool skipTraining = false;
-    protected State currentState;
     // Accessors
     public bool StartEnable { get => startEnable; set => startEnable = value; }
     public bool DemoMode { get => demoMode; }
@@ -78,7 +79,7 @@ public abstract class GameMaster : MonoBehaviour
     // Task Data logging
     private DataStreamLogger taskDataLogger;
     [SerializeField]
-    protected const string taskDataFormat = "";
+    protected string taskDataFormat = "";
     protected string logData = "";
     #endregion
 
@@ -108,6 +109,7 @@ public abstract class GameMaster : MonoBehaviour
     //
     // Flow control
     //
+    private State currentState;
     protected float taskTime = 0.0f;
     protected int sessionNumber = 1;
     protected int iterationNumber = 1;
@@ -169,7 +171,40 @@ public abstract class GameMaster : MonoBehaviour
 
     #endregion
 
+    /// <summary>
+    /// Methods in this region should not be overriden in the implemented class.
+    /// If for some reason you need to override them, make sure you call base.Method() first.
+    /// </summary>
     #region Unity MonoBehavior methods
+
+    // Runs once when the experiment is launched
+    protected virtual void Start()
+    {
+        // Initialize UI.
+        InitializeUI();
+
+        // Initialize ExperimentSystem
+        InitialiseExperimentSystems();
+
+        // Initialise state machine
+        currentState = new Welcome(this);
+    }
+
+    // Runs continuously at the current frame-rate.
+    protected virtual void Update()
+    {
+        // Run everything in Update except Performing Task
+        if (!(currentState is PerformingTask))
+            currentState = currentState.Process();
+    }
+
+    // Run deterministically at the physics engine sample time.
+    protected virtual void FixedUpdate()
+    {
+        // Only run Performing Task in Fixed Update
+        if (currentState is PerformingTask)
+            currentState = currentState.Process();
+    }
 
     private void OnApplicationQuit()
     {
@@ -188,12 +223,12 @@ public abstract class GameMaster : MonoBehaviour
     /// <returns>The text to be displayed as a string.</returns>
     public virtual string GetDisplayInfoText()
     {
-        string Text;
-        Text = "Status: " + currentState.StateName.ToString() + ".\n";
-        Text += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
-        Text += "Experiment Progress: " + sessionNumber + "/" + iterationsPerSession.Count + ".\n";
-        Text += "Session Progress: " + iterationNumber + "/" + iterationsPerSession[sessionNumber - 1] + ".\n";
-        return Text;
+        string text;
+        text = "Status: " + currentState.StateName.ToString() + ".\n";
+        text += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
+        text += "Experiment Progress: " + sessionNumber + "/" + iterationsPerSession.Count + ".\n";
+        text += "Session Progress: " + iterationNumber + "/" + iterationsPerSession[sessionNumber - 1] + ".\n";
+        return text;
     }
 
     /// <summary>
@@ -255,12 +290,36 @@ public abstract class GameMaster : MonoBehaviour
                 //Debug.Log(wifiSensor.RunThread);
             }
         }
+
+        // Send the player to the experiment centre position
+        TeleportToStartPosition();
     }
+
+    /// <summary>
+    /// Coroutine for the welcome text.
+    /// Implement your welcome loop here.
+    /// </summary>
+    /// <returns>Yield instruction</returns>
+    public abstract IEnumerator WelcomeLoop();
 
     /// <summary>
     /// Performs initialisation procedures for the experiment. Sets variables to their zero state.
     /// </summary>
     public abstract void InitialiseExperiment();
+
+    /// <summary>
+    /// Coroutine for the experiment instructions.
+    /// Implement your instructions loop here.
+    /// </summary>
+    /// <returns>Yield instruction</returns>
+    public abstract IEnumerator InstructionsLoop();
+
+    /// <summary>
+    /// Coroutine for the experiment training.
+    /// Implement your training loop here.
+    /// </summary>
+    /// <returns>Yield instruction</returns>
+    public abstract IEnumerator TrainingLoop();
 
     /// <summary>
     /// Checks whether the subject is ready to start performing the task.
@@ -323,7 +382,7 @@ public abstract class GameMaster : MonoBehaviour
     /// Handles procedures that occurs while the task is being executed (and not related to data logging).
     /// </summary>
     /// <returns></returns>
-    public abstract bool HandleInTaskBehaviour();
+    public abstract void HandleInTaskBehaviour();
 
     /// <summary>
     /// Checks whether the task has be successfully completed or not.
@@ -361,6 +420,16 @@ public abstract class GameMaster : MonoBehaviour
     }
 
     /// <summary>
+    /// Checks if the condition for changing experiment session has been reached.
+    /// </summary>
+    /// <returns>True if the condition for changing sessions has been reached.</returns>
+    public virtual bool IsEndOfSession()
+    {
+        // Check that the iteration counter has reached the max for that session
+        return iterationNumber > iterationsPerSession[sessionNumber];
+    }
+
+    /// <summary>
     /// Handles procedures performed when initialising the next iteration.
     /// Updates iteration number, session number, resets the task time, and starts a new data log by default.
     /// Extend this method by doing your own implementation, with base.HandleSessionInitialisation() being called at the start.
@@ -381,27 +450,14 @@ public abstract class GameMaster : MonoBehaviour
     }
 
     /// <summary>
-    /// Checks if the condition for the rest period has been reached.
-    /// </summary>
-    /// <returns>True if the rest condition has been reached.</returns>
-    public abstract bool IsRestTime();
-
-    /// <summary>
-    /// Checks if the condition for changing experiment session has been reached.
-    /// </summary>
-    /// <returns>True if the condition for changing sessions has been reached.</returns>
-    public abstract bool IsEndOfSession();
-
-    /// <summary>
     /// Checks if the condition for ending the experiment has been reached.
     /// </summary>
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
-    public abstract bool IsEndOfExperiment();
-
-    /// <summary>
-    /// Configures the next session. Performs all the configurations required when starting a new experiment session.
-    /// </summary>
-    public abstract void ConfigureNextSession();
+    public virtual bool IsEndOfExperiment()
+    {
+        // Check that the last session has been reached and the last iteration of that session has passed.
+        return (sessionNumber == iterationsPerSession.Count && iterationNumber > iterationsPerSession[sessionNumber]);
+    }
 
     /// <summary>
     /// Performs all the required procedures to end the experiment.
@@ -428,25 +484,14 @@ public abstract class GameMaster : MonoBehaviour
     }
 
     /// <summary>
-    /// Coroutine for the welcome text.
-    /// Implement your welcome loop here.
+    /// Checks if the condition for the rest period has been reached.
     /// </summary>
-    /// <returns>Yield instruction</returns>
-    public abstract IEnumerator WelcomeLoop();
-
-    /// <summary>
-    /// Coroutine for the experiment instructions.
-    /// Implement your instructions loop here.
-    /// </summary>
-    /// <returns>Yield instruction</returns>
-    public abstract IEnumerator InstructionsLoop();
-
-    /// <summary>
-    /// Coroutine for the experiment training.
-    /// Implement your training loop here.
-    /// </summary>
-    /// <returns>Yield instruction</returns>
-    public abstract IEnumerator TrainingLoop();
+    /// <returns>True if the rest condition has been reached.</returns>
+    public virtual bool IsRestTime()
+    {
+        // Give rest after a restIterations number of task iterations.
+        return iterationNumber % restIterations == 0;
+    }
 
     #endregion
 
@@ -604,44 +649,48 @@ public abstract class GameMaster : MonoBehaviour
     #region Support methods
 
     /// <summary>
-    /// Resets the iteration counter back to one.
+    /// Starts the welcome loop.
     /// </summary>
-    //public void ResetIterationCounter()
-    //{
-    //    iterationNumber = 1;
-    //}
+    public void StartWelcomeLoop()
+    {
+        StartCoroutine(WelcomeLoop());
+    }
 
-    ///// <summary>
-    ///// Increases the iteration counter by one.
-    ///// </summary>
-    //public void IncreaseIterationCounter()
-    //{
-    //    iterationNumber++;
-    //}
+    /// <summary>
+    /// Starts the instructions loop.
+    /// </summary>
+    public void StartInstructionsLoop()
+    {
+        StartCoroutine(InstructionsLoop());
+    }
 
-    ///// <summary>
-    ///// Resets the session counter back to one.
-    ///// </summary>
-    //public void ResetSessionNumber()
-    //{
-    //    sessionNumber = 1;
-    //}
+    /// <summary>
+    /// Starts the training loop.
+    /// </summary>
+    public void StartTrainingLoop()
+    {
+        StartCoroutine(TrainingLoop());
+    }
 
-    ///// <summary>
-    ///// Increases the session counter by one.
-    ///// </summary>
-    //public void IncreaseSessionNumber()
-    //{
-    //    sessionNumber++;
-    //}
 
-    ///// <summary>
-    ///// Resets the task time back to zero.
-    ///// </summary>
-    //public void ResetTaskTime()
-    //{
-    //    taskTime = 0;
-    //}
+    /// <summary>
+    /// Returns the name of the current state.
+    /// </summary>
+    /// <returns>The current state name.</returns>
+    protected State.STATE GetCurrentStateName()
+    {
+        return currentState.StateName;
+    }
+
+    /// <summary>
+    ///  Waits for the subject to press the "object interact button" which is mapped to the trigger.
+    /// </summary>
+    /// <returns></returns>
+    protected IEnumerator WaitForSubjectAcknowledgement()
+    {
+        yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
+        yield return new WaitForSeconds(0.5f);
+    }
     
     /// <summary>
     /// Sets the waitFlag after X seconds .
@@ -710,7 +759,7 @@ public abstract class GameMaster : MonoBehaviour
     /// <summary>
     /// Teleports the player to the experiment center position and orients experiment assets to fit the world.
     /// </summary>
-    public void TeleportToStartPosition()
+    protected void TeleportToStartPosition()
     {
         // Get player object
         GameObject playerGO = GameObject.FindGameObjectWithTag("Player");

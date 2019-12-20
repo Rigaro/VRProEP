@@ -16,6 +16,7 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         protected override void Enter()
         {
+            Debug.Log("Instructions State");
             if (gm.SkipInstructions)
                 stateStage = EVENT.EXIT;
             else
@@ -34,7 +35,7 @@ namespace VRProEP.GameEngineCore
             if (!gm.InInstructions)
             {
                 gm.InInstructions = true;
-                StartCoroutine(gm.InstructionsLoop());
+                gm.StartInstructionsLoop();
             }
 
             // Once the GM has flagged the end, we can move on.

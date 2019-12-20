@@ -35,7 +35,7 @@ namespace VRProEP.GameEngineCore
             if (!gm.InTraining)
             {
                 gm.InTraining = true;
-                StartCoroutine(gm.TrainingLoop());
+                gm.StartTrainingLoop();
             }
 
             // Once the GM has flagged the end, we can move on.

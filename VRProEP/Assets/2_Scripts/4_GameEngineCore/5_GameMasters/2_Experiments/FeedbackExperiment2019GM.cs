@@ -27,7 +27,7 @@ public class FeedbackExperiment2019GM : GameMaster
     public List<int> trainingPerSessionPerSetting = new List<int> { 1, 1, 0, 1, 1, 0 };
     public List<FeedbackExperiment> sessionType = new List<FeedbackExperiment> { FeedbackExperiment.Force, FeedbackExperiment.Roughness, FeedbackExperiment.Mixed, FeedbackExperiment.Force, FeedbackExperiment.Roughness, FeedbackExperiment.Mixed }; //size 6 def.(Force Roughness Mixed Force Roughness Mixed)
     public List<VisualFeebackType> visualFeedbackType = new List<VisualFeebackType> { VisualFeebackType.On, VisualFeebackType.On, VisualFeebackType.On, VisualFeebackType.None, VisualFeebackType.None, VisualFeebackType.None }; // size 6 def.(on on on none none none)
-    public int restIterations = 25;
+    public int restTaskIterations = 75;
     List<List<int[]>> experimentTargetList = new List<List<int[]>>();
     System.Random r = new System.Random();
     private int randIndex;
@@ -40,8 +40,8 @@ public class FeedbackExperiment2019GM : GameMaster
     public bool isLefty = false;
 
     // Experiment management
-    private List<int> iterationsPerSession = new List<int>();
-    private List<int> trainingPerSession = new List<int>();
+    //private List<int> iterationsPerSession = new List<int>();
+    //private List<int> trainingPerSession = new List<int>();
     private int numberOfIterations;
     private int iterationNumberTotal;
     private int iterationNumberCounterTotal;
@@ -59,7 +59,7 @@ public class FeedbackExperiment2019GM : GameMaster
     //private bool inInstructions = false;
     private bool inSessionInstructions = false;
     private bool inSessionInstructionsEnd = false;
-    private string infoText;
+    //private string infoText;
     private bool logEnd = false;
     //private SteamVR_Action_Boolean buttonAction = SteamVR_Input.GetAction<SteamVR_Action_Boolean>("ObjectInteractButton");
 
@@ -824,7 +824,7 @@ public class FeedbackExperiment2019GM : GameMaster
     {
         throw new System.NotImplementedException();
     }
-    public override bool HandleInTaskBehaviour()
+    public override void HandleInTaskBehaviour()
     {
         throw new System.NotImplementedException();
     }
@@ -997,7 +997,7 @@ public class FeedbackExperiment2019GM : GameMaster
     /// <returns>True if the rest condition has been reached.</returns>
     public override bool IsRestTime()
     {
-        if (iterationNumberCounterTotal % restIterations == 0)
+        if (iterationNumberCounterTotal % restTaskIterations == 0)
         {
             return true;
         }
@@ -1036,7 +1036,7 @@ public class FeedbackExperiment2019GM : GameMaster
     /// <summary>
     /// Launches the next session. Performs all the required preparations.
     /// </summary>
-    public override void ConfigureNextSession()
+    public void ConfigureNextSession()
     {
         //No training in Session: Mixed or no Visual Feedback
         if (sessionType[sessionNumber - 1] == FeedbackExperiment.Mixed || visualFeedbackType[sessionNumber - 1] == VisualFeebackType.None)
@@ -1447,7 +1447,7 @@ public class FeedbackExperiment2019GM : GameMaster
             InstructionManager.DisplayText(defaultText + "Different tactile feedback will be given to you, as explained before the experiment." + continueText);
             yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
             yield return new WaitForSeconds(0.5f);
-            InstructionManager.DisplayText(defaultText + "You will get " + RestTime + " seconds rest every " + restIterations + " iterations." + continueText);
+            InstructionManager.DisplayText(defaultText + "You will get " + RestTime + " seconds rest every " + restTaskIterations + " iterations." + continueText);
             yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
             yield return new WaitForSeconds(0.5f);
             InstructionManager.DisplayText(defaultText + "Your HUD will indicate when it is time to rest by turning green." + continueText);
