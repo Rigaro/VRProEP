@@ -118,19 +118,7 @@ public class MyExperimentTemplate : GameMaster
         sphereTransform = sphereGO.transform;
         cubeGO.SetActive(false);
         sphereGO.SetActive(false);
-
-        // e.g. then set the object positions relative to the player position
-        // Get player object
-        GameObject playerGO = GameObject.FindGameObjectWithTag("Player");
-        if (playerGO == null)
-            throw new System.NullReferenceException("Player GameObject not found.");
-        Player player = playerGO.GetComponent<Player>();
-        if (player == null)
-            throw new System.NullReferenceException("Player Component not found.");
-        // Set the position
-        cubeTransform.position = player.transform.position + new Vector3(0.3f, 0.0f, 0.3f); // Front right of the subject (30cm)
-        sphereTransform.position = player.transform.position + new Vector3(0.3f, 0.0f, -0.3f); // Front left of the subject (30cm)
-        
+                
         //
         // Hand tracking sensor for demo
         //
@@ -152,7 +140,7 @@ public class MyExperimentTemplate : GameMaster
         
         //
         HudManager.DisplayText("Look to the top right.");
-        InstructionManager.DisplayText("Here you can write a welcome for your subject! \n Press the trigger button to continue...");
+        InstructionManager.DisplayText("This is the welcome. Here you can write a welcome for your subject! \n Press the trigger button to continue...");
         yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
         //
         HudManager.ClearText();
@@ -171,6 +159,15 @@ public class MyExperimentTemplate : GameMaster
         // e.g. activate the sphere and set the hidden number to 42.
         sphereGO.SetActive(true);
         someHiddenNumber = 42.0f;
+
+        // e.g. then set the object positions relative to the player position
+        // Get player object
+        GameObject headGO = GameObject.FindGameObjectWithTag("Head");
+        if (headGO == null)
+            throw new System.NullReferenceException("Head GameObject not found.");
+        // Set the position
+        cubeTransform.position = headGO.transform.position + new Vector3(-0.3f, -0.6f, 0.3f); // Front right of the subject (30cm)
+        sphereTransform.position = headGO.transform.position + new Vector3(-0.3f, -0.6f, -0.3f); // Front left of the subject (30cm)
     }
 
     /// <summary>
@@ -185,7 +182,7 @@ public class MyExperimentTemplate : GameMaster
         inInstructions = true;
 
         //
-        InstructionManager.DisplayText("You can use other conditions to wait, not only the trigger press! e.g. 10 seconds.");
+        InstructionManager.DisplayText("These are the isntructions. You can use other conditions to wait, not only the trigger press! e.g. 10 seconds.");
         HudManager.DisplayText("You can use the HUD too!");
         yield return new WaitForSecondsRealtime(10.0f); // Wait for some time.
         //
@@ -210,11 +207,11 @@ public class MyExperimentTemplate : GameMaster
         inTraining = true;
 
         // Only run the training loop when requested, for instance some session may require different session.
-        if(trainingPerSession[sessionNumber] == 1)
+        if(trainingPerSession[sessionNumber-1] == 1)
         {
 
             //
-            InstructionManager.DisplayText("You'll probably want to guide your subject through the task here! \n Press the trigger button to continue...");
+            InstructionManager.DisplayText("This is training. You'll probably want to guide your subject through the task here! \n Press the trigger button to continue...");
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
                                                           //
             InstructionManager.DisplayText("Like... Punch the Cube!");

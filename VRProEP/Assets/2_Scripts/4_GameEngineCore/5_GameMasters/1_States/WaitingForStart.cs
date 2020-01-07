@@ -38,6 +38,7 @@ namespace VRProEP.GameEngineCore
             waitState = WaitState.Waiting;
             // Reset flags
             gm.StartEnable = false;
+            gm.StopHUDCountDown();
             counting = false;
             //requestedPause = false;
             base.Enter();
@@ -48,6 +49,7 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         protected override void Update()
         {
+            Debug.Log(gm.CountdownDone);
             // Display status to user
             gm.InstructionManager.DisplayText(gm.GetDisplayInfoText());
             

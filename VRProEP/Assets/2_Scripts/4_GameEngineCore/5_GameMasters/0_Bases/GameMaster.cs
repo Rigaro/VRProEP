@@ -426,7 +426,7 @@ public abstract class GameMaster : MonoBehaviour
     public virtual bool IsEndOfSession()
     {
         // Check that the iteration counter has reached the max for that session
-        return iterationNumber > iterationsPerSession[sessionNumber];
+        return iterationNumber >= iterationsPerSession[sessionNumber - 1];
     }
 
     /// <summary>
@@ -456,7 +456,7 @@ public abstract class GameMaster : MonoBehaviour
     public virtual bool IsEndOfExperiment()
     {
         // Check that the last session has been reached and the last iteration of that session has passed.
-        return (sessionNumber == iterationsPerSession.Count && iterationNumber > iterationsPerSession[sessionNumber]);
+        return (sessionNumber == iterationsPerSession.Count && iterationNumber >= iterationsPerSession[sessionNumber - 1]);
     }
 
     /// <summary>
