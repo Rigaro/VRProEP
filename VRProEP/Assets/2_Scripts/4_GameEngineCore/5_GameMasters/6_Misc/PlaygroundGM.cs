@@ -598,7 +598,7 @@ public class PlaygroundGM : GameMaster
         // Load
         avatarType = AvatarType.Transhumeral;
 
-        AvatarSystem.LoadPlayer(UserType.AbleBodied, AvatarType.Transhumeral);
+        AvatarSystem.LoadPlayer(UserType.Ablebodied, AvatarType.Transhumeral);
         AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
         // Fade
         SteamVR_Fade.Start(Color.black, 0.0f);

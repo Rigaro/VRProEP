@@ -40,7 +40,7 @@ namespace VRProEP.GameEngineCore
         /// <param name="handType">The type of hand.</param>
         /// <param name="avatarType">The type of avatar.</param>
         /// <returns></returns>
-        public static AvatarData CreateAvatarCustomizationData(string userID, string residualLimbType, string socketType, string elbowType, string forearmType, string handType)
+        public static AvatarData CreateAvatarCustomizationData(string userID, AvatarType type, string residualLimbType, string socketType, string elbowType, string forearmType, string handType)
         {
             // Create avatar data object.
             AvatarData avatarData = new AvatarData();
@@ -53,7 +53,7 @@ namespace VRProEP.GameEngineCore
             avatarData.handType = handType;
 
             // Save customization data and set active.
-            SaveAvatarCustomizationData(userID, avatarData);
+            SaveAvatarCustomizationData(userID, avatarData, type);
             activeAvatarData = avatarData;
 
             return avatarData;
@@ -91,7 +91,7 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         /// <param name="userID">The user id of the user whose avatar wants to be loaded.</param>
         /// <param name="avatarData">The avatar customization data to save.</param>
-        public static void SaveAvatarCustomizationData(string userID, AvatarData avatarData)
+        public static void SaveAvatarCustomizationData(string userID, AvatarData avatarData, AvatarType type)
         {
             string saveFolder = dataFolder + userID;
 
@@ -101,7 +101,7 @@ namespace VRProEP.GameEngineCore
 
 
             // Set file, format data as JSON, and save.
-            string saveFilePath = saveFolder + "/avatarInfo.json";
+            string saveFilePath = saveFolder + "/avatarInfo_" + type.ToString() + ".json";
             string avatarDataAsJson = JsonUtility.ToJson(avatarData);
             File.WriteAllText(saveFilePath, avatarDataAsJson);
         }
@@ -231,7 +231,7 @@ namespace VRProEP.GameEngineCore
 
             switch (userType)
             {
-                case UserType.AbleBodied:
+                case UserType.Ablebodied:
                     switch (avatarType)
                     {
                         case AvatarType.AbleBodied:
@@ -293,7 +293,7 @@ namespace VRProEP.GameEngineCore
             //
             // Able-bodied subject with transhumeral frame
             //
-            if (userType == UserType.AbleBodied && avatarType == AvatarType.Transhumeral)
+            if (userType == UserType.Ablebodied && avatarType == AvatarType.Transhumeral)
             {
                 // Load TH tracking frame from Frames folder and check whether successfully loaded.
                 GameObject ableBodiedTHFramePrefab = Resources.Load<GameObject>("Frames/AbleBodiedFrameTH");
@@ -306,7 +306,7 @@ namespace VRProEP.GameEngineCore
             //
             // Able-bodied subject with transradial frame
             //
-            else if (userType == UserType.AbleBodied && avatarType == AvatarType.Transradial)
+            else if (userType == UserType.Ablebodied && avatarType == AvatarType.Transradial)
             {
                 // Load TR tracking frame from Frames folder and check whether successfully loaded.
                 GameObject ableBodiedTRFramePrefab = Resources.Load<GameObject>("Frames/AbleBodiedFrameTR");

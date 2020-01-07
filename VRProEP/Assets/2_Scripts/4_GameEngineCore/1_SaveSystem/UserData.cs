@@ -9,7 +9,7 @@ namespace VRProEP.GameEngineCore
     {
         Transhumeral,
         Transradial,
-        AbleBodied
+        Ablebodied
     }
 
     /// <summary>
@@ -22,14 +22,20 @@ namespace VRProEP.GameEngineCore
         public string familyName;
         public int yearOfBirth;
         public string id;
+        public float weight;
         public float height;
         public float upperArmLength;
         public float upperArmWidth;
         public float forearmLength;
         public float forearmWidth;
         public float handLength;
-        public UserType type = UserType.AbleBodied;
+        public UserType type = UserType.Ablebodied;
         public bool lefty = false;
+
+        public void GenerateUserID()
+        {
+            id = name.ToCharArray()[0].ToString() + familyName.ToCharArray()[0].ToString() + yearOfBirth.ToString() + (100*height).ToString();
+        }
     }
 
 }

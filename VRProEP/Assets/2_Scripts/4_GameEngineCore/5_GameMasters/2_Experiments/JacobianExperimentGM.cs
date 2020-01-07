@@ -78,7 +78,7 @@ public class JacobianExperimentGM : GameMaster
             //
             // Debug Jacobian
             //
-            AvatarSystem.LoadPlayer(UserType.AbleBodied, AvatarType.Transhumeral);
+            AvatarSystem.LoadPlayer(UserType.Ablebodied, AvatarType.Transhumeral);
             AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
             // Initialize prosthesis
             GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");

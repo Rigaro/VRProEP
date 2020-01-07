@@ -36,7 +36,7 @@ public class EMGDataGM : GameMaster
         if (debug)
         {
             SaveSystem.LoadUserData("MD1942");
-            AvatarSystem.LoadPlayer(UserType.AbleBodied, AvatarType.AbleBodied);
+            AvatarSystem.LoadPlayer(UserType.Ablebodied, AvatarType.AbleBodied);
             AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
         }
         // Initialize ExperimentSystem

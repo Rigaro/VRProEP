@@ -97,7 +97,7 @@ public class PhotoStageGM : GameMaster
     public void LoadTHAvatar()
     {
         SaveSystem.LoadUserData("MD1942");
-        AvatarSystem.LoadPlayer(UserType.AbleBodied, AvatarType.Transhumeral);
+        AvatarSystem.LoadPlayer(UserType.Ablebodied, AvatarType.Transhumeral);
         AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
 
         // Initialize prosthesis
