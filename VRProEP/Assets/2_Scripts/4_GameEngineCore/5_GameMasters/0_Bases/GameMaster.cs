@@ -367,15 +367,13 @@ public abstract class GameMaster : MonoBehaviour
         }
 
         //
-        // Append data to lists
-        //
-        taskTime += Time.fixedDeltaTime;
-
-        //
         // Log current data and clear before next run.
         //
         taskDataLogger.AppendData(logData);
         logData = "";
+
+        // Update run time
+        taskTime += Time.fixedDeltaTime;
     }
 
     /// <summary>
@@ -392,8 +390,13 @@ public abstract class GameMaster : MonoBehaviour
 
     /// <summary>
     /// Handles procedures that occur as soon as the task is completed.
+    /// Extend this method by doing your own implementation, with base.HandleTaskCompletion() being called at the start.
     /// </summary>
-    public abstract void HandleTaskCompletion();
+    public virtual void HandleTaskCompletion()
+    {
+        // Make sure the log is closed properly
+        taskDataLogger.CloseLog();
+    }
 
     /// <summary>
     /// Handles the procedures performed when analysing results.

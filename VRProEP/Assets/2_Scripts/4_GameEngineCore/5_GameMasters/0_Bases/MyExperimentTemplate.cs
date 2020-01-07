@@ -345,9 +345,12 @@ public class MyExperimentTemplate : GameMaster
 
     /// <summary>
     /// Handles procedures that occur as soon as the task is completed.
+    /// Extend this method by doing your own implementation, with base.HandleTaskCompletion() being called at the start.
     /// </summary>
     public override void HandleTaskCompletion()
     {
+        base.HandleTaskCompletion();
+
         // Let's just reactivate the objects
         isCubeAvailable = true;
         cubeGO.SetActive(true);
