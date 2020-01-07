@@ -16,7 +16,7 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         protected override void Enter()
         {
-            Debug.Log("Instructions State");
+            //Debug.Log("Instructions State");
             if (gm.SkipInstructions)
                 stateStage = EVENT.EXIT;
             else

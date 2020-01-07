@@ -130,6 +130,13 @@ public class MyExperimentTemplate : GameMaster
         // Set the position
         cubeTransform.position = player.transform.position + new Vector3(0.3f, 0.0f, 0.3f); // Front right of the subject (30cm)
         sphereTransform.position = player.transform.position + new Vector3(0.3f, 0.0f, -0.3f); // Front left of the subject (30cm)
+        
+        //
+        // Hand tracking sensor for demo
+        //
+        GameObject handGO = GameObject.FindGameObjectWithTag("Hand");
+        VirtualPositionTracker handTracker = new VirtualPositionTracker(handGO.transform);
+        ExperimentSystem.AddSensor(handTracker);
     }
 
     /// <summary>

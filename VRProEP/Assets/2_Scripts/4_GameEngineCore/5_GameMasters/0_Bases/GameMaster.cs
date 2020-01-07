@@ -269,16 +269,16 @@ public abstract class GameMaster : MonoBehaviour
             ExperimentSystem.SetActiveExperimentID(this.gameObject.name + "_Debug");
 
 
+        // Make sure flow control is initialised
+        sessionNumber = 1;
+        iterationNumber = 1;
+
         //
         // Create the default data loggers
         //
         taskDataLogger = new DataStreamLogger("TaskData");
         ExperimentSystem.AddExperimentLogger(taskDataLogger);
-
-
-        // Make sure flow control is initialised
-        sessionNumber = 1;
-        iterationNumber = 1;
+        taskDataLogger.AddNewLogFile(sessionNumber, iterationNumber, taskDataFormat); // Add file
 
         // Restart UDP threads
         foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
