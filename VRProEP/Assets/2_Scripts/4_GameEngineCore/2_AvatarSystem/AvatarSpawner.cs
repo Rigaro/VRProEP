@@ -36,7 +36,7 @@ namespace VRProEP.GameEngineCore
             LoadSocket(avatarData.socketType);
             LoadElbow(avatarData.elbowType, userData.upperArmLength);
             LoadForearm(avatarData.forearmType, userData.upperArmLength, userData.forearmLength);
-            LoadHand(avatarData.handType, userData.upperArmLength, userData.forearmLength, userData.handLength);
+            LoadHand(avatarData.handType, userData.upperArmLength, userData.forearmLength, userData.handLength, userData.lefty);
 
             
             // Deactivate rendering of the markers
@@ -430,14 +430,18 @@ namespace VRProEP.GameEngineCore
         /// <param name="lowerArmLength">The user's lower-arm length.</param>
         /// <param name="handLength">The user's hand length.</param>
         /// <returns>The instantiated hand GameObject.</returns>
-        private static GameObject LoadHand(string handType, float upperArmLength, float lowerArmLength, float handLength)
+        private static GameObject LoadHand(string handType, float upperArmLength, float lowerArmLength, float handLength, bool lefty)
         {
+            string side = "R";
+            if (lefty)
+                side = "L";
+
             // Need to attach to Forearm, so find that first and get its Rigidbody.
             GameObject forearmGO = GameObject.FindGameObjectWithTag("Forearm");
             Rigidbody forearmRB = forearmGO.GetComponent<Rigidbody>();
 
             // Load hand from avatar folder and check whether successfully loaded.
-            GameObject handPrefab = Resources.Load<GameObject>("Avatars/Hands/" + handType);
+            GameObject handPrefab = Resources.Load<GameObject>("Avatars/Hands/" + handType + side);
             if (handPrefab == null)
                 throw new System.Exception("The requested hand prefab was not found.");
 
