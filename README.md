@@ -24,7 +24,7 @@ https://liv.tv/
 ### Thalmic Labs Myoband
 Pattern recognition based myoelectric sensor. Discontinued.
 
-# 
+# Platform versions in reseach papers
 
 ## RA-L 2019 Paper
 The following platform and Unity versions were used for the experiments included in the paper submitted to IEEE Robotics and Automation Letters in 2019.
