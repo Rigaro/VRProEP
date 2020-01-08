@@ -12,6 +12,20 @@ Wiki: https://github.com/Rigaro/VRProEP/wiki
 - Mixed reality: Allows recording of the user and virtual reality environment in Mixed Reality by placing the user in the virtual world.
 - External hardware: Allows the integration of external hardware devices. Currently implemented: bone conduction feedback device, myoware sEMG electrode system, Thalmic Labs Myoband.
 
+## Integrations
+### SteamVR
+SteamVR used to handle Virtual Reality headsets.
+Current headset compatibility: HTC Vive Pro.
+
+### LIV
+Software to create Mixed Reality videos.
+https://liv.tv/
+
+### Thalmic Labs Myoband
+Pattern recognition based myoelectric sensor. Discontinued.
+
+# 
+
 ## RA-L 2019 Paper
 The following platform and Unity versions were used for the experiments included in the paper submitted to IEEE Robotics and Automation Letters in 2019.
 
@@ -28,12 +42,4 @@ The following platform and Unity versions were used for the experiments included
 
 Runs from Unity Editor. See Wiki for more information.
 
-## Integrations
-### SteamVR
-SteamVR used to handle Virtual Reality headsets.
-Current headset compatibility: HTC Vive Pro.
-
-### LIV
-Software to create Mixed Reality videos.
-https://liv.tv/
 
