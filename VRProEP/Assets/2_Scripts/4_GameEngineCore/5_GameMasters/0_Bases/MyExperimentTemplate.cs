@@ -52,8 +52,6 @@ public class MyExperimentTemplate : GameMaster
     // having to load it from the menus.
     private void Awake()
     {
-        //instance = (MyExperimentTemplate)GetComponent<GameMaster>();
-
         if (debug)
         {
             SaveSystem.LoadUserData("MD1942"); // Load the test/demo user (Mr Demo)

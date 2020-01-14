@@ -49,7 +49,6 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         protected override void Update()
         {
-            Debug.Log(gm.CountdownDone);
             // Display status to user
             gm.InstructionManager.DisplayText(gm.GetDisplayInfoText());
             

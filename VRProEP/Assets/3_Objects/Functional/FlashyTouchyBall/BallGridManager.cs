@@ -98,6 +98,7 @@ public class BallGridManager : MonoBehaviour
         ResetBallSelection();
 
         // Select ball
+        selectedIndex = index;
         balls[index].SetSelected();
         hasSelected = true;
         selectedTouched = false;
