@@ -86,7 +86,11 @@ public class KinematicEnergy2020 : GameMaster
     private bool hasReached = false;
     private bool taskComplete = false;
 
-    // Other help stuff
+    // Prosthesis handling objects
+    private GameObject prosthesisManagerGO;
+    private ConfigurableElbowManager elbowManager;
+
+    // Other helpful stuff
     private float leftySign = 1.0f;
     #endregion
 
@@ -99,12 +103,29 @@ public class KinematicEnergy2020 : GameMaster
     {
         if (debug)
         {
+            //
+            // Debug able
+            //
             SaveSystem.LoadUserData("DB1942174"); // Load the test/demo user (Mr Demo)
             //
             // Debug using able-bodied configuration
             //
-            AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
-            AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
+            //AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
+            //AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
+
+            //
+            // Debug prosthetic
+            //
+            AvatarSystem.LoadPlayer(UserType.Ablebodied, AvatarType.Transhumeral);
+            AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
+            // Initialize prosthesis
+            GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+            ConfigurableElbowManager elbowManager = prosthesisManagerGO.AddComponent<ConfigurableElbowManager>();
+            elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + SaveSystem.ActiveUser.handLength / 2.0f));
+            // Set the reference generator to jacobian-based.
+            //elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
+            // Set the reference generator to linear synergy.
+            elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
         }
 
     }
@@ -192,7 +213,7 @@ public class KinematicEnergy2020 : GameMaster
         //
         // Add arm motion trackers for able-bodied case.
         //
-        if (AvatarSystem.AvatarType == AvatarType.AbleBodied)
+        if (experimentType == ExperimentType.TypeOne)
         { 
             // Lower limb motion tracker
             GameObject llMotionTrackerGO = GameObject.FindGameObjectWithTag("ForearmTracker");
@@ -204,7 +225,27 @@ public class KinematicEnergy2020 : GameMaster
             upperArmTracker = new VIVETrackerManager(ulMotionTrackerGO.transform);
             ExperimentSystem.AddSensor(upperArmTracker);
         }
+        else if (experimentType == ExperimentType.TypeTwo)
+        {
+            // Get active sensors from avatar system and get the vive tracker being used for the UA
+            foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
+            {
+                if (sensor is VIVETrackerManager)
+                    upperArmTracker = (VIVETrackerManager)sensor;
+            }
+            if (upperArmTracker == null)
+                throw new System.NullReferenceException("The residual limb tracker was not found.");
 
+            // Set VIVE tracker and Linear synergy as active.
+            // Get prosthesis
+            prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+            elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
+            // Set the reference generator to linear synergy.
+            elbowManager.ChangeSensor("VAL_SENSOR_VIVETRACKER");
+            elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
+        }
+
+        // Add the 
         if (!debug)
         {
             // Shoulder acromium head tracker
@@ -306,7 +347,13 @@ public class KinematicEnergy2020 : GameMaster
     {
         // Check that upper and lower arms are within the tolerated start position.
         float qShoulder = leftySign * Mathf.Rad2Deg * (upperArmTracker.GetProcessedData(5) + Mathf.PI); // Offsetting to horizontal position being 0.
-        float qElbow = Mathf.Rad2Deg * (lowerArmTracker.GetProcessedData(5)) - qShoulder; // Offsetting to horizontal position being 0.
+        float qElbow = 0;
+
+        if (experimentType == ExperimentType.TypeOne)
+            qElbow = Mathf.Rad2Deg * (lowerArmTracker.GetProcessedData(5)) - qShoulder; // Offsetting to horizontal position being 0.
+        else if (experimentType == ExperimentType.TypeTwo)
+            qElbow = -Mathf.Rad2Deg * elbowManager.GetElbowAngle();
+        
         // The difference to the start position
         float qSDiff = qShoulder - startShoulderAngle;
         float qEDiff = qElbow - startElbowAngle;
@@ -356,6 +403,9 @@ public class KinematicEnergy2020 : GameMaster
     {
         // Select target
         gridManager.SelectBall(targetOrder[iterationNumber - 1]);
+        // Return prosthetic elbow to -90deg
+        if (experimentType == ExperimentType.TypeTwo)
+            elbowManager.SetElbowAngle(Mathf.Deg2Rad * -90.0f);
     }
 
     /// <summary>
