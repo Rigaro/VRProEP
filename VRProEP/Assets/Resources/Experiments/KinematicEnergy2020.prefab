@@ -63,7 +63,7 @@ MonoBehaviour:
   gridColumns: 2
   gridSpacing: 0.15
   gridHeightMultiplier: 0.8
-  gridReachMultiplier: 0.8
+  gridReachMultiplier: 0.9
   gridManager: {fileID: 9044975067194370354}
   startShoulderAngle: 0
   startElbowAngle: 90
@@ -273,6 +273,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SubjectPositionMarker
+      objectReference: {fileID: 0}
+    - target: {fileID: 7473179249313783679, guid: 0c31051c9c8054747ab339e8d45285f6,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0c31051c9c8054747ab339e8d45285f6, type: 3}

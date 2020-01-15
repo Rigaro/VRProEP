@@ -38,21 +38,17 @@ public class KinematicEnergy2020 : GameMaster
 
     [SerializeField]
     [Tooltip("The percentage of the subject's height where the grid centre will be placed.")]
-    [Range(0.0f, 1.0f)]
+    [Range(0.0f, 1.5f)]
     private float gridHeightMultiplier = 0.6f;
 
     [SerializeField]
     [Tooltip("The percentage of the subject's arm length where the grid centre will be placed.")]
-    [Range(0.0f, 1.0f)]
+    [Range(0.0f, 1.5f)]
     private float gridReachMultiplier = 0.6f;
 
     [SerializeField]
     private BallGridManager gridManager;
-
-    // Target management variables
-    private int targetNumber; // The total number of targets
-    private List<int> targetOrder = new List<int>(); // A list of target indexes ordered for selection over iterations in a session.
-
+    
     [Header("Experiment configuration: Start position")]
     [SerializeField]
     [Tooltip("The subject's shoulder start angle in degrees.")]
@@ -74,11 +70,6 @@ public class KinematicEnergy2020 : GameMaster
     [Tooltip("The number of iterations per target.")]
     [Range(1, 100)]
     private int iterationsPerTarget = 1;
-
-    [SerializeField]
-    [Tooltip("The number of sessions for the experiment.")]
-    [Range(1, 100)]
-    private int sessions = 1;
     
     // Instructions management
     //private string infoText;
@@ -86,6 +77,14 @@ public class KinematicEnergy2020 : GameMaster
     // Motion tracking for experiment management (check for start position)
     private VIVETrackerManager upperArmTracker;
     private VIVETrackerManager lowerArmTracker;
+    
+    // Target management variables
+    private int targetNumber; // The total number of targets
+    private List<int> targetOrder = new List<int>(); // A list of target indexes ordered for selection over iterations in a session.
+
+    // Flow control
+    private bool hasReached = false;
+    private bool taskComplete = false;
 
     // Other help stuff
     private float leftySign = 1.0f;
@@ -133,10 +132,11 @@ public class KinematicEnergy2020 : GameMaster
     /// <param name="setActive">Sets the HUD colour as active (Blue).</param>
     public override void HandleHUDColour(bool setActive = false)
     {
-        // You can choose to use the base initialisation or get rid of it completely.
-        base.HandleHUDColour();
+        // Overwrite HUD behaviour except for default HUD behaviour
+        if (GetCurrentStateName() == State.STATE.RESTING || GetCurrentStateName() == State.STATE.PAUSED || GetCurrentStateName() == State.STATE.END)
+            base.HandleHUDColour();
 
-        // No changes needed to HUD.
+        // Custom HUD handled in waiting for start and performing task relevant methods.
     }
 
     /// <summary>
@@ -153,7 +153,14 @@ public class KinematicEnergy2020 : GameMaster
         //
         // Set the experiment type configuration
         //
-        experimentType = ExperimentType.TypeOne; // Able-bodied experiment type
+        // Type one if able-bodied subject
+        if (AvatarSystem.AvatarType == AvatarType.AbleBodied)
+            experimentType = ExperimentType.TypeOne; // Able-bodied experiment type
+        // Type two if prosthetic (Adaptive Synergy)
+        else if (AvatarSystem.AvatarType == AvatarType.Transhumeral)
+            experimentType = ExperimentType.TypeTwo; // Able-bodied experiment type
+
+
         if (SaveSystem.ActiveUser.lefty)
             leftySign = -1.0f;
 
@@ -162,7 +169,7 @@ public class KinematicEnergy2020 : GameMaster
         //
         // Set iterations variables for flow control.
         targetNumber = gridRows * gridColumns;
-        for(int i = 0; i < iterationsPerSession.Count; i++)
+        for (int i = 0; i < iterationsPerSession.Count; i++)
             iterationsPerSession[i] = targetNumber * iterationsPerTarget;
 
         // Create the list of target indexes and shuffle it.
@@ -180,20 +187,23 @@ public class KinematicEnergy2020 : GameMaster
         float subjectHeight = SaveSystem.ActiveUser.height;
         float subjectArmLength = SaveSystem.ActiveUser.upperArmLength + SaveSystem.ActiveUser.forearmLength + (SaveSystem.ActiveUser.handLength / 2);
         // Set the grid distance from subject
-        gridManager.transform.position = new Vector3(-gridReachMultiplier * subjectArmLength, gridHeightMultiplier * subjectHeight, 0.0f);
+        gridManager.transform.position = new Vector3((-gridReachMultiplier * subjectArmLength) - 0.1f, gridHeightMultiplier * subjectHeight, 0.0f);
 
         //
-        // Add arm and body motion trackers.
+        // Add arm motion trackers for able-bodied case.
         //
-        // Lower limb motion tracker
-        GameObject llMotionTrackerGO = GameObject.FindGameObjectWithTag("ForearmTracker");
-        lowerArmTracker = new VIVETrackerManager(llMotionTrackerGO.transform);
-        ExperimentSystem.AddSensor(lowerArmTracker);
+        if (AvatarSystem.AvatarType == AvatarType.AbleBodied)
+        { 
+            // Lower limb motion tracker
+            GameObject llMotionTrackerGO = GameObject.FindGameObjectWithTag("ForearmTracker");
+            lowerArmTracker = new VIVETrackerManager(llMotionTrackerGO.transform);
+            ExperimentSystem.AddSensor(lowerArmTracker);
 
-        // Upper limb motion tracker
-        GameObject ulMotionTrackerGO = AvatarSystem.AddMotionTracker();
-        upperArmTracker = new VIVETrackerManager(ulMotionTrackerGO.transform);
-        ExperimentSystem.AddSensor(upperArmTracker);
+            // Upper limb motion tracker
+            GameObject ulMotionTrackerGO = AvatarSystem.AddMotionTracker();
+            upperArmTracker = new VIVETrackerManager(ulMotionTrackerGO.transform);
+            ExperimentSystem.AddSensor(upperArmTracker);
+        }
 
         if (!debug)
         {
@@ -315,7 +325,7 @@ public class KinematicEnergy2020 : GameMaster
 
         if (Mathf.Abs(qSDiff) < startTolerance && Mathf.Abs(qEDiff) < startTolerance)
         {
-            HudManager.colour = HUDManager.HUDColour.Red;
+            HudManager.colour = HUDManager.HUDColour.Orange;
             return true;
         }
         // Provide instructions when not there yet
@@ -323,14 +333,14 @@ public class KinematicEnergy2020 : GameMaster
         {
             string helpText = "";
             if (qSDiff < 0 && Mathf.Abs(qSDiff) > startTolerance)
-                helpText += "Raise your upper-arm.\n";
+                helpText += "UA: ++.\n";
             else if (qSDiff > 0 && Mathf.Abs(qSDiff) > startTolerance)
-                helpText += "Lower your upper-arm.\n";
+                helpText += "UA: --.\n";
 
             if (qEDiff < 0 && Mathf.Abs(qEDiff) > startTolerance)
-                helpText += "Raise your lower-arm.\n";
+                helpText += "LA: ++.\n";
             else if (qEDiff > 0 && Mathf.Abs(qEDiff) > startTolerance)
-                helpText += "Lower your lower-arm.\n";
+                helpText += "LA: --.\n";
 
             HudManager.DisplayText(helpText);
             HudManager.colour = HUDManager.HUDColour.Red;
@@ -380,7 +390,7 @@ public class KinematicEnergy2020 : GameMaster
     /// <returns></returns>
     public override void HandleInTaskBehaviour()
     {
-
+        HudManager.colour = HUDManager.HUDColour.Blue;
     }
 
     /// <summary>
@@ -392,14 +402,34 @@ public class KinematicEnergy2020 : GameMaster
         //
         // Check that the selected ball has been touched.
         //
-        return gridManager.SelectedTouched;
+        if (gridManager.SelectedTouched && !hasReached)
+            StartCoroutine(EndTaskCoroutine());
+
+        return taskComplete;
     }
+
+    /// <summary>
+    /// Raises the complete task flag after 1 second to allow for additional data to be gathered
+    /// after the subject touches the selected sphere.
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator EndTaskCoroutine()
+    {
+        hasReached = true;
+        yield return new WaitForSecondsRealtime(1.0f);
+        taskComplete = true;
+    }
+
 
     public override void HandleTaskCompletion()
     {
         base.HandleTaskCompletion();
 
-        HudManager.colour = HUDManager.HUDColour.Green;
+        // Signal the subject that the task is done
+        HudManager.colour = HUDManager.HUDColour.Green; 
+        // Reset flags
+        hasReached = false;
+        taskComplete = false;
     }
 
     /// <summary>
@@ -407,7 +437,8 @@ public class KinematicEnergy2020 : GameMaster
     /// </summary>
     public override void HandleResultAnalysis()
     {
-        // Do some analysis
+        // If it's able-bodied, no need to do anything
+        // If it's KE-Adaptive-Synergy then perform synergy update
     }
 
     public override void HandleIterationInitialisation()

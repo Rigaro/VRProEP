@@ -104,8 +104,12 @@ namespace VRProEP.GameEngineCore
                 throw new System.Exception("The player GameObject was not found.");
 
             string side = "R";
+            float sign = 1.0f;
             if (lefty)
+            {
                 side = "L";
+                sign = -1.0f;
+            }
 
             // Load able bodied hand from avatar folder and check whether successfully loaded.
             GameObject handPrefab = Resources.Load<GameObject>("Avatars/Hands/ACESAble_" + side);
@@ -128,7 +132,7 @@ namespace VRProEP.GameEngineCore
             
             // Scale hand to fit user's hand
             float scaleFactor = handLength / activeHandData.dimensions.x;
-            handGO.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+            handGO.transform.localScale = new Vector3(sign*scaleFactor, sign*scaleFactor, sign*scaleFactor);
 
             return handGO;
         }
@@ -431,8 +435,12 @@ namespace VRProEP.GameEngineCore
         private static GameObject LoadHand(string handType, float upperArmLength, float lowerArmLength, float handLength, bool lefty)
         {
             string side = "R";
+            float sign = 1.0f;
             if (lefty)
+            {
                 side = "L";
+                sign = -1.0f;
+            }
 
             // Need to attach to Forearm, so find that first and get its Rigidbody.
             GameObject forearmGO = GameObject.FindGameObjectWithTag("Forearm");
@@ -461,7 +469,7 @@ namespace VRProEP.GameEngineCore
 
             // Scale hand to fit user's hand
             float scaleFactor = handLength / activeHandData.dimensions.x;
-            handGO.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+            handGO.transform.localScale = new Vector3(sign*scaleFactor, sign*scaleFactor, sign*scaleFactor);
 
             // Attach the socket to the residual limb through a fixed joint.
             FixedJoint handFixedJoint = handGO.GetComponent<FixedJoint>();

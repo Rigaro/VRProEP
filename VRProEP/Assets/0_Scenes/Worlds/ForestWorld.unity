@@ -3846,9 +3846,39 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8072093157744520089, guid: 540437a41962c494392435d9a166ad65,
         type: 3}
+      propertyPath: iterationsPerSession.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8072093157744520089, guid: 540437a41962c494392435d9a166ad65,
+        type: 3}
+      propertyPath: trainingPerSession.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8072093157744520089, guid: 540437a41962c494392435d9a166ad65,
+        type: 3}
       propertyPath: debugText
       value: 
       objectReference: {fileID: 826256571}
+    - target: {fileID: 8072093157744520089, guid: 540437a41962c494392435d9a166ad65,
+        type: 3}
+      propertyPath: gridRows
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8072093157744520089, guid: 540437a41962c494392435d9a166ad65,
+        type: 3}
+      propertyPath: gridColumns
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8072093157744520089, guid: 540437a41962c494392435d9a166ad65,
+        type: 3}
+      propertyPath: sessions
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8072093157744520089, guid: 540437a41962c494392435d9a166ad65,
+        type: 3}
+      propertyPath: iterationsPerTarget
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 9044975066999247918, guid: 540437a41962c494392435d9a166ad65,
         type: 3}
       propertyPath: m_LocalPosition.x

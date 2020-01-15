@@ -73,7 +73,7 @@ GameObject:
   - component: {fileID: 54988436631265482}
   - component: {fileID: 138552803602157468}
   m_Layer: 0
-  m_Name: ACESHandL
+  m_Name: ACESHand_L
   m_TagString: Hand
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -86,7 +86,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1058940015095344}
-  m_LocalRotation: {x: 0.7132063, y: 0.18283845, z: 0.6766411, w: -0.00798279}
+  m_LocalRotation: {x: -0.66981053, y: -0.09623403, z: -0.7309698, w: 0.08818226}
   m_LocalPosition: {x: -0.003, y: 0, z: -0.01}
   m_LocalScale: {x: -1, y: -1, z: -1}
   m_Children:
@@ -94,7 +94,7 @@ Transform:
   - {fileID: 4230033028485634}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 195, y: -85, z: -15.000001}
+  m_LocalEulerAnglesHint: {x: -15.000001, y: -275, z: 180}
 --- !u!33 &33183109599819094
 MeshFilter:
   m_ObjectHideFlags: 0

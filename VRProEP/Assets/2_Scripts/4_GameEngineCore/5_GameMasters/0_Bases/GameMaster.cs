@@ -243,7 +243,7 @@ public abstract class GameMaster : MonoBehaviour
     {
         if (currentState is Resting || currentState is End || currentState is Paused)
         {
-            HudManager.colour = HUDManager.HUDColour.Green;
+            HudManager.colour = HUDManager.HUDColour.Purple;
         }
         else
         {
