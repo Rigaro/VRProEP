@@ -73,7 +73,7 @@ GameObject:
   - component: {fileID: 54988436631265482}
   - component: {fileID: 138552803602157468}
   m_Layer: 0
-  m_Name: ACESHand
+  m_Name: ACESHandL
   m_TagString: Hand
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -86,15 +86,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1058940015095344}
-  m_LocalRotation: {x: 0.18283853, y: -0.651519, z: -0.007982977, w: 0.73622644}
+  m_LocalRotation: {x: 0.7132063, y: 0.18283845, z: 0.6766411, w: -0.00798279}
   m_LocalPosition: {x: -0.003, y: 0, z: -0.01}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: -1, y: -1, z: -1}
   m_Children:
   - {fileID: 4062578404777320}
   - {fileID: 4230033028485634}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 15.000001, y: -85, z: -15.000001}
+  m_LocalEulerAnglesHint: {x: 195, y: -85, z: -15.000001}
 --- !u!33 &33183109599819094
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -128,6 +128,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
