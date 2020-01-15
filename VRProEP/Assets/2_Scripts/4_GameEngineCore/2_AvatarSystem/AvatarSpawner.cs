@@ -108,7 +108,7 @@ namespace VRProEP.GameEngineCore
                 side = "L";
 
             // Load able bodied hand from avatar folder and check whether successfully loaded.
-            GameObject handPrefab = Resources.Load<GameObject>("Avatars/Hands/ACESAble" + side);
+            GameObject handPrefab = Resources.Load<GameObject>("Avatars/Hands/ACESAble_" + side);
             if (handPrefab == null)
                 throw new System.Exception("The requested hand prefab was not found.");
 
@@ -120,9 +120,7 @@ namespace VRProEP.GameEngineCore
             handGO.GetComponent<SteamVR_Behaviour_Pose>().origin = playerGO.transform; // Behaviour pose version
 
             // Load hand object info
-            //string objectPath = resourcesDataPath + "/Hands/ACESAble" + side + ".json";
-            //string objectDataAsJson = File.ReadAllText(objectPath);
-            string objectPath = "Avatars/Hands/ACESAble" + side;
+            string objectPath = "Avatars/Hands/ACESAble_" + side;
             string objectDataAsJson = Resources.Load<TextAsset>(objectPath).text;
             activeHandData = JsonUtility.FromJson<AvatarObjectData>(objectDataAsJson);
             if (activeHandData == null)
@@ -441,7 +439,7 @@ namespace VRProEP.GameEngineCore
             Rigidbody forearmRB = forearmGO.GetComponent<Rigidbody>();
 
             // Load hand from avatar folder and check whether successfully loaded.
-            GameObject handPrefab = Resources.Load<GameObject>("Avatars/Hands/" + handType + side);
+            GameObject handPrefab = Resources.Load<GameObject>("Avatars/Hands/" + handType + "_" + side);
             if (handPrefab == null)
                 throw new System.Exception("The requested hand prefab was not found.");
 
@@ -451,7 +449,7 @@ namespace VRProEP.GameEngineCore
             // Load hand object info
             //string objectPath = resourcesDataPath + "/Hands/" + handType + ".json";
             //string objectDataAsJson = File.ReadAllText(objectPath);
-            string objectPath = "Avatars/Hands/" + handType;
+            string objectPath = "Avatars/Hands/" + handType + "_" + side;
             string objectDataAsJson = Resources.Load<TextAsset>(objectPath).text;
             activeHandData = JsonUtility.FromJson<AvatarObjectData>(objectDataAsJson);
             if (activeHandData == null)
