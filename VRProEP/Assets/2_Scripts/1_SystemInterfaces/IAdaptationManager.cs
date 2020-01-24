@@ -29,5 +29,10 @@ namespace VRProEP.AdaptationCore
         /// Resets the adaptation algorithm.
         /// </summary>
         void Reset();
+        /// <summary>
+        /// Returns the states of the adaptation manager.
+        /// </summary>
+        /// <returns>An array of floats containing the states of the adaptation manager.</returns>
+        float[] GetStates();
     }
 }

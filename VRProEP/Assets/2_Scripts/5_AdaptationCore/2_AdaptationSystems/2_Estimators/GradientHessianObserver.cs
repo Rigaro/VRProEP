@@ -222,7 +222,7 @@ namespace VRProEP.AdaptationCore
         {
             // First, multiply the previous states estimate xHat times C.
             // And remove it from the input u to get estimation error 'uTilde'.
-            float uTilde = u - Math.VectorMultiplication(C, xHat);
+            float uTilde = u - Math.VectorDotProduct(C, xHat);
             //Debug.Log(uTilde);
             // Now multiply error by the gain L,
             // multiply the previous states estimate xHat times A.
@@ -242,7 +242,7 @@ namespace VRProEP.AdaptationCore
                     // Update the dither derivative C' and create a vector with it.
                     Cd = new float[3] { 0.0f, dithers[0].Update(t), dithers[1].Update(t) };
                     // And finally multiply it by xHat to get du.
-                    duHat[0] = Math.VectorMultiplication(Cd, xHat);
+                    duHat[0] = Math.VectorDotProduct(Cd, xHat);
                     break;
                 //
                 // Gradient-Hessian
@@ -252,8 +252,8 @@ namespace VRProEP.AdaptationCore
                     Cd = new float[5] { 0, dithers[0].Update(t), dithers[1].Update(t), 0, 0 };
                     float[] Cdd = new float[5] { 0, 0, 0, dithers[2].Update(t), dithers[3].Update(t) };
                     // And finally multiply it by xHat to get du and d2u.
-                    duHat[0] = Math.VectorMultiplication(Cd, xHat) / a;
-                    duHat[1] = Math.VectorMultiplication(Cdd, xHat) / (a * a);
+                    duHat[0] = Math.VectorDotProduct(Cd, xHat) / a;
+                    duHat[1] = Math.VectorDotProduct(Cdd, xHat) / (a * a);
                     break;
                 default:
                     throw new System.Exception("Invalid observer type.");

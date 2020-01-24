@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace VRProEP.AdaptationCore
 {
-    public interface IPerformanceEvaluator
+    public interface IPerformanceEvaluator<T>
     {
         /// <summary>
         /// Adds a data-set for performance evaluation.
         /// </summary>
-        /// <param name="data"> The data vector. </param>
-        void AppendData(List<float> data);
+        /// <param name="data"> The data vectors. </param>
+        void AppendData(List<T> data);
         /// <summary>
         /// Clears the performance evaluator data memory.
         /// </summary>
@@ -24,6 +24,6 @@ namespace VRProEP.AdaptationCore
         /// Calculates the performance with the current data-sets available.
         /// </summary>
         /// <returns> The updated performance. </returns>
-        float UpdatePerformance();
+        float EvaluatePerformance();
     }
 }

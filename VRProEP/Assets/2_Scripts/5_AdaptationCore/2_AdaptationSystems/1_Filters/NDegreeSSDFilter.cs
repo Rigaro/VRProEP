@@ -47,7 +47,7 @@ namespace VRProEP.AdaptationCore
             // Compute next states x_1 = A*x + B*u
             float[] states_1 = Math.VectorAddition(Math.MatrixVectorMultiplication(A, states), Math.VectorScalarMultiplication(B, u));
             // Compute output y = C*x + D*u
-            float y = Math.VectorMultiplication(C, states) + D*u;
+            float y = Math.VectorDotProduct(C, states) + D*u;
             // Update states
             states = states_1;
             // Return filteres signal

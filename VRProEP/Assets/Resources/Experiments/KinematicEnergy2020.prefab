@@ -56,20 +56,25 @@ MonoBehaviour:
   playerOrientation: 0
   restTime: 60
   restIterations: 100
-  iterationsPerSession: 000000000000000000000000
-  trainingPerSession: 000000000000000000000000
+  iterationsPerSession: 00000000
+  trainingPerSession: 00000000
   taskDataFormat: loc,t,aDotUA,bDotUA,gDotUA,aUA,bUA,gUA,xUA,yUA,zUA,aDotE,bDotE,gDotE,aE,bE,gE,xE,yE,zE,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,xHand,yHand,zHand,aHand,bHand,gHand
-  gridRows: 2
-  gridColumns: 2
+  ablebodiedDataFormat: loc,t,aDotUA,bDotUA,gDotUA,aUA,bUA,gUA,xUA,yUA,zUA,aDotE,bDotE,gDotE,aE,bE,gE,xE,yE,zE,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,xHand,yHand,zHand,aHand,bHand,gHand
+  prostheticDataFormat: loc,t,aDotUA,bDotUA,gDotUA,aUA,bUA,gUA,xUA,yUA,zUA,qE,qDotE,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,xHand,yHand,zHand,aHand,bHand,gHand,enable
+  performanceDataFormat: i,J,uf,du,d2u,thetaBar,theta
+  gridRows: 1
+  gridColumns: 1
   gridSpacing: 0.15
-  gridHeightMultiplier: 0.8
+  gridHeightMultiplier: 0.7
   gridReachMultiplier: 0.9
   gridManager: {fileID: 9044975067194370354}
   startShoulderAngle: 0
   startElbowAngle: 90
   startTolerance: 5
-  iterationsPerTarget: 2
-  sessions: 3
+  iterationsPerTarget: 30
+  theta: 0.5
+  ditherAmplitude: 0.05
+  optimiserGain: 0.001
 --- !u!1001 &5916067502469450487
 PrefabInstance:
   m_ObjectHideFlags: 0

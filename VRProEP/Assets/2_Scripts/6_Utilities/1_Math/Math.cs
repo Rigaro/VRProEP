@@ -100,7 +100,7 @@ namespace VRProEP.Utilities
         /// <param name="v1">The row vector.</param>
         /// <param name="v2">The column vector.</param>
         /// <returns></returns>
-        public static float VectorMultiplication(float[] v1, float[] v2)
+        public static float VectorDotProduct(float[] v1, float[] v2)
         {
             if (v1 == null || v2 == null)
                 throw new System.ArgumentNullException("A provided vector is empty.");
@@ -168,6 +168,27 @@ namespace VRProEP.Utilities
         }
 
         /// <summary>
+        /// Performs a multiplication between the elements of two vectors.
+        /// </summary>
+        /// <param name="v1">The first vector.</param>
+        /// <param name="v2">The second vector.</param>
+        /// <returns></returns>
+        public static float[] VectorElementMultiplication(float[] v1, float[] v2)
+        {
+            if (v1 == null || v2 == null)
+                throw new System.ArgumentNullException("A provided vector is empty.");
+            if (v1.Length != v2.Length)
+                throw new System.ArgumentOutOfRangeException("The vectors are not of the same length.");
+
+            float[] result = new float[v1.Length];
+            for (int i = 0; i < v1.Length; i++)
+            {
+                result[i] = v1[i] * v2[i];
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Adds two vectors together. Vectors should be of the same length.
         /// </summary>
         /// <param name="v1">The first vector.</param>
@@ -189,10 +210,10 @@ namespace VRProEP.Utilities
         }
 
         /// <summary>
-        /// Adds two vectors together. Vectors should be of the same length.
+        /// Adds two matrices together. Matrices should be of the same size.
         /// </summary>
-        /// <param name="v1">The first vector.</param>
-        /// <param name="v2">The second vector</param>
+        /// <param name="v1">The first matrix.</param>
+        /// <param name="v2">The second matrix</param>
         /// <returns></returns>
         public static float[][] MatrixAddition(float[][] m1, float[][] m2)
         {
@@ -222,11 +243,10 @@ namespace VRProEP.Utilities
             return result;
         }
         /// <summary>
-        /// Adds two vectors together. Vectors should be of the same length.
+        /// Performs a matrix transpose.
         /// </summary>
-        /// <param name="v1">The first vector.</param>
-        /// <param name="v2">The second vector</param>
-        /// <returns></returns>
+        /// <param name="m1">The matrix to be transposed.</param>
+        /// <returns>The matrix transpose</returns>
         public static float[][] MatrixTranspose(float[][] m1)
         {
             if (m1 == null)

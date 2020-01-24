@@ -14,12 +14,21 @@ using Valve.VR.InteractionSystem;
 using VRProEP.ExperimentCore;
 using VRProEP.GameEngineCore;
 using VRProEP.ProsthesisCore;
+using VRProEP.AdaptationCore;
 using VRProEP.Utilities;
 
 public class KinematicEnergy2020 : GameMaster
 {
     // Here you can place all your Unity (GameObjects or similar)
     #region Unity objects
+    [Header("Experiment configuration: Data format")]
+    [SerializeField]
+    private string ablebodiedDataFormat = "loc,t,aDotUA,bDotUA,gDotUA,aUA,bUA,gUA,xUA,yUA,zUA,aDotE,bDotE,gDotE,aE,bE,gE,xE,yE,zE,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,xHand,yHand,zHand,aHand,bHand,gHand";
+    [SerializeField]
+    private string prostheticDataFormat = "loc,t,aDotUA,bDotUA,gDotUA,aUA,bUA,gUA,xUA,yUA,zUA,qE,qDotE,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,xHand,yHand,zHand,aHand,bHand,gHand,enable";
+    [SerializeField]
+    protected string performanceDataFormat = "i,J,uf,du,d2u,thetaBar,theta";
+
     [Header("Experiment configuration: Grid")]
     [SerializeField]
     [Tooltip("The number of rows for the reaching grid.")]
@@ -74,10 +83,13 @@ public class KinematicEnergy2020 : GameMaster
     // Instructions management
     //private string infoText;
 
-    // Motion tracking for experiment management (check for start position)
+    // Motion tracking for experiment management and adaptation (check for start position)
     private VIVETrackerManager upperArmTracker;
     private VIVETrackerManager lowerArmTracker;
-    
+    private VIVETrackerManager shoulderTracker;
+    private VIVETrackerManager c7Tracker;
+    private VirtualPositionTracker handTracker;
+
     // Target management variables
     private int targetNumber; // The total number of targets
     private List<int> targetOrder = new List<int>(); // A list of target indexes ordered for selection over iterations in a session.
@@ -89,6 +101,23 @@ public class KinematicEnergy2020 : GameMaster
     // Prosthesis handling objects
     private GameObject prosthesisManagerGO;
     private ConfigurableElbowManager elbowManager;
+
+    // Prosthesis adaptation stuff
+    private List<Vector3> shPosBuffer;
+    private List<Vector3> c7PosBuffer;
+    private TransCyberHPIPersonalisation personaliser;
+    private UpperBodyCompensationMotionPM evaluator;
+    [Header("Experiment configuration: Personalisation")]
+    [SerializeField]
+    [Range(0.1f, 3.0f)]
+    private float theta = 0.5f;
+    [SerializeField]
+    private float ditherAmplitude = 0.05f;
+    [SerializeField]
+    private float optimiserGain = 0.001f;
+
+    // Additional data logging
+    private DataStreamLogger performanceDataLogger;
 
     // Other helpful stuff
     private float leftySign = 1.0f;
@@ -110,22 +139,22 @@ public class KinematicEnergy2020 : GameMaster
             //
             // Debug using able-bodied configuration
             //
-            //AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
-            //AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
+            AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
+            AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
 
             //
             // Debug prosthetic
             //
-            AvatarSystem.LoadPlayer(UserType.Ablebodied, AvatarType.Transhumeral);
-            AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
-            // Initialize prosthesis
-            GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
-            ConfigurableElbowManager elbowManager = prosthesisManagerGO.AddComponent<ConfigurableElbowManager>();
-            elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + SaveSystem.ActiveUser.handLength / 2.0f));
-            // Set the reference generator to jacobian-based.
-            //elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
-            // Set the reference generator to linear synergy.
-            elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
+            //AvatarSystem.LoadPlayer(UserType.Ablebodied, AvatarType.Transhumeral);
+            //AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
+            //// Initialize prosthesis
+            //GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+            //ConfigurableElbowManager elbowManager = prosthesisManagerGO.AddComponent<ConfigurableElbowManager>();
+            //elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + SaveSystem.ActiveUser.handLength / 2.0f));
+            //// Set the reference generator to jacobian-based.
+            ////elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
+            //// Set the reference generator to linear synergy.
+            //elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
         }
 
     }
@@ -168,19 +197,30 @@ public class KinematicEnergy2020 : GameMaster
     /// </summary>
     public override void InitialiseExperimentSystems()
     {
-        // First run the base initialisation which is needed.
-        base.InitialiseExperimentSystems();
-
         //
         // Set the experiment type configuration
         //
         // Type one if able-bodied subject
         if (AvatarSystem.AvatarType == AvatarType.AbleBodied)
+        {
             experimentType = ExperimentType.TypeOne; // Able-bodied experiment type
+            taskDataFormat = ablebodiedDataFormat;
+        }
         // Type two if prosthetic (Adaptive Synergy)
         else if (AvatarSystem.AvatarType == AvatarType.Transhumeral)
+        {
             experimentType = ExperimentType.TypeTwo; // Able-bodied experiment type
+            taskDataFormat = prostheticDataFormat;
+        }
+        // Then run the base initialisation which is needed.
+        base.InitialiseExperimentSystems();
 
+        //
+        // Create the performance data loggers
+        //
+        performanceDataLogger = new DataStreamLogger("TaskData");
+        ExperimentSystem.AddExperimentLogger(performanceDataLogger);
+        performanceDataLogger.AddNewLogFile(AvatarSystem.AvatarType.ToString(), sessionNumber, performanceDataFormat); // Add file
 
         if (SaveSystem.ActiveUser.lefty)
             leftySign = -1.0f;
@@ -243,18 +283,36 @@ public class KinematicEnergy2020 : GameMaster
             // Set the reference generator to linear synergy.
             elbowManager.ChangeSensor("VAL_SENSOR_VIVETRACKER");
             elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
+
+            // TEST
+            elbowManager.SetSynergy(theta);
+            // Create the personalisation algorithm object
+            float[] ditherFrequency = { Mathf.PI / 4, 2*Mathf.PI / 4 };
+            float[] observerGain = { 0.3840f, 0.6067f, -0.2273f, -0.8977f, -1.0302f };
+            float[][] A = new float[2][];
+            A[0] = new float[2] { 1.3130f, -0.8546f };
+            A[1] = new float[2] { 1.0f, 0.0f };
+            float[] B = { 1.0f, 0.0f };
+            float[] C = { 0.0131f, -0.0131f };
+            float D = 0.0f;
+            personaliser = new TransCyberHPIPersonalisation(ditherAmplitude, 0, ditherFrequency, observerGain, 1, optimiserGain, 0.1f, A, B, C, D, theta, 0.1f, 3.0f);
         }
 
-        // Add the 
+        // Performance evaluation objects
+        evaluator = new UpperBodyCompensationMotionPM(0.5f, 0.5f);
+        shPosBuffer = new List<Vector3>();
+        c7PosBuffer = new List<Vector3>();
+
+        // Debug?
         if (!debug)
         {
             // Shoulder acromium head tracker
             GameObject motionTrackerGO1 = AvatarSystem.AddMotionTracker();
-            VIVETrackerManager shoulderTracker = new VIVETrackerManager(motionTrackerGO1.transform);
+            shoulderTracker = new VIVETrackerManager(motionTrackerGO1.transform);
             ExperimentSystem.AddSensor(shoulderTracker);
             // C7 tracker
             GameObject motionTrackerGO2 = AvatarSystem.AddMotionTracker();
-            VIVETrackerManager c7Tracker = new VIVETrackerManager(motionTrackerGO2.transform);
+            c7Tracker = new VIVETrackerManager(motionTrackerGO2.transform);
             ExperimentSystem.AddSensor(c7Tracker);
         }
 
@@ -262,11 +320,12 @@ public class KinematicEnergy2020 : GameMaster
         // Hand tracking sensor
         //
         GameObject handGO = GameObject.FindGameObjectWithTag("Hand");
-        VirtualPositionTracker handTracker = new VirtualPositionTracker(handGO.transform);
+        handTracker = new VirtualPositionTracker(handGO.transform);
         ExperimentSystem.AddSensor(handTracker);
 
         // Spawn grid
         gridManager.SpawnGrid(gridRows, gridColumns, gridSpacing);
+
     }
 
     /// <summary>
@@ -401,6 +460,9 @@ public class KinematicEnergy2020 : GameMaster
     /// </summary>
     public override void PrepareForStart()
     {
+        // Clear buffers
+        shPosBuffer.Clear();
+        c7PosBuffer.Clear();
         // Select target
         gridManager.SelectBall(targetOrder[iterationNumber - 1]);
         // Return prosthetic elbow to -90deg
@@ -432,6 +494,15 @@ public class KinematicEnergy2020 : GameMaster
 
         // Continue with data logging.
         base.HandleTaskDataLogging();
+
+        // Performance evaluation data buffering
+        if (!debug)
+        {
+            Vector3 shPos = new Vector3(shoulderTracker.GetProcessedData("X_Pos"), shoulderTracker.GetProcessedData("Y_Pos"), shoulderTracker.GetProcessedData("Z_Pos"));
+            Vector3 c7Pos = new Vector3(c7Tracker.GetProcessedData("X_Pos"), c7Tracker.GetProcessedData("Y_Pos"), c7Tracker.GetProcessedData("Z_Pos"));
+            shPosBuffer.Add(shPos);
+            c7PosBuffer.Add(c7Pos);
+        }
     }
 
     /// <summary>
@@ -487,8 +558,35 @@ public class KinematicEnergy2020 : GameMaster
     /// </summary>
     public override void HandleResultAnalysis()
     {
-        // If it's able-bodied, no need to do anything
-        // If it's KE-Adaptive-Synergy then perform synergy update
+        if(!debug)
+        {
+            // Performance evaluation
+            evaluator.AddData<Vector3>(shPosBuffer, evaluator.SHOULDER);
+            evaluator.AddData<Vector3>(c7PosBuffer, evaluator.TRUNK);
+            float J = evaluator.Update();
+
+            //Debug.Log("J = " + J);
+            string iterationResults = iterationNumber + "," +
+                                     J;
+
+            // If it's able-bodied, no need to do anything
+            // If it's KE-Adaptive-Synergy then perform synergy update
+            if (experimentType == ExperimentType.TypeTwo)
+            {
+                // Perform update
+                theta = personaliser.UpdateParameter(J, iterationNumber);
+                elbowManager.SetSynergy(theta);
+                // Add algorithm states data to log
+                foreach (float value in personaliser.GetStates())
+                    iterationResults += "," + value;
+            }
+            iterationResults += "," + theta;
+            //Debug.Log("Theta: " + theta);
+
+            // Log results
+            performanceDataLogger.AppendData(iterationResults);
+            performanceDataLogger.SaveLog();
+        }
     }
 
     public override void HandleIterationInitialisation()
@@ -502,6 +600,10 @@ public class KinematicEnergy2020 : GameMaster
     public override void HandleSessionInitialisation()
     {
         base.HandleSessionInitialisation();
+
+        // New file for the performance data logger
+        performanceDataLogger.CloseLog();
+        performanceDataLogger.AddNewLogFile(AvatarSystem.AvatarType.ToString(), sessionNumber, performanceDataFormat); // Add file
 
         // Clear ball
         gridManager.ResetBallSelection();

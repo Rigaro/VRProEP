@@ -304,7 +304,7 @@ namespace VRProEP.ProsthesisCore
             else if (channel == 8)
                 return trackerTransform.position.z;
             else
-                throw new System.ArgumentOutOfRangeException("The channel range is 1-9.");
+                throw new System.ArgumentOutOfRangeException("The channel range is 0-8.");
         }
 
         /// <summary>

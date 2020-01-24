@@ -18,6 +18,7 @@ namespace VRProEP.AdaptationCore
         protected float theta;
         protected float thetaMin;
         protected float thetaMax;
+        private List<float> states = new List<float>();
 
         /// <summary>
         /// Sets the limits for the parameter that is being adapted.
@@ -38,14 +39,14 @@ namespace VRProEP.AdaptationCore
         /// <returns>The updated parameter value.</returns>
         public float UpdateParameter(float u, float t)
         {
-            // Prepare variables
-            float thetaBar = 0.0f; // Parameter estimate
+            // Clear states variable
+            states.Clear();
 
             // Get gradient estimate
             float[] duArr = estimator.Update(u, t);
 
             // Update parameter estimate
-            thetaBar = optimiser.Update(duArr);
+            float thetaBar = optimiser.Update(duArr);
 
             // Add excitation dither
             theta = thetaBar + dither.Update(t);
@@ -54,8 +55,22 @@ namespace VRProEP.AdaptationCore
             if (theta > thetaMax) theta = thetaMax;
             else if (theta < thetaMin) theta = thetaMin;
 
+            // Add data to states
+            states.AddRange(duArr);
+            states.Add(thetaBar);
+
             return theta;
         }
+
+        /// <summary>
+        /// Returns the states of the adaptation manager.
+        /// </summary>
+        /// <returns>An array of floats containing the states of the adaptation manager.</returns>
+        public float[] GetStates()
+        {
+            return states.ToArray();
+        }
+
         /// <summary>
         /// Returns the current parameter value.
         /// </summary>
