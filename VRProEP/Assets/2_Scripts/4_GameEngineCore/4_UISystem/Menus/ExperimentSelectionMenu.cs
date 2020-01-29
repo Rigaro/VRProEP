@@ -145,7 +145,9 @@ public class ExperimentSelectionMenu : MonoBehaviour
                     }
 
                     // Load training
-                    SteamVR_LoadLevel.Begin("ProsthesisTraining");
+                    //SteamVR_LoadLevel.Begin("ProsthesisTraining");
+                    // Load experiment.
+                     SteamVR_LoadLevel.Begin("JacobianSynergyExperiment");
                 }
                 else
                     logManager.DisplayInformationOnLog(3.0f, "Please configure the " + optionList[optionNumber] + " avatar.");

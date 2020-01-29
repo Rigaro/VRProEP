@@ -96,6 +96,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -3849,31 +3850,6 @@ PrefabInstance:
       propertyPath: debugText
       value: 
       objectReference: {fileID: 826256571}
-    - target: {fileID: 8072093157744520089, guid: 540437a41962c494392435d9a166ad65,
-        type: 3}
-      propertyPath: gridHeightMultiplier
-      value: 0.8
-      objectReference: {fileID: 0}
-    - target: {fileID: 8072093157744520089, guid: 540437a41962c494392435d9a166ad65,
-        type: 3}
-      propertyPath: iterationsPerTarget
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8072093157744520089, guid: 540437a41962c494392435d9a166ad65,
-        type: 3}
-      propertyPath: gridRows
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 8072093157744520089, guid: 540437a41962c494392435d9a166ad65,
-        type: 3}
-      propertyPath: gridColumns
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 8072093157744520089, guid: 540437a41962c494392435d9a166ad65,
-        type: 3}
-      propertyPath: gridSpacing
-      value: 0.2
-      objectReference: {fileID: 0}
     - target: {fileID: 9044975066999247918, guid: 540437a41962c494392435d9a166ad65,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3932,7 +3908,7 @@ PrefabInstance:
     - target: {fileID: 9044975066999247919, guid: 540437a41962c494392435d9a166ad65,
         type: 3}
       propertyPath: m_Name
-      value: KinematicEnergy2020
+      value: GridReaching2020
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 540437a41962c494392435d9a166ad65, type: 3}

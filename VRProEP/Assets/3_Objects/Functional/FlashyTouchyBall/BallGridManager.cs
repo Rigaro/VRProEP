@@ -105,6 +105,15 @@ public class BallGridManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Gets the position of the currently selected ball.
+    /// </summary>
+    /// <returns>The ball position as a Vector3</returns>
+    public Vector3 GetSelectedBallPosition()
+    {
+        return balls[selectedIndex].transform.position;
+    }
+
+    /// <summary>
     /// Clears the ball selection
     /// </summary>
     public void ResetBallSelection()

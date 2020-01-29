@@ -7,7 +7,7 @@ public class ExperimentLoader : MonoBehaviour
 {
     [SerializeField]
     private bool debug = false;
-
+    
     // Start is called before the first frame update
     void Start()
     {

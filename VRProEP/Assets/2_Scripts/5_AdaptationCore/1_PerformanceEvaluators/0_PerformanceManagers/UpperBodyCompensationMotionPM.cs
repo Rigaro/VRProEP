@@ -7,8 +7,8 @@ namespace VRProEP.AdaptationCore
 {
     public class UpperBodyCompensationMotionPM : IPerformanceManager
     {
-        public readonly string SHOULDER = "Shoulder";
-        public readonly string TRUNK = "Trunk";
+        public static string SHOULDER = "Shoulder";
+        public static string TRUNK = "Trunk";
 
         private ConvexSumOfNormsOF objectiveFunction;
         private MaxDisplacementPE shEvaluator;

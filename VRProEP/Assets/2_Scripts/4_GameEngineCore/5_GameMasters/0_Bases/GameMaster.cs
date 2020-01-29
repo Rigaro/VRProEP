@@ -1,6 +1,7 @@
 ﻿// System
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 // Unity
 using UnityEngine;
@@ -104,6 +105,13 @@ public abstract class GameMaster : MonoBehaviour
     }
     protected ExperimentType experimentType;
 
+    #region Dynamic configuration
+
+    // Experiment configuration
+    protected TextAsset configAsset;
+
+    #endregion
+
     #region Flow control variables
 
     //
@@ -180,6 +188,9 @@ public abstract class GameMaster : MonoBehaviour
     // Runs once when the experiment is launched
     protected virtual void Start()
     {
+        // Configure experiment
+        ConfigureExperiment();
+
         // Initialize UI.
         InitializeUI();
 
@@ -255,6 +266,18 @@ public abstract class GameMaster : MonoBehaviour
     }
 
     /// <summary>
+    /// Configures the experiment from a text file.
+    /// The method needs to be extended to extract data from the configuration file that is automatically loaded.
+    /// </summary>
+    public virtual void ConfigureExperiment()
+    {
+        if (debug)
+            configAsset = Resources.Load<TextAsset>("Experiments/" + this.gameObject.name);
+        else
+            configAsset = Resources.Load<TextAsset>("Experiments/" + ExperimentSystem.ActiveExperimentID);
+    }
+
+    /// <summary>
     /// Initializes the ExperimentSystem and its components.
     /// Verifies that all components needed for the experiment are available.
     /// This must be done in Start.
@@ -267,8 +290,7 @@ public abstract class GameMaster : MonoBehaviour
         //
         if (debug)
             ExperimentSystem.SetActiveExperimentID(this.gameObject.name + "_Debug");
-
-
+        
         // Make sure flow control is initialised
         sessionNumber = 1;
         iterationNumber = 1;

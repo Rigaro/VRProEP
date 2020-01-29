@@ -1,6 +1,7 @@
 ﻿// System
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 // Unity
 using UnityEngine;
@@ -17,17 +18,20 @@ using VRProEP.ProsthesisCore;
 using VRProEP.AdaptationCore;
 using VRProEP.Utilities;
 
-public class KinematicEnergy2020 : GameMaster
+public class GridReaching2020GM : GameMaster
 {
     // Here you can place all your Unity (GameObjects or similar)
     #region Unity objects
     [Header("Experiment configuration: Data format")]
     [SerializeField]
-    private string ablebodiedDataFormat = "loc,t,aDotUA,bDotUA,gDotUA,aUA,bUA,gUA,xUA,yUA,zUA,aDotE,bDotE,gDotE,aE,bE,gE,xE,yE,zE,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,xHand,yHand,zHand,aHand,bHand,gHand";
+    private string ablebodiedDataFormat = "loc,t,aDotE,bDotE,gDotE,aE,bE,gE,xE,yE,zE,aDotUA,bDotUA,gDotUA,aUA,bUA,gUA,xUA,yUA,zUA,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,xHand,yHand,zHand,aHand,bHand,gHand";
     [SerializeField]
     private string prostheticDataFormat = "loc,t,aDotUA,bDotUA,gDotUA,aUA,bUA,gUA,xUA,yUA,zUA,qE,qDotE,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,xHand,yHand,zHand,aHand,bHand,gHand,enable";
     [SerializeField]
-    protected string performanceDataFormat = "i,J,uf,du,d2u,thetaBar,theta";
+    private string ablebodiedPerformanceDataFormat = "i,J,loc,targetX,targetY,targetZ";
+    [SerializeField]
+    private string prostheticPerformanceDataFormat = "i,J,uf,du,d2u,thetaBar,theta,loc,targetX,targetY,targetZ";
+    private string performanceDataFormat;
 
     [Header("Experiment configuration: Grid")]
     [SerializeField]
@@ -103,10 +107,13 @@ public class KinematicEnergy2020 : GameMaster
     private ConfigurableElbowManager elbowManager;
 
     // Prosthesis adaptation stuff
-    private List<Vector3> shPosBuffer;
-    private List<Vector3> c7PosBuffer;
+    private List<Vector3> laDataBuffer;
+    private List<Vector3> uaDataBuffer;
+    private List<Vector3> shDataBuffer;
+    private List<Vector3> c7DataBuffer;
     private TransCyberHPIPersonalisation personaliser;
-    private UpperBodyCompensationMotionPM evaluator;
+    //private UpperBodyCompensationMotionPM evaluator;
+    private IPerformanceManager evaluator;
     [Header("Experiment configuration: Personalisation")]
     [SerializeField]
     [Range(0.1f, 3.0f)]
@@ -121,6 +128,26 @@ public class KinematicEnergy2020 : GameMaster
 
     // Other helpful stuff
     private float leftySign = 1.0f;
+
+    // Experiment configuration file objects
+    public enum EvaluatorType
+    {
+        Compensation,
+        KinematicEnergy
+    }
+    [SerializeField]
+    private EvaluatorType evaluatorType = EvaluatorType.Compensation;
+    private class GridReachingConfigurator
+    {
+        public int gridRows = 3;
+        public int gridColumns = 3;
+        public float gridSpacing = 0.2f;
+        public float gridHeightMultiplier = 0.8f;
+        public float gridReachMultiplier = 0.9f;
+        public int iterationsPerTarget = 10;
+    }
+    private GridReachingConfigurator configurator;
+
     #endregion
 
     // Here are all the methods you need to write for your experiment.
@@ -132,6 +159,13 @@ public class KinematicEnergy2020 : GameMaster
     {
         if (debug)
         {
+            //// Save some test config data
+            //string configFilePath = Application.dataPath + "/Resources/Experiments/GridReaching2020.config";
+            //Debug.Log(configFilePath);
+            //configurator = new GridReachingConfigurator();
+            //string configuratorAsJson = JsonUtility.ToJson(configurator);
+            //File.WriteAllText(configFilePath, configuratorAsJson);
+
             //
             // Debug able
             //
@@ -190,6 +224,25 @@ public class KinematicEnergy2020 : GameMaster
     }
 
     /// <summary>
+    /// Configures the experiment from a text file.
+    /// The method needs to be extended to extract data from the configuration file that is automatically loaded.
+    /// </summary>
+    public override void ConfigureExperiment()
+    {
+        base.ConfigureExperiment();
+
+        // Convert configuration file to configuration class.
+        configurator = JsonUtility.FromJson<GridReachingConfigurator>(configAsset.text);
+        // Load data
+        gridRows = configurator.gridRows;
+        gridColumns = configurator.gridColumns;
+        gridSpacing = configurator.gridSpacing;
+        gridHeightMultiplier = configurator.gridHeightMultiplier;
+        gridReachMultiplier = configurator.gridReachMultiplier;
+        iterationsPerTarget = configurator.iterationsPerTarget;
+    }
+
+    /// <summary>
     /// Initializes the ExperimentSystem and its components.
     /// Verifies that all components needed for the experiment are available.
     /// This must be done in Start.
@@ -205,12 +258,14 @@ public class KinematicEnergy2020 : GameMaster
         {
             experimentType = ExperimentType.TypeOne; // Able-bodied experiment type
             taskDataFormat = ablebodiedDataFormat;
+            performanceDataFormat = ablebodiedPerformanceDataFormat;
         }
         // Type two if prosthetic (Adaptive Synergy)
         else if (AvatarSystem.AvatarType == AvatarType.Transhumeral)
         {
             experimentType = ExperimentType.TypeTwo; // Able-bodied experiment type
             taskDataFormat = prostheticDataFormat;
+            performanceDataFormat = prostheticPerformanceDataFormat;
         }
         // Then run the base initialisation which is needed.
         base.InitialiseExperimentSystems();
@@ -218,7 +273,7 @@ public class KinematicEnergy2020 : GameMaster
         //
         // Create the performance data loggers
         //
-        performanceDataLogger = new DataStreamLogger("TaskData");
+        performanceDataLogger = new DataStreamLogger("PerformanceData");
         ExperimentSystem.AddExperimentLogger(performanceDataLogger);
         performanceDataLogger.AddNewLogFile(AvatarSystem.AvatarType.ToString(), sessionNumber, performanceDataFormat); // Add file
 
@@ -284,9 +339,8 @@ public class KinematicEnergy2020 : GameMaster
             elbowManager.ChangeSensor("VAL_SENSOR_VIVETRACKER");
             elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
 
-            // TEST
-            elbowManager.SetSynergy(theta);
             // Create the personalisation algorithm object
+            elbowManager.SetSynergy(theta);
             float[] ditherFrequency = { Mathf.PI / 4, 2*Mathf.PI / 4 };
             float[] observerGain = { 0.3840f, 0.6067f, -0.2273f, -0.8977f, -1.0302f };
             float[][] A = new float[2][];
@@ -298,10 +352,17 @@ public class KinematicEnergy2020 : GameMaster
             personaliser = new TransCyberHPIPersonalisation(ditherAmplitude, 0, ditherFrequency, observerGain, 1, optimiserGain, 0.1f, A, B, C, D, theta, 0.1f, 3.0f);
         }
 
-        // Performance evaluation objects
-        evaluator = new UpperBodyCompensationMotionPM(0.5f, 0.5f);
-        shPosBuffer = new List<Vector3>();
-        c7PosBuffer = new List<Vector3>();
+        if (evaluatorType == EvaluatorType.Compensation)
+        {
+            // Performance evaluation objects
+            evaluator = new UpperBodyCompensationMotionPM(0.5f, 0.5f);
+            shDataBuffer = new List<Vector3>();
+            c7DataBuffer = new List<Vector3>();
+        }
+        else if (evaluatorType == EvaluatorType.KinematicEnergy)
+        {
+            throw new System.NotImplementedException("KE method not yet implemented");
+        }
 
         // Debug?
         if (!debug)
@@ -461,8 +522,8 @@ public class KinematicEnergy2020 : GameMaster
     public override void PrepareForStart()
     {
         // Clear buffers
-        shPosBuffer.Clear();
-        c7PosBuffer.Clear();
+        shDataBuffer.Clear();
+        c7DataBuffer.Clear();
         // Select target
         gridManager.SelectBall(targetOrder[iterationNumber - 1]);
         // Return prosthetic elbow to -90deg
@@ -498,10 +559,17 @@ public class KinematicEnergy2020 : GameMaster
         // Performance evaluation data buffering
         if (!debug)
         {
-            Vector3 shPos = new Vector3(shoulderTracker.GetProcessedData("X_Pos"), shoulderTracker.GetProcessedData("Y_Pos"), shoulderTracker.GetProcessedData("Z_Pos"));
-            Vector3 c7Pos = new Vector3(c7Tracker.GetProcessedData("X_Pos"), c7Tracker.GetProcessedData("Y_Pos"), c7Tracker.GetProcessedData("Z_Pos"));
-            shPosBuffer.Add(shPos);
-            c7PosBuffer.Add(c7Pos);
+            if (evaluatorType == EvaluatorType.Compensation)
+            {
+                Vector3 shPos = new Vector3(shoulderTracker.GetProcessedData("X_Pos"), shoulderTracker.GetProcessedData("Y_Pos"), shoulderTracker.GetProcessedData("Z_Pos"));
+                Vector3 c7Pos = new Vector3(c7Tracker.GetProcessedData("X_Pos"), c7Tracker.GetProcessedData("Y_Pos"), c7Tracker.GetProcessedData("Z_Pos"));
+                shDataBuffer.Add(shPos);
+                c7DataBuffer.Add(c7Pos);
+            }
+            else if (evaluatorType == EvaluatorType.KinematicEnergy)
+            {
+                throw new System.NotImplementedException("KE method not yet implemented");
+            }
         }
     }
 
@@ -561,8 +629,15 @@ public class KinematicEnergy2020 : GameMaster
         if(!debug)
         {
             // Performance evaluation
-            evaluator.AddData<Vector3>(shPosBuffer, evaluator.SHOULDER);
-            evaluator.AddData<Vector3>(c7PosBuffer, evaluator.TRUNK);
+            if (evaluatorType == EvaluatorType.Compensation)
+            {
+                evaluator.AddData<Vector3>(shDataBuffer, UpperBodyCompensationMotionPM.SHOULDER);
+                evaluator.AddData<Vector3>(c7DataBuffer, UpperBodyCompensationMotionPM.TRUNK);
+            }
+            else if (evaluatorType == EvaluatorType.KinematicEnergy)
+            {
+                throw new System.NotImplementedException("KE method not yet implemented.");
+            }
             float J = evaluator.Update();
 
             //Debug.Log("J = " + J);
@@ -579,8 +654,11 @@ public class KinematicEnergy2020 : GameMaster
                 // Add algorithm states data to log
                 foreach (float value in personaliser.GetStates())
                     iterationResults += "," + value;
+
+                iterationResults += "," + theta;
             }
-            iterationResults += "," + theta;
+            Vector3 ballPos = gridManager.GetSelectedBallPosition();
+            iterationResults += "," + targetOrder[iterationNumber - 1] + "," + ballPos.x + "," + ballPos.y + "," + ballPos.z;
             //Debug.Log("Theta: " + theta);
 
             // Log results
@@ -603,7 +681,7 @@ public class KinematicEnergy2020 : GameMaster
 
         // New file for the performance data logger
         performanceDataLogger.CloseLog();
-        performanceDataLogger.AddNewLogFile(AvatarSystem.AvatarType.ToString(), sessionNumber, performanceDataFormat); // Add file
+        performanceDataLogger.AddNewLogFile(AvatarSystem.AvatarType.ToString(), sessionNumber, ablebodiedPerformanceDataFormat); // Add file
 
         // Clear ball
         gridManager.ResetBallSelection();

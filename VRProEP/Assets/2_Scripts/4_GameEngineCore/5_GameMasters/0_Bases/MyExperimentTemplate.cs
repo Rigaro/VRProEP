@@ -43,6 +43,21 @@ public class MyExperimentTemplate : GameMaster
 
     // Hidden
     private float someHiddenNumber = 0.0f;
+
+    #endregion
+
+    #region Dynamic configuration
+
+    //
+    // Configuration class:
+    // Modify this class to be able to configure your experiment from a configuration file
+    //
+    private class Configurator
+    {
+        public float someHiddenNumber = 0.0f;
+    }
+    private Configurator config;
+
     #endregion
 
     // Here are all the methods you need to write for your experiment.
@@ -94,6 +109,21 @@ public class MyExperimentTemplate : GameMaster
         base.HandleHUDColour();
 
         // No changes needed to HUD.
+    }
+
+    /// <summary>
+    /// Configures the experiment from a text file.
+    /// The method needs to be extended to extract data from the configuration file that is automatically loaded.
+    /// </summary>
+    public override void ConfigureExperiment()
+    {
+        // First call the base method to load the file
+        base.ConfigureExperiment();
+
+        // Convert configuration file to configuration class.
+        config = JsonUtility.FromJson<Configurator>(configAsset.text);
+        // Load data
+        someHiddenNumber = config.someHiddenNumber;
     }
 
     /// <summary>
