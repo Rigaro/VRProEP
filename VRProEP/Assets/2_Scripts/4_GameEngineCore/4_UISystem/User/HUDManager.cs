@@ -17,6 +17,12 @@ namespace VRProEP.GameEngineCore
             Purple
         }
 
+        public enum HUDCentreColour
+        {
+            None,
+            Yellow
+        }
+
         public GameObject hudText;
         public GameObject hudGraphics;
         public GameObject hudBlueGraphics;
@@ -25,7 +31,11 @@ namespace VRProEP.GameEngineCore
         public GameObject hudYellowGraphics;
         public GameObject hudOrangeGraphics;
         public GameObject hudPurpleGraphics;
+        public GameObject hudCentreYellowGraphics;
         public HUDColour colour;
+        public HUDCentreColour centreColour;
+
+        private bool clearCentre = true;
 
         private TextMeshPro hudTextMesh;
 
@@ -92,6 +102,14 @@ namespace VRProEP.GameEngineCore
                 hudOrangeGraphics.SetActive(false);
                 hudPurpleGraphics.SetActive(true);
                 hudGreenGraphics.SetActive(false);
+            }
+            if(centreColour == HUDCentreColour.None && !clearCentre)
+            {
+                hudCentreYellowGraphics.SetActive(false);
+            }
+            if (centreColour == HUDCentreColour.Yellow && !hudCentreYellowGraphics.activeSelf)
+            {
+                hudCentreYellowGraphics.SetActive(true);
             }
         }
 
