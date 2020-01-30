@@ -104,7 +104,7 @@ public class ExperimentSelectionMenu : MonoBehaviour
                         KeepOnLoad();
 
                         // Load experiment.
-                        // SteamVR_LoadLevel.Begin("JacobianSynergyExperiment");
+                        //SteamVR_LoadLevel.Begin("JacobianSynergyExperiment");
 
                         // Load training
                         SteamVR_LoadLevel.Begin("ProsthesisTraining");

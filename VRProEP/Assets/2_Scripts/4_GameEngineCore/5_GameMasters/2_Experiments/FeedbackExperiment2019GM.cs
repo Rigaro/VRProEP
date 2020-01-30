@@ -843,6 +843,9 @@ public class FeedbackExperiment2019GM : GameMaster
     /// </summary>
     public override void InitialiseExperimentSystems()
     {
+        GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+        FakeEMGBoniHand prosthesisManager = prosthesisManagerGO.GetComponent<FakeEMGBoniHand>();
+        prosthesisManager.InitializeProsthesis();
         //
         // Set the experiment type and ID
         //

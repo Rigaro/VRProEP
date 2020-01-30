@@ -69,7 +69,7 @@ public class MyExperimentTemplate : GameMaster
     {
         if (debug)
         {
-            SaveSystem.LoadUserData("MD1942"); // Load the test/demo user (Mr Demo)
+            SaveSystem.LoadUserData("DB1942174"); // Load the test/demo user (Mr Demo)
             //
             // Debug using able-bodied configuration
             //
