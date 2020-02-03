@@ -114,6 +114,7 @@ public class MyExperimentTemplate : GameMaster
     /// <summary>
     /// Configures the experiment from a text file.
     /// The method needs to be extended to extract data from the configuration file that is automatically loaded.
+    /// If no configuration is needed, then leave empty.
     /// </summary>
     public override void ConfigureExperiment()
     {

@@ -8133,7 +8133,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 542860650}
         m_MethodName: ReturnToMainMenu
         m_Mode: 1
         m_Arguments:
@@ -9917,7 +9917,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &542860650
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22401,7 +22401,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Mode Selection
+  m_text: Experiment Selection
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
   m_sharedMaterial: {fileID: 2140032, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
@@ -24249,7 +24249,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 542860650}
         m_MethodName: ReturnToExperimentConfigMenu
         m_Mode: 1
         m_Arguments:
@@ -29181,7 +29181,7 @@ MonoBehaviour:
   sensorOptionsButton: {fileID: 1233107139}
   sensorOptionsMenu: {fileID: 2116354057}
   modeSelectionButton: {fileID: 1424943404}
-  experimentSelectionMenu: {fileID: 2049467183}
+  experimentSelectionMenu: {fileID: 542860649}
   activeUserTMP: {fileID: 956281018}
   sensorTMP: {fileID: 1211208050}
   experimentSensorsTMP: {fileID: 1803538302}
@@ -32923,7 +32923,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2045290973
 Transform:
   m_ObjectHideFlags: 0

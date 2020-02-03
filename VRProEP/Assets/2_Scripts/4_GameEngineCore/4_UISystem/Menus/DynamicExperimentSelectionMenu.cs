@@ -28,6 +28,7 @@ public class DynamicExperimentSelectionMenu : MonoBehaviour
         string[] availableExperiments = Directory.GetFiles(Application.dataPath + "/Resources/Experiments/", "*.prefab");
         // Clear list
         experimentList.Clear();
+        experimentDropdown.ClearOptions();
         // Add an empty one as default to force selection.
         experimentList.Add(string.Empty);
 
@@ -47,12 +48,6 @@ public class DynamicExperimentSelectionMenu : MonoBehaviour
 
     private void InitialiseExperiment()
     {
-        SaveSystem.LoadUserData("DB1942174"); // Load the test/demo user (Mr Demo)
-                                              //
-                                              // Debug using able-bodied configuration
-                                              //
-        AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
-        AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
         if (selectedExperiment == 0)
         {
             logManager.DisplayInformationOnLog(5, "Please select an experiment from the dropdown menu.");
@@ -89,12 +84,14 @@ public class DynamicExperimentSelectionMenu : MonoBehaviour
 
     public void ReturnToExperimentConfigMenu()
     {
+        experimentDropdown.ClearOptions();
         experimentConfigMenu.SetActive(true);
         gameObject.SetActive(false);
     }
 
     public void ReturnToMainMenu()
     {
+        experimentDropdown.ClearOptions();
         // Return to main menu
         mainMenu.SetActive(true);
         gameObject.SetActive(false);

@@ -23,6 +23,7 @@ public class AddSensorMenu : MonoBehaviour {
         string[] availableSensors = Enum.GetNames(typeof(SensorType));
         // Clear list
         sensorList.Clear();
+        sensorDropdown.ClearOptions();
         // Add an empty one as default to force selection.
         sensorList.Add(string.Empty);
 

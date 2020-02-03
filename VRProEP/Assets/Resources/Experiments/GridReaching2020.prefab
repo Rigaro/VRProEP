@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6021774852150993635
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3090069130878690261}
+  m_Layer: 0
+  m_Name: StartPosPhoto
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &3090069130878690261
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6021774852150993635}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 6120348429048087449}
+  m_Father: {fileID: 9044975066999247918}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!1 &8247319642344124534
 GameObject:
   m_ObjectHideFlags: 0
@@ -11,12 +42,12 @@ GameObject:
   - component: {fileID: 6120348429048087449}
   - component: {fileID: 5710816671318817375}
   m_Layer: 0
-  m_Name: StartPosPhoto
+  m_Name: Photo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6120348429048087449
 Transform:
   m_ObjectHideFlags: 0
@@ -26,10 +57,10 @@ Transform:
   m_GameObject: {fileID: 8247319642344124534}
   m_LocalRotation: {x: -0.30761656, y: -0.37013093, z: -0.12863383, w: 0.86708045}
   m_LocalPosition: {x: -1.125, y: 2.034, z: 1.255}
-  m_LocalScale: {x: 0.015, y: 0.015, z: 1}
+  m_LocalScale: {x: 0.015000001, y: 0.015000001, z: 1}
   m_Children: []
-  m_Father: {fileID: 9044975066999247918}
-  m_RootOrder: 2
+  m_Father: {fileID: 3090069130878690261}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: -38.953003, y: -46.353, z: 0.342}
 --- !u!212 &5710816671318817375
 SpriteRenderer:
@@ -111,7 +142,7 @@ Transform:
   m_Children:
   - {fileID: 9044975067194370355}
   - {fileID: 1887047862402091588}
-  - {fileID: 6120348429048087449}
+  - {fileID: 3090069130878690261}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -137,7 +168,7 @@ MonoBehaviour:
   experimentCenter: {fileID: 1887047862402091588}
   playerOrientation: 0
   restTime: 60
-  restIterations: 50
+  restIterations: 150
   iterationsPerSession: 00000000
   trainingPerSession: 01000000
   taskDataFormat: loc,t,aDotUA,bDotUA,gDotUA,aUA,bUA,gUA,xUA,yUA,zUA,aDotE,bDotE,gDotE,aE,bE,gE,xE,yE,zE,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,xHand,yHand,zHand,aHand,bHand,gHand
@@ -154,7 +185,7 @@ MonoBehaviour:
   startShoulderAngle: 0
   startElbowAngle: 90
   startTolerance: 5
-  startPosPhoto: {fileID: 8247319642344124534}
+  startPosPhoto: {fileID: 6021774852150993635}
   iterationsPerTarget: 2
   theta: 0.5
   ditherAmplitude: 0.05

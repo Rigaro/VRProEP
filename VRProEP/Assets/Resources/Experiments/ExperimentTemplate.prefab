@@ -55,6 +55,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -141,7 +142,7 @@ MonoBehaviour:
   demoMode: 0
   skipInstructions: 0
   skipTraining: 0
-  debug: 1
+  debug: 0
   debugText: {fileID: 0}
   worldOrientation: 180
   experimentCenter: {fileID: 5068888239709386013}
@@ -242,6 +243,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

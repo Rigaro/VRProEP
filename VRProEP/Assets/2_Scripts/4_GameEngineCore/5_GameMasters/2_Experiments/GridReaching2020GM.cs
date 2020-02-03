@@ -125,6 +125,8 @@ public class GridReaching2020GM : GameMaster
     private float ditherAmplitude = 0.05f;
     [SerializeField]
     private float optimiserGain = 0.001f;
+    [SerializeField]
+    private bool adaptiveSynergy = true;
 
     // Additional data logging
     private DataStreamLogger performanceDataLogger;
@@ -149,6 +151,7 @@ public class GridReaching2020GM : GameMaster
         public float gridReachMultiplier = 0.9f;
         public int iterationsPerTarget = 10;
         public EvaluatorType evaluatorType = EvaluatorType.Compensation;
+        public bool adaptiveSynergy = true;
     }
     private GridReachingConfigurator configurator;
 
@@ -240,7 +243,13 @@ public class GridReaching2020GM : GameMaster
     /// </summary>
     public override void ConfigureExperiment()
     {
-        base.ConfigureExperiment();
+        string expCode = "";
+        if (AvatarSystem.AvatarType == AvatarType.AbleBodied)
+            expCode = "_A";
+        else if (AvatarSystem.AvatarType == AvatarType.Transhumeral)
+            expCode = "_P";
+
+        configAsset = Resources.Load<TextAsset>("Experiments/" + ExperimentSystem.ActiveExperimentID + expCode);
 
         // Convert configuration file to configuration class.
         configurator = JsonUtility.FromJson<GridReachingConfigurator>(configAsset.text);
@@ -252,6 +261,7 @@ public class GridReaching2020GM : GameMaster
         gridReachMultiplier = configurator.gridReachMultiplier;
         iterationsPerTarget = configurator.iterationsPerTarget;
         evaluatorType = configurator.evaluatorType;
+        adaptiveSynergy = configurator.adaptiveSynergy;
     }
 
     /// <summary>
@@ -400,7 +410,6 @@ public class GridReaching2020GM : GameMaster
 
         // Spawn grid
         gridManager.SpawnGrid(gridRows, gridColumns, gridSpacing);
-
     }
 
     /// <summary>
@@ -559,6 +568,7 @@ public class GridReaching2020GM : GameMaster
             startPosPhoto.SetActive(true);
             yield return new WaitUntil(() => IsReadyToStart());
             startPosPhoto.SetActive(false);
+            HudManager.ClearText();
             //
             // HUD Colours
             InstructionManager.DisplayText("The colour of the HUD will tell you what you need to do." + "\n\n (Press the trigger)");
@@ -575,7 +585,7 @@ public class GridReaching2020GM : GameMaster
             HudManager.DisplayText("I'm blue!");
             HudManager.colour = HUDManager.HUDColour.Blue;
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-            InstructionManager.DisplayText("Green for returning for to the start position." + "\n\n (Press the trigger)");
+            InstructionManager.DisplayText("Green for returning to the start position." + "\n\n (Press the trigger)");
             HudManager.DisplayText("I'm green!");
             HudManager.colour = HUDManager.HUDColour.Green;
             //
@@ -585,10 +595,11 @@ public class GridReaching2020GM : GameMaster
             HudManager.ClearText();
             HudManager.colour = HUDManager.HUDColour.Red;
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-            InstructionManager.DisplayText("When a sphere is selected, it'll turn blue." + "\n\n (Press the trigger)");
+            InstructionManager.DisplayText("The sphere that you need to reach will turn blue." + "\n\n (Press the trigger)");
             gridManager.SelectBall(0);
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-            InstructionManager.DisplayText("You'll have to wait for a three second countdown. Look at the sphere!");
+            InstructionManager.DisplayText("You'll have to wait for a three second countdown. Look at the sphere and get ready!" + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
             HudManager.colour = HUDManager.HUDColour.Orange;
             HUDCountDown(3);
             yield return new WaitUntil(() => CountdownDone); // And wait 
@@ -819,7 +830,7 @@ public class GridReaching2020GM : GameMaster
 
             // If it's able-bodied, no need to do anything
             // If it's KE-Adaptive-Synergy then perform synergy update
-            if (experimentType == ExperimentType.TypeTwo)
+            if (experimentType == ExperimentType.TypeTwo && adaptiveSynergy)
             {
                 // Perform update
                 theta = personaliser.UpdateParameter(J, iterationNumber);
