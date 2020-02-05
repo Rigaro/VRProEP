@@ -94,8 +94,9 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaDirect: 0.5
     m_PVRFilteringAtrousPositionSigmaIndirect: 2
     m_PVRFilteringAtrousPositionSigmaAO: 1
-    m_ShowResolutionOverlay: 1
     m_ExportTrainingData: 0
+    m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -1241,12 +1242,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a45575bbe8ec7641ba9e463960bf03b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableStart: 0
+  startEnable: 0
   demoMode: 0
-  restTime: 60
   skipInstructions: 0
+  skipTraining: 0
   debug: 0
   debugText: {fileID: 0}
+  worldOrientation: 180
+  experimentCenter: {fileID: 0}
+  playerOrientation: 0
+  restTime: 60
+  restIterations: 40
+  iterationsPerSession: 
+  trainingPerSession: 
+  taskDataFormat: 
   skipAll: 0
   skipTraining: 0
   graspTaskObject: {fileID: 662748840}
@@ -1744,6 +1753,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -1755,6 +1765,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -1881,7 +1892,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1049163153
 Transform:
   m_ObjectHideFlags: 0
@@ -2868,6 +2879,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 7c7f035155747064abf0c2b25d6817e6, type: 2}
+    - target: {fileID: 6437606, guid: 861fea087c7148246939515a3d957d2e, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7533131160649118917, guid: 861fea087c7148246939515a3d957d2e,
         type: 3}
       propertyPath: m_LocalPosition.y
@@ -2882,10 +2897,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalPosition.x
       value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6437606, guid: 861fea087c7148246939515a3d957d2e, type: 3}
-      propertyPath: m_Enabled
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 861fea087c7148246939515a3d957d2e, type: 3}
@@ -2946,8 +2957,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_text: +
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2957,7 +2966,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4286975232
+    rgba: 4287040768
   m_fontColor: {r: 0, g: 0.05252205, b: 0.5283019, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -3070,6 +3079,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -3081,6 +3091,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -3540,6 +3551,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 525163194}
     m_Modifications:
+    - target: {fileID: 568604226, guid: 4ab0187edf055cf43a6bffe00f5ed98d, type: 3}
+      propertyPath: celestialBodies.Array.data[1]
+      value: 
+      objectReference: {fileID: 2101780924}
     - target: {fileID: 2779305442372045540, guid: 4ab0187edf055cf43a6bffe00f5ed98d,
         type: 3}
       propertyPath: m_Name
@@ -3600,10 +3615,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 568604226, guid: 4ab0187edf055cf43a6bffe00f5ed98d, type: 3}
-      propertyPath: celestialBodies.Array.data[1]
-      value: 
-      objectReference: {fileID: 2101780924}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4ab0187edf055cf43a6bffe00f5ed98d, type: 3}
 --- !u!4 &1790853193 stripped
@@ -3657,8 +3668,9 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1834398400}
   m_Enabled: 1
-  serializedVersion: 9
+  serializedVersion: 10
   m_Type: 2
+  m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 2
   m_Range: 31.426498
@@ -3965,11 +3977,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 525163194}
     m_Modifications:
-    - target: {fileID: 2931449269174227165, guid: f468cd1b5161b334780d9951b5d0b313,
-        type: 3}
-      propertyPath: m_Name
-      value: Asteroids
-      objectReference: {fileID: 0}
     - target: {fileID: 2931449269174227162, guid: f468cd1b5161b334780d9951b5d0b313,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4024,6 +4031,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2931449269174227165, guid: f468cd1b5161b334780d9951b5d0b313,
+        type: 3}
+      propertyPath: m_Name
+      value: Asteroids
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f468cd1b5161b334780d9951b5d0b313, type: 3}
@@ -4117,6 +4129,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1370607352}
     m_Modifications:
+    - target: {fileID: 4625835713384106231, guid: ba36b4ec77a50de43a4775f276a03b83,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4625835713582996582, guid: ba36b4ec77a50de43a4775f276a03b83,
         type: 3}
       propertyPath: m_Name
@@ -4176,11 +4193,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4625835713384106231, guid: ba36b4ec77a50de43a4775f276a03b83,
-        type: 3}
-      propertyPath: m_Mesh
-      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ba36b4ec77a50de43a4775f276a03b83, type: 3}
@@ -4270,11 +4282,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 78793367}
     m_Modifications:
-    - target: {fileID: 7473179249313783619, guid: 0c31051c9c8054747ab339e8d45285f6,
-        type: 3}
-      propertyPath: m_Name
-      value: SubjectPositionMarker
-      objectReference: {fileID: 0}
     - target: {fileID: 7473179249313783618, guid: 0c31051c9c8054747ab339e8d45285f6,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4379,6 +4386,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7473179249313783619, guid: 0c31051c9c8054747ab339e8d45285f6,
+        type: 3}
+      propertyPath: m_Name
+      value: SubjectPositionMarker
       objectReference: {fileID: 0}
     - target: {fileID: 7473179249313783679, guid: 0c31051c9c8054747ab339e8d45285f6,
         type: 3}

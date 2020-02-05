@@ -554,7 +554,7 @@ public class JacobianExperimentGM : GameMaster
         }
     }
 
-    private void FixedUpdate()
+    protected override void FixedUpdate()
     {
         //
         // Tasks performed determinalistically throughout the experiment
