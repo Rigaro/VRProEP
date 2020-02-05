@@ -97,6 +97,8 @@ public class ExperimentSelectionMenu : MonoBehaviour
                     {
                         if (sensor.GetSensorType().Equals(SensorType.EMGWiFi))
                             EMGAvailable = true;
+                        else if (sensor.GetSensorType().Equals(SensorType.ThalmicMyo))
+                            EMGAvailable = true;
                     }
                     // Load when EMG is available.
                     if (EMGAvailable)
@@ -145,9 +147,9 @@ public class ExperimentSelectionMenu : MonoBehaviour
                     }
 
                     // Load training
-                    //SteamVR_LoadLevel.Begin("ProsthesisTraining");
+                    SteamVR_LoadLevel.Begin("ProsthesisTraining");
                     // Load experiment.
-                     SteamVR_LoadLevel.Begin("JacobianSynergyExperiment");
+                     //SteamVR_LoadLevel.Begin("JacobianSynergyExperiment");
                 }
                 else
                     logManager.DisplayInformationOnLog(3.0f, "Please configure the " + optionList[optionNumber] + " avatar.");

@@ -620,7 +620,7 @@ public abstract class GameMaster : MonoBehaviour
             //HudManager.DisplayText("Ending experiment...", 3.0f);
             //InstructionManager.DisplayText("Ending experiment...", 3.0f);
             //MonitorManager.DisplayText("Ending experiment...", 3.0f);
-            //experimentState = ExperimentState.End;
+            experimentState = ExperimentState.End;
             return true;
         }
         else
@@ -660,9 +660,9 @@ public abstract class GameMaster : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.N))
         {
-            HudManager.DisplayText("Preparing next session...", 3.0f);
-            InstructionManager.DisplayText("Preparing next session...", 3.0f);
-            MonitorManager.DisplayText("Preparing next session...", 3.0f);
+            //HudManager.DisplayText("Preparing next session...", 3.0f);
+            //InstructionManager.DisplayText("Preparing next session...", 3.0f);
+            //MonitorManager.DisplayText("Preparing next session...", 3.0f);
             experimentState = ExperimentState.InitializingNext;
             return true;
         }

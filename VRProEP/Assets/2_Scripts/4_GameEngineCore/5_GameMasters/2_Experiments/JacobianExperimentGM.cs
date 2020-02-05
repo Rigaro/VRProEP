@@ -93,7 +93,7 @@ public class JacobianExperimentGM : GameMaster
     }
 
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
         // Initialize ExperimentSystem
         InitialiseExperimentSystems();
@@ -132,7 +132,7 @@ public class JacobianExperimentGM : GameMaster
     }
 
     // Update is called once per frame
-    void Update() 
+    protected override void Update() 
     {
         switch (experimentState)
         {
@@ -742,6 +742,8 @@ public class JacobianExperimentGM : GameMaster
                     udpSensor.StartSensorReading();
                     //Debug.Log(wifiSensor.RunThread);
                 }
+                else if (sensor.GetSensorType().Equals(SensorType.ThalmicMyo))
+                    EMGAvailable = true;
             }
             // Set whether emg or synergy based
             if (EMGAvailable)
@@ -802,8 +804,9 @@ public class JacobianExperimentGM : GameMaster
             // Get prosthesis
             prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
             elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
-            // Set active sensor and reference generator to EMG.
-            elbowManager.ChangeSensor("VAL_SENSOR_SEMG");
+            // Set active sensor and reference generator to EMG.            
+            //elbowManager.ChangeSensor("VAL_SENSOR_SEMG");
+            elbowManager.ChangeSensor("VAL_SENSOR_THALMYO");
             elbowManager.ChangeReferenceGenerator("VAL_REFGEN_EMGPROP");
         }
         else if (experimentType == ExperimentType.TypeThree) // Jacobian synergy case

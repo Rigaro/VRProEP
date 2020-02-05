@@ -22467,10 +22467,10 @@ MonoBehaviour:
   m_firstVisibleCharacter: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -11.898926, y: 0, z: -11.89856, w: 60.00853}
+  m_margin: {x: -19.944458, y: 0, z: -24.83728, w: 60.00853}
   m_textInfo:
     textComponent: {fileID: 1341403701}
-    characterCount: 14
+    characterCount: 20
     spriteCount: 0
     spaceCount: 1
     wordCount: 2
@@ -29181,7 +29181,7 @@ MonoBehaviour:
   sensorOptionsButton: {fileID: 1233107139}
   sensorOptionsMenu: {fileID: 2116354057}
   modeSelectionButton: {fileID: 1424943404}
-  experimentSelectionMenu: {fileID: 542860649}
+  experimentSelectionMenu: {fileID: 2049467183}
   activeUserTMP: {fileID: 956281018}
   sensorTMP: {fileID: 1211208050}
   experimentSensorsTMP: {fileID: 1803538302}

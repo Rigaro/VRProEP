@@ -41,7 +41,7 @@ public class ProsthesisTrainingGM : GameMaster
     // private GameObject elbowGO;
 
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
         TrainingCamera.enabled = false;
         if (debug)
@@ -58,7 +58,7 @@ public class ProsthesisTrainingGM : GameMaster
     }
 
     // Update is called once per frame
-    void Update()
+    protected override void Update()
     {
         switch (experimentState)
         {
@@ -372,8 +372,7 @@ public class ProsthesisTrainingGM : GameMaster
                             displayData += "\n" + element.ToString();
                     }
                 }
-
-
+                
 
                 InstructionManager.DisplayText(displayData);
                 //hudManager.DisplayText(logData);
@@ -468,12 +467,13 @@ public class ProsthesisTrainingGM : GameMaster
             if (emgEnable)
             {
                 // Create and add sensor
-                EMGWiFiManager emgSensor = new EMGWiFiManager(ip, port, channelSize);
-                emgSensor.ConfigureLimits(0, 1023, 0);
-                emgSensor.ConfigureLimits(1, 1023, 0);
+                //EMGWiFiManager emgSensor = new EMGWiFiManager(ip, port, channelSize);
+                ThalmicMyobandManager emgSensor = new ThalmicMyobandManager();
+                //emgSensor.ConfigureLimits(0, 1023, 0);
+                //emgSensor.ConfigureLimits(1, 1023, 0);
                 AvatarSystem.AddActiveSensor(emgSensor);
                 elbowManager.AddSensor(emgSensor);
-                emgSensor.StartSensorReading();
+                //emgSensor.StartSensorReading();
 
                 // Set active sensor and reference generator to EMG.
                 elbowManager.ChangeSensor("VAL_SENSOR_SEMG");
@@ -568,6 +568,8 @@ public class ProsthesisTrainingGM : GameMaster
                     UDPSensorManager udpSensor = (UDPSensorManager)sensor;
                     udpSensor.StartSensorReading();
                 }
+                else if(sensor.GetSensorType().Equals(SensorType.ThalmicMyo))
+                    EMGAvailable = true;
             }
             // Set whether emg or synergy based
             if (EMGAvailable)
@@ -579,7 +581,8 @@ public class ProsthesisTrainingGM : GameMaster
                 GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
                 elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
                 // Set active sensor and reference generator to EMG.
-                elbowManager.ChangeSensor("VAL_SENSOR_SEMG");
+                //elbowManager.ChangeSensor("VAL_SENSOR_SEMG");
+                elbowManager.ChangeSensor("VAL_SENSOR_THALMYO");
                 elbowManager.ChangeReferenceGenerator("VAL_REFGEN_EMGPROP");
             }
             else
