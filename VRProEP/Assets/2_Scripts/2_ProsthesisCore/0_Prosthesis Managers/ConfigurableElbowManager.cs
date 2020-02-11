@@ -19,6 +19,10 @@ namespace VRProEP.ProsthesisCore
 
         public bool IsEnabled { get => isEnabled; }
 
+        private float[] xBar = { Mathf.Deg2Rad * -90.0f };
+        private float[] xMin = { Mathf.Deg2Rad * -145.0f };
+        private float[] xMax = { Mathf.Deg2Rad * -0.1f };
+
 
         /// <summary>
         /// Initializes the Elbow prosthesis with basic functionality.
@@ -34,9 +38,6 @@ namespace VRProEP.ProsthesisCore
             // Create a VIVETracker with the obtained transform
             VIVETrackerManager trackerManager = new VIVETrackerManager(residualLimbTrackerGO.transform);
             // Create a basic reference generator: Integrator.
-            float[] xBar = { Mathf.Deg2Rad * -90.0f };
-            float[] xMin = { Mathf.Deg2Rad * -145.0f };
-            float[] xMax = { Mathf.Deg2Rad * -0.1f };
             IntegratorReferenceGenerator integratorRG = new IntegratorReferenceGenerator(xBar, xMin, xMax);
             // Create configurable input manager with the created sensor and RG.
             inputManager = new ConfigurableInputManager(trackerManager, integratorRG);
@@ -87,7 +88,7 @@ namespace VRProEP.ProsthesisCore
             // Add a Linear Kinematic Synergy to the prosthesis
             float[] theta = { -synValue };
             float[] thetaMin = { -3.5f };
-            float[] thetaMax = { -0.5f };
+            float[] thetaMax = { -0.1f };
             LinearKinematicSynergy linSyn = new LinearKinematicSynergy(xBar, xMin, xMax, theta, thetaMin, thetaMax);
             inputManager.Configure("CMD_ADD_REFGEN", linSyn);
 
@@ -177,6 +178,28 @@ namespace VRProEP.ProsthesisCore
         public void SetSynergy(float theta)
         {
             inputManager.Configure("CMD_SET_SYNERGY", -theta);
+        }
+
+        /// <summary>
+        /// Returns the current elbow joint angle.
+        /// </summary>
+        /// <returns></returns>
+        public float GetElbowAngle()
+        {
+            return elbowState;
+        }
+
+        /// <summary>
+        /// Sets the elbow to a given value.
+        /// </summary>
+        /// <param name="elbowAngle">The desired elbow angle in radians.</param>
+        public void SetElbowAngle(float elbowAngle)
+        {
+            if (elbowAngle > xMax[0] || elbowAngle < xMin[0])
+                throw new System.ArgumentOutOfRangeException("The provided elbow angle is out of the allowed range.");
+
+            inputManager.Configure("CMD_SET_REFERENCE", elbowAngle);
+            elbowState = elbowAngle;
         }
     }
 }

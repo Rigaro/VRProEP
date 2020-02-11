@@ -36,7 +36,7 @@ namespace VRProEP.GameEngineCore
             LoadSocket(avatarData.socketType);
             LoadElbow(avatarData.elbowType, userData.upperArmLength);
             LoadForearm(avatarData.forearmType, userData.upperArmLength, userData.forearmLength);
-            LoadHand(avatarData.handType, userData.upperArmLength, userData.forearmLength, userData.handLength);
+            LoadHand(avatarData.handType, userData.upperArmLength, userData.forearmLength, userData.handLength, userData.lefty);
 
             
             // Deactivate rendering of the markers
@@ -104,11 +104,15 @@ namespace VRProEP.GameEngineCore
                 throw new System.Exception("The player GameObject was not found.");
 
             string side = "R";
+            float sign = 1.0f;
             if (lefty)
+            {
                 side = "L";
+                sign = -1.0f;
+            }
 
             // Load able bodied hand from avatar folder and check whether successfully loaded.
-            GameObject handPrefab = Resources.Load<GameObject>("Avatars/Hands/ACESAble" + side);
+            GameObject handPrefab = Resources.Load<GameObject>("Avatars/Hands/ACESAble_" + side);
             if (handPrefab == null)
                 throw new System.Exception("The requested hand prefab was not found.");
 
@@ -120,9 +124,7 @@ namespace VRProEP.GameEngineCore
             handGO.GetComponent<SteamVR_Behaviour_Pose>().origin = playerGO.transform; // Behaviour pose version
 
             // Load hand object info
-            //string objectPath = resourcesDataPath + "/Hands/ACESAble" + side + ".json";
-            //string objectDataAsJson = File.ReadAllText(objectPath);
-            string objectPath = "Avatars/Hands/ACESAble" + side;
+            string objectPath = "Avatars/Hands/ACESAble_" + side;
             string objectDataAsJson = Resources.Load<TextAsset>(objectPath).text;
             activeHandData = JsonUtility.FromJson<AvatarObjectData>(objectDataAsJson);
             if (activeHandData == null)
@@ -130,7 +132,7 @@ namespace VRProEP.GameEngineCore
             
             // Scale hand to fit user's hand
             float scaleFactor = handLength / activeHandData.dimensions.x;
-            handGO.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+            handGO.transform.localScale = new Vector3(sign*scaleFactor, sign*scaleFactor, sign*scaleFactor);
 
             return handGO;
         }
@@ -430,14 +432,22 @@ namespace VRProEP.GameEngineCore
         /// <param name="lowerArmLength">The user's lower-arm length.</param>
         /// <param name="handLength">The user's hand length.</param>
         /// <returns>The instantiated hand GameObject.</returns>
-        private static GameObject LoadHand(string handType, float upperArmLength, float lowerArmLength, float handLength)
+        private static GameObject LoadHand(string handType, float upperArmLength, float lowerArmLength, float handLength, bool lefty)
         {
+            string side = "R";
+            float sign = 1.0f;
+            if (lefty)
+            {
+                side = "L";
+                sign = -1.0f;
+            }
+
             // Need to attach to Forearm, so find that first and get its Rigidbody.
             GameObject forearmGO = GameObject.FindGameObjectWithTag("Forearm");
             Rigidbody forearmRB = forearmGO.GetComponent<Rigidbody>();
 
             // Load hand from avatar folder and check whether successfully loaded.
-            GameObject handPrefab = Resources.Load<GameObject>("Avatars/Hands/" + handType);
+            GameObject handPrefab = Resources.Load<GameObject>("Avatars/Hands/" + handType + "_" + side);
             if (handPrefab == null)
                 throw new System.Exception("The requested hand prefab was not found.");
 
@@ -447,7 +457,7 @@ namespace VRProEP.GameEngineCore
             // Load hand object info
             //string objectPath = resourcesDataPath + "/Hands/" + handType + ".json";
             //string objectDataAsJson = File.ReadAllText(objectPath);
-            string objectPath = "Avatars/Hands/" + handType;
+            string objectPath = "Avatars/Hands/" + handType + "_" + side;
             string objectDataAsJson = Resources.Load<TextAsset>(objectPath).text;
             activeHandData = JsonUtility.FromJson<AvatarObjectData>(objectDataAsJson);
             if (activeHandData == null)
@@ -459,7 +469,7 @@ namespace VRProEP.GameEngineCore
 
             // Scale hand to fit user's hand
             float scaleFactor = handLength / activeHandData.dimensions.x;
-            handGO.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+            handGO.transform.localScale = new Vector3(sign*scaleFactor, sign*scaleFactor, sign*scaleFactor);
 
             // Attach the socket to the residual limb through a fixed joint.
             FixedJoint handFixedJoint = handGO.GetComponent<FixedJoint>();

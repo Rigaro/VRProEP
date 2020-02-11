@@ -53,16 +53,15 @@ namespace VRProEP.GameEngineCore
         /// <param name="handL">The user's hand length.</param>
         /// <param name="userType">The user type according to the enum UserType.</param>
         /// <returns>The created UserData.</returns>
-        public static UserData CreateNewUser(string name, string familyName, int yob, float uArmL, float uArmW, float fArmL, float fArmW, float handL, UserType userType, bool lefty = false)
+        public static UserData CreateNewUser(string name, string familyName, int yob, float weight, float height, float uArmL, float uArmW, float fArmL, float fArmW, float handL, UserType userType, bool lefty = false)
         {
-            // Generate user ID
-            string userID = name.ToCharArray()[0].ToString() + familyName.ToCharArray()[0].ToString() + yob.ToString();
             // Create new UserData
             UserData newUser = new UserData();
             newUser.name = name;
             newUser.familyName = familyName;
             newUser.yearOfBirth = yob;
-            newUser.id = userID;
+            newUser.weight = weight;
+            newUser.height = height;
             newUser.upperArmLength = uArmL;
             newUser.upperArmWidth = uArmW;
             newUser.forearmLength = fArmL;
@@ -70,6 +69,9 @@ namespace VRProEP.GameEngineCore
             newUser.handLength = handL;
             newUser.type = userType;
             newUser.lefty = lefty;
+
+            // Generate user ID
+            newUser.GenerateUserID();
 
             return CreateNewUser(newUser);
         }

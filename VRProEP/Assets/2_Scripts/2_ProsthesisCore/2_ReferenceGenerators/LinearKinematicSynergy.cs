@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using VRProEP.GameEngineCore;
 
 namespace VRProEP.ProsthesisCore
 {
@@ -11,6 +12,7 @@ namespace VRProEP.ProsthesisCore
     public class LinearKinematicSynergy : AdaptiveGenerator
     {
         private bool enableRequested = false;
+        private float leftySign = 1.0f;
         
         /// <summary>
         /// Basic synergistic prosthesis reference generator.
@@ -24,7 +26,9 @@ namespace VRProEP.ProsthesisCore
         /// <param name="thetaMax">The upper limit for the parameters.</param>
         public LinearKinematicSynergy(float[] xBar, float[] xMin, float[] xMax, float[] theta, float[] thetaMin, float[] thetaMax) : base(xBar, xMin, xMax, theta, thetaMin, thetaMax, ReferenceGeneratorType.LinearKinematicSynergy)
         {
-
+            // Flip the sign for lefty subjects as the sensor is mirrored.
+            if (SaveSystem.ActiveUser.lefty)
+                leftySign = -1.0f;
         }
 
         /// <summary>
@@ -47,7 +51,7 @@ namespace VRProEP.ProsthesisCore
                 throw new System.ArgumentOutOfRangeException("The length of the parameters does not match the number of reference channels.");
 
             // Extract input
-            float qDotShoulder = input[0];
+            float qDotShoulder = leftySign * input[0];
             bool enable = false;
             if (input[1] >= 1.0f)
                 enable = true;

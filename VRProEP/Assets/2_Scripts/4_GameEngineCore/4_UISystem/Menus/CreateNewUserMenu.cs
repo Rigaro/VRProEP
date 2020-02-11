@@ -34,6 +34,13 @@ public class CreateNewUserMenu : MonoBehaviour {
         dataSet += 1;
     }
 
+    public void SetWeight(string weight)
+    {
+        float f_weight = float.Parse(weight);
+        userData.weight = f_weight;
+        dataSet += 1;
+    }
+
     public void SetHeight(string height)
     {
         float f_height = float.Parse(height);
@@ -95,22 +102,26 @@ public class CreateNewUserMenu : MonoBehaviour {
     public void CreateUser()
     {
         // Check that all data has been set.
-        if (dataSet < 9)
+        if (dataSet < 10)
             logManager.DisplayInformationOnLog(3.0f, "Not all user information has been set.");
         else if (!userTypeSet)
             logManager.DisplayInformationOnLog(3.0f, "Choose a valid user type.");
         else
         {
             // Generate user ID
-            string userID = userData.name.ToCharArray()[0].ToString() + userData.familyName.ToCharArray()[0].ToString() + userData.yearOfBirth.ToString();
-            userData.id = userID;
+            //string userID = userData.name.ToCharArray()[0].ToString() + userData.familyName.ToCharArray()[0].ToString() + userData.yearOfBirth.ToString();
+            //userData.id = userID;
+            userData.GenerateUserID();
+
             // Create new user.
             try
             {
                 SaveSystem.CreateNewUser(userData);
 
-                // Create a default avatar.
-                AvatarSystem.CreateAvatarCustomizationData(userID, "ResidualLimbUpperDefault", "UpperSocketDefault", "ElbowCustom", "ForearmCustom", "ACESHand");
+                // Create a all avatars.
+                AvatarSystem.CreateAvatarCustomizationData(userData.id, AvatarType.AbleBodied, "ResidualLimbUpperDefault", "UpperSocketDefault", "ElbowCustom", "ForearmCustom", "ACESHand");
+                AvatarSystem.CreateAvatarCustomizationData(userData.id, AvatarType.Transhumeral, "ResidualLimbUpperDefault", "UpperSocketDefault", "ElbowCustom", "ForearmCustom", "ACESHand");
+                AvatarSystem.CreateAvatarCustomizationData(userData.id, AvatarType.Transradial, "ResidualLimbLowerDefault", "LowerSocketDefault", "ElbowCustom", "ForearmCustom", "ACESHand");
 
                 // Return to main menu
                 experimentMenu.GetComponent<MainMenu>().createdUser = true;

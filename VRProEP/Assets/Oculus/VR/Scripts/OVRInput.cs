@@ -1,22 +1,17 @@
 /************************************************************************************
+Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
 
-Copyright   :   Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Licensed under the Oculus SDK License Version 3.4.1 (the "License");
-you may not use the Oculus SDK except in compliance with the License,
-which is provided at the time of installation or download, or which
-otherwise accompanies this software in either electronic or hard copy form.
+Licensed under the Oculus Utilities SDK License Version 1.31 (the "License"); you may not use
+the Utilities SDK except in compliance with the License, which is provided at the time of installation
+or download, or which otherwise accompanies this software in either electronic or hard copy form.
 
 You may obtain a copy of the License at
+https://developer.oculus.com/licenses/utilities-1.31
 
-https://developer.oculus.com/licenses/sdk-3.4.1
-
-Unless required by applicable law or agreed to in writing, the Oculus SDK
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
+Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+ANY KIND, either express or implied. See the License for the specific language governing
+permissions and limitations under the License.
 ************************************************************************************/
 
 using System;
@@ -28,9 +23,11 @@ using UnityEngine;
 #if UNITY_2017_2_OR_NEWER
 using InputTracking = UnityEngine.XR.InputTracking;
 using Node = UnityEngine.XR.XRNode;
+using Settings = UnityEngine.XR.XRSettings;
 #else
 using InputTracking = UnityEngine.VR.InputTracking;
 using Node = UnityEngine.VR.VRNode;
+using Settings = UnityEngine.VR.VRSettings;
 #endif
 
 /// <summary>
@@ -114,7 +111,7 @@ public static class OVRInput
 		Any                       = ~None,      ///< Maps to Physical Button: [Gamepad, Touch, LTouch, RTouch, LTrackedRemote, RTrackedRemote, Touchpad, Remote: Any]
 	}
 
-    [Flags]
+	[Flags]
 	/// Virtual capacitive touch mappings that allow the same input bindings to work across different controllers with capacitive touch support.
 	public enum Touch
 	{
@@ -134,7 +131,7 @@ public static class OVRInput
 		Any                       = ~None,                        ///< Maps to RawTouch: [Touch, LTouch, RTouch, LTrackedRemote, RTrackedRemote, Touchpad: Any], [Gamepad, Remote: None]
 	}
 
-    [Flags]
+	[Flags]
 	/// Raw capacitive touch mappings that can be used to directly query the state of a controller.
 	public enum RawTouch
 	{
@@ -154,7 +151,7 @@ public static class OVRInput
 		Any                       = ~None,                        ///< Maps to Physical Touch: [Touch, LTouch, RTouch, LTrackedRemote, RTrackedRemote, Touchpad: Any], [Gamepad, Remote: None]
 	}
 
-    [Flags]
+	[Flags]
 	/// Virtual near touch mappings that allow the same input bindings to work across different controllers with near touch support.
 	/// A near touch uses the capacitive touch sensors of a controller to detect approximate finger proximity prior to a full touch being reported.
 	public enum NearTouch
@@ -167,7 +164,7 @@ public static class OVRInput
 		Any                       = ~None,      ///< Maps to RawNearTouch: [Touch, LTouch, RTouch: Any], [Gamepad, LTrackedRemote, RTrackedRemote, Touchpad, Remote: None]
 	}
 
-    [Flags]
+	[Flags]
 	/// Raw near touch mappings that can be used to directly query the state of a controller.
 	public enum RawNearTouch
 	{
@@ -179,7 +176,7 @@ public static class OVRInput
 		Any                       = ~None,      ///< Maps to Physical NearTouch: [Touch, LTouch, RTouch: Any], [Gamepad, LTrackedRemote, RTrackedRemote, Touchpad, Remote: None]
 	}
 
-    [Flags]
+	[Flags]
 	/// Virtual 1-dimensional axis (float) mappings that allow the same input bindings to work across different controllers.
 	public enum Axis1D
 	{
@@ -191,7 +188,7 @@ public static class OVRInput
 		Any                       = ~None, ///< Maps to RawAxis1D: [Gamepad, Touch, LTouch, RTouch: Any], [LTrackedRemote, RTrackedRemote, Touchpad, Remote: None]
 	}
 
-    [Flags]
+	[Flags]
 	/// Raw 1-dimensional axis (float) mappings that can be used to directly query the state of a controller.
 	public enum RawAxis1D
 	{
@@ -203,7 +200,7 @@ public static class OVRInput
 		Any                       = ~None, ///< Maps to Physical Axis1D: [Gamepad, Touch, LTouch, RTouch: Any], [LTrackedRemote, RTrackedRemote, Touchpad, Remote: None]
 	}
 
-    [Flags]
+	[Flags]
 	/// Virtual 2-dimensional axis (Vector2) mappings that allow the same input bindings to work across different controllers.
 	public enum Axis2D
 	{
@@ -215,7 +212,7 @@ public static class OVRInput
 		Any                       = ~None, ///< Maps to RawAxis2D: [Gamepad, Touch, LTouch, RTouch, LTrackedRemote, RTrackedRemote, Touchpad: Any], [Remote: None]
 	}
 
-    [Flags]
+	[Flags]
 	/// Raw 2-dimensional axis (Vector2) mappings that can be used to directly query the state of a controller.
 	public enum RawAxis2D
 	{
@@ -225,6 +222,16 @@ public static class OVRInput
 		RThumbstick               = 0x02,  ///< Maps to Physical Axis2D: [Gamepad, Touch, RTouch: RThumbstick], [LTouch, LTrackedRemote, RTrackedRemote, Touchpad, Remote: None]
 		RTouchpad                 = 0x08,  ///< Maps to Physical Axis2D: [RTrackedRemote: RTouchpad], [Gamepad, Touch, LTouch, RTouch, LTrackedRemote, Touchpad, Remote: None]
 		Any                       = ~None, ///< Maps to Physical Axis2D: [Gamepad, Touch, LTouch, RTouch, LTrackedRemote, RTrackedRemote: Any], [Touchpad, Remote: None]
+	}
+
+	[Flags]
+	/// OpenVR Controller State Enum
+	public enum OpenVRButton : ulong
+	{
+		None                      = 0,
+		Two                       = 0x0002,
+		Thumbstick                = 0x100000000,
+		Grip                      = 0x0004,
 	}
 
 	[Flags]
@@ -257,7 +264,7 @@ public static class OVRInput
 	private static Controller activeControllerType = Controller.None;
 	private static Controller connectedControllerTypes = Controller.None;
 	private static OVRPlugin.Step stepType = OVRPlugin.Step.Render;
-    private static int fixedUpdateCount = 0;
+	private static int fixedUpdateCount = 0;
 
 
 	private static bool _pluginSupportsActiveController = false;
@@ -299,23 +306,31 @@ public static class OVRInput
 #elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
 			new OVRControllerGamepadMac(),
 #else
-            new OVRControllerGamepadPC(),
+			new OVRControllerGamepadPC(),
 			new OVRControllerTouch(),
 			new OVRControllerLTouch(),
 			new OVRControllerRTouch(),
 			new OVRControllerRemote(),
 #endif
 		};
+
+		InitHapticInfo();
 	}
 
-    /// <summary>
-    /// Updates the internal state of OVRInput. Must be called manually if used independently from OVRManager.
-    /// </summary>
-    public static void Update()
+	/// <summary>
+	/// Updates the internal state of OVRInput. Must be called manually if used independently from OVRManager.
+	/// </summary>
+	public static void Update()
 	{
 		connectedControllerTypes = Controller.None;
 		stepType = OVRPlugin.Step.Render;
 		fixedUpdateCount = 0;
+
+		if (OVRManager.loadedXRDevice == OVRManager.XRDevice.OpenVR)
+		{
+			UpdateXRControllerNodeIds();
+			UpdateXRControllerHaptics();
+		}
 
 		for (int i = 0; i < controllers.Count; i++)
 		{
@@ -350,25 +365,30 @@ public static class OVRInput
 			activeControllerType = Controller.None;
 		}
 
-        // Promote TrackedRemote to Active if one is connected and no other controller is active
+		// Promote TrackedRemote to Active if one is connected and no other controller is active
 		if (activeControllerType == Controller.None)
 		{
-            if ((connectedControllerTypes & Controller.RTrackedRemote) != 0)
-            {
-                activeControllerType = Controller.RTrackedRemote;
-            }
-            else if ((connectedControllerTypes & Controller.LTrackedRemote) != 0)
-            {
-                activeControllerType = Controller.LTrackedRemote;
-            }
+			if ((connectedControllerTypes & Controller.RTrackedRemote) != 0)
+			{
+				activeControllerType = Controller.RTrackedRemote;
+			}
+			else if ((connectedControllerTypes & Controller.LTrackedRemote) != 0)
+			{
+				activeControllerType = Controller.LTrackedRemote;
+			}
 		}
 
-		if (pluginSupportsActiveController)
+		if ( OVRManager.loadedXRDevice == OVRManager.XRDevice.Oculus && pluginSupportsActiveController)
 		{
 			// override locally derived active and connected controllers if plugin provides more accurate data
 			connectedControllerTypes = (OVRInput.Controller)OVRPlugin.GetConnectedControllers();
 			activeControllerType = (OVRInput.Controller)OVRPlugin.GetActiveController();
 		}
+		else if (OVRManager.loadedXRDevice == OVRManager.XRDevice.OpenVR)
+		{
+			activeControllerType = connectedControllerTypes;
+		}
+
 	}
 
 	/// <summary>
@@ -393,15 +413,35 @@ public static class OVRInput
 		switch (controllerType)
 		{
 			case Controller.LTouch:
-            case Controller.LTrackedRemote:
-                return OVRPlugin.GetNodeOrientationTracked(OVRPlugin.Node.HandLeft);
-            case Controller.RTouch:
-            case Controller.RTrackedRemote:
-                return OVRPlugin.GetNodeOrientationTracked(OVRPlugin.Node.HandRight);
-            default:
+			case Controller.LTrackedRemote:
+				return OVRPlugin.GetNodeOrientationTracked(OVRPlugin.Node.HandLeft);
+			case Controller.RTouch:
+			case Controller.RTrackedRemote:
+				return OVRPlugin.GetNodeOrientationTracked(OVRPlugin.Node.HandRight);
+			default:
 				return false;
 		}
 	}
+
+	/// <summary>
+	/// Returns true if the given Controller's orientation is currently valid.
+	/// Only supported for Oculus LTouch and RTouch controllers. Non-tracked controllers will return false.
+	/// </summary>
+	public static bool GetControllerOrientationValid(OVRInput.Controller controllerType)
+	{
+		switch (controllerType)
+		{
+			case Controller.LTouch:
+			case Controller.LTrackedRemote:
+				return OVRPlugin.GetNodeOrientationValid(OVRPlugin.Node.HandLeft);
+			case Controller.RTouch:
+			case Controller.RTrackedRemote:
+				return OVRPlugin.GetNodeOrientationValid(OVRPlugin.Node.HandRight);
+			default:
+				return false;
+		}
+	}
+
 
 	/// <summary>
 	/// Returns true if the given Controller's position is currently tracked.
@@ -413,17 +453,36 @@ public static class OVRInput
 		{
 			case Controller.LTouch:
 			case Controller.LTrackedRemote:
-                return OVRPlugin.GetNodePositionTracked(OVRPlugin.Node.HandLeft);
-            case Controller.RTouch:
-            case Controller.RTrackedRemote:
-                return OVRPlugin.GetNodePositionTracked(OVRPlugin.Node.HandRight);
-            default:
+				return OVRPlugin.GetNodePositionTracked(OVRPlugin.Node.HandLeft);
+			case Controller.RTouch:
+			case Controller.RTrackedRemote:
+				return OVRPlugin.GetNodePositionTracked(OVRPlugin.Node.HandRight);
+			default:
 				return false;
 		}
 	}
 
 	/// <summary>
-	/// Gets the position of the given Controller relative to its local coordinate space.
+	/// Returns true if the given Controller's position is currently valid.
+	/// Only supported for Oculus LTouch and RTouch controllers. Non-tracked controllers will return false.
+	/// </summary>
+	public static bool GetControllerPositionValid(OVRInput.Controller controllerType)
+	{
+		switch (controllerType)
+		{
+			case Controller.LTouch:
+			case Controller.LTrackedRemote:
+				return OVRPlugin.GetNodePositionValid(OVRPlugin.Node.HandLeft);
+			case Controller.RTouch:
+			case Controller.RTrackedRemote:
+				return OVRPlugin.GetNodePositionValid(OVRPlugin.Node.HandRight);
+			default:
+				return false;
+		}
+	}
+
+	/// <summary>
+	/// Gets the position of the given Controller local to its tracking space.
 	/// Only supported for Oculus LTouch and RTouch controllers. Non-tracked controllers will return Vector3.zero.
 	/// </summary>
 	public static Vector3 GetLocalControllerPosition(OVRInput.Controller controllerType)
@@ -432,55 +491,107 @@ public static class OVRInput
 		{
 			case Controller.LTouch:
 			case Controller.LTrackedRemote:
-				return InputTracking.GetLocalPosition(Node.LeftHand);
+				if (OVRManager.loadedXRDevice == OVRManager.XRDevice.Oculus)
+					return OVRPlugin.GetNodePose(OVRPlugin.Node.HandLeft, stepType).ToOVRPose().position;
+				else if (OVRManager.loadedXRDevice == OVRManager.XRDevice.OpenVR)
+					return openVRControllerDetails[0].localPosition;
+				else
+				{
+					Vector3 retVec;
+					if (OVRNodeStateProperties.GetNodeStatePropertyVector3(Node.LeftHand, NodeStatePropertyType.Position, OVRPlugin.Node.HandLeft, stepType, out retVec))
+						return retVec;
+					return Vector3.zero;				//Will never be hit, but is a final fallback.
+				}
 			case Controller.RTouch:
 			case Controller.RTrackedRemote:
-				return InputTracking.GetLocalPosition(Node.RightHand);
+				if (OVRManager.loadedXRDevice == OVRManager.XRDevice.Oculus)
+					return OVRPlugin.GetNodePose(OVRPlugin.Node.HandRight, stepType).ToOVRPose().position;
+				else if (OVRManager.loadedXRDevice == OVRManager.XRDevice.OpenVR)
+					return openVRControllerDetails[1].localPosition;
+				else
+				{
+					Vector3 retVec;
+					if (OVRNodeStateProperties.GetNodeStatePropertyVector3(Node.RightHand, NodeStatePropertyType.Position, OVRPlugin.Node.HandRight, stepType, out retVec))
+						return retVec;
+					return Vector3.zero;
+				}
 			default:
 				return Vector3.zero;
 		}
 	}
 
 	/// <summary>
-    /// Gets the linear velocity of the given Controller relative to its local coordinate space.
-    /// Only supported for Oculus LTouch and RTouch controllers. Non-tracked controllers will return Vector3.zero.
-    /// </summary>
-    public static Vector3 GetLocalControllerVelocity(OVRInput.Controller controllerType)
-    {
-        switch (controllerType)
-        {
-            case Controller.LTouch:
-			case Controller.LTrackedRemote:
-				return OVRNodeStateProperties.GetNodeStateProperty(Node.LeftHand, NodeStatePropertyType.Velocity, OVRPlugin.Node.HandLeft, stepType);
-			case Controller.RTouch:
-			case Controller.RTrackedRemote:
-				return OVRNodeStateProperties.GetNodeStateProperty(Node.RightHand, NodeStatePropertyType.Velocity, OVRPlugin.Node.HandRight, stepType);
-			default:
-                return Vector3.zero;
-        }
-    }
+	/// Gets the linear velocity of the given Controller local to its tracking space.
+	/// Only supported for Oculus LTouch and RTouch controllers. Non-tracked controllers will return Vector3.zero.
+	/// </summary>
+	public static Vector3 GetLocalControllerVelocity(OVRInput.Controller controllerType)
+	{
+		Vector3 velocity = Vector3.zero;
 
-    /// <summary>
-    /// Gets the linear acceleration of the given Controller relative to its local coordinate space.
-    /// Only supported for Oculus LTouch and RTouch controllers. Non-tracked controllers will return Vector3.zero.
-    /// </summary>
-    public static Vector3 GetLocalControllerAcceleration(OVRInput.Controller controllerType)
-    {
-        switch (controllerType)
-        {
-            case Controller.LTouch:
+		switch (controllerType)
+		{
+			case Controller.LTouch:
 			case Controller.LTrackedRemote:
-				return OVRNodeStateProperties.GetNodeStateProperty(Node.LeftHand, NodeStatePropertyType.Acceleration, OVRPlugin.Node.HandLeft, stepType);
+				if (OVRNodeStateProperties.GetNodeStatePropertyVector3(Node.LeftHand, NodeStatePropertyType.Velocity, OVRPlugin.Node.HandLeft, stepType, out velocity))
+				{
+					return velocity;
+				}
+				else
+				{
+					return Vector3.zero;
+				}
 			case Controller.RTouch:
 			case Controller.RTrackedRemote:
-				return OVRNodeStateProperties.GetNodeStateProperty(Node.RightHand, NodeStatePropertyType.Acceleration, OVRPlugin.Node.HandRight, stepType);
+				if (OVRNodeStateProperties.GetNodeStatePropertyVector3(Node.RightHand, NodeStatePropertyType.Velocity, OVRPlugin.Node.HandRight, stepType, out velocity))
+				{
+					return velocity;
+				}
+				else
+				{
+					return Vector3.zero;
+				}
 			default:
-                return Vector3.zero;
-        }
-    }
+				return Vector3.zero;
+		}
+	}
 
 	/// <summary>
-	/// Gets the rotation of the given Controller relative to its local coordinate space.
+	/// Gets the linear acceleration of the given Controller local to its tracking space.
+	/// Only supported for Oculus LTouch and RTouch controllers. Non-tracked controllers will return Vector3.zero.
+	/// </summary>
+	public static Vector3 GetLocalControllerAcceleration(OVRInput.Controller controllerType)
+	{
+		Vector3 accel = Vector3.zero;
+
+		switch (controllerType)
+		{
+			case Controller.LTouch:
+			case Controller.LTrackedRemote:
+				if (OVRNodeStateProperties.GetNodeStatePropertyVector3(Node.LeftHand, NodeStatePropertyType.Acceleration, OVRPlugin.Node.HandLeft, stepType, out accel))
+				{
+					return accel;
+				}
+				else
+				{
+					return Vector3.zero;
+				}
+			case Controller.RTouch:
+			case Controller.RTrackedRemote:
+				if (OVRNodeStateProperties.GetNodeStatePropertyVector3(Node.RightHand, NodeStatePropertyType.Acceleration, OVRPlugin.Node.HandRight, stepType, out accel))
+				{
+					return accel;
+				}
+				else
+				{
+					return Vector3.zero;
+				}
+			default:
+				return Vector3.zero;
+		}
+	}
+
+	/// <summary>
+	/// Gets the rotation of the given Controller local to its tracking space.
 	/// Only supported for Oculus LTouch and RTouch controllers. Non-tracked controllers will return Quaternion.identity.
 	/// </summary>
 	public static Quaternion GetLocalControllerRotation(OVRInput.Controller controllerType)
@@ -489,50 +600,102 @@ public static class OVRInput
 		{
 			case Controller.LTouch:
 			case Controller.LTrackedRemote:
-				return InputTracking.GetLocalRotation(Node.LeftHand);
+				if (OVRManager.loadedXRDevice == OVRManager.XRDevice.Oculus)
+					return OVRPlugin.GetNodePose(OVRPlugin.Node.HandLeft, stepType).ToOVRPose().orientation;
+				else if (OVRManager.loadedXRDevice == OVRManager.XRDevice.OpenVR)
+					return openVRControllerDetails[0].localOrientation;
+				else
+				{
+					Quaternion retQuat;
+					if (OVRNodeStateProperties.GetNodeStatePropertyQuaternion(Node.LeftHand, NodeStatePropertyType.Orientation, OVRPlugin.Node.HandLeft, stepType, out retQuat))
+						return retQuat;
+					return Quaternion.identity;
+				}
 			case Controller.RTouch:
 			case Controller.RTrackedRemote:
-				return InputTracking.GetLocalRotation(Node.RightHand);
+				if (OVRManager.loadedXRDevice == OVRManager.XRDevice.Oculus)
+					return OVRPlugin.GetNodePose(OVRPlugin.Node.HandRight, stepType).ToOVRPose().orientation;
+				else if (OVRManager.loadedXRDevice == OVRManager.XRDevice.OpenVR)
+					return openVRControllerDetails[1].localOrientation;
+				else
+				{
+					Quaternion retQuat;
+					if (OVRNodeStateProperties.GetNodeStatePropertyQuaternion(Node.RightHand, NodeStatePropertyType.Orientation, OVRPlugin.Node.HandRight, stepType, out retQuat))
+						return retQuat;
+					return Quaternion.identity;
+				}
 			default:
 				return Quaternion.identity;
 		}
 	}
 
 	/// <summary>
-	/// Gets the angular velocity of the given Controller relative to its local coordinate space in radians per second around each axis.
+	/// Gets the angular velocity of the given Controller local to its tracking space in radians per second around each axis.
 	/// Only supported for Oculus LTouch and RTouch controllers. Non-tracked controllers will return Vector3.zero.
 	/// </summary>
 	public static Vector3 GetLocalControllerAngularVelocity(OVRInput.Controller controllerType)
 	{
+		Vector3 velocity = Vector3.zero;
+
 		switch (controllerType)
 		{
-		case Controller.LTouch:
-		case Controller.LTrackedRemote:
-			return OVRNodeStateProperties.GetNodeStateProperty(Node.LeftHand, NodeStatePropertyType.AngularVelocity, OVRPlugin.Node.HandLeft, stepType);
-		case Controller.RTouch:
-		case Controller.RTrackedRemote:
-			return OVRNodeStateProperties.GetNodeStateProperty(Node.RightHand, NodeStatePropertyType.AngularVelocity, OVRPlugin.Node.HandRight, stepType);
-		default:
-			return Vector3.zero;
+			case Controller.LTouch:
+			case Controller.LTrackedRemote:
+				if (OVRNodeStateProperties.GetNodeStatePropertyVector3(Node.LeftHand, NodeStatePropertyType.AngularVelocity, OVRPlugin.Node.HandLeft, stepType, out velocity))
+				{
+					return velocity;
+				}
+				else
+				{
+					return Vector3.zero;
+				}
+			case Controller.RTouch:
+			case Controller.RTrackedRemote:
+				if (OVRNodeStateProperties.GetNodeStatePropertyVector3(Node.RightHand, NodeStatePropertyType.AngularVelocity, OVRPlugin.Node.HandRight, stepType, out velocity))
+				{
+					return velocity;
+				}
+				else
+				{
+					return Vector3.zero;
+				}
+			default:
+				return Vector3.zero;
 		}
 	}
 
 	/// <summary>
-	/// Gets the angular acceleration of the given Controller relative to its local coordinate space in radians per second per second around each axis.
+	/// Gets the angular acceleration of the given Controller local to its tracking space in radians per second per second around each axis.
 	/// Only supported for Oculus LTouch and RTouch controllers. Non-tracked controllers will return Vector3.zero.
 	/// </summary>
 	public static Vector3 GetLocalControllerAngularAcceleration(OVRInput.Controller controllerType)
 	{
+		Vector3 accel = Vector3.zero;
+
 		switch (controllerType)
 		{
-		case Controller.LTouch:
-		case Controller.LTrackedRemote:
-			return OVRNodeStateProperties.GetNodeStateProperty(Node.LeftHand, NodeStatePropertyType.AngularAcceleration, OVRPlugin.Node.HandLeft, stepType);
-		case Controller.RTouch:
-		case Controller.RTrackedRemote:
-			return OVRNodeStateProperties.GetNodeStateProperty(Node.RightHand, NodeStatePropertyType.AngularAcceleration, OVRPlugin.Node.HandRight, stepType);
-		default:
-			return Vector3.zero;
+			case Controller.LTouch:
+			case Controller.LTrackedRemote:
+				if (OVRNodeStateProperties.GetNodeStatePropertyVector3(Node.LeftHand, NodeStatePropertyType.AngularAcceleration, OVRPlugin.Node.HandLeft, stepType, out accel))
+				{
+					return accel;
+				}
+				else
+				{
+					return Vector3.zero;
+				}
+			case Controller.RTouch:
+			case Controller.RTrackedRemote:
+				if (OVRNodeStateProperties.GetNodeStatePropertyVector3(Node.RightHand, NodeStatePropertyType.AngularAcceleration, OVRPlugin.Node.HandRight, stepType, out accel))
+				{
+					return accel;
+				}
+				else
+				{
+					return Vector3.zero;
+				}
+			default:
+				return Vector3.zero;
 		}
 	}
 
@@ -990,6 +1153,9 @@ public static class OVRInput
 		{
 			OVRControllerBase controller = controllers[i];
 
+			if (OVRManager.loadedXRDevice != OVRManager.XRDevice.Oculus)
+				controller.shouldApplyDeadzone = false;
+
 			if (ShouldResolveController(controller.controllerType, controllerMask))
 			{
 				RawAxis1D resolvedMask = rawMask | controller.ResolveToRawMask(virtualMask);
@@ -1064,6 +1230,9 @@ public static class OVRInput
 		for (int i = 0; i < controllers.Count; i++)
 		{
 			OVRControllerBase controller = controllers[i];
+
+			if (OVRManager.loadedXRDevice != OVRManager.XRDevice.Oculus)
+				controller.shouldApplyDeadzone = false;
 
 			if (ShouldResolveController(controller.controllerType, controllerMask))
 			{
@@ -1143,22 +1312,222 @@ public static class OVRInput
 		return activeControllerType;
 	}
 
+	private static void StartVibration(float amplitude, float duration, Node controllerNode)
+	{
+		int index = (controllerNode == Node.LeftHand) ? 0 : 1;
+		hapticInfos[index].hapticsDurationPlayed = 0.0f;
+		hapticInfos[index].hapticAmplitude = amplitude;
+		hapticInfos[index].hapticsDuration = duration;
+		hapticInfos[index].playingHaptics = (amplitude != 0.0f);
+		hapticInfos[index].node = controllerNode;
+		if (amplitude <= 0.0f || duration <= 0.0f)
+		{
+			hapticInfos[index].playingHaptics = false;
+		}
+	}
+
+	private static int NUM_HAPTIC_CHANNELS = 2;
+	private static HapticInfo[] hapticInfos;
+
+	private static float OPENVR_MAX_HAPTIC_AMPLITUDE = 4000.0f;
+	private static float HAPTIC_VIBRATION_DURATION_SECONDS = 2.0f;
+	private static String OPENVR_TOUCH_NAME = "oculus_touch";
+	private static String OPENVR_VIVE_CONTROLLER_NAME = "vive_controller";
+	private static String OPENVR_WINDOWSMR_CONTROLLER_NAME = "holographic_controller";
+
+	[Flags]
+	/// OpenVR Controller Enum
+	public enum OpenVRController : ulong
+	{
+		Unknown = 0,
+		OculusTouch = 1,
+		ViveController = 2,
+		WindowsMRController = 3
+	}
+
+	[StructLayout(LayoutKind.Sequential)]
+	public struct OpenVRControllerDetails
+	{
+		public OVR.OpenVR.VRControllerState_t state;
+		public OpenVRController controllerType;
+		public uint deviceID;
+		public Vector3 localPosition;           //Position relative to Tracking Space
+		public Quaternion localOrientation;     //Orientation relative to Tracking Space
+	}
+
+	public static OpenVRControllerDetails[] openVRControllerDetails = new OpenVRControllerDetails[2];
+
+	private class HapticInfo
+	{
+		public bool playingHaptics;
+		public float hapticsDurationPlayed;
+		public float hapticsDuration;
+		public float hapticAmplitude;
+		public Node node;
+	}
+
+	/// <summary>
+	/// Sets OpenVR left and right controller poses local to tracking space
+	/// </summary>
+	public static void SetOpenVRLocalPose(Vector3 leftPos, Vector3 rightPos, Quaternion leftRot, Quaternion rightRot)
+	{
+		openVRControllerDetails[0].localPosition = leftPos;
+		openVRControllerDetails[0].localOrientation = leftRot;
+		openVRControllerDetails[1].localPosition = rightPos;
+		openVRControllerDetails[1].localOrientation = rightRot;
+	}
+
+	/// <summary>
+	/// Accesses OpenVR properties about a given deviceID. Especially useful for differentiating per type of OpenVR device (i.e. Oculus, Vive)
+	/// </summary>
+	public static string GetOpenVRStringProperty(OVR.OpenVR.ETrackedDeviceProperty prop, uint deviceId = OVR.OpenVR.OpenVR.k_unTrackedDeviceIndex_Hmd)
+	{
+
+		OVR.OpenVR.ETrackedPropertyError error = OVR.OpenVR.ETrackedPropertyError.TrackedProp_Success;
+		OVR.OpenVR.CVRSystem system = OVR.OpenVR.OpenVR.System;
+		if (system != null)
+		{
+			uint capacity = system.GetStringTrackedDeviceProperty(deviceId, prop, null, 0, ref error);
+			if (capacity > 1)
+			{
+				var result = new System.Text.StringBuilder((int)capacity);
+				system.GetStringTrackedDeviceProperty(deviceId, prop, result, capacity, ref error);
+				return result.ToString();
+			}
+			return (error != OVR.OpenVR.ETrackedPropertyError.TrackedProp_Success) ? error.ToString() : "<unknown>";
+		}
+		return "";
+	}
+
+	/// <summary>
+	/// Associates OpenVR device IDs with left and right motion controllers, for later haptic playback.
+	/// </summary>
+	private static void UpdateXRControllerNodeIds()
+	{
+		if (OVRManager.loadedXRDevice == OVRManager.XRDevice.OpenVR)
+		{
+			openVRControllerDetails[0].deviceID = OVR.OpenVR.OpenVR.k_unMaxTrackedDeviceCount;
+			openVRControllerDetails[1].deviceID = OVR.OpenVR.OpenVR.k_unMaxTrackedDeviceCount;
+
+			OVR.OpenVR.CVRSystem system = OVR.OpenVR.OpenVR.System;
+
+			if (system != null)
+			{
+				for (uint id = 0; id < OVR.OpenVR.OpenVR.k_unMaxTrackedDeviceCount; id++)
+				{
+					OVR.OpenVR.ETrackedDeviceClass deviceClass = system.GetTrackedDeviceClass(id);
+					if (deviceClass == OVR.OpenVR.ETrackedDeviceClass.Controller && system.IsTrackedDeviceConnected(id))
+					{
+						OpenVRController controllerType;
+						String controllerName = GetOpenVRStringProperty(OVR.OpenVR.ETrackedDeviceProperty.Prop_ControllerType_String, id);
+						if (controllerName == OPENVR_TOUCH_NAME)
+							controllerType = OpenVRController.OculusTouch;
+						else if (controllerName == OPENVR_VIVE_CONTROLLER_NAME)
+							controllerType = OpenVRController.ViveController;
+						else if (controllerName == OPENVR_WINDOWSMR_CONTROLLER_NAME)
+							controllerType = OpenVRController.WindowsMRController;
+						else
+							controllerType = OpenVRController.Unknown;
+
+						OVR.OpenVR.ETrackedControllerRole role = system.GetControllerRoleForTrackedDeviceIndex(id);
+						if (role == OVR.OpenVR.ETrackedControllerRole.LeftHand)
+						{
+							system.GetControllerState(id, ref openVRControllerDetails[0].state, (uint)Marshal.SizeOf(typeof(OVR.OpenVR.VRControllerState_t)));
+							openVRControllerDetails[0].deviceID = id;
+							openVRControllerDetails[0].controllerType = controllerType;
+							connectedControllerTypes |= Controller.LTouch;
+						}
+						else if (role == OVR.OpenVR.ETrackedControllerRole.RightHand)
+						{
+							system.GetControllerState(id, ref openVRControllerDetails[1].state, (uint)Marshal.SizeOf(typeof(OVR.OpenVR.VRControllerState_t)));
+							openVRControllerDetails[1].deviceID = id;
+							openVRControllerDetails[1].controllerType = controllerType;
+							connectedControllerTypes |= Controller.RTouch;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/// <summary>
+	/// Runs once a frame to update cross-platform haptic playback
+	/// </summary>
+	private static void UpdateXRControllerHaptics()
+	{
+		if (OVRManager.loadedXRDevice == OVRManager.XRDevice.OpenVR)
+		{
+			for (int i = 0; i < NUM_HAPTIC_CHANNELS; i++)
+			{
+				if (hapticInfos[i].playingHaptics)
+				{
+					hapticInfos[i].hapticsDurationPlayed += Time.deltaTime;
+
+					PlayHapticImpulse(hapticInfos[i].hapticAmplitude, hapticInfos[i].node);
+
+					if (hapticInfos[i].hapticsDurationPlayed >= hapticInfos[i].hapticsDuration)
+					{
+						hapticInfos[i].playingHaptics = false;
+					}
+				}
+			}
+
+		}
+	}
+
+	private static void InitHapticInfo()
+	{
+		hapticInfos = new HapticInfo[NUM_HAPTIC_CHANNELS];
+		for (int i = 0; i < NUM_HAPTIC_CHANNELS; i++)
+		{
+			hapticInfos[i] = new HapticInfo();
+		}
+	}
+
+	private static void PlayHapticImpulse(float amplitude, Node deviceNode)
+	{
+		OVR.OpenVR.CVRSystem system = OVR.OpenVR.OpenVR.System;
+		if (system != null && amplitude != 0.0f)
+		{
+			uint controllerId = (deviceNode == Node.LeftHand) ? openVRControllerDetails[0].deviceID : openVRControllerDetails[1].deviceID;
+
+			if (IsValidOpenVRDevice(controllerId))
+				system.TriggerHapticPulse(controllerId, 0, (char)(OPENVR_MAX_HAPTIC_AMPLITUDE * amplitude));
+		}
+	}
+
+	private static bool IsValidOpenVRDevice(uint deviceId)
+	{
+		return (deviceId >= 0 && deviceId < OVR.OpenVR.OpenVR.k_unMaxTrackedDeviceCount);
+	}
+
 	/// <summary>
 	/// Activates vibration with the given frequency and amplitude with the given controller mask.
 	/// Ignored on controllers that do not support vibration. Expected values range from 0 to 1.
 	/// </summary>
 	public static void SetControllerVibration(float frequency, float amplitude, Controller controllerMask = Controller.Active)
 	{
-		if ((controllerMask & Controller.Active) != 0)
-			controllerMask |= activeControllerType;
-
-		for (int i = 0; i < controllers.Count; i++)
+		if (OVRManager.loadedXRDevice == OVRManager.XRDevice.Oculus)
 		{
-			OVRControllerBase controller = controllers[i];
+			if ((controllerMask & Controller.Active) != 0)
+				controllerMask |= activeControllerType;
 
-			if (ShouldResolveController(controller.controllerType, controllerMask))
+			for (int i = 0; i < controllers.Count; i++)
 			{
-				controller.SetControllerVibration(frequency, amplitude);
+				OVRControllerBase controller = controllers[i];
+
+				if (ShouldResolveController(controller.controllerType, controllerMask))
+				{
+					controller.SetControllerVibration(frequency, amplitude);
+				}
+			}
+		}
+		else if (OVRManager.loadedXRDevice == OVRManager.XRDevice.OpenVR)
+		{
+			if (controllerMask == Controller.LTouch || controllerMask == Controller.RTouch)
+			{
+				Node controllerNode = (controllerMask == Controller.LTouch) ? Node.LeftHand : Node.RightHand;
+				StartVibration(amplitude, HAPTIC_VIBRATION_DURATION_SECONDS, controllerNode);
 			}
 		}
 	}
@@ -1602,8 +1971,8 @@ public static class OVRInput
 		{
 			OVRPlugin.ControllerState4 state;
 
-			if (!OVRPlugin.initialized && ( (controllerType & Controller.Touch) != 0) )
-				state = GetCrossPlatformState(controllerType);
+			if (OVRManager.loadedXRDevice == OVRManager.XRDevice.OpenVR && ( (controllerType & Controller.Touch) != 0) )
+				state = GetOpenVRControllerState(controllerType);
 			else
 				state = OVRPlugin.GetControllerState4((uint)controllerType);
 
@@ -1639,34 +2008,64 @@ public static class OVRInput
 			return ((Controller)currentState.ConnectedControllers & controllerType);
 		}
 
-		private OVRPlugin.ControllerState4 GetCrossPlatformState(Controller controllerType)
+		private OVRPlugin.ControllerState4 GetOpenVRControllerState(Controller controllerType)
 		{
 			OVRPlugin.ControllerState4 state = new OVRPlugin.ControllerState4();
 
-			if (controllerType == Controller.LTouch)
+			if ((controllerType & Controller.LTouch) == Controller.LTouch && IsValidOpenVRDevice(openVRControllerDetails[0].deviceID))
 			{
-				if (Input.GetButton("Oculus_CrossPlatform_Button4"))
+				OVR.OpenVR.VRControllerState_t leftControllerState = openVRControllerDetails[0].state;
+				if ((leftControllerState.ulButtonPressed & ((ulong)OpenVRButton.Two)) == (ulong)OpenVRButton.Two)
 					state.Buttons |= (uint)RawButton.Y;
-				if (Input.GetButton("Oculus_CrossPlatform_PrimaryThumbstick"))
+				if ((leftControllerState.ulButtonPressed & ((ulong)OpenVRButton.Thumbstick)) == (ulong)OpenVRButton.Thumbstick)
 					state.Buttons |= (uint)RawButton.LThumbstick;
 
-				state.LThumbstick.x = Input.GetAxis("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
-				state.LThumbstick.y = Input.GetAxis("Oculus_CrossPlatform_PrimaryThumbstickVertical");
-				state.LIndexTrigger = Input.GetAxis("Oculus_CrossPlatform_PrimaryIndexTrigger");
-				state.LHandTrigger = Input.GetAxis("Oculus_CrossPlatform_PrimaryHandTrigger");
-			}
-			else if (controllerType == Controller.RTouch)
-			{
-				if (Input.GetButton("Oculus_CrossPlatform_Button2"))
-					state.Buttons |= (uint)RawButton.B;
+				state.LIndexTrigger = leftControllerState.rAxis1.x;
 
-				if (Input.GetButton("Oculus_CrossPlatform_SecondaryThumbstick"))
+				if (openVRControllerDetails[0].controllerType == OpenVRController.OculusTouch || openVRControllerDetails[0].controllerType == OpenVRController.ViveController)
+				{
+					state.LThumbstick.x = leftControllerState.rAxis0.x;
+					state.LThumbstick.y = leftControllerState.rAxis0.y;
+				}
+				else if (openVRControllerDetails[0].controllerType == OpenVRController.WindowsMRController)
+				{
+					state.LThumbstick.x = leftControllerState.rAxis2.x;
+					state.LThumbstick.y = leftControllerState.rAxis2.y;
+				}
+
+				if (openVRControllerDetails[0].controllerType == OpenVRController.OculusTouch)
+					state.LHandTrigger = leftControllerState.rAxis2.x;
+				else if (openVRControllerDetails[0].controllerType == OpenVRController.ViveController || openVRControllerDetails[0].controllerType == OpenVRController.WindowsMRController)
+					state.LHandTrigger = ((leftControllerState.ulButtonPressed & ((ulong)OpenVRButton.Grip)) == ((ulong)OpenVRButton.Grip)) ? 1 : 0;
+
+			}
+
+			if ((controllerType & Controller.RTouch) == Controller.RTouch && IsValidOpenVRDevice(openVRControllerDetails[1].deviceID))
+			{
+				OVR.OpenVR.VRControllerState_t rightControllerState = openVRControllerDetails[1].state;
+				if ((rightControllerState.ulButtonPressed & ((ulong)OpenVRButton.Two)) == (ulong)OpenVRButton.Two)
+					state.Buttons |= (uint)RawButton.B;
+				if ((rightControllerState.ulButtonPressed & ((ulong)OpenVRButton.Thumbstick)) == (ulong)OpenVRButton.Thumbstick)
 					state.Buttons |= (uint)RawButton.RThumbstick;
 
-				state.RThumbstick.x = Input.GetAxis("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
-				state.RThumbstick.y = Input.GetAxis("Oculus_CrossPlatform_SecondaryThumbstickVertical");
-				state.RIndexTrigger = Input.GetAxis("Oculus_CrossPlatform_SecondaryIndexTrigger");
-				state.RHandTrigger = Input.GetAxis("Oculus_CrossPlatform_SecondaryHandTrigger");
+				state.RIndexTrigger = rightControllerState.rAxis1.x;
+
+				if (openVRControllerDetails[1].controllerType == OpenVRController.OculusTouch || openVRControllerDetails[1].controllerType == OpenVRController.ViveController)
+				{
+					state.RThumbstick.x = rightControllerState.rAxis0.x;
+					state.RThumbstick.y = rightControllerState.rAxis0.y;
+				}
+				else if (openVRControllerDetails[1].controllerType == OpenVRController.WindowsMRController)
+				{
+					state.RThumbstick.x = rightControllerState.rAxis2.x;
+					state.RThumbstick.y = rightControllerState.rAxis2.y;
+				}
+
+				if (openVRControllerDetails[1].controllerType == OpenVRController.OculusTouch)
+					state.RHandTrigger = rightControllerState.rAxis2.x;
+				else if (openVRControllerDetails[1].controllerType == OpenVRController.ViveController || openVRControllerDetails[1].controllerType == OpenVRController.WindowsMRController)
+					state.RHandTrigger = ((rightControllerState.ulButtonPressed & ((ulong)OpenVRButton.Grip)) == ((ulong)OpenVRButton.Grip)) ? 1 : 0;
+
 			}
 
 			return state;
@@ -2557,7 +2956,7 @@ public static class OVRInput
 
 	private class OVRControllerTouchpad : OVRControllerBase
 	{
-        private OVRPlugin.Vector2f moveAmount;
+		private OVRPlugin.Vector2f moveAmount;
 		private float maxTapMagnitude = 0.1f;
 		private float minMoveMagnitude = 0.15f;
 
@@ -2567,28 +2966,28 @@ public static class OVRInput
 		}
 
 		public override Controller Update()
-        {
-            Controller res = base.Update();
+		{
+			Controller res = base.Update();
 
-            if (GetDown(RawTouch.LTouchpad, OVRInput.Controller.Touchpad))
+			if (GetDown(RawTouch.LTouchpad, OVRInput.Controller.Touchpad))
 			{
-                moveAmount = currentState.LTouchpad;
+				moveAmount = currentState.LTouchpad;
 			}
 
-            if (GetUp(RawTouch.LTouchpad, OVRInput.Controller.Touchpad))
+			if (GetUp(RawTouch.LTouchpad, OVRInput.Controller.Touchpad))
 			{
 				moveAmount.x = previousState.LTouchpad.x - moveAmount.x;
 				moveAmount.y = previousState.LTouchpad.y - moveAmount.y;
 
 				Vector2 move = new Vector2(moveAmount.x, moveAmount.y);
-                float moveMag = move.magnitude;
+				float moveMag = move.magnitude;
 
-                if (moveMag < maxTapMagnitude)
-                {
-                    // Emit Touchpad Tap
-                    currentState.Buttons |= (uint)RawButton.Start;
-                    currentState.Buttons |= (uint)RawButton.LTouchpad;
-                }
+				if (moveMag < maxTapMagnitude)
+				{
+					// Emit Touchpad Tap
+					currentState.Buttons |= (uint)RawButton.Start;
+					currentState.Buttons |= (uint)RawButton.LTouchpad;
+				}
 				else if (moveMag >= minMoveMagnitude)
 				{
 					move.Normalize();
@@ -2620,8 +3019,8 @@ public static class OVRInput
 				}
 			}
 
-            return res;
-        }
+			return res;
+		}
 
 		public override void ConfigureButtonMap()
 		{
@@ -2640,7 +3039,7 @@ public static class OVRInput
 			buttonMap.PrimaryThumbstickDown    = RawButton.None;
 			buttonMap.PrimaryThumbstickLeft    = RawButton.None;
 			buttonMap.PrimaryThumbstickRight   = RawButton.None;
-            buttonMap.PrimaryTouchpad          = RawButton.LTouchpad;
+			buttonMap.PrimaryTouchpad          = RawButton.LTouchpad;
 			buttonMap.SecondaryShoulder        = RawButton.None;
 			buttonMap.SecondaryIndexTrigger    = RawButton.None;
 			buttonMap.SecondaryHandTrigger     = RawButton.None;
@@ -2707,8 +3106,8 @@ public static class OVRInput
 
 	private class OVRControllerLTrackedRemote : OVRControllerBase
 	{
-        private bool emitSwipe;
-        private OVRPlugin.Vector2f moveAmount;
+		private bool emitSwipe;
+		private OVRPlugin.Vector2f moveAmount;
 		private float minMoveMagnitude = 0.3f;
 
 		public OVRControllerLTrackedRemote()
@@ -2797,24 +3196,24 @@ public static class OVRInput
 			axis2DMap.SecondaryTouchpad        = RawAxis2D.None;
 		}
 
-        public override Controller Update()
-        {
-            Controller res = base.Update();
+		public override Controller Update()
+		{
+			Controller res = base.Update();
 
-            if (GetDown(RawTouch.LTouchpad, OVRInput.Controller.LTrackedRemote))
+			if (GetDown(RawTouch.LTouchpad, OVRInput.Controller.LTrackedRemote))
 			{
-                emitSwipe = true;
-                moveAmount = currentState.LTouchpad;
+				emitSwipe = true;
+				moveAmount = currentState.LTouchpad;
 			}
 
-            if (GetDown(RawButton.LTouchpad, OVRInput.Controller.LTrackedRemote))
-            {
-                emitSwipe = false;
-            }
-
-            if (GetUp(RawTouch.LTouchpad, OVRInput.Controller.LTrackedRemote) && emitSwipe)
+			if (GetDown(RawButton.LTouchpad, OVRInput.Controller.LTrackedRemote))
 			{
-                emitSwipe = false;
+				emitSwipe = false;
+			}
+
+			if (GetUp(RawTouch.LTouchpad, OVRInput.Controller.LTrackedRemote) && emitSwipe)
+			{
+				emitSwipe = false;
 
 				moveAmount.x = previousState.LTouchpad.x - moveAmount.x;
 				moveAmount.y = previousState.LTouchpad.y - moveAmount.y;
@@ -2852,8 +3251,8 @@ public static class OVRInput
 				}
 			}
 
-            return res;
-        }
+			return res;
+		}
 
 		public override bool WasRecentered()
 		{
@@ -2873,8 +3272,8 @@ public static class OVRInput
 
 	private class OVRControllerRTrackedRemote : OVRControllerBase
 	{
-        private bool emitSwipe;
-        private OVRPlugin.Vector2f moveAmount;
+		private bool emitSwipe;
+		private OVRPlugin.Vector2f moveAmount;
 		private float minMoveMagnitude = 0.3f;
 
 		public OVRControllerRTrackedRemote()
@@ -2963,24 +3362,24 @@ public static class OVRInput
 			axis2DMap.SecondaryTouchpad        = RawAxis2D.None;
 		}
 
-        public override Controller Update()
-        {
-            Controller res = base.Update();
+		public override Controller Update()
+		{
+			Controller res = base.Update();
 
-            if (GetDown(RawTouch.RTouchpad, OVRInput.Controller.RTrackedRemote))
+			if (GetDown(RawTouch.RTouchpad, OVRInput.Controller.RTrackedRemote))
 			{
-                emitSwipe = true;
-                moveAmount = currentState.RTouchpad;
+				emitSwipe = true;
+				moveAmount = currentState.RTouchpad;
 			}
 
-            if (GetDown(RawButton.RTouchpad, OVRInput.Controller.RTrackedRemote))
+			if (GetDown(RawButton.RTouchpad, OVRInput.Controller.RTrackedRemote))
 			{
-                emitSwipe = false;
+				emitSwipe = false;
 			}
 
-            if (GetUp(RawTouch.RTouchpad, OVRInput.Controller.RTrackedRemote) && emitSwipe)
+			if (GetUp(RawTouch.RTouchpad, OVRInput.Controller.RTrackedRemote) && emitSwipe)
 			{
-                emitSwipe = false;
+				emitSwipe = false;
 
 				moveAmount.x = previousState.RTouchpad.x - moveAmount.x;
 				moveAmount.y = previousState.RTouchpad.y - moveAmount.y;
@@ -3018,8 +3417,8 @@ public static class OVRInput
 				}
 			}
 
-            return res;
-        }
+			return res;
+		}
 
 		public override bool WasRecentered()
 		{
@@ -3035,5 +3434,5 @@ public static class OVRInput
 		{
 			return currentState.RBatteryPercentRemaining;
 		}
-    }
+	}
 }

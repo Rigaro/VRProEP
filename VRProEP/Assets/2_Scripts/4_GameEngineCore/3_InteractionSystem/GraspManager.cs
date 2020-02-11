@@ -50,7 +50,7 @@ public class GraspManager : MonoBehaviour {
     public bool throwEnable = false;
     public float throwMultiplier = 1.0f;
 
-    [Header("Interaction setttings")]
+    [Header("Interaction settings")]
     [SerializeField]
     private List<float> interactionInputs;
     [SerializeField]

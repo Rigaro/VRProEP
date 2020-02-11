@@ -77,12 +77,12 @@ public class GridReaching2019GM : GameMaster
     private int sessions = 1;
 
     // iteration management variables
-    private int iterationsPerSession;
+    //private int iterationsPerSession;
     private int maxIterations;
     private int completedIterations = 0;
 
     // Instructions management
-    private string infoText;
+    //private string infoText;
 
     // Motion tracking for experiment management (check for start position)
     private VIVETrackerManager upperArmTracker;
@@ -91,7 +91,7 @@ public class GridReaching2019GM : GameMaster
     //
     // Data logging
     //
-    private float taskTime = 0.0f;
+    //private float taskTime = 0.0f;
     private DataStreamLogger motionLogger;
     private const string motionDataAbleFormat = "loc,t,aDotUA,bDotUA,gDotUA,aUA,bUA,gUA,xUA,yUA,zUA,aDotE,bDotE,gDotE,aE,bE,gE,xE,yE,zE,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,xHand,yHand,zHand,aHand,bHand,gHand";
 
@@ -114,7 +114,7 @@ public class GridReaching2019GM : GameMaster
     void Start()
     {
         // Initialize ExperimentSystem
-        InitExperimentSystem();
+        InitialiseExperimentSystems();
 
         // Initialize UI.
         InitializeUI();
@@ -141,18 +141,18 @@ public class GridReaching2019GM : GameMaster
              *************************************************
              */
             // Welcome subject to the virtual world.
-            case ExperimentState.HelloWorld:
+            case ExperimentState.Welcome:
                 if (WaitFlag)
                 {
                     if (debug)
                         TeleportToStartPosition();
-                    hudManager.ClearText();
-                    experimentState = ExperimentState.InitializingApplication;
+                    HudManager.ClearText();
+                    experimentState = ExperimentState.Initialising;
                 }
                 else
                 {
-                    hudManager.DisplayText("Welcome!");
-                    instructionManager.DisplayText("Hello world!");
+                    HudManager.DisplayText("Welcome!");
+                    InstructionManager.DisplayText("Hello world!");
                 }
                 break;
             /*
@@ -161,7 +161,7 @@ public class GridReaching2019GM : GameMaster
              *************************************************
              */
             // Perform initialization functions before starting experiment.
-            case ExperimentState.InitializingApplication:
+            case ExperimentState.Initialising:
                 //
                 // Perform experiment initialization procedures
                 //
@@ -189,18 +189,18 @@ public class GridReaching2019GM : GameMaster
                 //
                 // Go to instructions
                 //
-                experimentState = ExperimentState.GivingInstructions;
+                experimentState = ExperimentState.Instructions;
                 break;
             /*
              *************************************************
              *  GivingInstructions
              *************************************************
              */
-            case ExperimentState.GivingInstructions:
+            case ExperimentState.Instructions:
                 // Skip instructions when repeating sessions
-                if (skipInstructions)
+                if (SkipInstructions)
                 {
-                    hudManager.DisplayText("Move to start", 2.0f);
+                    HudManager.DisplayText("Move to start", 2.0f);
                     // Turn targets clear
                     experimentState = ExperimentState.WaitingForStart;
                     break;
@@ -213,7 +213,7 @@ public class GridReaching2019GM : GameMaster
                 //
                 // Go to waiting for start
                 //
-                hudManager.DisplayText("Move to start", 2.0f);
+                HudManager.DisplayText("Move to start", 2.0f);
                 // Turn targets clear
                 experimentState = ExperimentState.WaitingForStart;
 
@@ -226,7 +226,7 @@ public class GridReaching2019GM : GameMaster
             case ExperimentState.WaitingForStart:
                 // Show status to subject
                 infoText = GetInfoText();
-                instructionManager.DisplayText(infoText);
+                InstructionManager.DisplayText(infoText);
 
                 // Check if pause requested
                 UpdatePause();
@@ -234,27 +234,27 @@ public class GridReaching2019GM : GameMaster
                 {
                     // Waiting for subject to get to start position.
                     case WaitState.Waiting:
-                        if (CheckReadyToStart())
+                        if (IsReadyToStart())
                         {
                             startEnable = true;
+                            // Select target
+                            gridManager.SelectBall(iterationNumber - 1);
                             waitState = WaitState.Countdown;
                         }
                         break;
                     // HUD countdown for reaching action.
                     case WaitState.Countdown:
                         // If all is good and haven't started counting, start.
-                        if (startEnable && !counting && !countdownDone)
+                        if (startEnable && !counting && !CountdownDone)
                         {
                             // Manage countdown
-                            hudManager.ClearText();
+                            HudManager.ClearText();
                             StopHUDCountDown();
                             counting = true;
                             HUDCountDown(3);
-                            // Select target
-                            gridManager.SelectBall(iterationNumber - 1);
                         }
                         // If all is good and the countdownDone flag is raised, switch to reaching.
-                        else if (countdownDone)
+                        else if (CountdownDone)
                         {
                             // Reset flags
                             startEnable = false;
@@ -266,7 +266,7 @@ public class GridReaching2019GM : GameMaster
                             break;
                         }
                         // If hand goes out of target reset countdown and wait for position
-                        else if (!CheckReadyToStart() && !countdownDone)
+                        else if (!IsReadyToStart() && !CountdownDone)
                         {
                             StopHUDCountDown();
                             startEnable = false;
@@ -275,7 +275,7 @@ public class GridReaching2019GM : GameMaster
                             // Clear ball
                             gridManager.ResetBallSelection();
                             // Indicate to move back
-                            hudManager.DisplayText("Move to start", 2.0f);
+                            HudManager.DisplayText("Move to start", 2.0f);
                             waitState = WaitState.Waiting;
                             break;
                         }
@@ -317,18 +317,18 @@ public class GridReaching2019GM : GameMaster
                 // Flow managment
                 //
                 // Rest for some time when required
-                if (CheckRestCondition())
+                if (IsRestTime())
                 {
-                    SetWaitFlag(restTime);
+                    SetWaitFlag(RestTime);
                     experimentState = ExperimentState.Resting;
                 }
                 // Check whether the new session condition is met
-                else if (CheckNextSessionCondition())
+                else if (IsEndOfSession())
                 {
-                    experimentState = ExperimentState.InitializingNextSession;
+                    experimentState = ExperimentState.InitializingNext;
                 }
                 // Check whether the experiment end condition is met
-                else if (CheckEndCondition())
+                else if (IsEndOfExperiment())
                 {
                     experimentState = ExperimentState.End;
                 }
@@ -364,7 +364,7 @@ public class GridReaching2019GM : GameMaster
              *  InitializingNext
              *************************************************
              */
-            case ExperimentState.InitializingNextSession:
+            case ExperimentState.InitializingNext:
                 //
                 // Perform session closure procedures
                 //
@@ -381,7 +381,7 @@ public class GridReaching2019GM : GameMaster
                 //
                 ExperimentSystem.GetActiveLogger(1).AddNewLogFile(sessionNumber, iterationNumber, "Data format");
 
-                experimentState = ExperimentState.InitializingApplication; // Initialize next session
+                experimentState = ExperimentState.Initialising; // Initialize next session
                 break;
             /*
              *************************************************
@@ -394,7 +394,7 @@ public class GridReaching2019GM : GameMaster
                 //
                 if (UpdateNext())
                 {
-                    LaunchNextSession();
+                    ConfigureNextSession();
                     break;
                 }
                 else if (UpdateEnd())
@@ -407,7 +407,7 @@ public class GridReaching2019GM : GameMaster
                 //
                 if (WaitFlag)
                 {
-                    hudManager.DisplayText("Get ready to restart!", 3.0f);
+                    HudManager.DisplayText("Get ready to restart!", 3.0f);
                     SetWaitFlag(5.0f);
                     experimentState = ExperimentState.UpdatingApplication;
                     break;
@@ -425,7 +425,7 @@ public class GridReaching2019GM : GameMaster
                 UpdatePause();
                 if (UpdateNext())
                 {
-                    LaunchNextSession();
+                    ConfigureNextSession();
                     break;
                 }
                 else if (UpdateEnd())
@@ -511,7 +511,7 @@ public class GridReaching2019GM : GameMaster
                 //
                 // Save log and reset flags when successfully compeleted task
                 //
-                if (CheckTaskCompletion())
+                if (IsTaskDone())
                 {
                     //
                     // Perform data management, such as appending data to lists for analysis
@@ -558,11 +558,49 @@ public class GridReaching2019GM : GameMaster
 
     #region Inherited methods overrides
 
+    public override void HandleResultAnalysis()
+    {
+        throw new System.NotImplementedException();
+    }
+    public override void HandleInTaskBehaviour()
+    {
+        throw new System.NotImplementedException();
+    }
+    public override void HandleTaskCompletion()
+    {
+        throw new System.NotImplementedException();
+    }
+    public override void PrepareForStart()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void StartFailureReset()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void InitialiseExperiment()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    /// <summary>
+    /// Gets the progress text to be displayed to the subject.
+    /// </summary>
+    /// <returns>The text to be displayed as a string.</returns>
+    public override string GetDisplayInfoText()
+    {
+        string Text;
+        Text = "Status: " + experimentState.ToString() + ".\n";
+        Text += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
+        return Text;
+    }
     /// <summary>
     /// Initializes the ExperimentSystem and its components.
     /// Verifies that all components needed for the experiment are available.
     /// </summary>
-    protected override void InitExperimentSystem()
+    public override void InitialiseExperimentSystems()
     {
         //
         // Set the experiment type configuration
@@ -579,8 +617,8 @@ public class GridReaching2019GM : GameMaster
         iterationNumber = 1;
         // Set iterations variables for flow control.
         targetNumber = gridRows * gridColumns;
-        iterationsPerSession = targetNumber * iterationsPerTarget;
-        maxIterations = iterationsPerSession * sessions;
+        iterationsPerSession[sessionNumber] = targetNumber * iterationsPerTarget;
+        maxIterations = iterationsPerSession[sessionNumber] * sessions;
         // Create the list of target indexes and shuffle it.
         for (int i = 0; i < targetNumber; i++)
         {
@@ -644,7 +682,7 @@ public class GridReaching2019GM : GameMaster
     /// Checks whether the subject is ready to start performing the task.
     /// </summary>
     /// <returns>True if ready to start.</returns>
-    protected override bool CheckReadyToStart()
+    public override bool IsReadyToStart()
     {
         // Check that upper and lower arms are within the tolerated start position.
         float qShoulder = Mathf.Rad2Deg * (upperArmTracker.GetProcessedData(5) + Mathf.PI); // Offsetting to horizontal position being 0.
@@ -669,7 +707,7 @@ public class GridReaching2019GM : GameMaster
             else if (qEDiff > 0 && Mathf.Abs(qEDiff) > startTolerance)
                 helpText += "Lower your lower-arm.\n";
 
-            hudManager.DisplayText(helpText);
+            HudManager.DisplayText(helpText);
             return false;
         }
     }
@@ -678,7 +716,7 @@ public class GridReaching2019GM : GameMaster
     /// Checks whether the task has be successfully completed or not.
     /// </summary>
     /// <returns>True if the task has been successfully completed.</returns>
-    protected override bool CheckTaskCompletion()
+    public override bool IsTaskDone()
     {
         //
         // Check that the selected ball has been touched.
@@ -690,7 +728,7 @@ public class GridReaching2019GM : GameMaster
     /// Checks if the condition for the rest period has been reached.
     /// </summary>
     /// <returns>True if the rest condition has been reached.</returns>
-    protected override bool CheckRestCondition()
+    public override bool IsRestTime()
     {
         return false;
     }
@@ -699,7 +737,7 @@ public class GridReaching2019GM : GameMaster
     /// Checks if the condition for changing experiment session has been reached.
     /// </summary>
     /// <returns>True if the condition for changing sessions has been reached.</returns>
-    protected override bool CheckNextSessionCondition()
+    public override bool IsEndOfSession()
     {
         return false;
     }
@@ -708,7 +746,7 @@ public class GridReaching2019GM : GameMaster
     /// Checks if the condition for ending the experiment has been reached.
     /// </summary>
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
-    protected override bool CheckEndCondition()
+    public override bool IsEndOfExperiment()
     {
         return completedIterations >= maxIterations;
     }
@@ -716,7 +754,7 @@ public class GridReaching2019GM : GameMaster
     /// <summary>
     /// Launches the next session. Performs all the required preparations.
     /// </summary>
-    protected override void LaunchNextSession()
+    public void ConfigureNextSession()
     {
         throw new System.NotImplementedException();
     }
@@ -724,7 +762,7 @@ public class GridReaching2019GM : GameMaster
     /// <summary>
     /// Finishes the experiment. Performs all the required procedures.
     /// </summary>
-    protected override void EndExperiment()
+    public override void EndExperiment()
     {
         throw new System.NotImplementedException();
     }
@@ -736,12 +774,27 @@ public class GridReaching2019GM : GameMaster
     /// Returns the progress update String
     /// </summary>
     /// <returns></returns>
-    private string GetInfoText()
+    public string GetInfoText()
     {
         string Text;
         Text = "Status: " + experimentState.ToString() + ".\n";
         Text = "Progress: " + completedIterations + "/" + maxIterations + ".\n";
         Text += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
         return Text;
+    }
+
+    public override IEnumerator WelcomeLoop()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override IEnumerator InstructionsLoop()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override IEnumerator TrainingLoop()
+    {
+        throw new System.NotImplementedException();
     }
 }

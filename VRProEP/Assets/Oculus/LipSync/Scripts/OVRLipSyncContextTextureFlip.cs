@@ -1,4 +1,4 @@
-﻿/************************************************************************************
+/************************************************************************************
 Filename    :   OVRLipSyncContextTextureFlip.cs
 Content     :   This bridges the phoneme/viseme output to texture flip targets
 Created     :   August 7th, 2015

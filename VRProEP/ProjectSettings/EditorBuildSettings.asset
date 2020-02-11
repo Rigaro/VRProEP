@@ -15,10 +15,10 @@ EditorBuildSettings:
     path: Assets/0_Scenes/DemoPlayground.unity
     guid: 2d1dd22ecd75bc44b92ffb73f43f5de0
   - enabled: 1
-    path: Assets/0_Scenes/Experiments/JacobianSynergyExperiment.unity
+    path: Assets/0_Scenes/Deprecated/Experiments/JacobianSynergyExperiment.unity
     guid: 109a4465252919148a52ace03703cb13
   - enabled: 1
-    path: Assets/0_Scenes/Experiments/EMGShoulderData.unity
+    path: Assets/0_Scenes/Deprecated/Experiments/EMGShoulderData.unity
     guid: 528d0eeccef45c74398d2eaf085fae7a
   - enabled: 1
     path: Assets/0_Scenes/Training/ProsthesisTraining.unity

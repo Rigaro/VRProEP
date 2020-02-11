@@ -24,7 +24,7 @@ public class VoiceModDemo_Logic : MonoBehaviour
 
 		// Initialize the proper target set
 		targetSet = 0;
-		SwitchTarget.SetActive(0);
+		//SwitchTarget.SetActive(0);
 
 		// Set initial color on models
 		if(material != null)
@@ -118,14 +118,14 @@ public class VoiceModDemo_Logic : MonoBehaviour
 		switch(targetSet)
 		{
 		case(0):
-			SwitchTarget.SetActive(0);
+			//SwitchTarget.SetActive(0);
 			OVRDebugConsole.Clear();
 			OVRDebugConsole.Log("MICROPHONE INPUT");
 			OVRDebugConsole.ClearTimeout(1.5f);
 
 			break;
 		case(1):
-			SwitchTarget.SetActive(1);
+			//SwitchTarget.SetActive(1);
 			OVRDebugConsole.Clear();
 			OVRDebugConsole.Log("SAMPLE INPUT");
 			OVRDebugConsole.ClearTimeout(1.5f);

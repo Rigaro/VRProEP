@@ -19,6 +19,7 @@ namespace VRProEP.ProsthesisCore
         public const string CMD_ADD_SENSOR = "CMD_ADD_SENSOR";
         public const string CMD_ADD_REFGEN = "CMD_ADD_REFGEN";
         public const string CMD_SET_SYNERGY = "CMD_SET_SYNERGY";
+        public const string CMD_SET_REFERENCE = "CMD_SET_REFERENCE";
         public const string VAL_SENSOR_VIVETRACKER = "VAL_SENSOR_VIVETRACKER";
         public const string VAL_SENSOR_VIVECONTROLLER = "VAL_SENSOR_VIVECONTROLLER";
         public const string VAL_SENSOR_OCULUSTOUCH = "VAL_SENSOR_OCULUSTOUCH";
@@ -293,6 +294,12 @@ namespace VRProEP.ProsthesisCore
                 case CMD_SET_SYNERGY:
                     if (value is float)
                         SetLinKinSynergy(0, value);
+                    else
+                        throw new System.ArgumentException("Invalid value provided.");
+                    break;
+                case CMD_SET_REFERENCE:
+                    if (value is float)
+                        activeGenerator.SetReference(0, value);
                     else
                         throw new System.ArgumentException("Invalid value provided.");
                     break;

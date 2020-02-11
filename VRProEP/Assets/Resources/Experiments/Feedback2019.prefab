@@ -64,6 +64,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -110,8 +111,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_text: Mid
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -268,6 +267,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -314,8 +314,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_text: Done
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -505,6 +503,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -551,8 +550,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_text: Smooth
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -772,6 +769,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -818,8 +816,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_text: Rough
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1070,17 +1066,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a75f0fa06044664a8b5e91f4b0e1f8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableStart: 0
+  startEnable: 0
   demoMode: 0
-  restTime: 120
   skipInstructions: 0
+  skipTraining: 0
   debug: 0
   debugText: {fileID: 0}
   worldOrientation: 180
   experimentCenter: {fileID: 1496852521280133188}
   playerOrientation: 180
+  restTime: 120
+  restIterations: 75
+  iterationsPerSession: 
+  trainingPerSession: 
+  taskDataFormat: 
   skipAll: 0
-  skipTraining: 0
   forceTargets:
   - 0.2
   - 0.5
@@ -1098,7 +1098,7 @@ MonoBehaviour:
   trainingPerSessionPerSetting: 010000000100000000000000010000000100000000000000
   sessionType: 000000000100000002000000000000000100000002000000
   visualFeedbackType: 010000000100000001000000000000000000000000000000
-  restIterations: 75
+  restTaskIterations: 75
   experimentObject: {fileID: 5806838228210032964}
   dropOffTransform: {fileID: 3014191614670997562}
   offHandObjects:
@@ -1115,11 +1115,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2035465937}
     m_Modifications:
-    - target: {fileID: 3069283205391279665, guid: 92c2b070e6c2408469c57194b4895a5c,
-        type: 3}
-      propertyPath: m_Name
-      value: VRGloveL
-      objectReference: {fileID: 0}
     - target: {fileID: 3068623343319861749, guid: 92c2b070e6c2408469c57194b4895a5c,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1174,6 +1169,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3069283205391279665, guid: 92c2b070e6c2408469c57194b4895a5c,
+        type: 3}
+      propertyPath: m_Name
+      value: VRGloveL
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 92c2b070e6c2408469c57194b4895a5c, type: 3}
@@ -1453,11 +1453,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8319260673236699376}
     m_Modifications:
-    - target: {fileID: 7473179249313783619, guid: 0c31051c9c8054747ab339e8d45285f6,
-        type: 3}
-      propertyPath: m_Name
-      value: SubjectPositionMarker
-      objectReference: {fileID: 0}
     - target: {fileID: 7473179249313783618, guid: 0c31051c9c8054747ab339e8d45285f6,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1562,6 +1557,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7473179249313783619, guid: 0c31051c9c8054747ab339e8d45285f6,
+        type: 3}
+      propertyPath: m_Name
+      value: SubjectPositionMarker
       objectReference: {fileID: 0}
     - target: {fileID: 7473179249313783679, guid: 0c31051c9c8054747ab339e8d45285f6,
         type: 3}
@@ -1939,11 +1939,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2035465937}
     m_Modifications:
-    - target: {fileID: 355428364207693151, guid: ca753d37433fa7540a64d7d32891bb20,
-        type: 3}
-      propertyPath: m_Name
-      value: VRGloveR
-      objectReference: {fileID: 0}
     - target: {fileID: 352129914448455119, guid: ca753d37433fa7540a64d7d32891bb20,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1998,6 +1993,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 355428364207693151, guid: ca753d37433fa7540a64d7d32891bb20,
+        type: 3}
+      propertyPath: m_Name
+      value: VRGloveR
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ca753d37433fa7540a64d7d32891bb20, type: 3}

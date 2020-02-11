@@ -1,4 +1,4 @@
-﻿/************************************************************************************
+/************************************************************************************
 Filename    :   OVRLipSyncContextMorphTarget.cs
 Content     :   This bridges the viseme output to the morph targets
 Created     :   August 7th, 2015
@@ -32,8 +32,6 @@ public class OVRLipSyncContextMorphTarget : MonoBehaviour
     public SkinnedMeshRenderer skinnedMeshRenderer = null;
 
     // Set the blendshape index to go to (-1 means there is not one assigned)
-    [OVRNamedArray(new string[] { "sil", "PP", "FF", "TH", "DD", "kk", "CH", "SS",
-        "nn", "RR", "aa", "E", "ih", "oh", "ou" })]
     [Tooltip("Blendshape index to trigger for each viseme.")]
     public int [] visemeToBlendTargets = Enumerable.Range(0, OVRLipSync.VisemeCount).ToArray();
 

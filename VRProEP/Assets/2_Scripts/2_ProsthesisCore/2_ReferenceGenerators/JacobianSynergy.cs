@@ -1,5 +1,6 @@
 ﻿//======= Copyright (c) Melbourne Robotics Lab, All rights reserved. ===============
 using UnityEngine;
+using VRProEP.GameEngineCore;
 
 namespace VRProEP.ProsthesisCore
 {
@@ -14,6 +15,7 @@ namespace VRProEP.ProsthesisCore
         private float lowerArmLength;
         private float alpha;
         private bool enableRequested = false;
+        private float leftySign = 1.0f;
 
         /// <summary>
         /// Jacobian-based synergistic prosthesis reference generator.
@@ -28,6 +30,10 @@ namespace VRProEP.ProsthesisCore
         {
             if (xBar.Length != xMin.Length || xBar.Length != xMax.Length)
                 throw new System.ArgumentOutOfRangeException("The length of the parameters does not match.");
+
+            // Flip the sign for lefty subjects as the sensor is mirrored.
+            if (SaveSystem.ActiveUser.lefty)
+                leftySign = -1.0f;
 
             channelSize = xBar.Length;
             this.xBar = xBar;
@@ -66,9 +72,9 @@ namespace VRProEP.ProsthesisCore
                 throw new System.ArgumentOutOfRangeException("The length of the parameters does not match the number of reference channels.");
 
             // Extract input
-            float qShoulder = input[0];
+            float qShoulder = leftySign * input[0];
             float qElbow = input[1];
-            float qDotShoulder = input[2];
+            float qDotShoulder = leftySign * input[2];
             bool enable = false;
             if (input[3] >= 1.0f)
                 enable = true;

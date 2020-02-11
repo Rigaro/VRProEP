@@ -11,7 +11,16 @@ namespace VRProEP.GameEngineCore
         {
             Blue,
             Red,
-            Green
+            Green,
+            Yellow,
+            Orange,
+            Purple
+        }
+
+        public enum HUDCentreColour
+        {
+            None,
+            Yellow
         }
 
         public GameObject hudText;
@@ -19,7 +28,14 @@ namespace VRProEP.GameEngineCore
         public GameObject hudBlueGraphics;
         public GameObject hudRedGraphics;
         public GameObject hudGreenGraphics;
+        public GameObject hudYellowGraphics;
+        public GameObject hudOrangeGraphics;
+        public GameObject hudPurpleGraphics;
+        public GameObject hudCentreYellowGraphics;
         public HUDColour colour;
+        public HUDCentreColour centreColour;
+
+        private bool clearCentre = true;
 
         private TextMeshPro hudTextMesh;
 
@@ -37,19 +53,63 @@ namespace VRProEP.GameEngineCore
             {
                 hudRedGraphics.SetActive(false);
                 hudGreenGraphics.SetActive(false);
+                hudYellowGraphics.SetActive(false);
+                hudOrangeGraphics.SetActive(false);
+                hudPurpleGraphics.SetActive(false);
                 hudBlueGraphics.SetActive(true);
             }
             if (colour == HUDColour.Red && !hudRedGraphics.activeSelf)
             {
                 hudBlueGraphics.SetActive(false);
                 hudGreenGraphics.SetActive(false);
+                hudYellowGraphics.SetActive(false);
+                hudOrangeGraphics.SetActive(false);
+                hudPurpleGraphics.SetActive(false);
                 hudRedGraphics.SetActive(true);
             }
             if (colour == HUDColour.Green && !hudGreenGraphics.activeSelf)
             {
                 hudBlueGraphics.SetActive(false);
                 hudRedGraphics.SetActive(false);
+                hudYellowGraphics.SetActive(false);
+                hudOrangeGraphics.SetActive(false);
+                hudPurpleGraphics.SetActive(false);
                 hudGreenGraphics.SetActive(true);
+            }
+            if (colour == HUDColour.Yellow && !hudYellowGraphics.activeSelf)
+            {
+                hudBlueGraphics.SetActive(false);
+                hudRedGraphics.SetActive(false);
+                hudYellowGraphics.SetActive(true);
+                hudOrangeGraphics.SetActive(false);
+                hudPurpleGraphics.SetActive(false);
+                hudGreenGraphics.SetActive(false);
+            }
+            if (colour == HUDColour.Orange && !hudOrangeGraphics.activeSelf)
+            {
+                hudBlueGraphics.SetActive(false);
+                hudRedGraphics.SetActive(false);
+                hudYellowGraphics.SetActive(false);
+                hudOrangeGraphics.SetActive(true);
+                hudPurpleGraphics.SetActive(false);
+                hudGreenGraphics.SetActive(false);
+            }
+            if (colour == HUDColour.Purple && !hudPurpleGraphics.activeSelf)
+            {
+                hudBlueGraphics.SetActive(false);
+                hudRedGraphics.SetActive(false);
+                hudYellowGraphics.SetActive(false);
+                hudOrangeGraphics.SetActive(false);
+                hudPurpleGraphics.SetActive(true);
+                hudGreenGraphics.SetActive(false);
+            }
+            if(centreColour == HUDCentreColour.None && !clearCentre)
+            {
+                hudCentreYellowGraphics.SetActive(false);
+            }
+            if (centreColour == HUDCentreColour.Yellow && !hudCentreYellowGraphics.activeSelf)
+            {
+                hudCentreYellowGraphics.SetActive(true);
             }
         }
 

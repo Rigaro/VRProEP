@@ -98,9 +98,19 @@ public class BallGridManager : MonoBehaviour
         ResetBallSelection();
 
         // Select ball
+        selectedIndex = index;
         balls[index].SetSelected();
         hasSelected = true;
         selectedTouched = false;
+    }
+
+    /// <summary>
+    /// Gets the position of the currently selected ball.
+    /// </summary>
+    /// <returns>The ball position as a Vector3</returns>
+    public Vector3 GetSelectedBallPosition()
+    {
+        return balls[selectedIndex].transform.position;
     }
 
     /// <summary>

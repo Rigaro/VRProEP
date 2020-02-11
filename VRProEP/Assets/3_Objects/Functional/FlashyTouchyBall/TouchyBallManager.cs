@@ -109,6 +109,9 @@ public class TouchyBallManager : MonoBehaviour
     /// </summary>
     public void ClearSelection()
     {
+        if (resetCoroutine != null)
+            StopCoroutine(resetCoroutine);
+
         resetCoroutine = StartCoroutine(ReturnToIdle(0.1f));
     }
 }

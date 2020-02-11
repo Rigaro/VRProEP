@@ -78,7 +78,7 @@ public class JacobianExperimentGM : GameMaster
             //
             // Debug Jacobian
             //
-            AvatarSystem.LoadPlayer(UserType.AbleBodied, AvatarType.Transhumeral);
+            AvatarSystem.LoadPlayer(UserType.Ablebodied, AvatarType.Transhumeral);
             AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
             // Initialize prosthesis
             GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
@@ -93,10 +93,10 @@ public class JacobianExperimentGM : GameMaster
     }
 
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
         // Initialize ExperimentSystem
-        InitExperimentSystem();
+        InitialiseExperimentSystems();
         
         // Initialize UI.
         InitializeUI();
@@ -132,7 +132,7 @@ public class JacobianExperimentGM : GameMaster
     }
 
     // Update is called once per frame
-    void Update() 
+    protected override void Update() 
     {
         switch (experimentState)
         {
@@ -142,16 +142,16 @@ public class JacobianExperimentGM : GameMaster
              *************************************************
              */
             // Welcome subject to the virtual world.
-            case ExperimentState.HelloWorld:
+            case ExperimentState.Welcome:
                 if (WaitFlag)
                 {
-                    hudManager.ClearText();
-                    experimentState = ExperimentState.InitializingApplication;
+                    HudManager.ClearText();
+                    experimentState = ExperimentState.Initialising;
                 }
                 else
                 {
-                    hudManager.DisplayText("Welcome!");
-                    instructionManager.DisplayText("Hello world!");
+                    HudManager.DisplayText("Welcome!");
+                    InstructionManager.DisplayText("Hello world!");
                 }
                 break;
             /*
@@ -160,7 +160,7 @@ public class JacobianExperimentGM : GameMaster
              *************************************************
              */
             // Perform initialization functions before starting experiment.
-            case ExperimentState.InitializingApplication:
+            case ExperimentState.Initialising:
                 //
                 // Perform experiment initialization procedures
                 //
@@ -180,7 +180,7 @@ public class JacobianExperimentGM : GameMaster
                 if (skipAll)
                 {
                     skipInstructions = true;
-                    experimentState = ExperimentState.GivingInstructions;
+                    experimentState = ExperimentState.Instructions;
                 }
                 else
                     experimentState = ExperimentState.Training;
@@ -204,7 +204,7 @@ public class JacobianExperimentGM : GameMaster
                 if (trainingEnd)
                 {
                     inTraining = false;
-                    experimentState = ExperimentState.GivingInstructions;
+                    experimentState = ExperimentState.Instructions;
                 }
                 break;
             /*
@@ -212,11 +212,11 @@ public class JacobianExperimentGM : GameMaster
              *  GivingInstructions
              *************************************************
              */
-            case ExperimentState.GivingInstructions:
+            case ExperimentState.Instructions:
                 // Skip instructions when repeating sessions
-                if (skipInstructions)
+                if (SkipInstructions)
                 {
-                    hudManager.DisplayText("Go to start!", 2.0f);
+                    HudManager.DisplayText("Go to start!", 2.0f);
                     // Enable task object, drop-off and start
                     //taskManager.SetObjectEnable(true);
                     activeDropOff.SetActive(true);
@@ -239,7 +239,7 @@ public class JacobianExperimentGM : GameMaster
                 if (instructionsEnd)
                 {
                     inInstructions = false;
-                    hudManager.DisplayText("Go to start!", 2.0f);
+                    HudManager.DisplayText("Go to start!", 2.0f);
                     // Enable task object, drop-off and start
                     //taskManager.SetObjectEnable(true);
                     activeDropOff.SetActive(true);
@@ -256,7 +256,7 @@ public class JacobianExperimentGM : GameMaster
                 infoText = "Status: Waiting to start.\n";
                 infoText += "Progress: " + (((sessionNumber - 1) * iterationLimit) + iterationNumber) + "/" + iterationLimit * numberOfSessions + ".\n";
                 infoText += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
-                instructionManager.DisplayText(infoText);
+                InstructionManager.DisplayText(infoText);
 
                 // Enable task object, drop-off if not done
                 if (!taskManager.enableFlag && startPositionManager.IsHandInPosition)
@@ -272,7 +272,7 @@ public class JacobianExperimentGM : GameMaster
                     case WaitState.Waiting:
                         if (taskManager.RunFlag && taskManager.enableFlag)
                         {
-                            hudManager.ClearText();
+                            HudManager.ClearText();
                             taskTime = 0.0f;
                             successTriggered = false;
                             experimentState = ExperimentState.PerformingTask;
@@ -296,7 +296,7 @@ public class JacobianExperimentGM : GameMaster
                 infoText = "Status: Performing task.\n";
                 infoText += "Progress: " + (((sessionNumber - 1) * iterationLimit) + iterationNumber) + "/" + iterationLimit * numberOfSessions + ".\n";
                 infoText += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
-                instructionManager.DisplayText(infoText);
+                InstructionManager.DisplayText(infoText);
 
                 break;
             /*
@@ -311,7 +311,7 @@ public class JacobianExperimentGM : GameMaster
                 infoText = "Status: Analizing results.\n";
                 infoText += "Progress: " + (((sessionNumber - 1) * iterationLimit) + iterationNumber) + "/" + iterationLimit * numberOfSessions + ".\n";
                 infoText += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
-                instructionManager.DisplayText(infoText);
+                InstructionManager.DisplayText(infoText);
 
                 //
                 // Data analysis and calculations
@@ -331,26 +331,26 @@ public class JacobianExperimentGM : GameMaster
                 //
                 successTriggered = false;
                 remainingDropOffIterations[activeDropOffNumber]--;
-                if (CheckEndCondition())
+                if (IsEndOfExperiment())
                 {
-                    hudManager.DisplayText("Experiment end. Thank you!", 6.0f);
+                    HudManager.DisplayText("Experiment end. Thank you!", 6.0f);
                     experimentState = ExperimentState.End;
                 }
                 // Check whether the new session condition is met
-                else if (CheckNextSessionCondition())
+                else if (IsEndOfSession())
                 {
-                    experimentState = ExperimentState.InitializingNextSession;
+                    experimentState = ExperimentState.InitializingNext;
                 }
                 // Rest for some time when required
-                else if (CheckRestCondition())
+                else if (IsRestTime())
                 {
-                    hudManager.DisplayText("Take a " + restTime + " seconds rest.", 6.0f);
-                    SetWaitFlag(restTime);
+                    HudManager.DisplayText("Take a " + RestTime + " seconds rest.", 6.0f);
+                    SetWaitFlag(RestTime);
                     experimentState = ExperimentState.Resting;
                 }
                 else
                 {
-                    hudManager.DisplayText("Good job!", 2.0f);
+                    HudManager.DisplayText("Good job!", 2.0f);
                     // Allow 3 seconds after task end to do calculations
                     SetWaitFlag(3.0f);
                     experimentState = ExperimentState.UpdatingApplication;
@@ -385,7 +385,7 @@ public class JacobianExperimentGM : GameMaster
                     //
                     // Go to start of next iteration
                     //
-                    hudManager.DisplayText("Go to start!", 2.0f);
+                    HudManager.DisplayText("Go to start!", 2.0f);
                     activeDropOff.SetActive(true);
                     experimentState = ExperimentState.WaitingForStart;
                 }
@@ -395,7 +395,7 @@ public class JacobianExperimentGM : GameMaster
              *  InitializingNext
              *************************************************
              */
-            case ExperimentState.InitializingNextSession:
+            case ExperimentState.InitializingNext:
                 //
                 // Perform session closure procedures
                 //
@@ -415,8 +415,8 @@ public class JacobianExperimentGM : GameMaster
                     remainingDropOffIterations.Add(iterationsPerDropOff);
                 iterationLimit = iterationsPerDropOff * dropOffLocations.Count;
 
-                hudManager.DisplayText("Take a " + restTime + " seconds rest.", 6.0f);
-                SetWaitFlag(restTime);
+                HudManager.DisplayText("Take a " + RestTime + " seconds rest.", 6.0f);
+                SetWaitFlag(RestTime);
 
                 experimentState = ExperimentState.Resting; // Initialize next session
                 break;
@@ -429,13 +429,13 @@ public class JacobianExperimentGM : GameMaster
                 infoText = "Status: Resting.\n";
                 infoText += "Progress: " + (((sessionNumber - 1) * iterationLimit) + iterationNumber) + "/" + iterationLimit * numberOfSessions + ".\n";
                 infoText += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
-                instructionManager.DisplayText(infoText);
+                InstructionManager.DisplayText(infoText);
                 //
                 // Check for session change or end request from experimenter
                 //
                 if (UpdateNext())
                 {
-                    LaunchNextSession();
+                    ConfigureNextSession();
                     break;
                 }
                 else if (UpdateEnd())
@@ -450,7 +450,7 @@ public class JacobianExperimentGM : GameMaster
                 {
                     // Disable drop-off location.
                     activeDropOff.SetActive(false);
-                    hudManager.DisplayText("Get ready!", 3.0f);
+                    HudManager.DisplayText("Get ready!", 3.0f);
                     SetWaitFlag(5.0f);
                     experimentState = ExperimentState.UpdatingApplication;
                     break;
@@ -468,7 +468,7 @@ public class JacobianExperimentGM : GameMaster
                 infoText = "Status: Experiment paused.\n";
                 infoText += "Progress: " + ( ((sessionNumber - 1) * iterationLimit) + iterationNumber) + "/" + iterationLimit * numberOfSessions + ".\n";
                 infoText += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
-                instructionManager.DisplayText(infoText);
+                InstructionManager.DisplayText(infoText);
 
                 // Disable task object, drop-off
                 if (taskManager.enableFlag)
@@ -480,7 +480,7 @@ public class JacobianExperimentGM : GameMaster
                 UpdatePause();
                 if (UpdateNext())
                 {
-                    LaunchNextSession();
+                    ConfigureNextSession();
                     break;
                 }
                 else if (UpdateEnd())
@@ -516,22 +516,22 @@ public class JacobianExperimentGM : GameMaster
         {
             if (experimentState == ExperimentState.Resting || experimentState == ExperimentState.End)
             {
-                hudManager.colour = HUDManager.HUDColour.Green;
+                HudManager.colour = HUDManager.HUDColour.Green;
             }
             else
             {
                 if (elbowManager.IsEnabled)
-                    hudManager.colour = HUDManager.HUDColour.Blue;
+                    HudManager.colour = HUDManager.HUDColour.Blue;
                 else
-                    hudManager.colour = HUDManager.HUDColour.Red;
+                    HudManager.colour = HUDManager.HUDColour.Red;
             }
         }
         else
         {
             if (experimentState == ExperimentState.Resting || experimentState == ExperimentState.End)
-                hudManager.colour = HUDManager.HUDColour.Green;
+                HudManager.colour = HUDManager.HUDColour.Green;
             else
-                hudManager.colour = HUDManager.HUDColour.Blue;
+                HudManager.colour = HUDManager.HUDColour.Blue;
         }
 
         //
@@ -550,11 +550,11 @@ public class JacobianExperimentGM : GameMaster
                 debugText += "Remaining drop-off #" + j + ": " + remainingIterations + ".\n";
                 j++;
             }
-            instructionManager.DisplayText(debugText);
+            InstructionManager.DisplayText(debugText);
         }
     }
 
-    private void FixedUpdate()
+    protected override void FixedUpdate()
     {
         //
         // Tasks performed determinalistically throughout the experiment
@@ -599,7 +599,7 @@ public class JacobianExperimentGM : GameMaster
                 //
                 // Save log and reset flags when successfully compeleted task
                 //
-                if (CheckTaskCompletion() && !successTriggered)
+                if (IsTaskDone() && !successTriggered)
                 {
                     //
                     // Perform data management, such as appending data to lists for analysis
@@ -653,11 +653,50 @@ public class JacobianExperimentGM : GameMaster
 
     #region Inherited methods overrides
 
+    public override void HandleResultAnalysis()
+    {
+        throw new System.NotImplementedException();
+    }
+    public override void HandleInTaskBehaviour()
+    {
+        throw new System.NotImplementedException();
+    }
+    public override void HandleTaskCompletion()
+    {
+        throw new System.NotImplementedException();
+    }
+    public override void PrepareForStart()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void StartFailureReset()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void InitialiseExperiment()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    /// <summary>
+    /// Gets the progress text to be displayed to the subject.
+    /// </summary>
+    /// <returns>The text to be displayed as a string.</returns>
+    public override string GetDisplayInfoText()
+    {
+        string Text;
+        Text = "Status: " + experimentState.ToString() + ".\n";
+        Text += "Time: " + System.DateTime.Now.ToString("H:mm tt") + ".\n";
+        return Text;
+    }
+
     /// <summary>
     /// Initializes the ExperimentSystem and its components.
     /// Verifies that all components needed for the experiment are available.
     /// </summary>
-    protected override void InitExperimentSystem()
+    public override void InitialiseExperimentSystems()
     {
         sessionNumber = 1;
         //
@@ -703,6 +742,8 @@ public class JacobianExperimentGM : GameMaster
                     udpSensor.StartSensorReading();
                     //Debug.Log(wifiSensor.RunThread);
                 }
+                else if (sensor.GetSensorType().Equals(SensorType.ThalmicMyo))
+                    EMGAvailable = true;
             }
             // Set whether emg or synergy based
             if (EMGAvailable)
@@ -763,8 +804,9 @@ public class JacobianExperimentGM : GameMaster
             // Get prosthesis
             prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
             elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
-            // Set active sensor and reference generator to EMG.
-            elbowManager.ChangeSensor("VAL_SENSOR_SEMG");
+            // Set active sensor and reference generator to EMG.            
+            //elbowManager.ChangeSensor("VAL_SENSOR_SEMG");
+            elbowManager.ChangeSensor("VAL_SENSOR_THALMYO");
             elbowManager.ChangeReferenceGenerator("VAL_REFGEN_EMGPROP");
         }
         else if (experimentType == ExperimentType.TypeThree) // Jacobian synergy case
@@ -814,7 +856,7 @@ public class JacobianExperimentGM : GameMaster
     /// Checks whether the subject is ready to start performing the task.
     /// </summary>
     /// <returns>True if ready to start.</returns>
-    protected override bool CheckReadyToStart()
+    public override bool IsReadyToStart()
     {
         throw new System.NotImplementedException();
     }
@@ -823,7 +865,7 @@ public class JacobianExperimentGM : GameMaster
     /// Checks whether the task has be successfully completed or not.
     /// </summary>
     /// <returns>True if the task has been successfully completed.</returns>
-    protected override bool CheckTaskCompletion()
+    public override bool IsTaskDone()
     {
         //
         // Perform some condition testing
@@ -842,7 +884,7 @@ public class JacobianExperimentGM : GameMaster
     /// Checks if the condition for the rest period has been reached.
     /// </summary>
     /// <returns>True if the rest condition has been reached.</returns>
-    protected override bool CheckRestCondition()
+    public override bool IsRestTime()
     {
         if (iterationNumber % restIterations == 0)
         {
@@ -856,7 +898,7 @@ public class JacobianExperimentGM : GameMaster
     /// Checks if the condition for changing experiment session has been reached.
     /// </summary>
     /// <returns>True if the condition for changing sessions has been reached.</returns>
-    protected override bool CheckNextSessionCondition()
+    public override bool IsEndOfSession()
     {
         if (iterationNumber >= iterationLimit)
         {
@@ -870,7 +912,7 @@ public class JacobianExperimentGM : GameMaster
     /// Checks if the condition for ending the experiment has been reached.
     /// </summary>
     /// <returns>True if the condition for ending the experiment has been reached.</returns>
-    protected override bool CheckEndCondition()
+    public override bool IsEndOfExperiment()
     {
         if (sessionNumber >= numberOfSessions && iterationNumber >= iterationLimit)
             return true;
@@ -881,7 +923,7 @@ public class JacobianExperimentGM : GameMaster
     /// <summary>
     /// Launches the next session. Performs all the required preparations.
     /// </summary>
-    protected override void LaunchNextSession()
+    public void ConfigureNextSession()
     {
         throw new System.NotImplementedException();
     }
@@ -889,7 +931,7 @@ public class JacobianExperimentGM : GameMaster
     /// <summary>
     /// Finishes the experiment. Performs all the required procedures.
     /// </summary>
-    protected override void EndExperiment()
+    public override void EndExperiment()
     {
         //
         // Update log data and close logs.
@@ -917,13 +959,19 @@ public class JacobianExperimentGM : GameMaster
         //
         // Display information
         //
-        instructionManager.DisplayText("End of experiment.\nThanks for your participation!\nYou can take the headset off.");
-        hudManager.DisplayText("Experiment end.");
+        InstructionManager.DisplayText("End of experiment.\nThanks for your participation!\nYou can take the headset off.");
+        HudManager.DisplayText("Experiment end.");
 
         //
         // Return to main menu ?
         //
     }
+
+    public override IEnumerator WelcomeLoop()
+    {
+        throw new System.NotImplementedException();
+    }
+
 
     /// <summary>
     /// Determines the next drop-off location.
@@ -951,51 +999,51 @@ public class JacobianExperimentGM : GameMaster
     /// Training coroutine
     /// </summary>
     /// <returns></returns>
-    private IEnumerator TrainingLoop()
+    public override IEnumerator TrainingLoop()
     {
         string defaultText = "\n\n...Press the Trigger to continue...";
         // Look in the direction of the monitor.
         inTraining = true;
         trainingEnd = false;
-        hudManager.DisplayText("Please look at the monitor. Top-right.");
+        HudManager.DisplayText("Please look at the monitor. Top-right.");
         yield return new WaitForSeconds(3.0f);
 
         // Introduce experiment modality.
-        instructionManager.DisplayText("Welcome to the space facility for prosthesis training." + defaultText);
+        InstructionManager.DisplayText("Welcome to the space facility for prosthesis training." + defaultText);
         yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
         yield return new WaitForSeconds(0.5f);
-        instructionManager.DisplayText("Make sure you are standing on top of the green circle." + defaultText);
+        InstructionManager.DisplayText("Make sure you are standing on top of the green circle." + defaultText);
         yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
         yield return new WaitForSeconds(0.5f);
-        instructionManager.DisplayText("Do not step outside of the circle for the duration of the experiment." + defaultText);
+        InstructionManager.DisplayText("Do not step outside of the circle for the duration of the experiment." + defaultText);
         yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
         yield return new WaitForSeconds(0.5f);
 
         if (experimentType == ExperimentType.TypeOne)
         {
-            instructionManager.DisplayText("Today we will be testing your forward reaching capabilities using your actual arm." + defaultText);
+            InstructionManager.DisplayText("Today we will be testing your forward reaching capabilities using your actual arm." + defaultText);
             yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
             yield return new WaitForSeconds(0.5f);
-            instructionManager.DisplayText("You should already be familiar with it. ;)" + defaultText);
+            InstructionManager.DisplayText("You should already be familiar with it. ;)" + defaultText);
             yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
             yield return new WaitForSeconds(0.5f);
 
         }
         else if (experimentType == ExperimentType.TypeTwo)
         {
-            instructionManager.DisplayText("Today we will be testing your forward reaching capabilities using a traditional prosthesis." + defaultText);
+            InstructionManager.DisplayText("Today we will be testing your forward reaching capabilities using a traditional prosthesis." + defaultText);
             yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
             yield return new WaitForSeconds(0.5f);
-            instructionManager.DisplayText("You should be familiar with how to make the prosthesis move using your muscles." + defaultText);
+            InstructionManager.DisplayText("You should be familiar with how to make the prosthesis move using your muscles." + defaultText);
             yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
             yield return new WaitForSeconds(0.5f);
         }
         else if (experimentType == ExperimentType.TypeThree || experimentType == ExperimentType.TypeFour)
         {
-            instructionManager.DisplayText("Today we will be testing your forward reaching capabilities using an experimental prosthesis." + defaultText);
+            InstructionManager.DisplayText("Today we will be testing your forward reaching capabilities using an experimental prosthesis." + defaultText);
             yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
             yield return new WaitForSeconds(0.5f);
-            instructionManager.DisplayText("You should be familiar with how the prosthesis moves according to the motion of your arm." + defaultText);
+            InstructionManager.DisplayText("You should be familiar with how the prosthesis moves according to the motion of your arm." + defaultText);
             yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
             yield return new WaitForSeconds(0.5f);
         }
@@ -1004,135 +1052,135 @@ public class JacobianExperimentGM : GameMaster
         {
             if (experimentType == ExperimentType.TypeTwo || experimentType == ExperimentType.TypeThree || experimentType == ExperimentType.TypeFour)
             {
-                instructionManager.DisplayText("You can see whether your prosthesis is enabled by the colour of your HUD." + defaultText);
+                InstructionManager.DisplayText("You can see whether your prosthesis is enabled by the colour of your HUD." + defaultText);
                 yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                 yield return new WaitForSeconds(0.5f);
-                instructionManager.DisplayText("A blue circle means it is enabled, a red circle means it is disabled." + defaultText);
+                InstructionManager.DisplayText("A blue circle means it is enabled, a red circle means it is disabled." + defaultText);
                 yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
                 yield return new WaitForSeconds(0.5f);
-                instructionManager.DisplayText("Try enabling it.");
+                InstructionManager.DisplayText("Try enabling it.");
                 yield return new WaitUntil(() => elbowManager.IsEnabled);
-                instructionManager.DisplayText("Well done!");
+                InstructionManager.DisplayText("Well done!");
                 yield return new WaitForSeconds(3.0f);
-                instructionManager.DisplayText("Try disabling it.");
+                InstructionManager.DisplayText("Try disabling it.");
                 yield return new WaitUntil(() => !elbowManager.IsEnabled);
-                instructionManager.DisplayText("Well done!");
+                InstructionManager.DisplayText("Well done!");
                 yield return new WaitForSeconds(3.0f);
             }
 
-            instructionManager.DisplayText("You will be required to grasp an object in front of you and place it on a shelf." + defaultText);
+            InstructionManager.DisplayText("You will be required to grasp an object in front of you and place it on a shelf." + defaultText);
             yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
             yield return new WaitForSeconds(0.5f);
-            instructionManager.DisplayText("You should not step when reaching for the object or dropping it off." + defaultText);
+            InstructionManager.DisplayText("You should not step when reaching for the object or dropping it off." + defaultText);
             yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
             yield return new WaitForSeconds(0.5f);
 
             // Look in the direction of the task.
-            instructionManager.DisplayText("Please look forward towards the desk.");
-            hudManager.DisplayText("Look forward.", 3.0f);
+            InstructionManager.DisplayText("Please look forward towards the desk.");
+            HudManager.DisplayText("Look forward.", 3.0f);
             yield return new WaitForSeconds(4.0f);
 
             // Mention task
-            hudManager.DisplayText("You will perform a set of...");
+            HudManager.DisplayText("You will perform a set of...");
             yield return new WaitForSeconds(4.0f);
-            hudManager.DisplayText("forward reaching task.");
+            HudManager.DisplayText("forward reaching task.");
             yield return new WaitForSeconds(4.0f);
 
             // Hand rest
-            hudManager.DisplayText("Before you begin each trial...");
+            HudManager.DisplayText("Before you begin each trial...");
             yield return new WaitForSeconds(4.0f);
-            hudManager.DisplayText("you need to place your hand over...");
+            HudManager.DisplayText("you need to place your hand over...");
             yield return new WaitForSeconds(4.0f);
-            hudManager.DisplayText("the orange circle.");
+            HudManager.DisplayText("the orange circle.");
             yield return new WaitForSeconds(4.0f);
-            hudManager.DisplayText("Try it now.");
+            HudManager.DisplayText("Try it now.");
             yield return new WaitUntil(() => startPositionManager.IsHandInPosition);
-            hudManager.DisplayText("Well done!");
+            HudManager.DisplayText("Well done!");
             yield return new WaitForSeconds(2.0f);
-            hudManager.DisplayText("That will trigger the start of...");
+            HudManager.DisplayText("That will trigger the start of...");
             yield return new WaitForSeconds(4.0f);
-            hudManager.DisplayText("the trial and the object will...");
+            HudManager.DisplayText("the trial and the object will...");
             yield return new WaitForSeconds(4.0f);
 
             // Show object
-            hudManager.DisplayText("appear over the blue +.");
+            HudManager.DisplayText("appear over the blue +.");
             yield return new WaitForSeconds(4.0f);
             taskManager.SetObjectEnable(true);
             taskManager.gameObject.tag = "Untagged";
-            hudManager.DisplayText("You can see it now.");
+            HudManager.DisplayText("You can see it now.");
             yield return new WaitForSeconds(3.0f);
             taskManager.gameObject.tag = "Graspable";
             taskManager.SetObjectEnable(false);
 
             // Show drop-off points
-            hudManager.DisplayText("You'll need to drop it off...");
+            HudManager.DisplayText("You'll need to drop it off...");
             yield return new WaitForSeconds(4.0f);
-            hudManager.DisplayText("on " + dropOffLocations.Count + " different locations.");
+            HudManager.DisplayText("on " + dropOffLocations.Count + " different locations.");
             yield return new WaitForSeconds(4.0f);
-            hudManager.DisplayText("The drop-off locations will be...");
+            HudManager.DisplayText("The drop-off locations will be...");
             yield return new WaitForSeconds(4.0f);
-            hudManager.DisplayText("the following...");
+            HudManager.DisplayText("the following...");
             yield return new WaitForSeconds(4.0f);
             int dropNum = 1;
             foreach (GameObject dropOff in dropOffLocations)
             {
                 dropOff.SetActive(true);
-                hudManager.DisplayText("Drop-off #" + dropNum + ".");
+                HudManager.DisplayText("Drop-off #" + dropNum + ".");
                 dropNum++;
                 yield return new WaitForSeconds(3.0f);
                 dropOff.SetActive(false);
             }
             // Handling
-            hudManager.DisplayText("Grasping is done automatically...");
+            HudManager.DisplayText("Grasping is done automatically...");
             yield return new WaitForSeconds(5.0f);
-            hudManager.DisplayText("by touching the object with your fingers.");
+            HudManager.DisplayText("by touching the object with your fingers.");
             yield return new WaitForSeconds(5.0f);
-            hudManager.DisplayText("Try it now.");
+            HudManager.DisplayText("Try it now.");
             taskManager.SetObjectEnable(true);
             activeDropOff.SetActive(true);
             yield return new WaitUntil(() => taskManager.SuccessFlag);
-            hudManager.DisplayText("Good job!");
+            HudManager.DisplayText("Good job!");
             yield return new WaitForSeconds(5.0f);
             activeDropOff.SetActive(false);
         }
 
 
         // Practice
-        hudManager.DisplayText("Now let's practice.");
+        HudManager.DisplayText("Now let's practice.");
         yield return new WaitForSeconds(5.0f);
-        hudManager.DisplayText("Try the task " + trainingIterations + " times.");
+        HudManager.DisplayText("Try the task " + trainingIterations + " times.");
         yield return new WaitForSeconds(5.0f);
         while (trainingIterations > 0)
         {
             int dONum = Random.Range(0, dropOffLocations.Count);
-            hudManager.DisplayText("Go to start!", 3.0f);
+            HudManager.DisplayText("Go to start!", 3.0f);
             yield return new WaitUntil(() => startPositionManager.IsHandInPosition);
             taskManager.SetObjectEnable(true);
             dropOffLocations[dONum].SetActive(true);
             yield return new WaitUntil(() => taskManager.RunFlag);
             yield return new WaitUntil(() => taskManager.SuccessFlag);
             trainingIterations--;
-            hudManager.DisplayText("Good job!", 3.0f);
+            HudManager.DisplayText("Good job!", 3.0f);
             yield return new WaitForSeconds(5.0f);
             dropOffLocations[dONum].SetActive(false);
         }
         
-        hudManager.DisplayText("Well done!");
+        HudManager.DisplayText("Well done!");
         yield return new WaitForSeconds(5.0f);
 
         // Finish training
-        hudManager.DisplayText("Please look at the monitor.");
-        instructionManager.DisplayText("Hi again. :)");
+        HudManager.DisplayText("Please look at the monitor.");
+        InstructionManager.DisplayText("Hi again. :)");
         yield return new WaitForSeconds(4.0f);
-        instructionManager.DisplayText("I think you are ready to get started!");
+        InstructionManager.DisplayText("I think you are ready to get started!");
         yield return new WaitForSeconds(5.0f);
-        instructionManager.DisplayText("The experiment will start after some final instructions.");
+        InstructionManager.DisplayText("The experiment will start after some final instructions.");
         yield return new WaitForSeconds(6.0f);
 
         trainingEnd = true;
     }
 
-    private IEnumerator InstructionsLoop()
+    public override IEnumerator InstructionsLoop()
     {
         inInstructions = true;
         instructionsEnd = false;
@@ -1140,41 +1188,41 @@ public class JacobianExperimentGM : GameMaster
         string defaultText = "Instructions:\n";
         string continueText = "\n\n...Press the Trigger to continue...";
 
-        instructionManager.DisplayText(defaultText + "The experiment requires you to repeat the grasp-and-drop-off task for " + iterationLimit * numberOfSessions + " iterations." + continueText);
+        InstructionManager.DisplayText(defaultText + "The experiment requires you to repeat the grasp-and-drop-off task for " + iterationLimit * numberOfSessions + " iterations." + continueText);
         yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
         yield return new WaitForSeconds(0.5f);
-        instructionManager.DisplayText(defaultText + "The drop-off location will be chosen randomly." + continueText);
+        InstructionManager.DisplayText(defaultText + "The drop-off location will be chosen randomly." + continueText);
         yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
         yield return new WaitForSeconds(0.5f);
-        instructionManager.DisplayText(defaultText + "You will get " + restTime + " seconds rest every " + restIterations + " iterations." + continueText);
+        InstructionManager.DisplayText(defaultText + "You will get " + RestTime + " seconds rest every " + restIterations + " iterations." + continueText);
         yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
         yield return new WaitForSeconds(0.5f);
-        instructionManager.DisplayText(defaultText + "Your HUD will indicate when it is time to rest by turning green." + continueText);
+        InstructionManager.DisplayText(defaultText + "Your HUD will indicate when it is time to rest by turning green." + continueText);
         yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
         yield return new WaitForSeconds(0.5f);
-        instructionManager.DisplayText(defaultText + "Your progress will be displayed here along with the status of the experiment." + continueText);
+        InstructionManager.DisplayText(defaultText + "Your progress will be displayed here along with the status of the experiment." + continueText);
         yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
         yield return new WaitForSeconds(0.5f);
-        instructionManager.DisplayText(defaultText + "If you need any rest please request it to the experimenter." + continueText);
+        InstructionManager.DisplayText(defaultText + "If you need any rest please request it to the experimenter." + continueText);
         yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
         yield return new WaitForSeconds(0.5f);
-        instructionManager.DisplayText(defaultText + "If you feel dizzy or want to stop the experiment please let the experimenter know immediately." + continueText);
+        InstructionManager.DisplayText(defaultText + "If you feel dizzy or want to stop the experiment please let the experimenter know immediately." + continueText);
         yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
         yield return new WaitForSeconds(0.5f);
-        instructionManager.DisplayText(defaultText + "Remember to not step during the experiment to perform the grasp-and-drop-off task." + continueText);
+        InstructionManager.DisplayText(defaultText + "Remember to not step during the experiment to perform the grasp-and-drop-off task." + continueText);
         yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
         yield return new WaitForSeconds(0.5f);
-        instructionManager.DisplayText(defaultText + "Remember that objects in VR are not physical so do not try to lean or support on them, particularly on the virtual desk in front of you while performing the task." + continueText);
+        InstructionManager.DisplayText(defaultText + "Remember that objects in VR are not physical so do not try to lean or support on them, particularly on the virtual desk in front of you while performing the task." + continueText);
         yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
         yield return new WaitForSeconds(0.5f);
-        instructionManager.DisplayText(defaultText + "All the information regarding the task will be displayed on your HUD." + continueText);
+        InstructionManager.DisplayText(defaultText + "All the information regarding the task will be displayed on your HUD." + continueText);
         yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
         yield return new WaitForSeconds(0.5f);
-        instructionManager.DisplayText(defaultText + "Your progress will be displayed here along with the current time." + continueText);
+        InstructionManager.DisplayText(defaultText + "Your progress will be displayed here along with the current time." + continueText);
         yield return new WaitUntil(() => buttonAction.GetStateDown(SteamVR_Input_Sources.Any));
         yield return new WaitForSeconds(0.5f);
-        instructionManager.DisplayText("Get ready to start! Look forward towards the desk.");
-        hudManager.DisplayText("Look forward.", 3.0f);
+        InstructionManager.DisplayText("Get ready to start! Look forward towards the desk.");
+        HudManager.DisplayText("Look forward.", 3.0f);
         yield return new WaitForSeconds(5.0f);
         HUDCountDown(3);
         yield return new WaitForSeconds(5.0f);

@@ -40,7 +40,7 @@ namespace VRProEP.GameEngineCore
         /// <param name="handType">The type of hand.</param>
         /// <param name="avatarType">The type of avatar.</param>
         /// <returns></returns>
-        public static AvatarData CreateAvatarCustomizationData(string userID, string residualLimbType, string socketType, string elbowType, string forearmType, string handType)
+        public static AvatarData CreateAvatarCustomizationData(string userID, AvatarType type, string residualLimbType, string socketType, string elbowType, string forearmType, string handType)
         {
             // Create avatar data object.
             AvatarData avatarData = new AvatarData();
@@ -53,7 +53,7 @@ namespace VRProEP.GameEngineCore
             avatarData.handType = handType;
 
             // Save customization data and set active.
-            SaveAvatarCustomizationData(userID, avatarData);
+            SaveAvatarCustomizationData(userID, avatarData, type);
             activeAvatarData = avatarData;
 
             return avatarData;
@@ -91,7 +91,7 @@ namespace VRProEP.GameEngineCore
         /// </summary>
         /// <param name="userID">The user id of the user whose avatar wants to be loaded.</param>
         /// <param name="avatarData">The avatar customization data to save.</param>
-        public static void SaveAvatarCustomizationData(string userID, AvatarData avatarData)
+        public static void SaveAvatarCustomizationData(string userID, AvatarData avatarData, AvatarType type)
         {
             string saveFolder = dataFolder + userID;
 
@@ -101,7 +101,7 @@ namespace VRProEP.GameEngineCore
 
 
             // Set file, format data as JSON, and save.
-            string saveFilePath = saveFolder + "/avatarInfo.json";
+            string saveFilePath = saveFolder + "/avatarInfo_" + type.ToString() + ".json";
             string avatarDataAsJson = JsonUtility.ToJson(avatarData);
             File.WriteAllText(saveFilePath, avatarDataAsJson);
         }
@@ -138,14 +138,14 @@ namespace VRProEP.GameEngineCore
             if (avatarType == AvatarType.Transhumeral)
             {
                 activeAvatarType = AvatarType.Transhumeral;
-                LoadTrackerFrame(userData.type, avatarType);
+                LoadTrackerFrame(userData.type, avatarType, userData.lefty);
                 CustomizeTrackingFrame(userData, avatarType);
                 AvatarSpawner.SpawnTranshumeralAvatar(userData, activeAvatarData);
             }
             else if (avatarType == AvatarType.Transradial)
             {
                 activeAvatarType = AvatarType.Transradial;
-                LoadTrackerFrame(userData.type, avatarType);
+                LoadTrackerFrame(userData.type, avatarType, userData.lefty);
                 CustomizeTrackingFrame(userData, avatarType);
                 AvatarSpawner.SpawnTransradialAvatar(userData, activeAvatarData);
             }
@@ -165,7 +165,7 @@ namespace VRProEP.GameEngineCore
         /// <param name="avatarType">The type of avatar to customize.</param>
         public static void CustomizeTrackingFrame(UserData userData, AvatarType avatarType)
         {
-            if (avatarType == AvatarType.Transhumeral)
+            if (userData.type == UserType.Ablebodied && avatarType == AvatarType.Transhumeral)
             {
                 // Load elbow location, shoulder location and upper arm collider objects.
                 GameObject elbowLocation = GameObject.FindGameObjectWithTag("ElbowLocation");
@@ -181,7 +181,7 @@ namespace VRProEP.GameEngineCore
                 upperArmCollider.transform.localScale = new Vector3(upperArmCollider.transform.localScale.x, userData.upperArmLength / 2.0f, upperArmCollider.transform.localScale.z);
                 upperArmCollider.transform.localPosition = new Vector3(upperArmCollider.transform.localPosition.x, -userData.upperArmLength / 2.0f, upperArmCollider.transform.localPosition.z);
             }
-            else if (avatarType == AvatarType.Transradial)
+            else if (userData.type == UserType.Ablebodied && avatarType == AvatarType.Transradial)
             {
                 // Load elbow location and check.
                 GameObject elbowLocation = GameObject.FindGameObjectWithTag("ElbowLocation");
@@ -190,6 +190,24 @@ namespace VRProEP.GameEngineCore
 
                 // Modify the location of the elbowLocation
                 elbowLocation.transform.position = new Vector3(elbowLocation.transform.position.x, -userData.forearmLength / 2.0f, elbowLocation.transform.position.z);
+            }
+            else if (userData.type == UserType.Transhumeral && avatarType == AvatarType.Transhumeral)
+            {
+                // Load elbow location, shoulder location and upper arm collider objects.
+                GameObject elbowLocation = GameObject.FindGameObjectWithTag("ElbowLocation");
+                GameObject shoulderMarker = GameObject.FindGameObjectWithTag("ShoulderLocation");
+                GameObject upperArmCollider = GameObject.FindGameObjectWithTag("UpperArmCollider");
+
+                if (elbowLocation == null || shoulderMarker == null || upperArmCollider == null)
+                    throw new System.Exception("The residual limb frame has not been loaded.");
+
+                // Modify the position of the elbow marker to half the distance from marker
+                elbowLocation.transform.position = new Vector3(elbowLocation.transform.position.x, -userData.upperArmLength / 2.0f, elbowLocation.transform.position.z);
+                // Modify position of shoulder marker
+                shoulderMarker.transform.position = new Vector3(shoulderMarker.transform.position.x, userData.upperArmLength + elbowLocation.transform.localPosition.y, shoulderMarker.transform.position.z);
+                // Change size and position of collider
+                upperArmCollider.transform.localScale = new Vector3(upperArmCollider.transform.localScale.x, userData.upperArmLength / 2.0f, upperArmCollider.transform.localScale.z);
+                upperArmCollider.transform.localPosition = new Vector3(upperArmCollider.transform.localPosition.x, -userData.upperArmLength / 2.0f, upperArmCollider.transform.localPosition.z);
             }
         }
 
@@ -231,7 +249,7 @@ namespace VRProEP.GameEngineCore
 
             switch (userType)
             {
-                case UserType.AbleBodied:
+                case UserType.Ablebodied:
                     switch (avatarType)
                     {
                         case AvatarType.AbleBodied:
@@ -246,7 +264,8 @@ namespace VRProEP.GameEngineCore
                             break;
                         case AvatarType.Transhumeral:
                             // Load prefab and check validity
-                            GameObject playerAbleTHPrefab = Resources.Load<GameObject>("Players/PlayerAbleTH");
+                            //GameObject playerAbleTHPrefab = Resources.Load<GameObject>("Players/PlayerAbleTH");
+                            GameObject playerAbleTHPrefab = Resources.Load<GameObject>("Players/PlayerPros");
                             if (playerAbleTHPrefab == null)
                                 throw new System.Exception("The requested player prefab was not found.");
 
@@ -257,7 +276,8 @@ namespace VRProEP.GameEngineCore
                             break;
                         case AvatarType.Transradial:
                             // Load prefab and check validity
-                            GameObject playerAbleTRPrefab = Resources.Load<GameObject>("Players/PlayerAbleTR");
+                            //GameObject playerAbleTRPrefab = Resources.Load<GameObject>("Players/PlayerAbleTR");
+                            GameObject playerAbleTRPrefab = Resources.Load<GameObject>("Players/PlayerPros");
                             if (playerAbleTRPrefab == null)
                                 throw new System.Exception("The requested player prefab was not found.");
 
@@ -271,6 +291,22 @@ namespace VRProEP.GameEngineCore
                     }
                     break;
                 case UserType.Transhumeral:
+                    switch (avatarType)
+                    {
+                        case AvatarType.Transhumeral:
+                            // Load prefab and check validity
+                            //GameObject playerTHPrefab = Resources.Load<GameObject>("Players/PlayerTH");
+                            GameObject playerTHPrefab = Resources.Load<GameObject>("Players/PlayerPros");
+                            if (playerTHPrefab == null)
+                                throw new System.Exception("The requested player prefab was not found.");
+
+                            // Instantiate
+                            Object.Instantiate(playerTHPrefab);
+                            isPlayerAvailable = true;
+                            break;
+                        default:
+                            throw new System.Exception("TH users can only be loaded with a TH avatar.");
+                    }
                     break;
                 case UserType.Transradial:
                     break;
@@ -283,8 +319,12 @@ namespace VRProEP.GameEngineCore
         /// Loads the tracking frame for a given avatar type and attaches it to the residual limb tracker.
         /// </summary>
         /// <param name="avatarType"></param>
-        private static void LoadTrackerFrame(UserType userType, AvatarType avatarType)
+        private static void LoadTrackerFrame(UserType userType, AvatarType avatarType, bool lefty)
         {
+            string side = "R";
+            if (lefty)
+                side = "L";
+
             GameObject trackerGO = GameObject.FindGameObjectWithTag("ResidualLimbTracker");
 
             if (trackerGO == null)
@@ -293,10 +333,10 @@ namespace VRProEP.GameEngineCore
             //
             // Able-bodied subject with transhumeral frame
             //
-            if (userType == UserType.AbleBodied && avatarType == AvatarType.Transhumeral)
+            if (userType == UserType.Ablebodied && avatarType == AvatarType.Transhumeral)
             {
                 // Load TH tracking frame from Frames folder and check whether successfully loaded.
-                GameObject ableBodiedTHFramePrefab = Resources.Load<GameObject>("Frames/AbleBodiedFrameTH");
+                GameObject ableBodiedTHFramePrefab = Resources.Load<GameObject>("Frames/AbleBodiedFrameTH_" + side);
                 if (ableBodiedTHFramePrefab == null)
                     throw new System.Exception("The requested tracker frame prefab was not found.");
 
@@ -306,16 +346,30 @@ namespace VRProEP.GameEngineCore
             //
             // Able-bodied subject with transradial frame
             //
-            else if (userType == UserType.AbleBodied && avatarType == AvatarType.Transradial)
+            else if (userType == UserType.Ablebodied && avatarType == AvatarType.Transradial)
             {
                 // Load TR tracking frame from Frames folder and check whether successfully loaded.
-                GameObject ableBodiedTRFramePrefab = Resources.Load<GameObject>("Frames/AbleBodiedFrameTR");
+                GameObject ableBodiedTRFramePrefab = Resources.Load<GameObject>("Frames/AbleBodiedFrameTR_" + side);
                 if (ableBodiedTRFramePrefab == null)
                     throw new System.Exception("The requested tracker frame prefab was not found.");
 
                 //GameObject residualLimbGO = Object.Instantiate(ableBodiedTHFramePrefab, trackerGO.transform, false);
                 Object.Instantiate(ableBodiedTRFramePrefab, trackerGO.transform, false);
             }
+            //
+            // TH subject with TH frame
+            //
+            else if (userType == UserType.Transhumeral && avatarType == AvatarType.Transhumeral)
+            {
+                // Load TH tracking frame from Frames folder and check whether successfully loaded.
+                GameObject transhumeralFramePrefab = Resources.Load<GameObject>("Frames/TranshumeralFrame_" + side);
+                if (transhumeralFramePrefab == null)
+                    throw new System.Exception("The requested tracker frame prefab was not found.");
+
+                //GameObject residualLimbGO = Object.Instantiate(ableBodiedTHFramePrefab, trackerGO.transform, false);
+                Object.Instantiate(transhumeralFramePrefab, trackerGO.transform, false);
+            }
+
         }
         
         /// <summary>
