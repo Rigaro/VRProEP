@@ -78,7 +78,7 @@ public abstract class GameMaster : MonoBehaviour
 
     #region Data Logging
     // Task Data logging
-    private DataStreamLogger taskDataLogger;
+    protected DataStreamLogger taskDataLogger;
     [Header("Experiment configuration: Data format")]
     [SerializeField]
     protected string taskDataFormat = "";

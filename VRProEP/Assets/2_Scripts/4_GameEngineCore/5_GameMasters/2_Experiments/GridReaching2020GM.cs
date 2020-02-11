@@ -289,8 +289,37 @@ public class GridReaching2020GM : GameMaster
             taskDataFormat = prostheticDataFormat;
             performanceDataFormat = prostheticPerformanceDataFormat;
         }
-        // Then run the base initialisation which is needed.
-        base.InitialiseExperimentSystems();
+        // Then run the base initialisation which is needed, with a small modification
+        //
+        // Set the experiment name only when debugging. Take  the name from the gameobject + Debug
+        //
+        if (debug)
+            ExperimentSystem.SetActiveExperimentID(this.gameObject.name + "_Debug");
+
+        // Make sure flow control is initialised
+        sessionNumber = 1;
+        iterationNumber = 1;
+
+        //
+        // Create the default data loggers
+        //
+        taskDataLogger = new DataStreamLogger("TaskData/" + AvatarSystem.AvatarType.ToString());
+        ExperimentSystem.AddExperimentLogger(taskDataLogger);
+        taskDataLogger.AddNewLogFile(sessionNumber, iterationNumber, taskDataFormat); // Add file
+
+        // Restart UDP threads
+        foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
+        {
+            if (sensor is UDPSensorManager udpSensor)
+            {
+                //Debug.Log(wifiSensor.RunThread);
+                udpSensor.StartSensorReading();
+                //Debug.Log(wifiSensor.RunThread);
+            }
+        }
+
+        // Send the player to the experiment centre position
+        TeleportToStartPosition();
 
         startPosPhoto.SetActive(false);
 
