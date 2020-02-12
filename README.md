@@ -3,6 +3,7 @@ Platform for evaluating and customizing prosthetic devices using virtual reality
 Development is generalized from the online synergy identification platform.
 
 Wiki: https://github.com/Rigaro/VRProEP/wiki
+Youtube: https://www.youtube.com/watch?v=vvq4tjShdB4
 
 ## Features
 - User data: User/subject information and experimental data is stored externally to software data to protect personal information. Experimental data is stored anonymously.
