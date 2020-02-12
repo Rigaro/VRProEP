@@ -2,7 +2,7 @@
 Platform for evaluating and customizing prosthetic devices using virtual reality.
 Development is generalized from the online synergy identification platform.
 
-Wiki: https://github.com/Rigaro/VRProEP/wiki
+Wiki: https://github.com/Rigaro/VRProEP/wiki  
 Youtube: https://www.youtube.com/watch?v=vvq4tjShdB4
 
 ## Features
