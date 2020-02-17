@@ -27,8 +27,8 @@ Pattern recognition based myoelectric sensor. Discontinued.
 
 # Platform versions in reseach papers
 
-## RA-L 2019 Paper
-The following platform and Unity versions were used for the experiments included in the paper submitted to IEEE Robotics and Automation Letters in 2019.
+## Transaction on Neural Systems and Rehabilitation Engineering 2020 Paper Submission
+The following platform and Unity versions were used for the experiments included in the paper submitted to IEEE Transaction on Neural Systems and Rehabilitation Engineering in 2020, titled *"Task-space Synergies for Reaching "*.
 
 - VRProEP Version: 0.4. Tag Link: https://github.com/Rigaro/VRProEP/releases/tag/0.4
 - Unity Version: 2018.3.8f1
