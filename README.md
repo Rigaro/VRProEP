@@ -25,6 +25,9 @@ https://liv.tv/
 ### Thalmic Labs Myoband
 Pattern recognition based myoelectric sensor. Discontinued.
 
+## Hardware
+Resources for hardware integration can be found in https://github.com/Rigaro/VRProEP-Hardware
+
 # Platform versions in reseach papers
 
 ## Transaction on Neural Systems and Rehabilitation Engineering 2020 Paper Submission
