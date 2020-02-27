@@ -26,7 +26,7 @@ https://liv.tv/
 Pattern recognition based myoelectric sensor. Discontinued.
 
 ## Hardware
-Resources for hardware integration can be found in https://github.com/Rigaro/VRProEP-Hardware
+Resources for hardware integration, such as CAD files and Arduino code, can be found in https://github.com/Rigaro/VRProEP-Hardware
 
 # Platform versions in reseach papers
 
