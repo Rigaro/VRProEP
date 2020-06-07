@@ -38,8 +38,10 @@ The following platform and Unity versions were used for the experiments included
 
 Runs from Unity Editor. See Wiki for more information.
 
-## Frontiers in Neuroscience 2019 Paper
-The following platform and Unity versions were used for the experiments included in the paper submitted to Frontiers in Neuroscience in 2019, titled *"Tactile Feedback in Closed-Loop Control of Myoelectric Hand Grasping: Conveying Information of Multiple Sensors Simultaneously via a Single Feedback Channel"*.
+## Frontiers in Neuroscience 2020 Paper
+The following platform and Unity versions were used for the experiments included in the paper published in Frontiers in Neuroscience in 2020, titled *"Tactile Feedback in Closed-Loop Control of Myoelectric Hand Grasping: Conveying Information of Multiple Sensors Simultaneously via a Single Feedback Channel"*.  
+Paper DOI: https://doi.org/10.3389/fnins.2020.00348  
+Paper website: https://www.frontiersin.org/articles/10.3389/fnins.2020.00348/full
 
 - VRProEP Version: 0.5.1. Tag Link: https://github.com/Rigaro/VRProEP/releases/tag/0.5.1
 - Unity Version: 2019.1.10f1
