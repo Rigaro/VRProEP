@@ -96,6 +96,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -314,8 +315,9 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 170076733}
   m_Enabled: 1
-  serializedVersion: 9
+  serializedVersion: 10
   m_Type: 1
+  m_Shape: 0
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
   m_Intensity: 1
   m_Range: 10
@@ -406,43 +408,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 225556714}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a75f0fa06044664a8b5e91f4b0e1f8a, type: 3}
+  m_Script: {fileID: 11500000, guid: 3067453ab9030694cb3a8d337dee06b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startEnable: 0
-  demoMode: 0
-  skipInstructions: 0
-  skipTraining: 0
-  debug: 0
-  debugText: {fileID: 0}
-  worldOrientation: 180
-  experimentCenter: {fileID: 0}
-  playerOrientation: 0
-  restTime: 60
-  restIterations: 100
-  iterationsPerSession: 
-  trainingPerSession: 
-  taskDataFormat: 
-  skipAll: 0
-  forceTargets:
-  - 0.2
-  - 0.5
-  - 0.8
-  forceColours: []
-  roughnessTargets:
-  - 0
-  - 0.050847456
-  - 0.11016949
-  iterationsPerSessionPerSetting: 050000000500000005000000050000000500000005000000
-  trainingPerSessionPerSetting: 010000000100000000000000010000000100000000000000
-  sessionType: 000000000100000002000000000000000100000002000000
-  visualFeedbackType: 010000000100000001000000000000000000000000000000
-  restTaskIterations: 75
-  experimentObject: {fileID: 0}
-  dropOffTransform: {fileID: 0}
-  offHandObjects: []
-  selectors: []
-  isLefty: 0
+  ipAddress: 192.168.137.75
+  port: 2380
+  sendData: 0
+  frequency: 1000
+  amplitude: 0.5
+  cube: {fileID: 0}
+  force: 0
+  roughness: 0
 --- !u!4 &225556716
 Transform:
   m_ObjectHideFlags: 0
@@ -550,6 +526,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -853,6 +830,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -965,6 +943,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -1513,6 +1492,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -1844,6 +1824,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -1960,6 +1941,7 @@ Texture2D:
   m_TextureFormat: 4
   m_MipCount: 1
   m_IsReadable: 1
+  m_IgnoreMasterTextureLimit: 0
   m_StreamingMipmaps: 0
   m_StreamingMipmapsPriority: 0
   m_AlphaIsTransparency: 0
