@@ -8,7 +8,7 @@ using VRProEP.ProsthesisCore;
 
 public class BasicTesterGM : MonoBehaviour
 {
-    public string ipAddress = "192.168.137.23";
+    public string ipAddress = "192.168.137.75";
     public int port = 2390;
     public bool sendData = false;
     public float frequency = 1000.0f;
@@ -28,7 +28,7 @@ public class BasicTesterGM : MonoBehaviour
         writer = new UDPWriter(ipAddress, port, "Boni");
         */
         SaveSystem.LoadUserData("MD1942");
-        float[] xBar = new float[] { 1000.0f, 0.0f };
+        float[] xBar = new float[] { 1000.0f, 0.0f, 1.0f };
         BoneConductionReferenceGenerator bcRG = new BoneConductionReferenceGenerator(xBar, (BoneConductionCharacterization)SaveSystem.LoadFeedbackCharacterization(SaveSystem.ActiveUser.id, FeedbackType.BoneConduction));
         BoneConductionController bcC = new BoneConductionController(ipAddress, port, 1, 1, 1);
         boniManager = new BoniManager(bcC, bcRG);
@@ -37,7 +37,8 @@ public class BasicTesterGM : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        float[] sensorData = new float[] { roughness, force };
+        roughness += 0.01f;
+        float[] sensorData = new float[] { roughness, force, 1.0f };
         boniManager.UpdateFeedback(0, sensorData);
         /*
         if (sendData)
@@ -54,7 +55,7 @@ public class BasicTesterGM : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        float[] sensorData = new float[] { 0.0f, 0.0f };
+        float[] sensorData = new float[] { 0.0f, 0.0f, 1.0f };
         boniManager.UpdateFeedback(0, sensorData);
     }
 
