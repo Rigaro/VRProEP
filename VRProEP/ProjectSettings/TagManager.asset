@@ -28,6 +28,7 @@ TagManager:
   - ForearmTracker
   - Floor
   - Boundary
+  - Bottle
   layers:
   - Default
   - TransparentFX
