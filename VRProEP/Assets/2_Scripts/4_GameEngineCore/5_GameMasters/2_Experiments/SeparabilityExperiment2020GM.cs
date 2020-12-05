@@ -16,35 +16,33 @@ using VRProEP.GameEngineCore;
 using VRProEP.ProsthesisCore;
 using VRProEP.Utilities;
 
-public class SeparabilityExperimentGM : GameMaster
+public class SeparabilityExperiment2020GM : GameMaster
 {
     // Here you can place all your Unity (GameObjects or similar)
     #region Unity objects
-    [Header("My Experiment Objects:")]
-    // Serialised
     [SerializeField]
-    private GameObject cubeGO; // e.g. some object you want to manipulate or get info from.
+    private string ablebodiedDataFormat = "loc,t,aDotE,bDotE,gDotE,aE,bE,gE,xE,yE,zE,aDotUA,bDotUA,gDotUA,aUA,bUA,gUA,xUA,yUA,zUA,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,xHand,yHand,zHand,aHand,bHand,gHand";
     [SerializeField]
-    private GameObject sphereGO;
+    private BottleGridManager gridManager;
 
-    // Hidden
-    private Transform cubeTransform; // e.g. the position of the object.
-    private Transform sphereTransform;
+    // Delsys EMG background data collection
+
     #endregion
 
     // Here are all the variables you need for your experiment
-    #region Experiment variables
-    [Header("My Experiment Variables:")]
-    // Serialised
-    [SerializeField]
-    private bool isCubeAvailable = false;
-    [SerializeField]
-    private bool isSphereAvailable = false;
 
-    // Hidden
-    private float someHiddenNumber = 0.0f;
+    // Motion tracking for experiment management and adaptation (check for start position)
+    private VIVETrackerManager upperArmTracker;
+    private VIVETrackerManager lowerArmTracker;
+    private VIVETrackerManager shoulderTracker;
+    private VIVETrackerManager c7Tracker;
+    private VirtualPositionTracker handTracker;
 
-    #endregion
+    // Flow control
+    private bool hasReached = false;
+    private bool taskComplete = false;
+
+
 
     #region Dynamic configuration
 
@@ -69,12 +67,14 @@ public class SeparabilityExperimentGM : GameMaster
     {
         if (debug)
         {
-            //SaveSystem.LoadUserData("DB1942174"); // Load the test/demo user (Mr Demo)
+            
+            SaveSystem.LoadUserData("TB199517500"); // Load the test/demo user (Mr Demo)
             //
             // Debug using able-bodied configuration
             //
-            //AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
-            //AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
+            Debug.Log("Load Avatar to Debug.");
+            AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
+            AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
         }
 
     }
@@ -89,9 +89,6 @@ public class SeparabilityExperimentGM : GameMaster
         // You can choose to use the base initialisation or get rid of it completely.
         string text = base.GetDisplayInfoText();
 
-        // e.g. only display the hidden number when performing the task
-        if (GetCurrentStateName() == State.STATE.PERFORMING_TASK)
-            text += "The magic number is: " + someHiddenNumber + ".\n";
         return text;
     }
 
@@ -120,11 +117,13 @@ public class SeparabilityExperimentGM : GameMaster
     {
         // First call the base method to load the file
         base.ConfigureExperiment();
+        //Debug.Log(this.gameObject.name);
+
+        //configAsset = Resources.Load<TextAsset>("Experiments/" + ExperimentSystem.ActiveExperimentID);
 
         // Convert configuration file to configuration class.
         config = JsonUtility.FromJson<Configurator>(configAsset.text);
-        // Load data
-        someHiddenNumber = config.someHiddenNumber;
+
     }
 
     /// <summary>
@@ -138,15 +137,7 @@ public class SeparabilityExperimentGM : GameMaster
         // First run the base initialisation which is needed.
         base.InitialiseExperimentSystems();
 
-        // e.g. make sure that the needed objects have been set.
-        if (cubeGO == null || sphereGO == null)
-            throw new System.Exception("You need to add the objects in the Unity inspector!");
-
-        // e.g. the update their transform handle and hide the objects
-        cubeTransform = cubeGO.transform;
-        sphereTransform = sphereGO.transform;
-        cubeGO.SetActive(false);
-        sphereGO.SetActive(false);
+        
                 
         //
         // Hand tracking sensor for demo
@@ -185,18 +176,8 @@ public class SeparabilityExperimentGM : GameMaster
     /// </summary>
     public override void InitialiseExperiment()
     {
-        // e.g. activate the sphere and set the hidden number to 42.
-        sphereGO.SetActive(true);
-        someHiddenNumber = 42.0f;
 
-        // e.g. then set the object positions relative to the player position
-        // Get player object
-        GameObject headGO = GameObject.FindGameObjectWithTag("Head");
-        if (headGO == null)
-            throw new System.NullReferenceException("Head GameObject not found.");
-        // Set the position
-        cubeTransform.position = headGO.transform.position + new Vector3(-0.3f, -0.6f, 0.3f); // Front right of the subject (30cm)
-        sphereTransform.position = headGO.transform.position + new Vector3(-0.3f, -0.6f, -0.3f); // Front left of the subject (30cm)
+       
     }
 
     /// <summary>
@@ -250,21 +231,7 @@ public class SeparabilityExperimentGM : GameMaster
 
             //
             HudManager.DisplayText("On your left, quick!!", 5.0f);
-            if (isCubeAvailable != true)
-            {
-                isCubeAvailable = true;
-                cubeGO.SetActive(true);
-            }
-            yield return new WaitForSecondsRealtime(5.0f);
-            HudManager.DisplayText("And it's gone...", 3.0f);
-            isCubeAvailable = false;
-            cubeGO.SetActive(false);
-            yield return new WaitForSecondsRealtime(5.0f);
-
-            //
-            HudManager.DisplayText("Look to the screen.");
-            InstructionManager.DisplayText("It's revolutionary ain't it! \n Press the trigger button to continue...");
-            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            
         }
 
         // Now that you are done, set the flag to indicate we are done.
@@ -291,21 +258,7 @@ public class SeparabilityExperimentGM : GameMaster
         // Here you can do stuff like preparing objects/assets, like setting a different colour to the object
         // we want the subject to reach.
         // For demo purposes, we'll just randomly pick between cube and sphere!
-        int randomNumber = Random.Range(0, 1); // The one is inclusive.
-        if (randomNumber == 0) // Select cube
-        {
-            isCubeAvailable = true;
-            cubeGO.SetActive(true);
-            isSphereAvailable = false;
-            sphereGO.SetActive(false);
-        }
-        else // Select sphere
-        {
-            isCubeAvailable = false;
-            cubeGO.SetActive(false);
-            isSphereAvailable = true;
-            sphereGO.SetActive(true);
-        }
+       
     }
 
     /// <summary>
@@ -317,12 +270,7 @@ public class SeparabilityExperimentGM : GameMaster
         // If our subject fails, do some resetting. 
         // In this example it'll happen if the subject stops holding the space bar.
         // So we enable both objects
-        isCubeAvailable = true;
-        cubeGO.SetActive(true);
-        isSphereAvailable = true;
-        sphereGO.SetActive(true);
-
-        someHiddenNumber++;
+        
     }
 
     /// <summary>
@@ -335,7 +283,7 @@ public class SeparabilityExperimentGM : GameMaster
     {
         // Add your custom data logging here
         // e.g. the magic number!
-        logData += someHiddenNumber + ",";  // Make sure you always end your custom data with a comma! Using CSV for data logging.
+        //logData += someHiddenNumber + ",";  // Make sure you always end your custom data with a comma! Using CSV for data logging.
 
         // Continue with data logging.
         base.HandleTaskDataLogging();
@@ -347,18 +295,7 @@ public class SeparabilityExperimentGM : GameMaster
     /// <returns></returns>
     public override void HandleInTaskBehaviour()
     {
-        // For demo purposes, we'll hide whatever object is active after 10 seconds
-        if (taskTime >= 10 && isCubeAvailable)
-        {
-            cubeGO.SetActive(false);
-            isCubeAvailable = false;
-        }
-        else if (taskTime >= 10 && isSphereAvailable)
-        {
-            sphereGO.SetActive(false);
-            isSphereAvailable = false;
-        }
-
+        
     }
 
     /// <summary>
@@ -380,11 +317,7 @@ public class SeparabilityExperimentGM : GameMaster
     {
         base.HandleTaskCompletion();
 
-        // Let's just reactivate the objects
-        isCubeAvailable = true;
-        cubeGO.SetActive(true);
-        isSphereAvailable = true;
-        sphereGO.SetActive(true);
+        
     }
 
     /// <summary>
@@ -393,8 +326,7 @@ public class SeparabilityExperimentGM : GameMaster
     public override void HandleResultAnalysis()
     {
         // Do some analysis
-        if (someHiddenNumber != 42.0f)
-            HudManager.DisplayText("Slap!");
+
     }
 
     /// <summary>
@@ -406,8 +338,6 @@ public class SeparabilityExperimentGM : GameMaster
     {
         base.HandleIterationInitialisation();
 
-        // Return variables to their initial condition
-        someHiddenNumber = 42.0f;
     }
 
     /// <summary>
@@ -429,8 +359,6 @@ public class SeparabilityExperimentGM : GameMaster
     {
         base.HandleSessionInitialisation();
 
-        // Return variables to their initial condition
-        someHiddenNumber = 42.0f;
     }
 
     /// <summary>

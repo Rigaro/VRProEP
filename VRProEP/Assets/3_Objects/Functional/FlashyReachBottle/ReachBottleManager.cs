@@ -123,13 +123,13 @@ public class ReachBottleManager : MonoBehaviour
         Vector3 postionError = this.transform.position - bottleInHand.transform.position;
         Vector3 rotationError = this.transform.rotation.eulerAngles - bottleInHand.transform.rotation.eulerAngles;
 
-        if (Mathf.Abs(postionError.x) < positionTolerance.x && Mathf.Abs(postionError.y) < positionTolerance.z && Mathf.Abs(postionError.z) < positionTolerance.z )
+        if (Mathf.Abs(postionError.x) < positionTolerance.x && Mathf.Abs(postionError.y) < positionTolerance.y && Mathf.Abs(postionError.z) < positionTolerance.z )
             positionReached = true;  
         else
             positionReached = false;
 
 
-        if (Mathf.Abs(rotationError.x) < rotationTolerance.x && Mathf.Abs(rotationError.y) < rotationTolerance.z && Mathf.Abs(rotationError.z) < rotationTolerance.z)
+        if (Mathf.Abs(rotationError.x) < rotationTolerance.x && Mathf.Abs(rotationError.z) < rotationTolerance.z)
             orientationReached = true;
         else
             orientationReached = false;
