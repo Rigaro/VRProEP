@@ -1,6 +1,7 @@
 ﻿// System
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 // Unity
 using UnityEngine;
@@ -25,11 +26,55 @@ public class SeparabilityExperiment2020GM : GameMaster
     [SerializeField]
     private BottleGridManager gridManager;
 
-    // Delsys EMG background data collection
+    [Header("Experiment configuration: Start position")]
+    [SerializeField]
+    [Tooltip("The subject's shoulder start angle in degrees.")]
+    [Range(-180.0f, 180.0f)]
+    private float startShoulderAngle = -90.0f;
+
+    [SerializeField]
+    [Tooltip("The subject's elbow start angle in degrees.")]
+    [Range(-180.0f, 180.0f)]
+    private float startElbowAngle = 90.0f;
+
+    [SerializeField]
+    [Tooltip("The start angle tolerance in degrees.")]
+    [Range(0.0f, 10.0f)]
+    private float startTolerance = 2.0f;
+
+    [Header("Experiment configuration: Reps and Sets")]
+    [SerializeField]
+    [Tooltip("The number of iterations per target.")]
+    [Range(1, 100)]
+    private int iterationsPerTarget = 10;
+
+
+    [Header("Grid Configurations")]
+    [SerializeField]
+    [Tooltip("Grid-Close: The percentage of the subject's armlentgh where the grid centre will be placed.")]
+    [Range(0, 2)]
+    private float gridCloseDistanceFactor = 0.75f;
+    [SerializeField]
+    [Tooltip("Grid-Mid: The percentage of the subject's armlentgh where the grid centre will be placed.")]
+    [Range(0, 2)]
+    private float gridMidDistanceFactor = 1.0f;
+    [SerializeField]
+    [Tooltip("Grid-Far: The percentage of the subject's armlentgh where the grid centre will be placed.")]
+    [Range(0, 2)]
+    private float gridFarDistanceFactor = 1.5f;
+    [SerializeField]
+    [Tooltip("The percentage of the subject's height where the grid centre will be placed.")]
+    [Range(0, 2)]
+    private float gridHeightFactor = 0.5f;
 
     #endregion
 
-    // Here are all the variables you need for your experiment
+    // Delsys EMG background data collection
+    private DelsysEMG delsysEMG = new DelsysEMG();
+
+    // Target management variables
+    private int targetNumber; // The total number of targets
+    private List<int> targetOrder = new List<int>(); // A list of target indexes ordered for selection over iterations in a session.
 
     // Motion tracking for experiment management and adaptation (check for start position)
     private VIVETrackerManager upperArmTracker;
@@ -41,7 +86,20 @@ public class SeparabilityExperiment2020GM : GameMaster
     // Flow control
     private bool hasReached = false;
     private bool taskComplete = false;
+    private bool emgIsRecording = false;
 
+
+    private float leftySign = 1.0f;
+
+    #region Private methods
+    private string ConfigEMGFilePath()
+    {
+        //string emgDataFilename =  Path.Combine(taskDataLogger.ActiveDataPath, "session_" + sessionNumber , "i" + "_" + iterationNumber + "EMG.csv");
+        string emgDataFilename = taskDataLogger.ActiveDataPath + "/session_" + sessionNumber + "/i" + "_" + iterationNumber + "EMG.csv";
+        return emgDataFilename;
+    }
+        
+    #endregion
 
 
     #region Dynamic configuration
@@ -52,7 +110,7 @@ public class SeparabilityExperiment2020GM : GameMaster
     //
     private class Configurator
     {
-        public float someHiddenNumber = 0.0f;
+        
     }
     private Configurator config;
 
@@ -61,6 +119,20 @@ public class SeparabilityExperiment2020GM : GameMaster
     // Here are all the methods you need to write for your experiment.
     #region GameMaster Inherited Methods
 
+    protected override void FixedUpdate()
+    {
+       
+        // Override fixed update to start the emg recording when the start performing the task
+        if ( GetCurrentStateName() == State.STATE.PERFORMING_TASK && !emgIsRecording)
+        {
+            
+            delsysEMG.StartRecording(ConfigEMGFilePath());
+            emgIsRecording = true;
+        }
+
+        base.FixedUpdate();
+
+    }
     // Place debug stuff here, for when you want to test the experiment directly from the world without 
     // having to load it from the menus.
     private void Awake()
@@ -117,12 +189,14 @@ public class SeparabilityExperiment2020GM : GameMaster
     {
         // First call the base method to load the file
         base.ConfigureExperiment();
-        //Debug.Log(this.gameObject.name);
 
         //configAsset = Resources.Load<TextAsset>("Experiments/" + ExperimentSystem.ActiveExperimentID);
 
         // Convert configuration file to configuration class.
         config = JsonUtility.FromJson<Configurator>(configAsset.text);
+
+       
+
 
     }
 
@@ -134,17 +208,120 @@ public class SeparabilityExperiment2020GM : GameMaster
     /// </summary>
     public override void InitialiseExperimentSystems()
     {
-        // First run the base initialisation which is needed.
-        base.InitialiseExperimentSystems();
 
-        
-                
+        // Set data format
+        taskDataFormat = ablebodiedDataFormat;
+
+        // Lefty sign
+        if (SaveSystem.ActiveUser.lefty)
+            leftySign = -1.0f;
+
+        #region Modify base
+        // Then run the base initialisation which is needed, with a small modification
         //
-        // Hand tracking sensor for demo
+        // Set the experiment name only when debugging. Take  the name from the gameobject + Debug
+        //
+        if (debug)
+            ExperimentSystem.SetActiveExperimentID(this.gameObject.name + "_Debug");
+
+        // Make sure flow control is initialised
+        sessionNumber = 1;
+        iterationNumber = 1;
+
+        //
+        // Create the default data loggers
+        //
+        taskDataLogger = new DataStreamLogger("TaskData/" + AvatarSystem.AvatarType.ToString());
+        ExperimentSystem.AddExperimentLogger(taskDataLogger);
+        taskDataLogger.AddNewLogFile(sessionNumber, iterationNumber, taskDataFormat); // Add file
+
+        // Send the player to the experiment centre position
+        TeleportToStartPosition();
+        #endregion
+
+        #region Initialize EMG sensors
+        //Initialse Delsys EMG sensor
+        delsysEMG.Init();
+        delsysEMG.Connect();
+        delsysEMG.StartAcquisition();
+        #endregion
+
+        #region Initialize world positioning
+        // Get user physiological data.
+        float subjectHeight = SaveSystem.ActiveUser.height;
+        float subjectArmLength = SaveSystem.ActiveUser.upperArmLength + SaveSystem.ActiveUser.forearmLength + (SaveSystem.ActiveUser.handLength / 2);
+        // Set the subject data for grid 
+        gridManager.SubjectHeight = subjectHeight;
+        gridManager.SubjectArmLength = subjectArmLength;
+        gridManager.ConfigGridPositionFactors(gridCloseDistanceFactor, gridMidDistanceFactor, gridFarDistanceFactor, gridHeightFactor);
+
+        #endregion
+
+        #region  Initialize motion sensors
+        //
+        // Add arm motion trackers for able-bodied case.
+        //
+        // Lower limb motion tracker
+        GameObject llMotionTrackerGO = GameObject.FindGameObjectWithTag("ForearmTracker");
+        lowerArmTracker = new VIVETrackerManager(llMotionTrackerGO.transform);
+        ExperimentSystem.AddSensor(lowerArmTracker);
+
+        // Upper limb motion tracker
+        GameObject ulMotionTrackerGO = AvatarSystem.AddMotionTracker();
+        upperArmTracker = new VIVETrackerManager(ulMotionTrackerGO.transform);
+        ExperimentSystem.AddSensor(upperArmTracker);
+
+        // Debug?
+        if (!debug)
+        {
+            // Shoulder acromium head tracker
+            GameObject motionTrackerGO1 = AvatarSystem.AddMotionTracker();
+            shoulderTracker = new VIVETrackerManager(motionTrackerGO1.transform);
+            ExperimentSystem.AddSensor(shoulderTracker);
+            // C7 tracker
+            GameObject motionTrackerGO2 = AvatarSystem.AddMotionTracker();
+            c7Tracker = new VIVETrackerManager(motionTrackerGO2.transform);
+            ExperimentSystem.AddSensor(c7Tracker);
+        }
+
+        //
+        // Hand tracking sensor
         //
         GameObject handGO = GameObject.FindGameObjectWithTag("Hand");
-        VirtualPositionTracker handTracker = new VirtualPositionTracker(handGO.transform);
+        handTracker = new VirtualPositionTracker(handGO.transform);
         ExperimentSystem.AddSensor(handTracker);
+
+        #endregion
+
+        #region Spawn bottle grid
+        // Spawn the grid
+        gridManager.GenerateBottleLocations();
+        gridManager.SpawnBottleGrid();
+        gridManager.ResetBottleSelection();
+        Debug.Log("Spawn the bottle grid!");
+        #endregion
+
+        #region Iteration settings
+        // Set iterations variables for flow control.
+        targetNumber = gridManager.TargetBottleNumber;
+        Debug.Log(iterationsPerSession.Count);
+
+        for (int i = 0; i < iterationsPerSession.Count; i++)
+        {
+            iterationsPerSession[i] = targetNumber * iterationsPerTarget;
+            
+        }
+           
+
+        // Create the list of target indexes and shuffle it.
+        for (int i = 0; i < targetNumber; i++)
+        {
+            for (int j = 0; j < iterationsPerTarget; j++)
+                targetOrder.Add(i);
+        }
+        targetOrder.Shuffle();
+
+        #endregion
     }
 
     /// <summary>
@@ -157,18 +334,18 @@ public class SeparabilityExperiment2020GM : GameMaster
         // First flag that we are in the welcome routine
         welcomeDone = false;
         inWelcome = true;
-        
-        //
-        HudManager.DisplayText("Look to the top right.");
-        InstructionManager.DisplayText("This is the welcome. Here you can write a welcome for your subject! \n Press the trigger button to continue...");
-        yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-        //
-        HudManager.ClearText();
-        InstructionManager.DisplayText("It's awesome! \n Press the trigger button to continue...");
-        yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
 
         // Now that you are done, set the flag to indicate we are done.
         welcomeDone = true;
+
+        HudManager.DisplayText("Look to the top right.");
+        InstructionManager.DisplayText("Hi " + SaveSystem.ActiveUser.name + "! Welcome to the virtual world. \n\n (Press the trigger button to continue...)");
+        yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+
+        InstructionManager.DisplayText("Make sure you are standing on top of the green circle. \n\n (Press the trigger button to continue...)");
+        yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+
+        
     }
 
     /// <summary>
@@ -191,6 +368,7 @@ public class SeparabilityExperiment2020GM : GameMaster
         instructionsDone = false;
         inInstructions = true;
 
+        /*
         //
         InstructionManager.DisplayText("These are the isntructions. You can use other conditions to wait, not only the trigger press! e.g. 10 seconds.");
         HudManager.DisplayText("You can use the HUD too!");
@@ -199,9 +377,13 @@ public class SeparabilityExperiment2020GM : GameMaster
         HudManager.DisplayText("And get their attention!", 5.0f);
         InstructionManager.DisplayText("It's exciting! \n Press the trigger button to continue...");
         yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+        */
+
+        yield return new WaitForSeconds(2.0f);
 
         // Now that you are done, set the flag to indicate we are done.
         instructionsDone = true;
+
     }
 
 
@@ -216,8 +398,13 @@ public class SeparabilityExperiment2020GM : GameMaster
         trainingDone = false;
         inTraining = true;
 
+
+        
+
+
+        /*
         // Only run the training loop when requested, for instance some session may require different session.
-        if(trainingPerSession[sessionNumber-1] == 1)
+        if (trainingPerSession[sessionNumber-1] == 1)
         {
 
             //
@@ -233,9 +420,12 @@ public class SeparabilityExperiment2020GM : GameMaster
             HudManager.DisplayText("On your left, quick!!", 5.0f);
             
         }
+        */
+        yield return new WaitForSeconds(2.0f);
 
         // Now that you are done, set the flag to indicate we are done.
-        trainingDone = true;
+        trainingDone = true; 
+
     }
 
     /// <summary>
@@ -245,8 +435,10 @@ public class SeparabilityExperiment2020GM : GameMaster
     public override bool IsReadyToStart()
     {
         // You can implement whatever condition you want, maybe touching an object in the virtual world or being in a certain posture.
-        // Here we are just going to use a button: Space!. So, the subject needs to hold the space bar.
-        return Input.GetKey(KeyCode.Space);
+
+        HudManager.colour = HUDManager.HUDColour.Orange;
+
+        return true;
     }
 
     /// <summary>
@@ -256,9 +448,10 @@ public class SeparabilityExperiment2020GM : GameMaster
     public override void PrepareForStart()
     {
         // Here you can do stuff like preparing objects/assets, like setting a different colour to the object
-        // we want the subject to reach.
-        // For demo purposes, we'll just randomly pick between cube and sphere!
-       
+
+        // Select target
+        gridManager.SelectBottle(targetOrder[iterationNumber - 1]);
+
     }
 
     /// <summary>
@@ -268,9 +461,9 @@ public class SeparabilityExperiment2020GM : GameMaster
     public override void StartFailureReset()
     {
         // If our subject fails, do some resetting. 
-        // In this example it'll happen if the subject stops holding the space bar.
-        // So we enable both objects
-        
+        // Clear bottle selection
+        gridManager.ResetBottleSelection();
+
     }
 
     /// <summary>
@@ -282,11 +475,11 @@ public class SeparabilityExperiment2020GM : GameMaster
     public override void HandleTaskDataLogging()
     {
         // Add your custom data logging here
-        // e.g. the magic number!
-        //logData += someHiddenNumber + ",";  // Make sure you always end your custom data with a comma! Using CSV for data logging.
+        logData += targetOrder[iterationNumber - 1] + ",";  // Make sure you always end your custom data with a comma! Using CSV for data logging.
 
         // Continue with data logging.
         base.HandleTaskDataLogging();
+
     }
 
     /// <summary>
@@ -295,7 +488,7 @@ public class SeparabilityExperiment2020GM : GameMaster
     /// <returns></returns>
     public override void HandleInTaskBehaviour()
     {
-        
+        HudManager.colour = HUDManager.HUDColour.Blue;
     }
 
     /// <summary>
@@ -305,8 +498,24 @@ public class SeparabilityExperiment2020GM : GameMaster
     public override bool IsTaskDone()
     {
         // You can implement whatever condition you want, maybe touching an object in the virtual world or being in a certain posture.
-        // Here we are just going to use a button: End!. So, the subject needs to hit End once.
-        return Input.GetKeyDown(KeyCode.End);
+
+        if (gridManager.SelectedTouched && !hasReached)
+            StartCoroutine(EndTaskCoroutine());
+
+        return taskComplete;
+    }
+
+
+    /// <summary>
+    /// Raises the complete task flag after 1 second to allow for additional data to be gathered
+    /// after the subject touches the selected sphere.
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator EndTaskCoroutine()
+    {
+        hasReached = true;
+        yield return new WaitForSecondsRealtime(1.0f);
+        taskComplete = true;
     }
 
     /// <summary>
@@ -316,8 +525,15 @@ public class SeparabilityExperiment2020GM : GameMaster
     public override void HandleTaskCompletion()
     {
         base.HandleTaskCompletion();
+        // Stop EMG reading and save data
+        delsysEMG.StopRecording();
+        emgIsRecording = false;
+        // Signal the subject that the task is done
+        HudManager.colour = HUDManager.HUDColour.Green;
+        // Reset flags
+        hasReached = false;
+        taskComplete = false;
 
-        
     }
 
     /// <summary>

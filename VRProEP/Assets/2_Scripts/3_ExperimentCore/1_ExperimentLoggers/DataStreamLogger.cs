@@ -18,6 +18,8 @@ namespace VRProEP.ExperimentCore
         private string activeExperimentID;
         private string activeDataLogTypeID;
 
+        public string ActiveDataPath { get => activeDataPath; }
+
         private bool isInitialized = false;
         private bool isConfigured = false;
 

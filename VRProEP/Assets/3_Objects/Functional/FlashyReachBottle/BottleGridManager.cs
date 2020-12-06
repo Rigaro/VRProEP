@@ -12,33 +12,68 @@ public class BottleGridManager : MonoBehaviour
     [SerializeField]
     private GameObject bottleInHand;
 
-
+    // Bottle list
     private List<ReachBottleManager> bottles = new List<ReachBottleManager>();// List of bottles
 
     // Postion of rotations of the bottles in the grid
     private List<Vector3> bottlePositions = new List<Vector3>();// List of the bottle postions
     private List<Vector3> bottleRotations = new List<Vector3>();// List of the bottle rotations
+    private float gridCloseDistanceFactor = 0.75f;
+    private float gridMidDistanceFactor = 1.0f;
+    private float gridFarDistanceFactor = 1.5f;
+    private float gridHeightFactor = 0.5f;
 
+    // Signs
     private bool hasSelected = false; // Whether a bottle has been selected
     private int selectedIndex = -1;
     private bool selectedTouched = false;
 
+    // Subject information
+    private float subjectHeight;
+    private float subjectArmLength;
+
+
+    // Accessor
     public bool SelectedTouched { get => selectedTouched; }
+    public int TargetBottleNumber { get => bottles.Count; }
+    public float SubjectHeight { set => subjectHeight = value; }
+    public float SubjectArmLength { set => subjectArmLength = value; }
+    /*
+    public float GridCloseDistanceFactor { set => gridCloseDistanceFactor = value;  }
+    public float GridMidDistanceFactor { set => gridMidDistanceFactor = value; }
+    public float GridFarDistanceFactor { set => gridFarDistanceFactor = value; }
+    public float GridHeightFactor { set => gridHeightFactor = value; }
+    */
 
-
+    /// <summary>
+    /// Check if the selected bottle is reached
+    /// </summary>
+    /// <param >
+    /// <returns bool reached>
+    /// 
+    public void ConfigGridPositionFactors(float close, float mid, float far, float height)
+    {
+        gridCloseDistanceFactor = close;
+        gridMidDistanceFactor = mid;
+        gridFarDistanceFactor = far;
+        gridHeightFactor = height;
+    }
 
     void Start()
     {
-
+        // Debug purpose
+        /*
         GenerateBottleLocations();
         SpawnBottleGrid();
         ResetBottleSelection();
+        */
     }
 
     void Update()
     {
 
-        // Change selected bottle
+        // Change selected bottle for debug
+        /*
         if (Input.GetKeyDown(KeyCode.F1))
         {
             selectedIndex = selectedIndex + 1;
@@ -46,6 +81,8 @@ public class BottleGridManager : MonoBehaviour
             SelectBottle(selectedIndex);
 
         }
+        */
+
 
         // Check if the selected bottle is reached or not
         selectedTouched = CheckReached();
@@ -85,11 +122,21 @@ public class BottleGridManager : MonoBehaviour
     /// <returns 
     public void GenerateBottleLocations()
     {
+        //
+        // Positions
+        //
+        // Close
+        bottlePositions.Add(new Vector3(subjectArmLength * gridCloseDistanceFactor, subjectHeight * gridHeightFactor, 0.0f));
 
-        bottlePositions.Add(new Vector3(1.0f, 1.0f, 0.2f));
+        // Mid
+        bottlePositions.Add(new Vector3(subjectArmLength * gridMidDistanceFactor, subjectHeight * gridHeightFactor, 0.0f));
 
-        bottlePositions.Add(new Vector3(1.0f, 1.0f, -0.2f));
+        // Far
+        bottlePositions.Add(new Vector3(subjectArmLength * gridFarDistanceFactor, subjectHeight * gridHeightFactor, 0.0f));
 
+        //
+        // Rotations
+        //
         bottleRotations.Add(new Vector3(0.0f, 0.0f, 0.0f));
 
         bottleRotations.Add(new Vector3(30.0f, 0.0f, 0f));
@@ -134,7 +181,9 @@ public class BottleGridManager : MonoBehaviour
         // Reset previous selections
         ResetBottleSelection();
 
+        selectedIndex = index;
         bottles[index].SetSelection();
+        
         hasSelected = true;
         selectedTouched = false;
     }
