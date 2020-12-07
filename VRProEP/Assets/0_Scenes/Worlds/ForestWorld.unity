@@ -5393,7 +5393,7 @@ PrefabInstance:
     - target: {fileID: 995420446278778647, guid: 20c0654ad1ca82446ae78e930c556187,
         type: 3}
       propertyPath: startTolerance
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 995420446278778647, guid: 20c0654ad1ca82446ae78e930c556187,
         type: 3}

@@ -29,7 +29,10 @@ public class ReachBottleManager : MonoBehaviour
 
 
     private ReachBottleState bottleState = ReachBottleState.Idle;
+    
+    private Renderer[] allRenderer;
     private Renderer bottleRenderer;
+    private Renderer baseRenderer;
     public ReachBottleState BottleState { get => bottleState; }
 
 
@@ -54,8 +57,13 @@ public class ReachBottleManager : MonoBehaviour
 
     void Start()
     {
-        bottleRenderer = GetComponent<Renderer>();
-        //bottleRenderer.material.color = idleColor;
+        //bottleRenderer = GetComponent<Renderer>();
+        allRenderer = GetComponentsInChildren<Renderer>();
+        bottleRenderer = allRenderer[0];
+        baseRenderer = allRenderer[1];
+
+        bottleRenderer.material.color = idleColor;
+        baseRenderer.material.color = idleColor;
     }
 
     /// <summary>
@@ -76,11 +84,12 @@ public class ReachBottleManager : MonoBehaviour
                     case ReachBottleState.Idle:
                         bottleState = ReachBottleState.Wrong;
                         bottleRenderer.material.color = wrongColor;
+                        baseRenderer.material.color = wrongColor;
                         break;
                     case ReachBottleState.Selected:
                         bottleState = ReachBottleState.Correct;
                         bottleRenderer.material.color = correctColor;
-                        
+                        baseRenderer.material.color = correctColor;
                         break;
                     case ReachBottleState.Correct:
 
@@ -155,6 +164,8 @@ public class ReachBottleManager : MonoBehaviour
         yield return new WaitForSecondsRealtime(waitSeconds);
         bottleState = ReachBottleState.Idle;
         bottleRenderer.material.color = idleColor;
+        baseRenderer.material.color = idleColor;
+
         isWaiting = false;
        // Debug.Log(bottleRenderer.material.color);
     }
@@ -181,6 +192,7 @@ public class ReachBottleManager : MonoBehaviour
 
         bottleState = ReachBottleState.Selected;
         bottleRenderer.material.color = selectedColor;
+        baseRenderer.material.color = selectedColor;
     }
 
     /// <summary>

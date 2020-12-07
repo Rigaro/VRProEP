@@ -597,6 +597,7 @@ public class SeparabilityExperiment2020GM : GameMaster
         if (gridManager.SelectedTouched && !hasReached)
             StartCoroutine(EndTaskCoroutine());
 
+       
         return taskComplete;
     }
 
@@ -610,9 +611,7 @@ public class SeparabilityExperiment2020GM : GameMaster
     {
         hasReached = true;
         yield return new WaitForSecondsRealtime(1.0f);
-        // Stop EMG reading and save data
-        delsysEMG.StopRecording();
-        emgIsRecording = false;
+        
 
         taskComplete = true;
     }
@@ -624,7 +623,9 @@ public class SeparabilityExperiment2020GM : GameMaster
     public override void HandleTaskCompletion()
     {
         base.HandleTaskCompletion();
-        
+        // Stop EMG reading and save data
+        delsysEMG.StopRecording();
+        emgIsRecording = false;
         // Signal the subject that the task is done
         HudManager.colour = HUDManager.HUDColour.Green;
         // Reset flags

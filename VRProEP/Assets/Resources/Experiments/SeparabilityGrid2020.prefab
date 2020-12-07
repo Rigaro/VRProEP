@@ -146,7 +146,7 @@ MonoBehaviour:
   gridManager: {fileID: 4720915417731872}
   startShoulderAngle: -90
   startElbowAngle: 90
-  startTolerance: 2
+  startTolerance: 5
   iterationsPerTarget: 10
   gridCloseDistanceFactor: 0.75
   gridMidDistanceFactor: 1

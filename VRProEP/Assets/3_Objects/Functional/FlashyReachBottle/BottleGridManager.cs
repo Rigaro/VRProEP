@@ -73,7 +73,7 @@ public class BottleGridManager : MonoBehaviour
     {
 
         // Change selected bottle for debug
-        /*
+        
         if (Input.GetKeyDown(KeyCode.F1))
         {
             selectedIndex = selectedIndex + 1;
@@ -81,7 +81,7 @@ public class BottleGridManager : MonoBehaviour
             SelectBottle(selectedIndex);
 
         }
-        */
+        
 
 
         // Check if the selected bottle is reached or not
