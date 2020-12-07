@@ -5395,6 +5395,11 @@ PrefabInstance:
       propertyPath: startTolerance
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 995420446278778647, guid: 20c0654ad1ca82446ae78e930c556187,
+        type: 3}
+      propertyPath: startElbowAngle
+      value: 90
+      objectReference: {fileID: 0}
     - target: {fileID: 2751063810298709859, guid: 20c0654ad1ca82446ae78e930c556187,
         type: 3}
       propertyPath: m_RootOrder
