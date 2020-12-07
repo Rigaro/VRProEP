@@ -5375,6 +5375,26 @@ PrefabInstance:
       propertyPath: experimentCenter
       value: 
       objectReference: {fileID: 14533115}
+    - target: {fileID: 995420446278778647, guid: 20c0654ad1ca82446ae78e930c556187,
+        type: 3}
+      propertyPath: gridHeightFactor
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 995420446278778647, guid: 20c0654ad1ca82446ae78e930c556187,
+        type: 3}
+      propertyPath: trainingPerSession.Array.data[0]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 995420446278778647, guid: 20c0654ad1ca82446ae78e930c556187,
+        type: 3}
+      propertyPath: startShoulderAngle
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 995420446278778647, guid: 20c0654ad1ca82446ae78e930c556187,
+        type: 3}
+      propertyPath: startTolerance
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 2751063810298709859, guid: 20c0654ad1ca82446ae78e930c556187,
         type: 3}
       propertyPath: m_RootOrder

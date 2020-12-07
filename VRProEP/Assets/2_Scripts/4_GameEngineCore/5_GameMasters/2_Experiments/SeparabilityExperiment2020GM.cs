@@ -67,6 +67,9 @@ public class SeparabilityExperiment2020GM : GameMaster
     [Range(0, 2)]
     private float gridHeightFactor = 0.5f;
 
+
+    [SerializeField]
+    private GameObject startPosPhoto;
     #endregion
 
     // Delsys EMG background data collection
@@ -88,8 +91,20 @@ public class SeparabilityExperiment2020GM : GameMaster
     private bool taskComplete = false;
     private bool emgIsRecording = false;
 
-
+    // Lefty subject sign
     private float leftySign = 1.0f;
+
+
+    private class GridReachingConfigurator
+    {
+        public int iterationsPerTarget = 10;
+        public float gridCloseDistanceFactor = 0.75f;
+        public float gridMidDistanceFactor = 1.0f;
+        public float gridFarDistanceFactor = 1.5f;
+        public float gridHeightFactor = 0.5f;
+    }
+    private GridReachingConfigurator configurator;
+
 
     #region Private methods
     private string ConfigEMGFilePath()
@@ -174,10 +189,7 @@ public class SeparabilityExperiment2020GM : GameMaster
     /// <param name="setActive">Sets the HUD colour as active (Blue).</param>
     public override void HandleHUDColour(bool setActive = false)
     {
-        // You can choose to use the base initialisation or get rid of it completely.
-        base.HandleHUDColour();
-
-        // No changes needed to HUD.
+            base.HandleHUDColour();
     }
 
     /// <summary>
@@ -193,10 +205,14 @@ public class SeparabilityExperiment2020GM : GameMaster
         //configAsset = Resources.Load<TextAsset>("Experiments/" + ExperimentSystem.ActiveExperimentID);
 
         // Convert configuration file to configuration class.
-        config = JsonUtility.FromJson<Configurator>(configAsset.text);
+        configurator = JsonUtility.FromJson<GridReachingConfigurator>(configAsset.text);
 
-       
-
+        // Load from config file
+        iterationsPerTarget = configurator.iterationsPerTarget;
+        gridCloseDistanceFactor = configurator.gridCloseDistanceFactor;
+        gridMidDistanceFactor = configurator.gridMidDistanceFactor;
+        gridFarDistanceFactor = configurator.gridFarDistanceFactor;
+        gridHeightFactor = configurator.gridHeightFactor;
 
     }
 
@@ -213,8 +229,10 @@ public class SeparabilityExperiment2020GM : GameMaster
         taskDataFormat = ablebodiedDataFormat;
 
         // Lefty sign
+        /*
         if (SaveSystem.ActiveUser.lefty)
             leftySign = -1.0f;
+            */
 
         #region Modify base
         // Then run the base initialisation which is needed, with a small modification
@@ -271,18 +289,15 @@ public class SeparabilityExperiment2020GM : GameMaster
         upperArmTracker = new VIVETrackerManager(ulMotionTrackerGO.transform);
         ExperimentSystem.AddSensor(upperArmTracker);
 
-        // Debug?
-        if (!debug)
-        {
-            // Shoulder acromium head tracker
-            GameObject motionTrackerGO1 = AvatarSystem.AddMotionTracker();
-            shoulderTracker = new VIVETrackerManager(motionTrackerGO1.transform);
-            ExperimentSystem.AddSensor(shoulderTracker);
-            // C7 tracker
-            GameObject motionTrackerGO2 = AvatarSystem.AddMotionTracker();
-            c7Tracker = new VIVETrackerManager(motionTrackerGO2.transform);
-            ExperimentSystem.AddSensor(c7Tracker);
-        }
+        
+        // Shoulder acromium head tracker
+        GameObject motionTrackerGO1 = AvatarSystem.AddMotionTracker();
+        shoulderTracker = new VIVETrackerManager(motionTrackerGO1.transform);
+        ExperimentSystem.AddSensor(shoulderTracker);
+        // C7 tracker
+        GameObject motionTrackerGO2 = AvatarSystem.AddMotionTracker();
+        c7Tracker = new VIVETrackerManager(motionTrackerGO2.transform);
+        
 
         //
         // Hand tracking sensor
@@ -335,9 +350,6 @@ public class SeparabilityExperiment2020GM : GameMaster
         welcomeDone = false;
         inWelcome = true;
 
-        // Now that you are done, set the flag to indicate we are done.
-        welcomeDone = true;
-
         HudManager.DisplayText("Look to the top right.");
         InstructionManager.DisplayText("Hi " + SaveSystem.ActiveUser.name + "! Welcome to the virtual world. \n\n (Press the trigger button to continue...)");
         yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
@@ -345,7 +357,10 @@ public class SeparabilityExperiment2020GM : GameMaster
         InstructionManager.DisplayText("Make sure you are standing on top of the green circle. \n\n (Press the trigger button to continue...)");
         yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
 
-        
+
+        // Now that you are done, set the flag to indicate we are done.
+        welcomeDone = true;
+
     }
 
     /// <summary>
@@ -399,29 +414,65 @@ public class SeparabilityExperiment2020GM : GameMaster
         inTraining = true;
 
 
-        
-
-
-        /*
-        // Only run the training loop when requested, for instance some session may require different session.
-        if (trainingPerSession[sessionNumber-1] == 1)
+        if (trainingPerSession[sessionNumber - 1] == 1)
         {
+            //
+            // Hud intro
+            InstructionManager.DisplayText("Alright " + SaveSystem.ActiveUser.name + ", let's show you the ropes." + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            InstructionManager.DisplayText("Let me introduce you to your assistant, the Heads Up Display (HUD)." + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            InstructionManager.DisplayText("Say hi!");
+            HudManager.DisplayText("Hi! I'm HUD!" + "\n (Press trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            HudManager.DisplayText("I'm here to help!" + "\n (Press trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            HudManager.DisplayText("Look at the screen.", 3);
+            InstructionManager.DisplayText("Let's start training then!" + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
 
             //
-            InstructionManager.DisplayText("This is training. You'll probably want to guide your subject through the task here! \n Press the trigger button to continue...");
-            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-                                                          //
-            InstructionManager.DisplayText("Like... Punch the Cube!");
-            yield return new WaitForSecondsRealtime(5.0f);
-            HudManager.DisplayText("What Cube???", 2.0f);
+            // Start position
+            InstructionManager.DisplayText("First, we'll show you the start position." + "\n\n (Press the trigger)");
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
 
             //
-            HudManager.DisplayText("On your left, quick!!", 5.0f);
-            
+            // Start position
+            InstructionManager.DisplayText("Your upper arm should be relaxed pointing downards while your elbow should be bent 90 degrees." + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            InstructionManager.DisplayText("Like so:" + "\n Try it.");
+            startPosPhoto.SetActive(true);
+            yield return new WaitUntil(() => IsReadyToStart());
+            startPosPhoto.SetActive(false);
+            HudManager.ClearText();
+            //
+            // HUD Colours
+            InstructionManager.DisplayText("The colour of the HUD will tell you what you need to do." + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            InstructionManager.DisplayText("Red for adjusting your start position." + "\n\n (Press the trigger)");
+            HudManager.DisplayText("I'm red!");
+            HudManager.colour = HUDManager.HUDColour.Red;
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            InstructionManager.DisplayText("Orange for waiting for the countdown." + "\n\n (Press the trigger)");
+            HudManager.DisplayText("I'm orange!");
+            HudManager.colour = HUDManager.HUDColour.Orange;
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            InstructionManager.DisplayText("Blue for reaching for the sphere!" + "\n\n (Press the trigger)");
+            HudManager.DisplayText("I'm blue!");
+            HudManager.colour = HUDManager.HUDColour.Blue;
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            InstructionManager.DisplayText("Green for returning to the start position." + "\n\n (Press the trigger)");
+            HudManager.DisplayText("I'm green!");
+            HudManager.colour = HUDManager.HUDColour.Green;
+
+            //
+            // End
+            InstructionManager.DisplayText("Make sure you hold your position until the HUD turns green before moving back to the start position." + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            InstructionManager.DisplayText("Otherwise, you look ready to go! Good luck!" + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
         }
-        */
-        yield return new WaitForSeconds(2.0f);
+
 
         // Now that you are done, set the flag to indicate we are done.
         trainingDone = true; 
@@ -435,10 +486,54 @@ public class SeparabilityExperiment2020GM : GameMaster
     public override bool IsReadyToStart()
     {
         // You can implement whatever condition you want, maybe touching an object in the virtual world or being in a certain posture.
+        // Check that upper and lower arms are within the tolerated start position.
+        float qShoulder = leftySign * Mathf.Rad2Deg * (upperArmTracker.GetProcessedData(5) + Mathf.PI); // Offsetting to horizontal position being 0.
+        float qElbow = 0;
+
 
         HudManager.colour = HUDManager.HUDColour.Orange;
+        qElbow = Mathf.Rad2Deg * (lowerArmTracker.GetProcessedData(5)) - qShoulder; // Offsetting to horizontal position being 0.
+        // The difference to the start position
+        float qSDiff = qShoulder - startShoulderAngle;
+        float qEDiff = qElbow - startElbowAngle;
 
-        return true;
+        //
+        // Update information displayed for debugging purposes
+        //
+        
+        if (debug)
+        {
+            InstructionManager.DisplayText(qShoulder.ToString() + "\n" + qElbow.ToString() + "\n");
+        }
+        
+
+
+        if (Mathf.Abs(qSDiff) < startTolerance && Mathf.Abs(qEDiff) < startTolerance)
+        {
+            HudManager.colour = HUDManager.HUDColour.Orange;
+            return true;
+        }
+        // Provide instructions when not there yet
+        else
+        {
+            
+            string helpText = "";
+            if (qSDiff < 0 && Mathf.Abs(qSDiff) > startTolerance)
+                helpText += "UA: ++.\n";
+            else if (qSDiff > 0 && Mathf.Abs(qSDiff) > startTolerance)
+                helpText += "UA: --.\n";
+
+            if (qEDiff < 0 && Mathf.Abs(qEDiff) > startTolerance)
+                helpText += "LA: ++.\n";
+            else if (qEDiff > 0 && Mathf.Abs(qEDiff) > startTolerance)
+                helpText += "LA: --.\n";
+
+            HudManager.DisplayText(helpText);
+            HudManager.colour = HUDManager.HUDColour.Red;
+          
+
+            return false;
+        }
     }
 
     /// <summary>
@@ -515,6 +610,10 @@ public class SeparabilityExperiment2020GM : GameMaster
     {
         hasReached = true;
         yield return new WaitForSecondsRealtime(1.0f);
+        // Stop EMG reading and save data
+        delsysEMG.StopRecording();
+        emgIsRecording = false;
+
         taskComplete = true;
     }
 
@@ -525,9 +624,7 @@ public class SeparabilityExperiment2020GM : GameMaster
     public override void HandleTaskCompletion()
     {
         base.HandleTaskCompletion();
-        // Stop EMG reading and save data
-        delsysEMG.StopRecording();
-        emgIsRecording = false;
+        
         // Signal the subject that the task is done
         HudManager.colour = HUDManager.HUDColour.Green;
         // Reset flags
