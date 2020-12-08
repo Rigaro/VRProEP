@@ -155,7 +155,7 @@ public class SeparabilityExperiment2020GM : GameMaster
         if (debug)
         {
             
-            SaveSystem.LoadUserData("TB199517500"); // Load the test/demo user (Mr Demo)
+            SaveSystem.LoadUserData("TB1995175"); // Load the test/demo user (Mr Demo)
             //
             // Debug using able-bodied configuration
             //
@@ -265,12 +265,12 @@ public class SeparabilityExperiment2020GM : GameMaster
         #endregion
 
         #region Initialize world positioning
-        // Get user physiological data.
-        float subjectHeight = SaveSystem.ActiveUser.height;
-        float subjectArmLength = SaveSystem.ActiveUser.upperArmLength + SaveSystem.ActiveUser.forearmLength + (SaveSystem.ActiveUser.handLength / 2);
-        // Set the subject data for grid 
-        gridManager.SubjectHeight = subjectHeight;
-        gridManager.SubjectArmLength = subjectArmLength;
+
+        // Set the subject physiological data for grid 
+        gridManager.SubjectHeight = SaveSystem.ActiveUser.height;
+        gridManager.SubjectArmLength = SaveSystem.ActiveUser.upperArmLength + SaveSystem.ActiveUser.forearmLength + (SaveSystem.ActiveUser.handLength / 2);
+        gridManager.SubjectTrunkLength = SaveSystem.ActiveUser.trunkLength;
+        gridManager.SubjectHeight2SA = SaveSystem.ActiveUser.height2SA;
         gridManager.ConfigGridPositionFactors(gridCloseDistanceFactor, gridMidDistanceFactor, gridFarDistanceFactor, gridHeightFactor);
 
         #endregion

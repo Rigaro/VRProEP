@@ -14,7 +14,7 @@ using System.Threading;
 using UnityEngine;
 
 
-public class DelsysEMG 
+public class DelsysEMG_Depracted2
 {
     //example of creating a list of sensor types to keep track of various TCP streams...
     enum SensorTypes { SensorTrigno, SensorTrignoImu, SensorTrignoMiniHead, NoSensor };
@@ -47,9 +47,9 @@ public class DelsysEMG
 
 
     //Threads for acquiring emg and acc data
-    private float samplingInterval = 0.0009f;
+    //private Timer emgTimer;
     private Thread emgThread;
-
+    //private long t0_in_ticks;
 
     //The following are storage for acquired data
     private List<float>[] emgDataList = new List<float>[16];
@@ -60,7 +60,6 @@ public class DelsysEMG
     private bool connected = false; //true if connected to server
     private bool running = false;   //true when acquiring data
     private bool recording = false; //for EMG data recording
-    
 
 
     //Saving file settings
@@ -71,6 +70,8 @@ public class DelsysEMG
     //Initialization
     public void Init()
     {
+        //t0_in_ticks = t0; //Initialize start time tick
+
         sensorList.Add("A", SensorTypes.SensorTrigno);
         sensorList.Add("D", SensorTypes.SensorTrigno);
         sensorList.Add("L", SensorTypes.SensorTrignoImu);
@@ -79,6 +80,8 @@ public class DelsysEMG
 
         Debug.Log("Delsys-> Initialize DelsysEMG");
     }
+
+    
 
     //Establish sensors connnection
     public bool Connect()
@@ -128,10 +131,30 @@ public class DelsysEMG
 
         SendCommand("UPSAMPLE OFF");
 
+
+        Debug.Log("Delsys-> Connected EMG sensor number: " + GetNbActiveSensors());
+        foreach (int element in GetChannelsActiveSensor())
+        {
+            Debug.Log("Delsys-> Connected EMG sensor channel: " + element);
+        }
+
         return connected;
     }
 
+    // Check time interval
+    public float CheckSamplingRate()
+    {
+        float samplingRate;
 
+        string interval = SendCommand("FRAME INTERVAL?");
+        string maxSample = SendCommand("MAX SAMPLES EMG?");
+
+        //Debug.Log(interval);
+        //Debug.Log(maxSample);
+
+        samplingRate = float.Parse(interval) / float.Parse(maxSample);
+        return samplingRate;
+    }
 
     //Close connection
     public void Close()
@@ -212,6 +235,7 @@ public class DelsysEMG
             running = false;    //stop threads
             Debug.Log("Delsys-> Server ERROR to start acquisition!");
         }
+
         
     }
 
@@ -230,11 +254,13 @@ public class DelsysEMG
             Debug.Log("Delsys->: Server stops!");
     }
 
-    //Start log to csv
+    
 
+    //Start log to csv, set the filename directly
     public void StartRecording(String filename)
     {
-        
+       
+
         //write data to csv
         csvEMG = new StringBuilder();
 
@@ -252,7 +278,54 @@ public class DelsysEMG
         Debug.Log("Delsys-> Recording...");
     }
 
-    //Stop log to csv and output file
+    // Create log file
+    private void CreateLogFile(String fileName)
+    { 
+        
+    }
+    
+    // Stream data logger
+    private void StreamDataLogger()
+    {
+
+
+    }
+
+
+    // Thread for imu emg acquisition
+    private void ImuEmgThreadRoutine()
+    {
+        emgStream.ReadTimeout = 1000;    //set timeout
+
+        BinaryReader reader = new BinaryReader(emgStream);
+        while (running)
+        {
+            try
+            {
+                // Stream the data;
+                for (int sn = 0; sn < 16; ++sn)
+                    tempEmgDataList[sn] = reader.ReadSingle();
+
+                // Record the data if recording
+                if (recording)
+                {
+                    //timeStampList.Add((float)((DateTime.Now.Ticks - t0_in_ticks) / (float)10000000));
+                    double time = (timeStampList.Count - 1) * 0.0009;
+                    timeStampList.Add((float)time);
+                    for (int sn = 0; sn < 16; ++sn)
+                        emgDataList[sn].Add(tempEmgDataList[sn]);
+                }
+
+            }
+            catch (IOException e)
+            {
+                Debug.Log(e.ToString());
+            }
+        }
+
+    }
+
+    //Stop log to csv and stop 
     public void StopRecording()
     {
         while (emgStream.DataAvailable)
@@ -335,8 +408,6 @@ public class DelsysEMG
     public bool IsConnected() { return connected; }
     public bool IsRunning() { return running; }
    
-
-
     #endregion
 
 
@@ -363,55 +434,7 @@ public class DelsysEMG
     }
 
 
-    // Thread for imu emg acquisition
-    private void ImuEmgThreadRoutine(object state)
-    {
-       // emgStream.ReadTimeout = 100000;    //set timeout
-
-        BinaryReader reader = new BinaryReader(emgStream);
-        while (running)
-        {
-            try
-            {
-                // Stream the data;
-                for (int sn = 0; sn < 16; ++sn)
-                    tempEmgDataList[sn] = reader.ReadSingle();
-
-                // Record the data
-                if (recording)
-                {
-                    double time = (timeStampList.Count-1) * samplingInterval;
-                    timeStampList.Add((float) time);
-                    for (int sn = 0; sn < 16; ++sn)
-                        emgDataList[sn].Add(tempEmgDataList[sn]);
-                }
-
-            }
-            catch (IOException e)
-            {
-                Debug.Log(e.ToString());
-            }
-        }
-
-    }
-
-
-    /*
-    // Check time interval
-    public float CheckSamplingInterval()
-    {
-        float samplingRate;
-
-        string interval = SendCommand("FRAME INTERVAL?");
-        string maxSample = SendCommand("MAX SAMPLES EMG?");
-
-        //Debug.Log(interval);
-        //Debug.Log(maxSample);
-
-        samplingRate = float.Parse(interval)/float.Parse(maxSample);
-        return samplingRate;
-    }
-    */
+   
 
 
 }
