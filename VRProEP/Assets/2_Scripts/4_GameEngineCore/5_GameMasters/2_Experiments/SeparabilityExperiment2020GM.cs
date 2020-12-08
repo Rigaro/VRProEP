@@ -289,15 +289,16 @@ public class SeparabilityExperiment2020GM : GameMaster
         upperArmTracker = new VIVETrackerManager(ulMotionTrackerGO.transform);
         ExperimentSystem.AddSensor(upperArmTracker);
 
-        
-        // Shoulder acromium head tracker
-        GameObject motionTrackerGO1 = AvatarSystem.AddMotionTracker();
-        shoulderTracker = new VIVETrackerManager(motionTrackerGO1.transform);
-        ExperimentSystem.AddSensor(shoulderTracker);
-        // C7 tracker
-        GameObject motionTrackerGO2 = AvatarSystem.AddMotionTracker();
-        c7Tracker = new VIVETrackerManager(motionTrackerGO2.transform);
-        
+        if (!debug)
+        {
+            // Shoulder acromium head tracker
+            GameObject motionTrackerGO1 = AvatarSystem.AddMotionTracker();
+            shoulderTracker = new VIVETrackerManager(motionTrackerGO1.transform);
+            ExperimentSystem.AddSensor(shoulderTracker);
+            // C7 tracker
+            GameObject motionTrackerGO2 = AvatarSystem.AddMotionTracker();
+            c7Tracker = new VIVETrackerManager(motionTrackerGO2.transform);
+        } 
 
         //
         // Hand tracking sensor

@@ -189,7 +189,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bottleInHand: {fileID: 0}
   positionTolerance: {x: 0.03, y: 0.03, z: 0.03}
-  rotationTolerance: {x: 10, y: 10, z: 10}
+  rotationTolerance: {x: 10, y: 10, z: 15}
   idleColor: {r: 1, g: 1, b: 1, a: 0}
   selectedColor: {r: 0.11347453, g: 0.29153177, b: 0.9622642, a: 0.4627451}
   correctColor: {r: 0.06132078, g: 1, b: 0.44227362, a: 0.7882353}

@@ -76,7 +76,7 @@ public class ReachBottleManager : MonoBehaviour
         // Check if hand is gone to return to idle.
         if (other.tag == "Bottle")
         {
-            Debug.Log("Collide");
+            //Debug.Log("Collide");
             if (CheckReached())
             {
                 switch (bottleState)

@@ -14,7 +14,7 @@ using System.Threading;
 using UnityEngine;
 
 
-public class DelsysEMG 
+public class DelsysEMG_Depracted
 {
     //example of creating a list of sensor types to keep track of various TCP streams...
     enum SensorTypes { SensorTrigno, SensorTrignoImu, SensorTrignoMiniHead, NoSensor };
@@ -230,6 +230,7 @@ public class DelsysEMG
         running = false;    //no longer running
                             //Wait for threads to terminate
         emgThread.Join();
+        //emgTimer.Dispose();
 
         //Send stop command to server
         string response = SendCommand(COMMAND_STOP);
@@ -245,8 +246,6 @@ public class DelsysEMG
     public void StartRecording(String filename)
     {
         
-        // Create csv file to log data
-
         //write data to csv
         csvEMG = new StringBuilder();
 
@@ -264,54 +263,7 @@ public class DelsysEMG
         Debug.Log("Delsys-> Recording...");
     }
 
-    // Create log file
-    private void CreateLogFile(String fileName)
-    { 
-        
-    }
-    
-    // Stream data logger
-    private void StreamDataLogger()
-    {
-
-
-    }
-
-
-    // Thread for imu emg acquisition
-    private void ImuEmgThreadRoutine()
-    {
-        emgStream.ReadTimeout = 1000;    //set timeout
-
-        BinaryReader reader = new BinaryReader(emgStream);
-        while (running)
-        {
-            try
-            {
-                // Stream the data;
-                for (int sn = 0; sn < 16; ++sn)
-                    tempEmgDataList[sn] = reader.ReadSingle();
-
-                // Record the data if recording
-                if (recording)
-                {
-                    //timeStampList.Add((float)((DateTime.Now.Ticks - t0_in_ticks) / (float)10000000));
-                    double time = (timeStampList.Count - 1) * 0.0009;
-                    timeStampList.Add((float)time);
-                    for (int sn = 0; sn < 16; ++sn)
-                        emgDataList[sn].Add(reader.ReadSingle());
-                }
-
-            }
-            catch (IOException e)
-            {
-                Debug.Log(e.ToString());
-            }
-        }
-
-    }
-
-    //Stop log to csv and stop 
+    //Stop log to csv and output file
     public void StopRecording()
     {
         recording = false;
@@ -417,7 +369,38 @@ public class DelsysEMG
     }
 
 
-   
+    // Thread for imu emg acquisition
+    private void ImuEmgThreadRoutine(object state)
+    {
+        emgStream.ReadTimeout = 1000;    //set timeout
+
+        BinaryReader reader = new BinaryReader(emgStream);
+        while (running)
+        {
+            try
+            {
+                // Stream the data;
+                for (int sn = 0; sn < 16; ++sn)
+                    tempEmgDataList[sn] = reader.ReadSingle();
+
+                // Record the data
+                if (recording)
+                {
+                    //timeStampList.Add((float)((DateTime.Now.Ticks - t0_in_ticks) / (float)10000000));
+                    double time = (timeStampList.Count-1) * 0.0009;
+                    timeStampList.Add((float) time);
+                    for (int sn = 0; sn < 16; ++sn)
+                        emgDataList[sn].Add(reader.ReadSingle());
+                }
+
+            }
+            catch (IOException e)
+            {
+                Debug.Log(e.ToString());
+            }
+        }
+
+    }
 
 
 }
