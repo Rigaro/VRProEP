@@ -29,7 +29,7 @@ namespace VRProEP.GameEngineCore
         public float forearmLength;
         public float forearmWidth;
         public float handLength;
-        public float trunkLength;
+        public float trunkLength2SA;
         public float height2SA;
         public UserType type = UserType.Ablebodied;
         public bool lefty = false;

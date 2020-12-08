@@ -31,7 +31,7 @@ public class BottleGridManager : MonoBehaviour
     // Subject information
     private float subjectHeight;
     private float subjectArmLength;
-    private float subjectTrunkLength;
+    private float subjectTrunkLength2SA;
     private float subjectHeight2SA;
 
 
@@ -40,7 +40,7 @@ public class BottleGridManager : MonoBehaviour
     public int TargetBottleNumber { get => bottles.Count; }
     public float SubjectHeight { set => subjectHeight = value; }
     public float SubjectArmLength { set => subjectArmLength = value; }
-    public float SubjectTrunkLength { set => subjectTrunkLength = value; }
+    public float SubjectTrunkLength2SA { set => subjectTrunkLength2SA = value; }
     public float SubjectHeight2SA { set => subjectHeight2SA = value; }
     /*
     public float GridCloseDistanceFactor { set => gridCloseDistanceFactor = value;  }

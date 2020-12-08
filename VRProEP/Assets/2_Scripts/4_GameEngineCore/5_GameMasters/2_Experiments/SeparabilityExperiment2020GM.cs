@@ -269,7 +269,7 @@ public class SeparabilityExperiment2020GM : GameMaster
         // Set the subject physiological data for grid 
         gridManager.SubjectHeight = SaveSystem.ActiveUser.height;
         gridManager.SubjectArmLength = SaveSystem.ActiveUser.upperArmLength + SaveSystem.ActiveUser.forearmLength + (SaveSystem.ActiveUser.handLength / 2);
-        gridManager.SubjectTrunkLength = SaveSystem.ActiveUser.trunkLength;
+        gridManager.SubjectTrunkLength2SA = SaveSystem.ActiveUser.trunkLength2SA;
         gridManager.SubjectHeight2SA = SaveSystem.ActiveUser.height2SA;
         gridManager.ConfigGridPositionFactors(gridCloseDistanceFactor, gridMidDistanceFactor, gridFarDistanceFactor, gridHeightFactor);
 

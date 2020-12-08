@@ -83,10 +83,10 @@ public class CreateNewUserMenu : MonoBehaviour {
         dataSet += 1;
     }
 
-    public void SetTrunkLength(string trunkLength)
+    public void SetTrunkLength2SA(string trunkLength)
     {
         float f_trunkLenght = float.Parse(trunkLength);
-        userData.trunkLength = f_trunkLenght;
+        userData.trunkLength2SA = f_trunkLenght;
         dataSet += 1;
 
     }

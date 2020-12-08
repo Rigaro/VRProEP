@@ -6816,7 +6816,7 @@ GameObject:
   - component: {fileID: 401377072}
   - component: {fileID: 401377071}
   m_Layer: 0
-  m_Name: TrunkLengthInputField
+  m_Name: TrunkLength2SAInputField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6897,7 +6897,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1765638280}
-        m_MethodName: SetTrunkLength
+        m_MethodName: SetTrunkLength2SA
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -11875,7 +11875,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Trunk length (m)...
+  m_Text: Trunk length to SA (m)...
 --- !u!222 &601468668
 CanvasRenderer:
   m_ObjectHideFlags: 0
