@@ -442,9 +442,9 @@ public class SeparabilityExperiment2020GM : GameMaster
 
             //
             // Start position
-            InstructionManager.DisplayText("Your upper arm should be relaxed pointing downards while your elbow should be bent 90 degrees." + "\n\n (Press the trigger)");
+            InstructionManager.DisplayText("Your upper arm should be relaxed pointing downards (0 degree) while your elbow should be bent 90 degrees." + "\n\n (Press the trigger)");
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-            InstructionManager.DisplayText("Like so:" + "\n Try it.");
+            InstructionManager.DisplayText("Try it. If you are not at the right position , the Hud displays: (current upper and fore arm angle/the desired one)");
             startPosPhoto.SetActive(true);
             yield return new WaitUntil(() => IsReadyToStart());
             startPosPhoto.SetActive(false);
@@ -461,7 +461,7 @@ public class SeparabilityExperiment2020GM : GameMaster
             HudManager.DisplayText("I'm orange!");
             HudManager.colour = HUDManager.HUDColour.Orange;
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-            InstructionManager.DisplayText("Blue for reaching for the sphere!" + "\n\n (Press the trigger)");
+            InstructionManager.DisplayText("Blue for reaching for the target bottle!" + "\n\n (Press the trigger)");
             HudManager.DisplayText("I'm blue!");
             HudManager.colour = HUDManager.HUDColour.Blue;
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
