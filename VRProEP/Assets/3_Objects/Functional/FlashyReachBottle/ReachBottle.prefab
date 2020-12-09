@@ -18,7 +18,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7542093968696702159
 Transform:
   m_ObjectHideFlags: 0
@@ -27,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2196904158819419908}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.3, z: 0}
+  m_LocalPosition: {x: 0, y: -0.15, z: 0}
   m_LocalScale: {x: 2, y: 0.3, z: 2}
   m_Children: []
   m_Father: {fileID: 6685780528362805355}
@@ -106,6 +106,7 @@ GameObject:
   - component: {fileID: 2961562406580554393}
   - component: {fileID: 4266836609894433890}
   - component: {fileID: 2639130513856246488}
+  - component: {fileID: 659374080838906851}
   m_Layer: 0
   m_Name: ReachBottle
   m_TagString: Untagged
@@ -188,12 +189,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bottleInHand: {fileID: 0}
-  positionTolerance: {x: 0.03, y: 0.03, z: 0.03}
-  rotationTolerance: {x: 10, y: 10, z: 15}
+  positionTolerance: {x: 0.02, y: 0.02, z: 0.02}
+  rotationTolerance: {x: 5, y: 30, z: 30}
   idleColor: {r: 1, g: 1, b: 1, a: 0}
-  selectedColor: {r: 0.11347453, g: 0.29153177, b: 0.9622642, a: 0.4627451}
-  correctColor: {r: 0.06132078, g: 1, b: 0.44227362, a: 0.7882353}
-  wrongColor: {r: 0.9433962, g: 0.07564971, b: 0.07564971, a: 0.7882353}
+  selectedColor: {r: 0.11347453, g: 0.29153177, b: 0.9622642, a: 0.70980394}
+  correctColor: {r: 0.06132078, g: 1, b: 0.44227362, a: 0.7019608}
+  wrongColor: {r: 0.9433962, g: 0.07564971, b: 0.07564971, a: 0.7058824}
 --- !u!65 &2639130513856246488
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -207,3 +208,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.8635503, y: 5.968748, z: 1.8635492}
   m_Center: {x: 0.00000021287373, y: 2.980854, z: -0.000000106436865}
+--- !u!54 &659374080838906851
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5402829214342902688}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0

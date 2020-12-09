@@ -19,7 +19,7 @@ namespace VRProEP.GameEngineCore
         {
             // Display status to user
             gm.InstructionManager.DisplayText(gm.GetDisplayInfoText());
-            gm.HandleHUDColour(false);
+            //gm.HandleHUDColour(false);
             // Encourage user
             gm.HudManager.DisplayText("Well done!", 2.0f);
             base.Enter();

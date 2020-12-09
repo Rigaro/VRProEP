@@ -298,7 +298,10 @@ public class SeparabilityExperiment2020GM : GameMaster
             // C7 tracker
             GameObject motionTrackerGO2 = AvatarSystem.AddMotionTracker();
             c7Tracker = new VIVETrackerManager(motionTrackerGO2.transform);
-        } 
+            ExperimentSystem.AddSensor(c7Tracker);
+        }
+
+        
 
         //
         // Hand tracking sensor
@@ -486,55 +489,57 @@ public class SeparabilityExperiment2020GM : GameMaster
     /// <returns>True if ready to start.</returns>
     public override bool IsReadyToStart()
     {
-        // You can implement whatever condition you want, maybe touching an object in the virtual world or being in a certain posture.
-        // Check that upper and lower arms are within the tolerated start position.
-        float qShoulder = leftySign * Mathf.Rad2Deg * (upperArmTracker.GetProcessedData(5) + Mathf.PI); // Offsetting to horizontal position being 0.
-        float qElbow = 0;
-
-
-        HudManager.colour = HUDManager.HUDColour.Orange;
-        qElbow = Mathf.Rad2Deg * (lowerArmTracker.GetProcessedData(5)) - qShoulder; // Offsetting to horizontal position being 0.
-        // The difference to the start position
-        float qSDiff = qShoulder - startShoulderAngle;
-        float qEDiff = qElbow - startElbowAngle;
-
-        //
-        // Update information displayed for debugging purposes
-        //
-        
-        if (debug)
+        if (!debug)
         {
-            InstructionManager.DisplayText(qShoulder.ToString() + "\n" + qElbow.ToString() + "\n");
-        }
-        
+            // You can implement whatever condition you want, maybe touching an object in the virtual world or being in a certain posture.
+            // Check that upper and lower arms are within the tolerated start position.
+            float qShoulder = leftySign * Mathf.Rad2Deg * (upperArmTracker.GetProcessedData(5) + Mathf.PI); // Offsetting to horizontal position being 0.
+            float qElbow = 0;
 
 
-        if (Mathf.Abs(qSDiff) < startTolerance && Mathf.Abs(qEDiff) < startTolerance)
-        {
             HudManager.colour = HUDManager.HUDColour.Orange;
-            return true;
+            qElbow = Mathf.Rad2Deg * (lowerArmTracker.GetProcessedData(5)) - qShoulder; // Offsetting to horizontal position being 0.
+            // The difference to the start position
+            float qSDiff = qShoulder - startShoulderAngle;
+            float qEDiff = qElbow - startElbowAngle;
+
+            //
+            // Update information displayed for debugging purposes
+            //
+
+
+            //InstructionManager.DisplayText(qShoulder.ToString() + "\n" + qElbow.ToString() + "\n");
+
+            if (Mathf.Abs(qSDiff) < startTolerance && Mathf.Abs(qEDiff) < startTolerance)
+            {
+                HudManager.colour = HUDManager.HUDColour.Orange;
+                return true;
+            }
+            // Provide instructions when not there yet
+            else
+            {
+
+                string helpText = "";
+                if (qSDiff < 0 && Mathf.Abs(qSDiff) > startTolerance)
+                    helpText += "UA: ++ (" + qShoulder.ToString("F0") + "/" + startShoulderAngle.ToString("F0") + ").\n";
+                else if (qSDiff > 0 && Mathf.Abs(qSDiff) > startTolerance)
+                    helpText += "UA: -- (" + qShoulder.ToString("F0") + "/" + startShoulderAngle.ToString("F0") + ").\n";
+
+                if (qEDiff < 0 && Mathf.Abs(qEDiff) > startTolerance)
+                    helpText += "LA: ++ (" + qElbow.ToString("F0") + "/" + startElbowAngle.ToString("F0") + ").\n";
+                else if (qEDiff > 0 && Mathf.Abs(qEDiff) > startTolerance)
+                    helpText += "LA: -- (" + qElbow.ToString("F0") + "/" + startElbowAngle.ToString("F0") + ").\n"; ;
+
+                HudManager.DisplayText(helpText);
+                HudManager.colour = HUDManager.HUDColour.Red;
+
+
+                return false;
+            }
+
         }
-        // Provide instructions when not there yet
         else
-        {
-            
-            string helpText = "";
-            if (qSDiff < 0 && Mathf.Abs(qSDiff) > startTolerance)
-                helpText += "UA: ++.\n";
-            else if (qSDiff > 0 && Mathf.Abs(qSDiff) > startTolerance)
-                helpText += "UA: --.\n";
-
-            if (qEDiff < 0 && Mathf.Abs(qEDiff) > startTolerance)
-                helpText += "LA: ++.\n";
-            else if (qEDiff > 0 && Mathf.Abs(qEDiff) > startTolerance)
-                helpText += "LA: --.\n";
-
-            HudManager.DisplayText(helpText);
-            HudManager.colour = HUDManager.HUDColour.Red;
-          
-
-            return false;
-        }
+            return true;
     }
 
     /// <summary>
@@ -573,9 +578,12 @@ public class SeparabilityExperiment2020GM : GameMaster
         // Add your custom data logging here
         logData += targetOrder[iterationNumber - 1] + ",";  // Make sure you always end your custom data with a comma! Using CSV for data logging.
 
+
         // Continue with data logging.
         base.HandleTaskDataLogging();
+    
 
+        //HudManager.DisplayText(GameObject.Find("Bottle").transform.localEulerAngles.ToString());
     }
 
     /// <summary>
@@ -694,7 +702,8 @@ public class SeparabilityExperiment2020GM : GameMaster
     public override void EndExperiment()
     {
         base.EndExperiment();
-
+        delsysEMG.StopAcquisition();
+        delsysEMG.Close();
         // You can do your own end of experiment stuff here
     }
 

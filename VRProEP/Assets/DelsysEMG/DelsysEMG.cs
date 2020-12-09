@@ -283,7 +283,7 @@ public class DelsysEMG
         int imEmgIndex = 0;
         float tStart = timeStampList[imEmgIndex];
         
-        while (imEmgIndex < emgDataList[0].Count - 1)
+        while (imEmgIndex < timeStampList.Count - 1)
         {
             //Write time stamps
             csvEMG.Append(timeStampList[imEmgIndex]- tStart + ",");

@@ -77,7 +77,7 @@ public class BottleGridManager : MonoBehaviour
     {
 
         // Change selected bottle for debug
-        /*
+        
         if (Input.GetKeyDown(KeyCode.F1))
         {
             selectedIndex = selectedIndex + 1;
@@ -85,7 +85,7 @@ public class BottleGridManager : MonoBehaviour
             SelectBottle(selectedIndex);
 
         }
-        */
+        
 
 
         // Check if the selected bottle is reached or not
@@ -130,22 +130,30 @@ public class BottleGridManager : MonoBehaviour
         // Positions
         //
         // Close
+        float spacing = 0.2f;
         bottlePositions.Add(new Vector3(subjectArmLength * gridCloseDistanceFactor, subjectHeight * gridHeightFactor, 0.0f));
+        bottlePositions.Add(new Vector3(subjectArmLength * gridCloseDistanceFactor, subjectHeight * gridHeightFactor + spacing, 0.0f));
+        bottlePositions.Add(new Vector3(subjectArmLength * gridCloseDistanceFactor, subjectHeight * gridHeightFactor - spacing, 0.0f));
 
         // Mid
         bottlePositions.Add(new Vector3(subjectArmLength * gridMidDistanceFactor, subjectHeight * gridHeightFactor, 0.0f));
+        bottlePositions.Add(new Vector3(subjectArmLength * gridMidDistanceFactor, subjectHeight * gridHeightFactor + (float)1.0* spacing, 0.0f));
+        bottlePositions.Add(new Vector3(subjectArmLength * gridMidDistanceFactor, subjectHeight * gridHeightFactor - (float)1.0 * spacing, 0.0f));
 
         // Far
         bottlePositions.Add(new Vector3(subjectArmLength * gridFarDistanceFactor, subjectHeight * gridHeightFactor, 0.0f));
+        bottlePositions.Add(new Vector3(subjectArmLength * gridFarDistanceFactor, subjectHeight * gridHeightFactor + spacing, 0.0f));
+        bottlePositions.Add(new Vector3(subjectArmLength * gridFarDistanceFactor, subjectHeight * gridHeightFactor - spacing, 0.0f));
+
 
         //
         // Rotations
         //
         bottleRotations.Add(new Vector3(0.0f, 0.0f, 0.0f));
 
-        bottleRotations.Add(new Vector3(30.0f, 0.0f, 0f));
+        bottleRotations.Add(new Vector3(45.0f, 0.0f, 0.0f));
 
-        bottleRotations.Add(new Vector3(-30.0f, 0.0f, -0f));
+        bottleRotations.Add(new Vector3(-45.0f, 0.0f, 0.0f));
     }
 
 
