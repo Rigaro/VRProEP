@@ -89,7 +89,7 @@ public class BottleGridManager : MonoBehaviour
 
     void Start()
     {
-        // Debug purpose
+        // Debug
         /*
         GenerateBottleLocations();
         SpawnBottleGrid();
@@ -99,10 +99,9 @@ public class BottleGridManager : MonoBehaviour
 
     void Update()
     {
-
+        // Debug
         // Change selected bottle for debug
-        
-        /*
+       
         if (Input.GetKeyDown(KeyCode.F1))
         {
             selectedIndex = selectedIndex + 1;
@@ -110,7 +109,7 @@ public class BottleGridManager : MonoBehaviour
             SelectBottle(selectedIndex);
 
         }
-        */
+        
 
 
         // Check if the selected bottle is reached or not
@@ -138,7 +137,6 @@ public class BottleGridManager : MonoBehaviour
                 selectedTouched = false;
         }
         //Debug.Log(this.bottles[selectedIndex].BottleState.ToString());
-        //return reached;
     }
 
     #region public methods
@@ -153,7 +151,6 @@ public class BottleGridManager : MonoBehaviour
         //
         // Constants
         // 
-        float spacing = 0.2f;
         float bottleheight = 0.2f;
 
         //
@@ -163,24 +160,32 @@ public class BottleGridManager : MonoBehaviour
         Vector3 anchorTargetMid = new Vector3(subjectArmLength * gridMidDistanceFactor, subjectHeight2SA - bottleheight / 2, 0.0f);
         Vector3 anchorTargetFar = new Vector3(subjectArmLength * gridFarDistanceFactor, subjectHeight2SA - bottleheight / 2, 0.0f);
         Vector3[] childTargetClose;
+        Vector3[] childTargetMid;
 
         // Close
         bottlePositions.Add(anchorTargetClose);
-        childTargetClose = GenerateChildTargetsClose(JointAngleAtAnchor(anchorTargetClose)[0], JointAngleAtAnchor(anchorTargetClose)[1]);
+        
+        childTargetClose = GenerateChildTargetsClose(JointAngleAtAnchor(anchorTargetClose)[0], JointAngleAtAnchor(anchorTargetClose)[1]); 
         for (int i = 0; i < childTargetClose.Length; i++)
         {
-            bottlePositions.Add(childTargetClose[i]);
+            bottlePositions.Add(childTargetClose[i]); // Add child ones
         }
         
-        Debug.Log("Joint angles");
-        Debug.Log(JointAngleAtAnchor(anchorTargetClose)[0]);
-        Debug.Log(JointAngleAtAnchor(anchorTargetClose)[1]);
-        
+       
 
         // Mid
         bottlePositions.Add(anchorTargetMid);
-
-
+        childTargetMid = GenerateChildTargetsMid(JointAngleAtAnchor(anchorTargetMid)[0], JointAngleAtAnchor(anchorTargetMid)[1]);
+        for (int i = 0; i < childTargetMid.Length; i++)
+        {
+            bottlePositions.Add(childTargetMid[i]); // Add child ones
+        }
+        
+       /*
+       Debug.Log("Joint angles");
+       Debug.Log(JointAngleAtAnchor(anchorTargetMid)[0]);
+       Debug.Log(JointAngleAtAnchor(anchorTargetMid)[1]);
+       */
         // Far
         bottlePositions.Add(anchorTargetFar);
 
@@ -204,21 +209,25 @@ public class BottleGridManager : MonoBehaviour
 
     private Vector3[] GenerateChildTargetsClose(float qShoulder, float qElbow)
     {
-        Vector3[] target = new Vector3[2];
+        float DELTA1 = 30f;
+        float DELTA2 = 45f;
+
+        Vector3[] target = new Vector3[3];
 
 
-        target[0].x = subjectUALength * Mathf.Sin(Mathf.Deg2Rad * qShoulder) + subjectFALength * Mathf.Sin(Mathf.Deg2Rad * (qShoulder + qElbow + 30) );
-        target[0].y = subjectHeight2SA - subjectUALength * Mathf.Cos(Mathf.Deg2Rad * qShoulder) - subjectFALength * Mathf.Cos(Mathf.Deg2Rad * (qShoulder + qElbow + 30));
+        target[0].x = subjectUALength * Mathf.Sin(Mathf.Deg2Rad * qShoulder) + subjectFALength * Mathf.Sin(Mathf.Deg2Rad * (qShoulder + qElbow + DELTA1) );
+        target[0].y = subjectHeight2SA - subjectUALength * Mathf.Cos(Mathf.Deg2Rad * qShoulder) - subjectFALength * Mathf.Cos(Mathf.Deg2Rad * (qShoulder + qElbow + DELTA1));
         target[0].z = 0.0f;
 
         
-        target[1].x = subjectUALength * Mathf.Sin(Mathf.Deg2Rad * qShoulder) + subjectFALength * Mathf.Sin(Mathf.Deg2Rad * (qShoulder + qElbow - 60));
-        target[1].y = subjectHeight2SA - subjectUALength * Mathf.Cos(Mathf.Deg2Rad * qShoulder) -subjectFALength * Mathf.Cos(Mathf.Deg2Rad * (qShoulder + qElbow - 60));
+        target[1].x = subjectUALength * Mathf.Sin(Mathf.Deg2Rad * qShoulder) + subjectFALength * Mathf.Sin(Mathf.Deg2Rad * (qShoulder + qElbow - DELTA2));
+        target[1].y = subjectHeight2SA - subjectUALength * Mathf.Cos(Mathf.Deg2Rad * qShoulder) -subjectFALength * Mathf.Cos(Mathf.Deg2Rad * (qShoulder + qElbow - DELTA2));
         target[1].z = 0.0f;
 
-        Debug.Log("Child targets");
-        Debug.Log(target[0]);
-        Debug.Log(target[1]);
+        target[2].x = subjectUALength * Mathf.Sin(Mathf.Deg2Rad * qShoulder) + subjectFALength * Mathf.Sin(Mathf.Deg2Rad * (qShoulder + qElbow - 2 * DELTA2));
+        target[2].y = subjectHeight2SA - subjectUALength * Mathf.Cos(Mathf.Deg2Rad * qShoulder) - subjectFALength * Mathf.Cos(Mathf.Deg2Rad * (qShoulder + qElbow - 2 * DELTA2));
+        target[2].z = 0.0f;
+
         return target;
     
     }
@@ -228,20 +237,55 @@ public class BottleGridManager : MonoBehaviour
     /// </summary>
     /// <param >
     /// <returns 
+
+    private Vector3[] GenerateChildTargetsMid(float qShoulder, float qElbow)
+    {
+        float DELTA = 30;
+
+        Vector3[] target = new Vector3[3];
+
+        target[0].x = subjectUALength * Mathf.Sin(Mathf.Deg2Rad * qShoulder) + subjectFALength * Mathf.Sin(Mathf.Deg2Rad * (qShoulder + qElbow + DELTA));
+        target[0].y = subjectHeight2SA - subjectUALength * Mathf.Cos(Mathf.Deg2Rad * qShoulder) - subjectFALength * Mathf.Cos(Mathf.Deg2Rad * (qShoulder + qElbow + DELTA));
+        target[0].z = 0.0f;
+
+
+        target[1].x = subjectUALength * Mathf.Sin(Mathf.Deg2Rad * qShoulder) + subjectFALength * Mathf.Sin(Mathf.Deg2Rad * (qShoulder + qElbow + 2 * DELTA));
+        target[1].y = subjectHeight2SA - subjectUALength * Mathf.Cos(Mathf.Deg2Rad * qShoulder) - subjectFALength * Mathf.Cos(Mathf.Deg2Rad * (qShoulder + qElbow + 2 * DELTA));
+        target[1].z = 0.0f;
+
+        target[2].x = subjectUALength * Mathf.Sin(Mathf.Deg2Rad * qShoulder) + subjectFALength * Mathf.Sin(Mathf.Deg2Rad * (qShoulder + qElbow + 3 * DELTA));
+        target[2].y = subjectHeight2SA - subjectUALength * Mathf.Cos(Mathf.Deg2Rad * qShoulder) - subjectFALength * Mathf.Cos(Mathf.Deg2Rad * (qShoulder + qElbow + 3 * DELTA));
+        target[2].z = 0.0f;
+
+        return target;
+    }
+
+        /// <summary>
+        /// Calculate shoulder and elbow angles of anchor position
+        /// </summary>
+        /// <param >
+        /// <returns 
     private float[] JointAngleAtAnchor(Vector3 anchorLocation)
     {
         float qShoulder = 0;
         float qElbow = 0;
-
-        float alpha = Mathf.Acos((Mathf.Pow(subjectUALength, 2) + Mathf.Pow(subjectFALength, 2) - Mathf.Pow(gridCloseDistanceFactor * subjectArmLength, 2))
+        if (subjectArmLength > anchorLocation.x)
+        {
+            float alpha = Mathf.Acos((Mathf.Pow(subjectUALength, 2) + Mathf.Pow(subjectFALength, 2) - Mathf.Pow(anchorLocation.x, 2))
                                     / (2 * subjectFALength * subjectUALength));
-        qElbow = 180 - Mathf.Rad2Deg * alpha;
+            qElbow = 180 - Mathf.Rad2Deg * alpha;
 
-        float beta = Mathf.Asin(subjectFALength * Mathf.Sin(alpha) / (gridCloseDistanceFactor * subjectArmLength));
+            float beta = Mathf.Asin(subjectFALength * Mathf.Sin(alpha) / (anchorLocation.x));
 
-        qShoulder = 90 - Mathf.Rad2Deg * beta;
+            qShoulder = 90 - Mathf.Rad2Deg * beta;
 
-        return new float[] {qShoulder, qElbow};
+            return new float[] { qShoulder, qElbow };
+        }
+        else
+        {
+            return new float[] { 90, 0 };
+        }
+        
     }
 
     /// <summary>
