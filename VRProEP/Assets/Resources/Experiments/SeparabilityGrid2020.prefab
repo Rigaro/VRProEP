@@ -152,6 +152,7 @@ MonoBehaviour:
   gridMidDistanceFactor: 1
   gridFarDistanceFactor: 1.5
   gridHeightFactor: 0.5
+  checkStartPosition: 1
   startPosPhoto: {fileID: 9025509897340019074}
 --- !u!1 &9025509897340019074
 GameObject:

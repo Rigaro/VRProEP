@@ -158,12 +158,15 @@ public class ReachBottleManager : MonoBehaviour
 
 
         //bottleState = BottleState.Correct;
-        reached = positionReached & orientationReached;
+
         //Debug.Log(bottleInHandRotation);
         // Debug.Log(postionError);
         //Debug.Log(rotationError);
-        if(bottleState == ReachBottleState.Selected)
-            Debug.Log(bottleInHandRotation);
+        //if(bottleState == ReachBottleState.Selected)
+        // Debug.Log(bottleInHandRotation);
+
+
+        reached = positionReached & orientationReached;
         return reached;
     }
 

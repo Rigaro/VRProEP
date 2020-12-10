@@ -67,6 +67,8 @@ public class SeparabilityExperiment2020GM : GameMaster
     [Range(0, 2)]
     private float gridHeightFactor = 0.5f;
 
+    [SerializeField]
+    private bool checkStartPosition;
 
     [SerializeField]
     private GameObject startPosPhoto;
@@ -95,7 +97,7 @@ public class SeparabilityExperiment2020GM : GameMaster
     private float leftySign = 1.0f;
 
 
-    private class GridReachingConfigurator
+    private class SeparabilityGridReachingConfigurator
     {
         public int iterationsPerTarget = 10;
         public float gridCloseDistanceFactor = 0.75f;
@@ -103,7 +105,7 @@ public class SeparabilityExperiment2020GM : GameMaster
         public float gridFarDistanceFactor = 1.5f;
         public float gridHeightFactor = 0.5f;
     }
-    private GridReachingConfigurator configurator;
+    private SeparabilityGridReachingConfigurator configurator;
 
 
     #region Private methods
@@ -205,7 +207,7 @@ public class SeparabilityExperiment2020GM : GameMaster
         //configAsset = Resources.Load<TextAsset>("Experiments/" + ExperimentSystem.ActiveExperimentID);
 
         // Convert configuration file to configuration class.
-        configurator = JsonUtility.FromJson<GridReachingConfigurator>(configAsset.text);
+        configurator = JsonUtility.FromJson<SeparabilityGridReachingConfigurator>(configAsset.text);
 
         // Load from config file
         iterationsPerTarget = configurator.iterationsPerTarget;
@@ -267,10 +269,8 @@ public class SeparabilityExperiment2020GM : GameMaster
         #region Initialize world positioning
 
         // Set the subject physiological data for grid 
-        gridManager.SubjectHeight = SaveSystem.ActiveUser.height;
-        gridManager.SubjectArmLength = SaveSystem.ActiveUser.upperArmLength + SaveSystem.ActiveUser.forearmLength + (SaveSystem.ActiveUser.handLength / 2);
-        gridManager.SubjectTrunkLength2SA = SaveSystem.ActiveUser.trunkLength2SA;
-        gridManager.SubjectHeight2SA = SaveSystem.ActiveUser.height2SA;
+        gridManager.ConfigUserData();
+       
         gridManager.ConfigGridPositionFactors(gridCloseDistanceFactor, gridMidDistanceFactor, gridFarDistanceFactor, gridHeightFactor);
 
         #endregion
@@ -446,6 +446,7 @@ public class SeparabilityExperiment2020GM : GameMaster
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
             InstructionManager.DisplayText("Try it. If you are not at the right position , the Hud displays: (current upper and fore arm angle/the desired one)");
             startPosPhoto.SetActive(true);
+            startPosPhoto.transform.Rotate(new Vector3(0.0f, 90.0f, 0.0f), Space.World);
             yield return new WaitUntil(() => IsReadyToStart());
             startPosPhoto.SetActive(false);
             HudManager.ClearText();
@@ -468,7 +469,9 @@ public class SeparabilityExperiment2020GM : GameMaster
             InstructionManager.DisplayText("Green for returning to the start position." + "\n\n (Press the trigger)");
             HudManager.DisplayText("I'm green!");
             HudManager.colour = HUDManager.HUDColour.Green;
-
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            HudManager.ClearText();
+            HudManager.colour = HUDManager.HUDColour.Red;
             //
             // End
             InstructionManager.DisplayText("Make sure you hold your position until the HUD turns green before moving back to the start position." + "\n\n (Press the trigger)");
@@ -489,7 +492,7 @@ public class SeparabilityExperiment2020GM : GameMaster
     /// <returns>True if ready to start.</returns>
     public override bool IsReadyToStart()
     {
-        if (!debug)
+        if (checkStartPosition)
         {
             // You can implement whatever condition you want, maybe touching an object in the virtual world or being in a certain posture.
             // Check that upper and lower arms are within the tolerated start position.
@@ -631,15 +634,21 @@ public class SeparabilityExperiment2020GM : GameMaster
     /// </summary>
     public override void HandleTaskCompletion()
     {
-        base.HandleTaskCompletion();
+        // Signal the subject that the task is done
+        HudManager.colour = HUDManager.HUDColour.Green;
+        HudManager.DisplayText("You can return to start position");
+
+
         // Stop EMG reading and save data
         delsysEMG.StopRecording();
         emgIsRecording = false;
-        // Signal the subject that the task is done
-        HudManager.colour = HUDManager.HUDColour.Green;
+        base.HandleTaskCompletion();
+
         // Reset flags
         hasReached = false;
         taskComplete = false;
+
+        
 
     }
 

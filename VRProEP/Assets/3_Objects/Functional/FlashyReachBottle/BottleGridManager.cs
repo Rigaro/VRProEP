@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using VRProEP.GameEngineCore;
+
 
 public class BottleGridManager : MonoBehaviour
 {
@@ -31,17 +33,22 @@ public class BottleGridManager : MonoBehaviour
     // Subject information
     private float subjectHeight;
     private float subjectArmLength;
+    private float subjectFALength;
+    private float subjectUALength;
     private float subjectTrunkLength2SA;
     private float subjectHeight2SA;
-
+   
 
     // Accessor
     public bool SelectedTouched { get => selectedTouched; }
     public int TargetBottleNumber { get => bottles.Count; }
+
+    /*
     public float SubjectHeight { set => subjectHeight = value; }
     public float SubjectArmLength { set => subjectArmLength = value; }
     public float SubjectTrunkLength2SA { set => subjectTrunkLength2SA = value; }
     public float SubjectHeight2SA { set => subjectHeight2SA = value; }
+    */
     /*
     public float GridCloseDistanceFactor { set => gridCloseDistanceFactor = value;  }
     public float GridMidDistanceFactor { set => gridMidDistanceFactor = value; }
@@ -50,10 +57,10 @@ public class BottleGridManager : MonoBehaviour
     */
 
     /// <summary>
-    /// Check if the selected bottle is reached
+    /// Config the grid paramenters
     /// </summary>
     /// <param >
-    /// <returns bool reached>
+    /// <returns>
     /// 
     public void ConfigGridPositionFactors(float close, float mid, float far, float height)
     {
@@ -61,6 +68,23 @@ public class BottleGridManager : MonoBehaviour
         gridMidDistanceFactor = mid;
         gridFarDistanceFactor = far;
         gridHeightFactor = height;
+    }
+
+    /// <summary>
+    /// Config user physiology data
+    /// </summary>
+    /// <param >
+    /// <returns>
+    /// 
+    public void ConfigUserData()
+    {
+        subjectHeight = SaveSystem.ActiveUser.height;
+        subjectArmLength = SaveSystem.ActiveUser.upperArmLength + SaveSystem.ActiveUser.forearmLength + (SaveSystem.ActiveUser.handLength / 2);
+        subjectFALength = SaveSystem.ActiveUser.forearmLength + (SaveSystem.ActiveUser.handLength / 2);
+        subjectUALength = SaveSystem.ActiveUser.upperArmLength;
+        subjectTrunkLength2SA = SaveSystem.ActiveUser.trunkLength2SA;
+        subjectHeight2SA = SaveSystem.ActiveUser.height2SA;
+
     }
 
     void Start()
@@ -78,6 +102,7 @@ public class BottleGridManager : MonoBehaviour
 
         // Change selected bottle for debug
         
+        /*
         if (Input.GetKeyDown(KeyCode.F1))
         {
             selectedIndex = selectedIndex + 1;
@@ -85,11 +110,11 @@ public class BottleGridManager : MonoBehaviour
             SelectBottle(selectedIndex);
 
         }
-        
+        */
 
 
         // Check if the selected bottle is reached or not
-        selectedTouched = CheckReached();
+         CheckReached();
         //Debug.Log(selectedTouched);
 
     }
@@ -100,21 +125,20 @@ public class BottleGridManager : MonoBehaviour
     /// </summary>
     /// <param >
     /// <returns bool reached>
-    private bool CheckReached()
+    private void CheckReached()
     {
-        bool reached = false;
-
+      
         // Check if the selected ball has been touched
-        if (hasSelected)
+        if (hasSelected && !selectedTouched)
         {
             if (this.bottles[selectedIndex].BottleState == ReachBottleManager.ReachBottleState.Correct)
                 
-                reached = true;
+                selectedTouched = true;
             else
-                reached = false;
+                selectedTouched = false;
         }
         //Debug.Log(this.bottles[selectedIndex].BottleState.ToString());
-        return reached;
+        //return reached;
     }
 
     #region public methods
@@ -127,23 +151,39 @@ public class BottleGridManager : MonoBehaviour
     public void GenerateBottleLocations()
     {
         //
-        // Positions
-        //
-        // Close
+        // Constants
+        // 
         float spacing = 0.2f;
-        bottlePositions.Add(new Vector3(subjectArmLength * gridCloseDistanceFactor, subjectHeight * gridHeightFactor, 0.0f));
-        bottlePositions.Add(new Vector3(subjectArmLength * gridCloseDistanceFactor, subjectHeight * gridHeightFactor + spacing, 0.0f));
-        bottlePositions.Add(new Vector3(subjectArmLength * gridCloseDistanceFactor, subjectHeight * gridHeightFactor - spacing, 0.0f));
+        float bottleheight = 0.2f;
+
+        //
+        // Anchor Positions
+        //
+        Vector3 anchorTargetClose = new Vector3(subjectArmLength * gridCloseDistanceFactor, subjectHeight2SA - bottleheight / 2, 0.0f);
+        Vector3 anchorTargetMid = new Vector3(subjectArmLength * gridMidDistanceFactor, subjectHeight2SA - bottleheight / 2, 0.0f);
+        Vector3 anchorTargetFar = new Vector3(subjectArmLength * gridFarDistanceFactor, subjectHeight2SA - bottleheight / 2, 0.0f);
+        Vector3[] childTargetClose;
+
+        // Close
+        bottlePositions.Add(anchorTargetClose);
+        childTargetClose = GenerateChildTargetsClose(JointAngleAtAnchor(anchorTargetClose)[0], JointAngleAtAnchor(anchorTargetClose)[1]);
+        for (int i = 0; i < childTargetClose.Length; i++)
+        {
+            bottlePositions.Add(childTargetClose[i]);
+        }
+        
+        Debug.Log("Joint angles");
+        Debug.Log(JointAngleAtAnchor(anchorTargetClose)[0]);
+        Debug.Log(JointAngleAtAnchor(anchorTargetClose)[1]);
+        
 
         // Mid
-        bottlePositions.Add(new Vector3(subjectArmLength * gridMidDistanceFactor, subjectHeight * gridHeightFactor, 0.0f));
-        bottlePositions.Add(new Vector3(subjectArmLength * gridMidDistanceFactor, subjectHeight * gridHeightFactor + (float)1.0* spacing, 0.0f));
-        bottlePositions.Add(new Vector3(subjectArmLength * gridMidDistanceFactor, subjectHeight * gridHeightFactor - (float)1.0 * spacing, 0.0f));
+        bottlePositions.Add(anchorTargetMid);
+
 
         // Far
-        bottlePositions.Add(new Vector3(subjectArmLength * gridFarDistanceFactor, subjectHeight * gridHeightFactor, 0.0f));
-        bottlePositions.Add(new Vector3(subjectArmLength * gridFarDistanceFactor, subjectHeight * gridHeightFactor + spacing, 0.0f));
-        bottlePositions.Add(new Vector3(subjectArmLength * gridFarDistanceFactor, subjectHeight * gridHeightFactor - spacing, 0.0f));
+        bottlePositions.Add(anchorTargetFar);
+
 
 
         //
@@ -156,6 +196,53 @@ public class BottleGridManager : MonoBehaviour
         bottleRotations.Add(new Vector3(-45.0f, 0.0f, 0.0f));
     }
 
+    /// <summary>
+    /// Calculate shoulder and elbow angles of anchor position
+    /// </summary>
+    /// <param >
+    /// <returns 
+
+    private Vector3[] GenerateChildTargetsClose(float qShoulder, float qElbow)
+    {
+        Vector3[] target = new Vector3[2];
+
+
+        target[0].x = subjectUALength * Mathf.Sin(Mathf.Deg2Rad * qShoulder) + subjectFALength * Mathf.Sin(Mathf.Deg2Rad * (qShoulder + qElbow + 30) );
+        target[0].y = subjectHeight2SA - subjectUALength * Mathf.Cos(Mathf.Deg2Rad * qShoulder) - subjectFALength * Mathf.Cos(Mathf.Deg2Rad * (qShoulder + qElbow + 30));
+        target[0].z = 0.0f;
+
+        
+        target[1].x = subjectUALength * Mathf.Sin(Mathf.Deg2Rad * qShoulder) + subjectFALength * Mathf.Sin(Mathf.Deg2Rad * (qShoulder + qElbow - 60));
+        target[1].y = subjectHeight2SA - subjectUALength * Mathf.Cos(Mathf.Deg2Rad * qShoulder) -subjectFALength * Mathf.Cos(Mathf.Deg2Rad * (qShoulder + qElbow - 60));
+        target[1].z = 0.0f;
+
+        Debug.Log("Child targets");
+        Debug.Log(target[0]);
+        Debug.Log(target[1]);
+        return target;
+    
+    }
+
+    /// <summary>
+    /// Calculate shoulder and elbow angles of anchor position
+    /// </summary>
+    /// <param >
+    /// <returns 
+    private float[] JointAngleAtAnchor(Vector3 anchorLocation)
+    {
+        float qShoulder = 0;
+        float qElbow = 0;
+
+        float alpha = Mathf.Acos((Mathf.Pow(subjectUALength, 2) + Mathf.Pow(subjectFALength, 2) - Mathf.Pow(gridCloseDistanceFactor * subjectArmLength, 2))
+                                    / (2 * subjectFALength * subjectUALength));
+        qElbow = 180 - Mathf.Rad2Deg * alpha;
+
+        float beta = Mathf.Asin(subjectFALength * Mathf.Sin(alpha) / (gridCloseDistanceFactor * subjectArmLength));
+
+        qShoulder = 90 - Mathf.Rad2Deg * beta;
+
+        return new float[] {qShoulder, qElbow};
+    }
 
     /// <summary>
     /// Spawn the boottle grid
