@@ -90,9 +90,9 @@ namespace VRProEP.GameEngineCore
                 hudBlueGraphics.SetActive(false);
                 hudRedGraphics.SetActive(false);
                 hudYellowGraphics.SetActive(false);
-                hudOrangeGraphics.SetActive(true);
                 hudPurpleGraphics.SetActive(false);
                 hudGreenGraphics.SetActive(false);
+                hudOrangeGraphics.SetActive(true);
             }
             if (colour == HUDColour.Purple && !hudPurpleGraphics.activeSelf)
             {

@@ -4495,6 +4495,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SeparabilityGrid2020
       objectReference: {fileID: 0}
+    - target: {fileID: 7057585951369286232, guid: 20c0654ad1ca82446ae78e930c556187,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8645427431186587885, guid: 20c0654ad1ca82446ae78e930c556187,
         type: 3}
       propertyPath: m_textInfo.characterCount
@@ -6195,7 +6200,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6eb2fdbc72fe56488fb5733de7c8447, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debug: 1
+  debug: 0
 --- !u!1001 &1754930143
 PrefabInstance:
   m_ObjectHideFlags: 0

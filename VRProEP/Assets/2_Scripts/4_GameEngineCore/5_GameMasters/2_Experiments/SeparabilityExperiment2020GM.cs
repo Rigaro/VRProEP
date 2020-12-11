@@ -264,6 +264,8 @@ public class SeparabilityExperiment2020GM : GameMaster
         delsysEMG.Init();
         delsysEMG.Connect();
         delsysEMG.StartAcquisition();
+
+
         #endregion
 
         #region Initialize world positioning
@@ -454,7 +456,7 @@ public class SeparabilityExperiment2020GM : GameMaster
             // HUD Colours
             InstructionManager.DisplayText("The colour of the HUD will tell you what you need to do." + "\n\n (Press the trigger)");
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-            InstructionManager.DisplayText("Red for adjusting your start position." + "\n\n (Press the trigger)");
+            InstructionManager.DisplayText("Red for returning back and adjusting your start position." + "\n\n (Press the trigger)");
             HudManager.DisplayText("I'm red!");
             HudManager.colour = HUDManager.HUDColour.Red;
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
@@ -466,10 +468,14 @@ public class SeparabilityExperiment2020GM : GameMaster
             HudManager.DisplayText("I'm blue!");
             HudManager.colour = HUDManager.HUDColour.Blue;
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-            InstructionManager.DisplayText("Green for returning to the start position." + "\n\n (Press the trigger)");
+            InstructionManager.DisplayText("Green for complete the task." + "\n\n (Press the trigger)");
             HudManager.DisplayText("I'm green!");
             HudManager.colour = HUDManager.HUDColour.Green;
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            InstructionManager.DisplayText("You need to hold on for a while until the HUD says Well Done, like" + "\n\n (Press the trigger)");
+            HudManager.DisplayText("Well Done");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+
             HudManager.ClearText();
             HudManager.colour = HUDManager.HUDColour.Red;
             //
@@ -622,9 +628,12 @@ public class SeparabilityExperiment2020GM : GameMaster
     private IEnumerator EndTaskCoroutine()
     {
         hasReached = true;
+        // Signal the subject that the task is done
+        HudManager.DisplayText("Hold on!");
+        HudManager.colour = HUDManager.HUDColour.Green;
+        HudManager.colour = HUDManager.HUDColour.Green;
+       
         yield return new WaitForSecondsRealtime(1.0f);
-        
-
         taskComplete = true;
     }
 
@@ -634,22 +643,17 @@ public class SeparabilityExperiment2020GM : GameMaster
     /// </summary>
     public override void HandleTaskCompletion()
     {
-        // Signal the subject that the task is done
-        HudManager.colour = HUDManager.HUDColour.Green;
-        HudManager.DisplayText("You can return to start position");
-
+       
 
         // Stop EMG reading and save data
         delsysEMG.StopRecording();
         emgIsRecording = false;
+
         base.HandleTaskCompletion();
 
         // Reset flags
         hasReached = false;
         taskComplete = false;
-
-        
-
     }
 
     /// <summary>

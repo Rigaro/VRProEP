@@ -13,9 +13,9 @@ public class ReachBottleManager : MonoBehaviour
     
     [Header("Tolerance")]
     [SerializeField]
-    Vector3 positionTolerance = new Vector3(0.1f, 0.1f, 0.1f);
+    Vector3 positionTolerance;
     [SerializeField]
-    Vector3 rotationTolerance = new Vector3(5.0f, 15.0f, 15.0f);
+    Vector3 rotationTolerance;
 
     [Header("Colour configuration")]
     [SerializeField]
@@ -151,19 +151,18 @@ public class ReachBottleManager : MonoBehaviour
             positionReached = false;
 
 
-        if (Mathf.Abs(rotationError.x) < rotationTolerance.x && Mathf.Abs(rotationError.z) < rotationTolerance.z) //
+        if ( (Mathf.Abs(rotationError.x) <= rotationTolerance.x) && (Mathf.Abs(rotationError.z) <= rotationTolerance.z) ) //
             orientationReached = true;
         else
             orientationReached = false;
 
 
-        //bottleState = BottleState.Correct;
-
+        //Debug.Log(targetRotation);
         //Debug.Log(bottleInHandRotation);
         // Debug.Log(postionError);
-        //Debug.Log(rotationError);
+        Debug.Log(rotationError);
         //if(bottleState == ReachBottleState.Selected)
-        // Debug.Log(bottleInHandRotation);
+         //Debug.Log(bottleInHandRotation);
 
 
         reached = positionReached & orientationReached;

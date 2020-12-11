@@ -37,7 +37,8 @@ public class BottleGridManager : MonoBehaviour
     private float subjectUALength;
     private float subjectTrunkLength2SA;
     private float subjectHeight2SA;
-   
+    private float subjectShoulderBreadth;
+    private float sagittalOffset;
 
     // Accessor
     public bool SelectedTouched { get => selectedTouched; }
@@ -84,7 +85,8 @@ public class BottleGridManager : MonoBehaviour
         subjectUALength = SaveSystem.ActiveUser.upperArmLength;
         subjectTrunkLength2SA = SaveSystem.ActiveUser.trunkLength2SA;
         subjectHeight2SA = SaveSystem.ActiveUser.height2SA;
-
+        subjectShoulderBreadth = SaveSystem.ActiveUser.shoulderBreadth;
+        sagittalOffset = -subjectShoulderBreadth / 4.0f;
     }
 
     void Start()
@@ -102,6 +104,7 @@ public class BottleGridManager : MonoBehaviour
         // Debug
         // Change selected bottle for debug
        
+        /*
         if (Input.GetKeyDown(KeyCode.F1))
         {
             selectedIndex = selectedIndex + 1;
@@ -109,7 +112,7 @@ public class BottleGridManager : MonoBehaviour
             SelectBottle(selectedIndex);
 
         }
-        
+        */
 
 
         // Check if the selected bottle is reached or not
@@ -128,7 +131,7 @@ public class BottleGridManager : MonoBehaviour
     {
       
         // Check if the selected ball has been touched
-        if (hasSelected && !selectedTouched)
+        if (hasSelected)
         {
             if (this.bottles[selectedIndex].BottleState == ReachBottleManager.ReachBottleState.Correct)
                 
@@ -156,11 +159,17 @@ public class BottleGridManager : MonoBehaviour
         //
         // Anchor Positions
         //
-        Vector3 anchorTargetClose = new Vector3(subjectArmLength * gridCloseDistanceFactor, subjectHeight2SA - bottleheight / 2, 0.0f);
-        Vector3 anchorTargetMid = new Vector3(subjectArmLength * gridMidDistanceFactor, subjectHeight2SA - bottleheight / 2, 0.0f);
-        Vector3 anchorTargetFar = new Vector3(subjectArmLength * gridFarDistanceFactor, subjectHeight2SA - bottleheight / 2, 0.0f);
+        Vector3 anchorTargetVeryClose = new Vector3(subjectArmLength * 0.5f, subjectHeight2SA - bottleheight / 2, sagittalOffset);
+        Vector3 anchorTargetClose = new Vector3(subjectArmLength * gridCloseDistanceFactor, subjectHeight2SA - bottleheight / 2, sagittalOffset);
+        Vector3 anchorTargetMid = new Vector3(subjectArmLength * gridMidDistanceFactor, subjectHeight2SA - bottleheight / 2, sagittalOffset);
+        Vector3 anchorTargetFar = new Vector3(subjectArmLength * gridFarDistanceFactor, subjectHeight2SA - bottleheight / 2, sagittalOffset);
         Vector3[] childTargetClose;
         Vector3[] childTargetMid;
+
+
+        //Very Close
+
+        bottlePositions.Add(anchorTargetVeryClose);
 
         // Close
         bottlePositions.Add(anchorTargetClose);
@@ -181,11 +190,11 @@ public class BottleGridManager : MonoBehaviour
             bottlePositions.Add(childTargetMid[i]); // Add child ones
         }
         
-       /*
+       
        Debug.Log("Joint angles");
        Debug.Log(JointAngleAtAnchor(anchorTargetMid)[0]);
        Debug.Log(JointAngleAtAnchor(anchorTargetMid)[1]);
-       */
+       
         // Far
         bottlePositions.Add(anchorTargetFar);
 
@@ -209,25 +218,25 @@ public class BottleGridManager : MonoBehaviour
 
     private Vector3[] GenerateChildTargetsClose(float qShoulder, float qElbow)
     {
-        float DELTA1 = 30f;
-        float DELTA2 = 45f;
+        float DELTA1 = 20f;
+        float DELTA2 = 20f;
 
-        Vector3[] target = new Vector3[3];
+        Vector3[] target = new Vector3[2];
 
 
         target[0].x = subjectUALength * Mathf.Sin(Mathf.Deg2Rad * qShoulder) + subjectFALength * Mathf.Sin(Mathf.Deg2Rad * (qShoulder + qElbow + DELTA1) );
         target[0].y = subjectHeight2SA - subjectUALength * Mathf.Cos(Mathf.Deg2Rad * qShoulder) - subjectFALength * Mathf.Cos(Mathf.Deg2Rad * (qShoulder + qElbow + DELTA1));
-        target[0].z = 0.0f;
+        target[0].z = sagittalOffset;
 
         
         target[1].x = subjectUALength * Mathf.Sin(Mathf.Deg2Rad * qShoulder) + subjectFALength * Mathf.Sin(Mathf.Deg2Rad * (qShoulder + qElbow - DELTA2));
-        target[1].y = subjectHeight2SA - subjectUALength * Mathf.Cos(Mathf.Deg2Rad * qShoulder) -subjectFALength * Mathf.Cos(Mathf.Deg2Rad * (qShoulder + qElbow - DELTA2));
-        target[1].z = 0.0f;
-
+        target[1].y = subjectHeight2SA - subjectUALength * Mathf.Cos(Mathf.Deg2Rad * qShoulder) -subjectFALength * Mathf.Cos(Mathf.Deg2Rad * (qShoulder + qElbow - 3*DELTA2));
+        target[1].z = sagittalOffset;
+        /*
         target[2].x = subjectUALength * Mathf.Sin(Mathf.Deg2Rad * qShoulder) + subjectFALength * Mathf.Sin(Mathf.Deg2Rad * (qShoulder + qElbow - 2 * DELTA2));
-        target[2].y = subjectHeight2SA - subjectUALength * Mathf.Cos(Mathf.Deg2Rad * qShoulder) - subjectFALength * Mathf.Cos(Mathf.Deg2Rad * (qShoulder + qElbow - 2 * DELTA2));
+        target[2].y = subjectHeight2SA - subjectUALength * Mathf.Cos(Mathf.Deg2Rad * qShoulder) - subjectFALength * Mathf.Cos(Mathf.Deg2Rad * (qShoulder + qElbow - 4 * DELTA2));
         target[2].z = 0.0f;
-
+        */
         return target;
     
     }
@@ -240,22 +249,24 @@ public class BottleGridManager : MonoBehaviour
 
     private Vector3[] GenerateChildTargetsMid(float qShoulder, float qElbow)
     {
-        float DELTA = 30;
+        float DELTA = 25f;
 
-        Vector3[] target = new Vector3[3];
+        Vector3[] target = new Vector3[2];
 
         target[0].x = subjectUALength * Mathf.Sin(Mathf.Deg2Rad * qShoulder) + subjectFALength * Mathf.Sin(Mathf.Deg2Rad * (qShoulder + qElbow + DELTA));
         target[0].y = subjectHeight2SA - subjectUALength * Mathf.Cos(Mathf.Deg2Rad * qShoulder) - subjectFALength * Mathf.Cos(Mathf.Deg2Rad * (qShoulder + qElbow + DELTA));
-        target[0].z = 0.0f;
+        target[0].z = sagittalOffset;
 
 
         target[1].x = subjectUALength * Mathf.Sin(Mathf.Deg2Rad * qShoulder) + subjectFALength * Mathf.Sin(Mathf.Deg2Rad * (qShoulder + qElbow + 2 * DELTA));
         target[1].y = subjectHeight2SA - subjectUALength * Mathf.Cos(Mathf.Deg2Rad * qShoulder) - subjectFALength * Mathf.Cos(Mathf.Deg2Rad * (qShoulder + qElbow + 2 * DELTA));
-        target[1].z = 0.0f;
+        target[1].z = sagittalOffset;
 
+        /*
         target[2].x = subjectUALength * Mathf.Sin(Mathf.Deg2Rad * qShoulder) + subjectFALength * Mathf.Sin(Mathf.Deg2Rad * (qShoulder + qElbow + 3 * DELTA));
         target[2].y = subjectHeight2SA - subjectUALength * Mathf.Cos(Mathf.Deg2Rad * qShoulder) - subjectFALength * Mathf.Cos(Mathf.Deg2Rad * (qShoulder + qElbow + 3 * DELTA));
         target[2].z = 0.0f;
+        */
 
         return target;
     }

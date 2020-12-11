@@ -98,6 +98,14 @@ public class CreateNewUserMenu : MonoBehaviour {
         dataSet += 1;
     }
 
+    public void SetShoulderBreadth(string shoulderBreadth)
+    {
+        float f_shoulderBreadth = float.Parse(shoulderBreadth);
+        userData.shoulderBreadth = f_shoulderBreadth;
+        dataSet += 1;
+
+    }
+
     public void SetUserType(Int32 userType)
     {
         if (userType != 4)
@@ -117,7 +125,7 @@ public class CreateNewUserMenu : MonoBehaviour {
     public void CreateUser()
     {
         // Check that all data has been set.
-        if (dataSet < 12)
+        if (dataSet < 13)
             logManager.DisplayInformationOnLog(3.0f, "Not all user information has been set.");
         else if (!userTypeSet)
             logManager.DisplayInformationOnLog(3.0f, "Choose a valid user type.");

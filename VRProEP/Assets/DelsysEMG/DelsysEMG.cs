@@ -257,7 +257,7 @@ public class DelsysEMG
     {
         while (emgStream.DataAvailable)
         {
-            Debug.Log("Data still streaming");
+            //Debug.Log("Data still streaming");
         }// block until all data are recorded
 
         recording = false;

@@ -1,1 +1,1 @@
-{"iterationsPerTarget": 4,"gridCloseDistanceFactor": 0.5,"gridMidDistanceFactor": 1.0,"gridFarDistanceFactor": 1.25,"gridHeightFactor": 0.8}
+{"iterationsPerTarget": 10,"gridCloseDistanceFactor": 0.7,"gridMidDistanceFactor": 0.9,"gridFarDistanceFactor": 1.2,"gridHeightFactor": 0.8}
