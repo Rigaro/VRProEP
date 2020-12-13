@@ -633,7 +633,7 @@ public class SeparabilityExperiment2020GM : GameMaster
         HudManager.colour = HUDManager.HUDColour.Green;
         HudManager.colour = HUDManager.HUDColour.Green;
        
-        yield return new WaitForSecondsRealtime(1.0f);
+        yield return new WaitForSecondsRealtime(2.0f);
         taskComplete = true;
     }
 

@@ -265,14 +265,14 @@ public class DelsysEMG
         Debug.Log("Delsys-> " + emgDataList[0].Count + " samples recorded.");
 
         //Write header to file
-        string header = "Time,";
+        string header = "t,";
 
         for (int i = 0; i < 16; i++) //emgDataList will contain the most samples
         {
             //Write sensors values
             if (_sensors[i] == SensorTypes.SensorTrignoImu)
             {
-                header += "No. " + (i+1).ToString() +",";
+                header += "ch" + (i+1).ToString() +",";
             }
         }
         csvEMG.Append(header);
