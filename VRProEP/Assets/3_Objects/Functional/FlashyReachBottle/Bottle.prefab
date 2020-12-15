@@ -124,5 +124,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   xOffest: 0.035
-  yOffest: -0.04
+  yOffest: -0.065
   zOffest: 0.01
