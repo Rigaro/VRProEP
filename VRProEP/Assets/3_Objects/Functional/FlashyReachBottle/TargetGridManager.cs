@@ -4,22 +4,32 @@ using UnityEngine;
 using VRProEP.GameEngineCore;
 
 
-public class BottleGridManager : MonoBehaviour
+public class TargetGridManager : MonoBehaviour
 {
     // Config variables
+    public enum TargetType { Bottle, Ball}
 
     [Header("Objects")]
     [SerializeField]
     private GameObject reachBottlePrefab;
     [SerializeField]
+    private GameObject reachBallPrefab;
+    [SerializeField]
     private GameObject bottleInHand;
+
+    [Header("Use which prefab")]
+    [SerializeField]
+    private TargetType targetType;
+
 
     // Bottle list
     private List<ReachBottleManager> bottles = new List<ReachBottleManager>();// List of bottles
+    private List<TouchyBallManager> balls = new List<TouchyBallManager>(); // List of balls
+
 
     // Postion of rotations of the bottles in the grid
-    private List<Vector3> bottlePositions = new List<Vector3>();// List of the bottle postions
-    private List<Vector3> bottleRotations = new List<Vector3>();// List of the bottle rotations
+    private List<Vector3> targetPositions = new List<Vector3>();// List of the bottle postions
+    private List<Vector3> targetRotations = new List<Vector3>();// List of the bottle rotations
     private float gridCloseDistanceFactor = 0.75f;
     private float gridMidDistanceFactor = 1.0f;
     private float gridFarDistanceFactor = 1.5f;
@@ -42,7 +52,7 @@ public class BottleGridManager : MonoBehaviour
 
     // Accessor
     public bool SelectedTouched { get => selectedTouched; }
-    public int TargetBottleNumber { get => bottles.Count; }
+    public int TargetNumber { get => Mathf.Max(bottles.Count,balls.Count); }
 
     /*
     public float SubjectHeight { set => subjectHeight = value; }
@@ -101,20 +111,16 @@ public class BottleGridManager : MonoBehaviour
 
     void Update()
     {
-        // Debug
-        // Change selected bottle for debug
-       
+        // Debug: Change selected bottle for debug
         
         if (Input.GetKeyDown(KeyCode.F1))
         {
             selectedIndex = selectedIndex + 1;
             if (selectedIndex > bottles.Count-1) selectedIndex = 0;
-            SelectBottle(selectedIndex);
+            SelectTarget(selectedIndex);
 
         }
         
-
-
         // Check if the selected bottle is reached or not
          CheckReached();
         //Debug.Log(selectedTouched);
@@ -131,13 +137,26 @@ public class BottleGridManager : MonoBehaviour
     {
       
         // Check if the selected ball has been touched
+
         if (hasSelected)
         {
-            if (this.bottles[selectedIndex].BottleState == ReachBottleManager.ReachBottleState.Correct)
-                
-                selectedTouched = true;
-            else
-                selectedTouched = false;
+            switch (targetType)
+            {
+                case TargetType.Bottle:
+                    if (this.bottles[selectedIndex].BottleState == ReachBottleManager.ReachBottleState.Correct)
+                        selectedTouched = true;
+                    else
+                        selectedTouched = false;
+                    break;
+
+                case TargetType.Ball:
+                    if (this.balls[selectedIndex].BallState == TouchyBallManager.TouchyBallState.Correct)
+                        selectedTouched = true;
+                    else
+                        selectedTouched = false;
+                    break;
+            }
+            
         }
         //Debug.Log(this.bottles[selectedIndex].BottleState.ToString());
     }
@@ -149,7 +168,7 @@ public class BottleGridManager : MonoBehaviour
     /// </summary>
     /// <param >
     /// <returns 
-    public void GenerateBottleLocations()
+    public void GenerateTargetLocations()
     {
         //
         // Constants
@@ -169,45 +188,44 @@ public class BottleGridManager : MonoBehaviour
 
         //Very Close
 
-        bottlePositions.Add(anchorTargetVeryClose);
+        targetPositions.Add(anchorTargetVeryClose);
 
         // Close
-        bottlePositions.Add(anchorTargetClose);
+        targetPositions.Add(anchorTargetClose);
         
         childTargetClose = GenerateChildTargetsClose(JointAngleAtAnchor(anchorTargetClose)[0], JointAngleAtAnchor(anchorTargetClose)[1]); 
         for (int i = 0; i < childTargetClose.Length; i++)
         {
-            bottlePositions.Add(childTargetClose[i]); // Add child ones
+            targetPositions.Add(childTargetClose[i]); // Add child ones
         }
         
        
 
         // Mid
-        bottlePositions.Add(anchorTargetMid);
+        targetPositions.Add(anchorTargetMid);
         childTargetMid = GenerateChildTargetsMid(JointAngleAtAnchor(anchorTargetMid)[0], JointAngleAtAnchor(anchorTargetMid)[1]);
         for (int i = 0; i < childTargetMid.Length; i++)
         {
-            bottlePositions.Add(childTargetMid[i]); // Add child ones
+            targetPositions.Add(childTargetMid[i]); // Add child ones
         }
         
-       
+       /*
        Debug.Log("Joint angles");
        Debug.Log(JointAngleAtAnchor(anchorTargetMid)[0]);
        Debug.Log(JointAngleAtAnchor(anchorTargetMid)[1]);
-       
+       */
+
         // Far
-        bottlePositions.Add(anchorTargetFar);
-
-
+        targetPositions.Add(anchorTargetFar);
 
         //
         // Rotations
         //
-        bottleRotations.Add(new Vector3(0.0f, 0.0f, 0.0f));
+        targetRotations.Add(new Vector3(0.0f, 0.0f, 0.0f));
 
-        bottleRotations.Add(new Vector3(45.0f, 0.0f, 0.0f));
+        //bottleRotations.Add(new Vector3(45.0f, 0.0f, 0.0f));
 
-        bottleRotations.Add(new Vector3(-45.0f, 0.0f, 0.0f));
+        //bottleRotations.Add(new Vector3(-45.0f, 0.0f, 0.0f));
     }
 
     /// <summary>
@@ -306,19 +324,41 @@ public class BottleGridManager : MonoBehaviour
     /// <returns bool reached>
     public void SpawnBottleGrid()
     {
-        for (int i = 0; i <= bottlePositions.Count-1; i++)
+        for (int i = 0; i <= targetPositions.Count-1; i++)
         {
-            for (int j = 0; j <= bottleRotations.Count-1; j++)
+
+            if (targetType == TargetType.Ball)
             {
                 // Spawn a new bottle with this as parent
-                GameObject bottle = Instantiate(reachBottlePrefab, this.transform);
+                GameObject target = Instantiate(reachBallPrefab, this.transform);
                 // Move the local position of the ball.
-                bottle.transform.localPosition = bottlePositions[i];
-                bottle.transform.Rotate(bottleRotations[j]);
+                target.transform.localPosition = targetPositions[i];
                 // Add bottle to collection
-                ReachBottleManager manager = bottle.GetComponent<ReachBottleManager>();
-                bottles.Add(manager);
-                manager.SetBottlInHand(this.bottleInHand); // Set in hand bottle gameobject 
+                TouchyBallManager manager = target.GetComponent<TouchyBallManager>();
+                balls.Add(manager);
+
+                // Hide the in hand bottle
+                bottleInHand.SetActive(false);
+            }
+
+            // Only bottle will use rotation requirements
+            for (int j = 0; j <= targetRotations.Count-1; j++)
+            {
+
+                if (targetType == TargetType.Bottle)
+                {
+                    // Spawn a new bottle with this as parent
+                    GameObject target = Instantiate(reachBottlePrefab, this.transform);
+                    // Move the local position of the ball.
+                    target.transform.localPosition = targetPositions[i];
+                    target.transform.Rotate(targetRotations[j]);
+                    // Add bottle to collection
+                    ReachBottleManager manager = target.GetComponent<ReachBottleManager>();
+                    bottles.Add(manager);
+                    manager.SetBottlInHand(this.bottleInHand); // Set in hand bottle gameobject 
+                }
+
+                
  
             }
         }
@@ -330,14 +370,23 @@ public class BottleGridManager : MonoBehaviour
     /// </summary>
     /// <param int index>
     /// <returns>
-    public void SelectBottle(int index)
+    public void SelectTarget(int index)
     {
         // Reset previous selections
-        ResetBottleSelection();
+        ResetTargetSelection();
 
         selectedIndex = index;
-        bottles[index].SetSelection();
         
+        switch (targetType)
+        {
+            case TargetType.Bottle:
+                bottles[index].SetSelected();
+                break;
+            case TargetType.Ball:
+                balls[index].SetSelected();
+                break;
+        }
+
         hasSelected = true;
         selectedTouched = false;
     }
@@ -345,12 +394,24 @@ public class BottleGridManager : MonoBehaviour
     /// <summary>
     /// Clears the ball selection
     /// </summary>
-    public void ResetBottleSelection()
+    public void ResetTargetSelection()
     {
-        foreach (ReachBottleManager bottle in bottles)
+        switch (targetType)
         {
-            bottle.ClearSelection();
+            case TargetType.Bottle:
+                foreach (ReachBottleManager bottle in bottles)
+                {
+                    bottle.ClearSelection();
+                }
+                break;
+            case TargetType.Ball:
+                foreach (TouchyBallManager ball in balls)
+                {
+                    ball.ClearSelection();
+                }
+                break;
         }
+               
         hasSelected = false;
         selectedTouched = false;
     }

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6701242334375883130}
   - component: {fileID: 7499521206575350260}
   m_Layer: 0
-  m_Name: BottleGrid
+  m_Name: TargetGrid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45,7 +45,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   reachBottlePrefab: {fileID: 5402829214342902688, guid: 839fbc23337464a41924dcdf052e5fdf,
     type: 3}
-  bottles: []
+  reachBallPrefab: {fileID: 4745927119710796115, guid: eafc0d42657ecd144bd2e855582fc314,
+    type: 3}
   bottleInHand: {fileID: 0}
-  positionTolerance: {x: 0.1, y: 0.1, z: 0.1}
-  rotationTolerance: {x: 5, y: 5, z: 5}

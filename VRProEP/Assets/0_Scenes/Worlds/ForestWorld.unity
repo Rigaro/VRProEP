@@ -1537,6 +1537,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 386990591}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &467681319 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9140484503144454110, guid: 20c0654ad1ca82446ae78e930c556187,
+    type: 3}
+  m_PrefabInstance: {fileID: 1285519619}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1efa888245966f489c87e24e8ef9ba8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &496902363
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4415,6 +4427,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4720915417731872, guid: 20c0654ad1ca82446ae78e930c556187, type: 3}
+      propertyPath: reachBottlePrefab
+      value: 
+      objectReference: {fileID: 5402829214342902688, guid: 839fbc23337464a41924dcdf052e5fdf,
+        type: 3}
     - target: {fileID: 995420446278778647, guid: 20c0654ad1ca82446ae78e930c556187,
         type: 3}
       propertyPath: debug
@@ -4433,6 +4450,16 @@ PrefabInstance:
     - target: {fileID: 995420446278778647, guid: 20c0654ad1ca82446ae78e930c556187,
         type: 3}
       propertyPath: skipInstructions
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 995420446278778647, guid: 20c0654ad1ca82446ae78e930c556187,
+        type: 3}
+      propertyPath: gridManager
+      value: 
+      objectReference: {fileID: 467681319}
+    - target: {fileID: 995420446278778647, guid: 20c0654ad1ca82446ae78e930c556187,
+        type: 3}
+      propertyPath: iterationsPerTarget
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3173896575985748330, guid: 20c0654ad1ca82446ae78e930c556187,
@@ -4533,6 +4560,11 @@ PrefabInstance:
     - target: {fileID: 9025509897340019074, guid: 20c0654ad1ca82446ae78e930c556187,
         type: 3}
       propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9140484503144454110, guid: 20c0654ad1ca82446ae78e930c556187,
+        type: 3}
+      propertyPath: targetType
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

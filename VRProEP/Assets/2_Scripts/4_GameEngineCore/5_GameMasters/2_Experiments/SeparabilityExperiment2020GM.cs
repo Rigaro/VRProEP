@@ -24,7 +24,7 @@ public class SeparabilityExperiment2020GM : GameMaster
     [SerializeField]
     private string ablebodiedDataFormat = "loc,t,aDotE,bDotE,gDotE,aE,bE,gE,xE,yE,zE,aDotUA,bDotUA,gDotUA,aUA,bUA,gUA,xUA,yUA,zUA,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,xHand,yHand,zHand,aHand,bHand,gHand";
     [SerializeField]
-    private BottleGridManager gridManager;
+    private TargetGridManager gridManager;
 
     [Header("Experiment configuration: Start position")]
     [SerializeField]
@@ -76,6 +76,7 @@ public class SeparabilityExperiment2020GM : GameMaster
 
     // Delsys EMG background data collection
     private DelsysEMG delsysEMG = new DelsysEMG();
+    private bool isDelsysConnected = false;
 
     // Target management variables
     private int targetNumber; // The total number of targets
@@ -140,7 +141,7 @@ public class SeparabilityExperiment2020GM : GameMaster
     {
        
         // Override fixed update to start the emg recording when the start performing the task
-        if ( GetCurrentStateName() == State.STATE.PERFORMING_TASK && !emgIsRecording)
+        if ( GetCurrentStateName() == State.STATE.PERFORMING_TASK && !emgIsRecording && isDelsysConnected)
         {
             
             delsysEMG.StartRecording(ConfigEMGFilePath());
@@ -262,8 +263,12 @@ public class SeparabilityExperiment2020GM : GameMaster
         #region Initialize EMG sensors
         //Initialse Delsys EMG sensor
         delsysEMG.Init();
-        delsysEMG.Connect();
-        delsysEMG.StartAcquisition();
+        if(delsysEMG.Connect());
+        {
+            delsysEMG.StartAcquisition();
+            isDelsysConnected = true;
+        }
+            
 
 
         #endregion
@@ -316,15 +321,15 @@ public class SeparabilityExperiment2020GM : GameMaster
 
         #region Spawn bottle grid
         // Spawn the grid
-        gridManager.GenerateBottleLocations();
+        gridManager.GenerateTargetLocations();
         gridManager.SpawnBottleGrid();
-        gridManager.ResetBottleSelection();
+        gridManager.ResetTargetSelection();
         Debug.Log("Spawn the bottle grid!");
         #endregion
 
         #region Iteration settings
         // Set iterations variables for flow control.
-        targetNumber = gridManager.TargetBottleNumber;
+        targetNumber = gridManager.TargetNumber;
         Debug.Log(iterationsPerSession.Count);
 
         for (int i = 0; i < iterationsPerSession.Count; i++)
@@ -560,7 +565,7 @@ public class SeparabilityExperiment2020GM : GameMaster
         // Here you can do stuff like preparing objects/assets, like setting a different colour to the object
 
         // Select target
-        gridManager.SelectBottle(targetOrder[iterationNumber - 1]);
+        gridManager.SelectTarget(targetOrder[iterationNumber - 1]);
 
     }
 
@@ -572,7 +577,7 @@ public class SeparabilityExperiment2020GM : GameMaster
     {
         // If our subject fails, do some resetting. 
         // Clear bottle selection
-        gridManager.ResetBottleSelection();
+        gridManager.ResetTargetSelection();
 
     }
 
@@ -643,11 +648,14 @@ public class SeparabilityExperiment2020GM : GameMaster
     /// </summary>
     public override void HandleTaskCompletion()
     {
-       
+
 
         // Stop EMG reading and save data
-        delsysEMG.StopRecording();
-        emgIsRecording = false;
+        if (isDelsysConnected)
+        {
+            delsysEMG.StopRecording();
+            emgIsRecording = false;
+        }
 
         base.HandleTaskCompletion();
 
@@ -715,8 +723,13 @@ public class SeparabilityExperiment2020GM : GameMaster
     public override void EndExperiment()
     {
         base.EndExperiment();
-        delsysEMG.StopAcquisition();
-        delsysEMG.Close();
+        if (isDelsysConnected)
+        {
+            delsysEMG.StopAcquisition();
+            delsysEMG.Close();
+            isDelsysConnected = false;
+        }
+        
         // You can do your own end of experiment stuff here
     }
 

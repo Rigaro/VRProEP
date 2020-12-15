@@ -109,7 +109,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 3818202620164268974}
+  - {fileID: 5347383071081834320}
   - {fileID: 2751063810298709859}
   - {fileID: 8645427431186587858}
   - {fileID: 7159149178417149295}
@@ -143,7 +143,7 @@ MonoBehaviour:
   trainingPerSession: 01000000
   taskDataFormat: 
   ablebodiedDataFormat: loc,t,aDotE,bDotE,gDotE,aE,bE,gE,xE,yE,zE,aDotUA,bDotUA,gDotUA,aUA,bUA,gUA,xUA,yUA,zUA,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,xHand,yHand,zHand,aHand,bHand,gHand
-  gridManager: {fileID: 4720915417731872}
+  gridManager: {fileID: 9140484503144454110}
   startShoulderAngle: 0
   startElbowAngle: 90
   startTolerance: 5
@@ -340,7 +340,7 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 1174501205756379024}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &7494943504696857300
+--- !u!1001 &1642161262371378730
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -350,7 +350,7 @@ PrefabInstance:
     - target: {fileID: 3896783260280946348, guid: f9ec67302367e7b4bbb4fbde9ab2dbfa,
         type: 3}
       propertyPath: m_Name
-      value: BottleGrid
+      value: TargetGrid
       objectReference: {fileID: 0}
     - target: {fileID: 6701242334375883130, guid: f9ec67302367e7b4bbb4fbde9ab2dbfa,
         type: 3}
@@ -414,17 +414,17 @@ PrefabInstance:
       objectReference: {fileID: 3467666750903069864}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f9ec67302367e7b4bbb4fbde9ab2dbfa, type: 3}
---- !u!4 &3818202620164268974 stripped
+--- !u!4 &5347383071081834320 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6701242334375883130, guid: f9ec67302367e7b4bbb4fbde9ab2dbfa,
     type: 3}
-  m_PrefabInstance: {fileID: 7494943504696857300}
+  m_PrefabInstance: {fileID: 1642161262371378730}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &4720915417731872 stripped
+--- !u!114 &9140484503144454110 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7499521206575350260, guid: f9ec67302367e7b4bbb4fbde9ab2dbfa,
     type: 3}
-  m_PrefabInstance: {fileID: 7494943504696857300}
+  m_PrefabInstance: {fileID: 1642161262371378730}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1

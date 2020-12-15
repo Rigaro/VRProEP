@@ -203,7 +203,7 @@ public class ReachBottleManager : MonoBehaviour
     /// <summary>
     /// Set bottle the selected one.
     /// </summary>
-    public void SetSelection()
+    public void SetSelected()
     {
         if (resetCoroutine != null)
             StopCoroutine(resetCoroutine);
