@@ -53,6 +53,7 @@ public class TargetGridManager : MonoBehaviour
     // Accessor
     public bool SelectedTouched { get => selectedTouched; }
     public int TargetNumber { get => Mathf.Max(bottles.Count,balls.Count); }
+    public TargetType CurrentTargetType { get => targetType; set => targetType = value; }
 
     /*
     public float SubjectHeight { set => subjectHeight = value; }
@@ -162,6 +163,30 @@ public class TargetGridManager : MonoBehaviour
     }
 
     #region public methods
+    /// <summary>
+    /// Add the locations of the grid
+    /// </summary>
+    /// <param >
+    /// <returns 
+    public void AddTargetLocation(Vector3 position)
+    {
+        targetPositions.Add(position);
+
+        
+    }
+
+    /// <summary>
+    /// Add the rotations of the grid
+    /// </summary>
+    /// <param >
+    /// <returns 
+    public void AddTargetRotation(Vector3 rotation)
+    {
+        targetRotations.Add(rotation);
+
+
+    }
+
 
     /// <summary>
     /// Generate the locations of the bottle grid
@@ -322,7 +347,7 @@ public class TargetGridManager : MonoBehaviour
     /// </summary>
     /// <param >
     /// <returns bool reached>
-    public void SpawnBottleGrid()
+    public void SpawnTargetGrid()
     {
         for (int i = 0; i <= targetPositions.Count-1; i++)
         {

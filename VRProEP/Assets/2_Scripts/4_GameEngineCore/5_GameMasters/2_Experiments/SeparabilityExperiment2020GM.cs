@@ -76,10 +76,9 @@ public class SeparabilityExperiment2020GM : GameMaster
 
     // Delsys EMG background data collection
     private DelsysEMG delsysEMG = new DelsysEMG();
-    private bool isDelsysConnected = false;
 
     // Target management variables
-    private int targetNumber; // The total number of targets
+    private int targetNumber = 9; // The total number of targets
     private List<int> targetOrder = new List<int>(); // A list of target indexes ordered for selection over iterations in a session.
 
     // Motion tracking for experiment management and adaptation (check for start position)
@@ -97,10 +96,16 @@ public class SeparabilityExperiment2020GM : GameMaster
     // Lefty subject sign
     private float leftySign = 1.0f;
 
+    //
+    private float[] elbowDesiredPos = { 30, 55, 80 };
+    //private float[] elbowDesiredPos = { 25, 50, 75 };
+
+    private float[] shoulderDesiredPos = { 40, 60, 80};
 
     private class SeparabilityGridReachingConfigurator
     {
         public int iterationsPerTarget = 10;
+        public int sessionNumber = 2;
         public float gridCloseDistanceFactor = 0.75f;
         public float gridMidDistanceFactor = 1.0f;
         public float gridFarDistanceFactor = 1.5f;
@@ -116,7 +121,64 @@ public class SeparabilityExperiment2020GM : GameMaster
         string emgDataFilename = taskDataLogger.ActiveDataPath + "/session_" + sessionNumber + "/i" + "_" + iterationNumber + "EMG.csv";
         return emgDataFilename;
     }
+
+
+    private bool IsAtRightPosition(float qShoudlerRef, float qElbowRef, float tolerance)
+    {
+  
+
+        // Check that upper and lower arms are within the tolerated start position.
+        float qShoulder = leftySign * Mathf.Rad2Deg * (upperArmTracker.GetProcessedData(5) + Mathf.PI); // Offsetting to horizontal position being 0.
+        float qElbow = 0;
+
+        HudManager.colour = HUDManager.HUDColour.Orange;
+        qElbow = Mathf.Rad2Deg * (lowerArmTracker.GetProcessedData(5)) - qShoulder; // Offsetting to horizontal position being 0.
+                                                                                    // The difference to the start position
+        float qSDiff = qShoulder - qShoudlerRef;
+        float qEDiff = qElbow - qElbowRef;
+
+
+        //
+        // Update information displayed for debugging purposes
+        //
+
+
+        //InstructionManager.DisplayText(qShoulder.ToString() + "\n" + qElbow.ToString() + "\n");
+
+        if (Mathf.Abs(qSDiff) < tolerance && Mathf.Abs(qEDiff) < tolerance)
+        {
+            HudManager.colour = HUDManager.HUDColour.Orange;
+            return true;
+        }
+        // Provide instructions when not there yet
+        else
+        {
+
+            string helpText = "";
+            if (qSDiff < 0 && Mathf.Abs(qSDiff) > tolerance)
+                helpText += "UA: ++ (" + qShoulder.ToString("F0") + "/" + qShoudlerRef.ToString("F0") + ").\n";
+            else if (qSDiff > 0 && Mathf.Abs(qSDiff) > tolerance)
+                helpText += "UA: -- (" + qShoulder.ToString("F0") + "/" + qShoudlerRef.ToString("F0") + ").\n";
+            else
+                helpText += "UA: == (" + qShoulder.ToString("F0") + "/" + qShoudlerRef.ToString("F0") + ").\n";
+
+
+            if (qEDiff < 0 && Mathf.Abs(qEDiff) > tolerance)
+                helpText += "LA: ++ (" + qElbow.ToString("F0") + "/" + qElbowRef.ToString("F0") + ").\n";
+            else if (qEDiff > 0 && Mathf.Abs(qEDiff) > tolerance)
+                helpText += "LA: -- (" + qElbow.ToString("F0") + "/" + qElbowRef.ToString("F0") + ").\n"; 
+            else
+                helpText += "LA: == (" + qElbow.ToString("F0") + "/" + qElbowRef.ToString("F0") + ").\n"; 
+            HudManager.DisplayText(helpText);
+            HudManager.colour = HUDManager.HUDColour.Red;
+
+
+            return false;
+        }
+
         
+    }
+
     #endregion
 
 
@@ -141,7 +203,7 @@ public class SeparabilityExperiment2020GM : GameMaster
     {
        
         // Override fixed update to start the emg recording when the start performing the task
-        if ( GetCurrentStateName() == State.STATE.PERFORMING_TASK && !emgIsRecording && isDelsysConnected)
+        if ( GetCurrentStateName() == State.STATE.PERFORMING_TASK && !emgIsRecording)
         {
             
             delsysEMG.StartRecording(ConfigEMGFilePath());
@@ -212,6 +274,11 @@ public class SeparabilityExperiment2020GM : GameMaster
 
         // Load from config file
         iterationsPerTarget = configurator.iterationsPerTarget;
+        for (int i = 0; i < configurator.sessionNumber-1; i++)
+        {
+            iterationsPerSession.Add(0);
+        }
+        
         gridCloseDistanceFactor = configurator.gridCloseDistanceFactor;
         gridMidDistanceFactor = configurator.gridMidDistanceFactor;
         gridFarDistanceFactor = configurator.gridFarDistanceFactor;
@@ -263,13 +330,8 @@ public class SeparabilityExperiment2020GM : GameMaster
         #region Initialize EMG sensors
         //Initialse Delsys EMG sensor
         delsysEMG.Init();
-        if(delsysEMG.Connect());
-        {
-            delsysEMG.StartAcquisition();
-            isDelsysConnected = true;
-        }
-            
-
+        delsysEMG.Connect();
+        delsysEMG.StartAcquisition();
 
         #endregion
 
@@ -319,35 +381,9 @@ public class SeparabilityExperiment2020GM : GameMaster
 
         #endregion
 
-        #region Spawn bottle grid
-        // Spawn the grid
-        gridManager.GenerateTargetLocations();
-        gridManager.SpawnBottleGrid();
-        gridManager.ResetTargetSelection();
-        Debug.Log("Spawn the bottle grid!");
-        #endregion
+        
 
-        #region Iteration settings
-        // Set iterations variables for flow control.
-        targetNumber = gridManager.TargetNumber;
-        Debug.Log(iterationsPerSession.Count);
-
-        for (int i = 0; i < iterationsPerSession.Count; i++)
-        {
-            iterationsPerSession[i] = targetNumber * iterationsPerTarget;
-            
-        }
-           
-
-        // Create the list of target indexes and shuffle it.
-        for (int i = 0; i < targetNumber; i++)
-        {
-            for (int j = 0; j < iterationsPerTarget; j++)
-                targetOrder.Add(i);
-        }
-        targetOrder.Shuffle();
-
-        #endregion
+        
     }
 
     /// <summary>
@@ -369,7 +405,48 @@ public class SeparabilityExperiment2020GM : GameMaster
         yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
 
 
+        //
+        // Hud intro
+        InstructionManager.DisplayText("Alright " + SaveSystem.ActiveUser.name + ", let's show you the ropes." + "\n\n (Press the trigger)");
+        yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+        InstructionManager.DisplayText("Let me introduce you to your assistant, the Heads Up Display (HUD)." + "\n\n (Press the trigger)");
+        yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+        InstructionManager.DisplayText("Say hi!");
+        HudManager.DisplayText("Hi! I'm HUD!" + "\n (Press trigger)");
+        yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+        HudManager.DisplayText("I'm here to help!" + "\n (Press trigger)");
+        yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+        HudManager.DisplayText("Look at the screen.", 3);
+
+        /*
+        //
+        // Generate the targets
+        InstructionManager.DisplayText("First, let's set up the experiment target for you. \n\n (Press the trigger)");
+        yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+
+        InstructionManager.DisplayText("Move your arms to the desired position as shown in the HUD. \n\n HUD: UA - Upper arm, FA - Fore arm; in the bracket (current upper and fore arm angle / the desired one)");
+
+        for (int i = 0; i < shoulderDesiredPos.Length; i++)
+        {
+            for (int j = 0; j < elbowDesiredPos.Length; j++)
+            {
+                if( i % 2 == 0)
+                    yield return new WaitUntil(() => IsAtRightPosition(shoulderDesiredPos[i], elbowDesiredPos[j], 2.0f));
+                else
+                    yield return new WaitUntil(() => IsAtRightPosition(shoulderDesiredPos[i], elbowDesiredPos[elbowDesiredPos.Length-1-j], 2.0f));
+                GameObject[] hand = GameObject.FindGameObjectsWithTag("IndexFingerCollider");
+                //Debug.Log(indexFinger[0].transform.position.ToString("F3"));
+                Vector3 location = Quaternion.Euler(0,this.worldOrientation, 0) * hand[0].transform.position;
+                gridManager.AddTargetLocation(location);
+            }
+        }
+
+        gridManager.AddTargetRotation(new Vector3(0.0f, 0.0f, 0.0f));
+        //gridManager.AddTargetRotation(new Vector3(45.0f, 0.0f, 0.0f));
+       // gridManager.AddTargetRotation(new Vector3(-45.0f, 0.0f, 0.0f));
+
         // Now that you are done, set the flag to indicate we are done.
+        */
         welcomeDone = true;
 
     }
@@ -380,7 +457,35 @@ public class SeparabilityExperiment2020GM : GameMaster
     public override void InitialiseExperiment()
     {
 
-       
+        #region Spawn bottle grid
+        // Spawn the grid
+        gridManager.GenerateTargetLocations();
+        gridManager.SpawnTargetGrid();
+        gridManager.ResetTargetSelection();
+        Debug.Log("Spawn the grid!");
+        #endregion
+
+        #region Iteration settings
+        // Set iterations variables for flow control.
+        targetNumber = gridManager.TargetNumber;
+        //Debug.Log(iterationsPerSession.Count);
+
+        for (int i = 0; i < iterationsPerSession.Count; i++)
+        {
+            iterationsPerSession[i] = targetNumber * iterationsPerTarget;
+
+        }
+
+
+        // Create the list of target indexes and shuffle it.
+        for (int i = 0; i < targetNumber; i++)
+        {
+            for (int j = 0; j < iterationsPerTarget; j++)
+                targetOrder.Add(i);
+        }
+        targetOrder.Shuffle();
+
+        #endregion
     }
 
     /// <summary>
@@ -393,19 +498,11 @@ public class SeparabilityExperiment2020GM : GameMaster
         // First flag that we are in the instructions routine
         instructionsDone = false;
         inInstructions = true;
-
-        /*
         //
-        InstructionManager.DisplayText("These are the isntructions. You can use other conditions to wait, not only the trigger press! e.g. 10 seconds.");
-        HudManager.DisplayText("You can use the HUD too!");
-        yield return new WaitForSecondsRealtime(10.0f); // Wait for some time.
-        //
-        HudManager.DisplayText("And get their attention!", 5.0f);
-        InstructionManager.DisplayText("It's exciting! \n Press the trigger button to continue...");
+        InstructionManager.DisplayText("Alright " + SaveSystem.ActiveUser.name + ", let me explain what we are doing today." + "\n\n (Press the trigger)");
         yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-        */
 
-        yield return new WaitForSeconds(2.0f);
+
 
         // Now that you are done, set the flag to indicate we are done.
         instructionsDone = true;
@@ -427,18 +524,7 @@ public class SeparabilityExperiment2020GM : GameMaster
 
         if (trainingPerSession[sessionNumber - 1] == 1)
         {
-            //
-            // Hud intro
-            InstructionManager.DisplayText("Alright " + SaveSystem.ActiveUser.name + ", let's show you the ropes." + "\n\n (Press the trigger)");
-            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-            InstructionManager.DisplayText("Let me introduce you to your assistant, the Heads Up Display (HUD)." + "\n\n (Press the trigger)");
-            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-            InstructionManager.DisplayText("Say hi!");
-            HudManager.DisplayText("Hi! I'm HUD!" + "\n (Press trigger)");
-            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-            HudManager.DisplayText("I'm here to help!" + "\n (Press trigger)");
-            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-            HudManager.DisplayText("Look at the screen.", 3);
+
             InstructionManager.DisplayText("Let's start training then!" + "\n\n (Press the trigger)");
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
 
@@ -505,55 +591,62 @@ public class SeparabilityExperiment2020GM : GameMaster
     {
         if (checkStartPosition)
         {
-            // You can implement whatever condition you want, maybe touching an object in the virtual world or being in a certain posture.
-            // Check that upper and lower arms are within the tolerated start position.
-            float qShoulder = leftySign * Mathf.Rad2Deg * (upperArmTracker.GetProcessedData(5) + Mathf.PI); // Offsetting to horizontal position being 0.
-            float qElbow = 0;
+            return IsAtRightPosition(startShoulderAngle, startElbowAngle, startTolerance);
+            #region Deprecated, use new method instead
+
+            /*
+              // Check that upper and lower arms are within the tolerated start position.
+              float qShoulder = leftySign * Mathf.Rad2Deg * (upperArmTracker.GetProcessedData(5) + Mathf.PI); // Offsetting to horizontal position being 0.
+              float qElbow = 0;
 
 
-            HudManager.colour = HUDManager.HUDColour.Orange;
-            qElbow = Mathf.Rad2Deg * (lowerArmTracker.GetProcessedData(5)) - qShoulder; // Offsetting to horizontal position being 0.
-            // The difference to the start position
-            float qSDiff = qShoulder - startShoulderAngle;
-            float qEDiff = qElbow - startElbowAngle;
+              HudManager.colour = HUDManager.HUDColour.Orange;
+              qElbow = Mathf.Rad2Deg * (lowerArmTracker.GetProcessedData(5)) - qShoulder; // Offsetting to horizontal position being 0.
+              // The difference to the start position
+              float qSDiff = qShoulder - startShoulderAngle;
+              float qEDiff = qElbow - startElbowAngle;
 
-            //
-            // Update information displayed for debugging purposes
-            //
-
-
-            //InstructionManager.DisplayText(qShoulder.ToString() + "\n" + qElbow.ToString() + "\n");
-
-            if (Mathf.Abs(qSDiff) < startTolerance && Mathf.Abs(qEDiff) < startTolerance)
-            {
-                HudManager.colour = HUDManager.HUDColour.Orange;
-                return true;
-            }
-            // Provide instructions when not there yet
-            else
-            {
-
-                string helpText = "";
-                if (qSDiff < 0 && Mathf.Abs(qSDiff) > startTolerance)
-                    helpText += "UA: ++ (" + qShoulder.ToString("F0") + "/" + startShoulderAngle.ToString("F0") + ").\n";
-                else if (qSDiff > 0 && Mathf.Abs(qSDiff) > startTolerance)
-                    helpText += "UA: -- (" + qShoulder.ToString("F0") + "/" + startShoulderAngle.ToString("F0") + ").\n";
-
-                if (qEDiff < 0 && Mathf.Abs(qEDiff) > startTolerance)
-                    helpText += "LA: ++ (" + qElbow.ToString("F0") + "/" + startElbowAngle.ToString("F0") + ").\n";
-                else if (qEDiff > 0 && Mathf.Abs(qEDiff) > startTolerance)
-                    helpText += "LA: -- (" + qElbow.ToString("F0") + "/" + startElbowAngle.ToString("F0") + ").\n"; ;
-
-                HudManager.DisplayText(helpText);
-                HudManager.colour = HUDManager.HUDColour.Red;
+              //
+              // Update information displayed for debugging purposes
+              //
 
 
-                return false;
-            }
+              //InstructionManager.DisplayText(qShoulder.ToString() + "\n" + qElbow.ToString() + "\n");
 
+              if (Mathf.Abs(qSDiff) < startTolerance && Mathf.Abs(qEDiff) < startTolerance)
+              {
+                  HudManager.colour = HUDManager.HUDColour.Orange;
+                  return true;
+              }
+              // Provide instructions when not there yet
+              else
+              {
+
+                  string helpText = "";
+                  if (qSDiff < 0 && Mathf.Abs(qSDiff) > startTolerance)
+                      helpText += "UA: ++ (" + qShoulder.ToString("F0") + "/" + startShoulderAngle.ToString("F0") + ").\n";
+                  else if (qSDiff > 0 && Mathf.Abs(qSDiff) > startTolerance)
+                      helpText += "UA: -- (" + qShoulder.ToString("F0") + "/" + startShoulderAngle.ToString("F0") + ").\n";
+
+                  if (qEDiff < 0 && Mathf.Abs(qEDiff) > startTolerance)
+                      helpText += "LA: ++ (" + qElbow.ToString("F0") + "/" + startElbowAngle.ToString("F0") + ").\n";
+                  else if (qEDiff > 0 && Mathf.Abs(qEDiff) > startTolerance)
+                      helpText += "LA: -- (" + qElbow.ToString("F0") + "/" + startElbowAngle.ToString("F0") + ").\n"; ;
+
+                  HudManager.DisplayText(helpText);
+                  HudManager.colour = HUDManager.HUDColour.Red;
+
+
+                  return false;
+              }
+              */
+            #endregion
         }
+
         else
             return true;
+
+    
     }
 
     /// <summary>
@@ -651,11 +744,8 @@ public class SeparabilityExperiment2020GM : GameMaster
 
 
         // Stop EMG reading and save data
-        if (isDelsysConnected)
-        {
-            delsysEMG.StopRecording();
-            emgIsRecording = false;
-        }
+        delsysEMG.StopRecording();
+        emgIsRecording = false;
 
         base.HandleTaskCompletion();
 
@@ -680,6 +770,7 @@ public class SeparabilityExperiment2020GM : GameMaster
     /// </summary>
     public override void HandleIterationInitialisation()
     {
+        
         base.HandleIterationInitialisation();
 
     }
@@ -691,7 +782,13 @@ public class SeparabilityExperiment2020GM : GameMaster
     public override bool IsEndOfSession()
     {
         // You can do your own implementation of this
+
+        
+
         return base.IsEndOfSession();
+       
+
+
     }
 
     /// <summary>
@@ -701,6 +798,22 @@ public class SeparabilityExperiment2020GM : GameMaster
     /// </summary>
     public override void HandleSessionInitialisation()
     {
+
+        HudManager.DisplayText("New session");
+        if (gridManager.CurrentTargetType == TargetGridManager.TargetType.Ball)
+        {
+            GameObject[] targets = GameObject.FindGameObjectsWithTag("TouchyBall");
+            foreach (GameObject target in targets)
+            {
+                Destroy(target);
+            }
+
+            gridManager.CurrentTargetType = TargetGridManager.TargetType.Bottle;
+            gridManager.SpawnTargetGrid();
+            gridManager.ResetTargetSelection();
+            Debug.Log("Spawn the grid!");
+        }
+
         base.HandleSessionInitialisation();
 
     }
@@ -723,12 +836,8 @@ public class SeparabilityExperiment2020GM : GameMaster
     public override void EndExperiment()
     {
         base.EndExperiment();
-        if (isDelsysConnected)
-        {
-            delsysEMG.StopAcquisition();
-            delsysEMG.Close();
-            isDelsysConnected = false;
-        }
+        delsysEMG.StopAcquisition();
+        delsysEMG.Close();
         
         // You can do your own end of experiment stuff here
     }

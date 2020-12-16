@@ -136,6 +136,8 @@ public class DelsysEMG
     //Close connection
     public void Close()
     {
+        if (!connected)
+            return;
         //Check if running and display error message if not
         if (running)
         {
@@ -218,9 +220,15 @@ public class DelsysEMG
     //Stop acquisition and write to file
     public void StopAcquisition()
     {
-        running = false;    //no longer running
-                            //Wait for threads to terminate
-        emgThread.Join();
+        if (!connected)
+            return;
+        if (running)
+        {
+            running = false;    //no longer running
+                                //Wait for threads to terminate
+            emgThread.Join();
+        }
+        
 
         //Send stop command to server
         string response = SendCommand(COMMAND_STOP);
@@ -255,6 +263,8 @@ public class DelsysEMG
     //Stop log to csv and output file
     public void StopRecording()
     {
+        if (!connected)
+            return;
         while (emgStream.DataAvailable)
         {
             //Debug.Log("Data still streaming");

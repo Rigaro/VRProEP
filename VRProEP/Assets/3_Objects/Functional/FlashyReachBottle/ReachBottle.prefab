@@ -109,7 +109,7 @@ GameObject:
   - component: {fileID: 659374080838906851}
   m_Layer: 0
   m_Name: ReachBottle
-  m_TagString: Untagged
+  m_TagString: ReachBottle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
