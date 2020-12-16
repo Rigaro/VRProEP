@@ -210,7 +210,6 @@ public class TargetGridManager : MonoBehaviour
         Vector3[] childTargetClose;
         Vector3[] childTargetMid;
 
-
         //Very Close
 
         targetPositions.Add(anchorTargetVeryClose);
@@ -234,12 +233,6 @@ public class TargetGridManager : MonoBehaviour
             targetPositions.Add(childTargetMid[i]); // Add child ones
         }
         
-       /*
-       Debug.Log("Joint angles");
-       Debug.Log(JointAngleAtAnchor(anchorTargetMid)[0]);
-       Debug.Log(JointAngleAtAnchor(anchorTargetMid)[1]);
-       */
-
         // Far
         targetPositions.Add(anchorTargetFar);
 
@@ -247,10 +240,8 @@ public class TargetGridManager : MonoBehaviour
         // Rotations
         //
         targetRotations.Add(new Vector3(0.0f, 0.0f, 0.0f));
-
-        //bottleRotations.Add(new Vector3(45.0f, 0.0f, 0.0f));
-
-        //bottleRotations.Add(new Vector3(-45.0f, 0.0f, 0.0f));
+        //targetRotations.Add(new Vector3(45.0f, 0.0f, 0.0f));
+        //targetRotations.Add(new Vector3(-45.0f, 0.0f, 0.0f));
     }
 
     /// <summary>
@@ -275,11 +266,7 @@ public class TargetGridManager : MonoBehaviour
         target[1].x = subjectUALength * Mathf.Sin(Mathf.Deg2Rad * qShoulder) + subjectFALength * Mathf.Sin(Mathf.Deg2Rad * (qShoulder + qElbow - DELTA2));
         target[1].y = subjectHeight2SA - subjectUALength * Mathf.Cos(Mathf.Deg2Rad * qShoulder) -subjectFALength * Mathf.Cos(Mathf.Deg2Rad * (qShoulder + qElbow - 3*DELTA2));
         target[1].z = sagittalOffset;
-        /*
-        target[2].x = subjectUALength * Mathf.Sin(Mathf.Deg2Rad * qShoulder) + subjectFALength * Mathf.Sin(Mathf.Deg2Rad * (qShoulder + qElbow - 2 * DELTA2));
-        target[2].y = subjectHeight2SA - subjectUALength * Mathf.Cos(Mathf.Deg2Rad * qShoulder) - subjectFALength * Mathf.Cos(Mathf.Deg2Rad * (qShoulder + qElbow - 4 * DELTA2));
-        target[2].z = 0.0f;
-        */
+
         return target;
     
     }
@@ -305,11 +292,6 @@ public class TargetGridManager : MonoBehaviour
         target[1].y = subjectHeight2SA - subjectUALength * Mathf.Cos(Mathf.Deg2Rad * qShoulder) - subjectFALength * Mathf.Cos(Mathf.Deg2Rad * (qShoulder + qElbow + 2 * DELTA));
         target[1].z = sagittalOffset;
 
-        /*
-        target[2].x = subjectUALength * Mathf.Sin(Mathf.Deg2Rad * qShoulder) + subjectFALength * Mathf.Sin(Mathf.Deg2Rad * (qShoulder + qElbow + 3 * DELTA));
-        target[2].y = subjectHeight2SA - subjectUALength * Mathf.Cos(Mathf.Deg2Rad * qShoulder) - subjectFALength * Mathf.Cos(Mathf.Deg2Rad * (qShoulder + qElbow + 3 * DELTA));
-        target[2].z = 0.0f;
-        */
 
         return target;
     }
@@ -362,7 +344,7 @@ public class TargetGridManager : MonoBehaviour
                 TouchyBallManager manager = target.GetComponent<TouchyBallManager>();
                 balls.Add(manager);
 
-                // Hide the in hand bottle
+                // Disable the in hand bottle
                 bottleInHand.SetActive(false);
             }
 
@@ -380,6 +362,9 @@ public class TargetGridManager : MonoBehaviour
                     // Add bottle to collection
                     ReachBottleManager manager = target.GetComponent<ReachBottleManager>();
                     bottles.Add(manager);
+
+                    // Eable the in hand bottle
+                    bottleInHand.SetActive(true);
                     manager.SetBottlInHand(this.bottleInHand); // Set in hand bottle gameobject 
                 }
 

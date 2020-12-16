@@ -397,7 +397,7 @@ public class SeparabilityExperiment2020GM : GameMaster
         welcomeDone = false;
         inWelcome = true;
 
-        HudManager.DisplayText("Look to the top right.");
+        HudManager.DisplayText("Look to the top right. Instructions will be displayed there.");
         InstructionManager.DisplayText("Hi " + SaveSystem.ActiveUser.name + "! Welcome to the virtual world. \n\n (Press the trigger button to continue...)");
         yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
 
@@ -407,9 +407,7 @@ public class SeparabilityExperiment2020GM : GameMaster
 
         //
         // Hud intro
-        InstructionManager.DisplayText("Alright " + SaveSystem.ActiveUser.name + ", let's show you the ropes." + "\n\n (Press the trigger)");
-        yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-        InstructionManager.DisplayText("Let me introduce you to your assistant, the Heads Up Display (HUD)." + "\n\n (Press the trigger)");
+        InstructionManager.DisplayText("Alright " + SaveSystem.ActiveUser.name + ", let me introduce you to your assistant, the Heads Up Display (HUD)." + "\n\n (Press the trigger)");
         yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
         InstructionManager.DisplayText("Say hi!");
         HudManager.DisplayText("Hi! I'm HUD!" + "\n (Press trigger)");
@@ -418,35 +416,54 @@ public class SeparabilityExperiment2020GM : GameMaster
         yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
         HudManager.DisplayText("Look at the screen.", 3);
 
+
+        //
+        // Experiment overall intro
+        InstructionManager.DisplayText("Alright " + SaveSystem.ActiveUser.name + ", let me explain what we are doing today." + "\n\n (Press the trigger)");
+        yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+        InstructionManager.DisplayText("Today, the experiment will require you to reach to the targets in front of you." + "\n\n (Press the trigger)");
+        yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+        InstructionManager.DisplayText("You will do 2 sessions and each contains 90 iterations." + "\n\n (Press the trigger)");
+        yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+        InstructionManager.DisplayText("A 60 sec rest occurs every 60 iterations" + "\n\n (Press the trigger)");
+        yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+
+
         /*
         //
         // Generate the targets
-        InstructionManager.DisplayText("First, let's set up the experiment target for you. \n\n (Press the trigger)");
+  
+        InstructionManager.DisplayText("First, let's set up the experiment targets set for you. \n\n (Press the trigger)");
         yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
 
-        InstructionManager.DisplayText("Move your arms to the desired position as shown in the HUD. \n\n HUD: UA - Upper arm, FA - Fore arm; in the bracket (current upper and fore arm angle / the desired one)");
+        InstructionManager.DisplayText("Naturally extend your arms to the desired joint positions as shown on the HUD. \n\n Format: UA - Upper arm, FA - Fore arm; in the bracket (current upper and fore arm angle / the desired one)");
 
         for (int i = 0; i < shoulderDesiredPos.Length; i++)
         {
             for (int j = 0; j < elbowDesiredPos.Length; j++)
             {
-                if( i % 2 == 0)
-                    yield return new WaitUntil(() => IsAtRightPosition(shoulderDesiredPos[i], elbowDesiredPos[j], 2.0f));
-                else
-                    yield return new WaitUntil(() => IsAtRightPosition(shoulderDesiredPos[i], elbowDesiredPos[elbowDesiredPos.Length-1-j], 2.0f));
-                GameObject[] hand = GameObject.FindGameObjectsWithTag("IndexFingerCollider");
+                yield return new WaitUntil(() => IsAtRightPosition(shoulderDesiredPos[i], elbowDesiredPos[j], 2.0f));
+
+                
+                //if ( i % 2 == 0)
+                    //yield return new WaitUntil(() => IsAtRightPosition(shoulderDesiredPos[i], elbowDesiredPos[j], 2.0f));
+                //else
+                    //yield return new WaitUntil(() => IsAtRightPosition(shoulderDesiredPos[i], elbowDesiredPos[elbowDesiredPos.Length-1-j], 2.0f));
+                
+        GameObject[] hand = GameObject.FindGameObjectsWithTag("IndexFingerCollider");
                 //Debug.Log(indexFinger[0].transform.position.ToString("F3"));
-                Vector3 location = Quaternion.Euler(0,this.worldOrientation, 0) * hand[0].transform.position;
+                Vector3 location = Quaternion.Euler(0,this.worldOrientation, 0) * hand[0].transform.position; // Add the index finger location
                 gridManager.AddTargetLocation(location);
             }
         }
 
         gridManager.AddTargetRotation(new Vector3(0.0f, 0.0f, 0.0f));
         //gridManager.AddTargetRotation(new Vector3(45.0f, 0.0f, 0.0f));
-       // gridManager.AddTargetRotation(new Vector3(-45.0f, 0.0f, 0.0f));
+        // gridManager.AddTargetRotation(new Vector3(-45.0f, 0.0f, 0.0f));
+       */
 
         // Now that you are done, set the flag to indicate we are done.
-        */
+        
         welcomeDone = true;
 
     }
@@ -456,8 +473,7 @@ public class SeparabilityExperiment2020GM : GameMaster
     /// </summary>
     public override void InitialiseExperiment()
     {
-
-        #region Spawn bottle grid
+        #region Spawn grid
         // Spawn the grid
         gridManager.GenerateTargetLocations();
         gridManager.SpawnTargetGrid();
@@ -498,9 +514,29 @@ public class SeparabilityExperiment2020GM : GameMaster
         // First flag that we are in the instructions routine
         instructionsDone = false;
         inInstructions = true;
-        //
-        InstructionManager.DisplayText("Alright " + SaveSystem.ActiveUser.name + ", let me explain what we are doing today." + "\n\n (Press the trigger)");
-        yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+
+        //Instructions
+        if (sessionNumber == 1) // first session
+        {
+            InstructionManager.DisplayText("Alright, the sphere targets should have spawned for you." + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            InstructionManager.DisplayText("In the 1st session, you will need to reach to the spheres using your index finger." + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            InstructionManager.DisplayText("If you are ready, let's start training!" + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+
+        }
+        else if (sessionNumber == 2) // second session
+        {
+            InstructionManager.DisplayText("You've finished the 1st session, well done. Let's start the second session" + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            InstructionManager.DisplayText("The sphere targets have been replaced by bottle targets and a bottle has been placed in your hand." + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            InstructionManager.DisplayText("In the 2nd session, you will need to match bothe the target locations and orientations ." + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            InstructionManager.DisplayText("If you are ready, let's start training!" + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+        }
 
 
 
@@ -522,7 +558,7 @@ public class SeparabilityExperiment2020GM : GameMaster
         inTraining = true;
 
 
-        if (trainingPerSession[sessionNumber - 1] == 1)
+        if (sessionNumber == 1)
         {
 
             InstructionManager.DisplayText("Let's start training then!" + "\n\n (Press the trigger)");
@@ -543,6 +579,7 @@ public class SeparabilityExperiment2020GM : GameMaster
             yield return new WaitUntil(() => IsReadyToStart());
             startPosPhoto.SetActive(false);
             HudManager.ClearText();
+
             //
             // HUD Colours
             InstructionManager.DisplayText("The colour of the HUD will tell you what you need to do." + "\n\n (Press the trigger)");
@@ -555,28 +592,101 @@ public class SeparabilityExperiment2020GM : GameMaster
             HudManager.DisplayText("I'm orange!");
             HudManager.colour = HUDManager.HUDColour.Orange;
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-            InstructionManager.DisplayText("Blue for reaching for the target bottle!" + "\n\n (Press the trigger)");
+            InstructionManager.DisplayText("Blue for reaching for the target.!" + "\n\n (Press the trigger)");
             HudManager.DisplayText("I'm blue!");
             HudManager.colour = HUDManager.HUDColour.Blue;
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-            InstructionManager.DisplayText("Green for complete the task." + "\n\n (Press the trigger)");
-            HudManager.DisplayText("I'm green!");
-            HudManager.colour = HUDManager.HUDColour.Green;
-            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-            InstructionManager.DisplayText("You need to hold on for a while until the HUD says Well Done, like" + "\n\n (Press the trigger)");
+            InstructionManager.DisplayText("You need to hold on for a while until the HUD says 'Well Done', like" + "\n\n (Press the trigger)");
+            HudManager.colour = HUDManager.HUDColour.Red;
             HudManager.DisplayText("Well Done");
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
 
             HudManager.ClearText();
             HudManager.colour = HUDManager.HUDColour.Red;
+
+            //
+            // Reaching practice
+            InstructionManager.DisplayText("The colour of the targets will tell you the status of the target." + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            InstructionManager.DisplayText("Blue: the target is selected as the next target." + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            InstructionManager.DisplayText("Green: you have successfully reached the selected one." + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            InstructionManager.DisplayText("Red: you reach to the wrong one." + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            InstructionManager.DisplayText("Ok, let's have a try." + "\n\n (Press the trigger)");
+            HudManager.ClearText();
+            HudManager.colour = HUDManager.HUDColour.Red;
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+
+            //Start practice
+            InstructionManager.DisplayText("The sphere that you need to reach will turn blue." + "\n\n (Press the trigger)");
+            gridManager.SelectTarget(0);
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            InstructionManager.DisplayText("You'll have to wait for a three second countdown. Look at the sphere and get ready!" + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            HudManager.colour = HUDManager.HUDColour.Orange;
+            HUDCountDown(3);
+            yield return new WaitUntil(() => CountdownDone); // And wait 
+            InstructionManager.DisplayText("Reach for it!!");
+            HudManager.DisplayText("Reach for it!!");
+            HudManager.colour = HUDManager.HUDColour.Blue;
+            yield return new WaitUntil(() => IsTaskDone());
+            // Signal the subject that the task is done
+            HudManager.DisplayText("Hold on!");
+            yield return new WaitForSecondsRealtime(1.0f);
+            HudManager.colour = HUDManager.HUDColour.Red;
+            HudManager.DisplayText("Well done (you can return to start position)!");
+            // Reset flags
+            hasReached = false;
+            taskComplete = false;
+            HudManager.DisplayText("You can relax now. Look to the top right.", 3);
+
             //
             // End
-            InstructionManager.DisplayText("Make sure you hold your position until the HUD turns green before moving back to the start position." + "\n\n (Press the trigger)");
+            InstructionManager.DisplayText("Make sure you hold your position until the HUD says 'Well Done' before moving back to the start position." + "\n\n (Press the trigger)");
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
             InstructionManager.DisplayText("Otherwise, you look ready to go! Good luck!" + "\n\n (Press the trigger)");
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
         }
+        if (sessionNumber == 2)
+        {
+            InstructionManager.DisplayText("Let's start training then!" + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
 
+            //
+            // Reaching practice
+            InstructionManager.DisplayText("Everthing is the same except you need to match the orientations." + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            InstructionManager.DisplayText("Ok, let's have a try." + "\n\n (Press the trigger)");
+            HudManager.ClearText();
+            HudManager.colour = HUDManager.HUDColour.Red;
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+
+            //Start practice
+            InstructionManager.DisplayText("The sphere that you need to reach will turn blue." + "\n\n (Press the trigger)");
+            gridManager.SelectTarget(0);
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            InstructionManager.DisplayText("You'll have to wait for a three second countdown. Look at the sphere and get ready!" + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            HudManager.colour = HUDManager.HUDColour.Orange;
+            HUDCountDown(3);
+            yield return new WaitUntil(() => CountdownDone); // And wait 
+            InstructionManager.DisplayText("Reach for it!!");
+            HudManager.DisplayText("Reach for it!!");
+            HudManager.colour = HUDManager.HUDColour.Blue;
+            yield return new WaitUntil(() => IsTaskDone());
+            // Signal the subject that the task is done
+            HudManager.DisplayText("Hold on!");
+            yield return new WaitForSecondsRealtime(1.0f);
+            HudManager.colour = HUDManager.HUDColour.Red;
+            HudManager.DisplayText("Well done (you can return to start position)!");
+            // Reset flags
+            hasReached = false;
+            taskComplete = false;
+            HudManager.DisplayText("You can relax now. Look to the top right.", 3);
+
+        }
 
         // Now that you are done, set the flag to indicate we are done.
         trainingDone = true; 
@@ -727,7 +837,7 @@ public class SeparabilityExperiment2020GM : GameMaster
     {
         hasReached = true;
         // Signal the subject that the task is done
-        HudManager.DisplayText("Hold on!");
+        HudManager.DisplayText("Hold on for a while!");
         HudManager.colour = HUDManager.HUDColour.Green;
         HudManager.colour = HUDManager.HUDColour.Green;
        
@@ -782,13 +892,8 @@ public class SeparabilityExperiment2020GM : GameMaster
     public override bool IsEndOfSession()
     {
         // You can do your own implementation of this
-
-        
-
         return base.IsEndOfSession();
        
-
-
     }
 
     /// <summary>
@@ -799,7 +904,7 @@ public class SeparabilityExperiment2020GM : GameMaster
     public override void HandleSessionInitialisation()
     {
 
-        HudManager.DisplayText("New session");
+        //HudManager.DisplayText("New session");
         if (gridManager.CurrentTargetType == TargetGridManager.TargetType.Ball)
         {
             GameObject[] targets = GameObject.FindGameObjectsWithTag("TouchyBall");

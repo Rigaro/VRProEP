@@ -123,6 +123,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 968b5333fbac20e4a8c318d40b832df5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  xOffest: 0.035
+  xOffest: 0.06
   yOffest: -0.065
   zOffest: 0.01
