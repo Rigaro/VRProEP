@@ -429,26 +429,26 @@ public class SeparabilityExperiment2020GM : GameMaster
         yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
 
 
-        /*
+        
         //
         // Generate the targets
   
         InstructionManager.DisplayText("First, let's set up the experiment targets set for you. \n\n (Press the trigger)");
         yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
 
-        InstructionManager.DisplayText("Naturally extend your arms to the desired joint positions as shown on the HUD. \n\n Format: UA - Upper arm, FA - Fore arm; in the bracket (current upper and fore arm angle / the desired one)");
+        InstructionManager.DisplayText("Extend your arms naturally forward to the desired joint positions as shown on the HUD. \n\n Format: UA - Upper arm, FA - Fore arm; in the bracket (current upper and fore arm angle / the desired one)");
 
         for (int i = 0; i < shoulderDesiredPos.Length; i++)
         {
             for (int j = 0; j < elbowDesiredPos.Length; j++)
             {
-                yield return new WaitUntil(() => IsAtRightPosition(shoulderDesiredPos[i], elbowDesiredPos[j], 2.0f));
+                //yield return new WaitUntil(() => IsAtRightPosition(shoulderDesiredPos[i], elbowDesiredPos[j], 2.0f));
 
                 
-                //if ( i % 2 == 0)
-                    //yield return new WaitUntil(() => IsAtRightPosition(shoulderDesiredPos[i], elbowDesiredPos[j], 2.0f));
-                //else
-                    //yield return new WaitUntil(() => IsAtRightPosition(shoulderDesiredPos[i], elbowDesiredPos[elbowDesiredPos.Length-1-j], 2.0f));
+                if ( i % 2 == 0)
+                    yield return new WaitUntil(() => IsAtRightPosition(shoulderDesiredPos[i], elbowDesiredPos[j], 2.0f));
+                else
+                    yield return new WaitUntil(() => IsAtRightPosition(shoulderDesiredPos[i], elbowDesiredPos[elbowDesiredPos.Length-1-j], 2.0f));
                 
         GameObject[] hand = GameObject.FindGameObjectsWithTag("IndexFingerCollider");
                 //Debug.Log(indexFinger[0].transform.position.ToString("F3"));
@@ -460,7 +460,7 @@ public class SeparabilityExperiment2020GM : GameMaster
         gridManager.AddTargetRotation(new Vector3(0.0f, 0.0f, 0.0f));
         //gridManager.AddTargetRotation(new Vector3(45.0f, 0.0f, 0.0f));
         // gridManager.AddTargetRotation(new Vector3(-45.0f, 0.0f, 0.0f));
-       */
+       
 
         // Now that you are done, set the flag to indicate we are done.
         
@@ -475,7 +475,7 @@ public class SeparabilityExperiment2020GM : GameMaster
     {
         #region Spawn grid
         // Spawn the grid
-        gridManager.GenerateTargetLocations();
+        //gridManager.GenerateTargetLocations();
         gridManager.SpawnTargetGrid();
         gridManager.ResetTargetSelection();
         Debug.Log("Spawn the grid!");
@@ -571,13 +571,13 @@ public class SeparabilityExperiment2020GM : GameMaster
 
             //
             // Start position
-            InstructionManager.DisplayText("Your upper arm should be relaxed pointing downards (0 degree) while your elbow should be bent 90 degrees." + "\n\n (Press the trigger)");
+            InstructionManager.DisplayText("Your upper arm and elbow should be relaxed pointing downards." + "\n\n (Press the trigger)");
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-            InstructionManager.DisplayText("Try it. If you are not at the right position , the Hud displays: (current upper and fore arm angle/the desired one)");
-            startPosPhoto.SetActive(true);
-            startPosPhoto.transform.Rotate(new Vector3(0.0f, 90.0f, 0.0f), Space.World);
+            InstructionManager.DisplayText("Try it. The HUD displays: (current upper and fore arm angle/the desired one)");
+            //startPosPhoto.SetActive(true);
+            //startPosPhoto.transform.Rotate(new Vector3(0.0f, 90.0f, 0.0f), Space.World);
             yield return new WaitUntil(() => IsReadyToStart());
-            startPosPhoto.SetActive(false);
+            //startPosPhoto.SetActive(false);
             HudManager.ClearText();
 
             //
@@ -644,7 +644,7 @@ public class SeparabilityExperiment2020GM : GameMaster
 
             //
             // End
-            InstructionManager.DisplayText("Make sure you hold your position until the HUD says 'Well Done' before moving back to the start position." + "\n\n (Press the trigger)");
+            InstructionManager.DisplayText("One more thing, make sure you hold your position until the HUD says 'Well Done' before moving back to the start position." + "\n\n (Press the trigger)");
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
             InstructionManager.DisplayText("Otherwise, you look ready to go! Good luck!" + "\n\n (Press the trigger)");
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
@@ -685,6 +685,13 @@ public class SeparabilityExperiment2020GM : GameMaster
             hasReached = false;
             taskComplete = false;
             HudManager.DisplayText("You can relax now. Look to the top right.", 3);
+
+            //
+            // End
+            InstructionManager.DisplayText("One more thing, make sure you hold your position until the HUD says 'Well Done' before moving back to the start position." + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            InstructionManager.DisplayText("Otherwise, you look ready to go! Good luck!" + "\n\n (Press the trigger)");
+            yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
 
         }
 

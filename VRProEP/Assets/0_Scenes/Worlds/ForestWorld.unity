@@ -4440,7 +4440,7 @@ PrefabInstance:
     - target: {fileID: 995420446278778647, guid: 20c0654ad1ca82446ae78e930c556187,
         type: 3}
       propertyPath: checkStartPosition
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 995420446278778647, guid: 20c0654ad1ca82446ae78e930c556187,
         type: 3}

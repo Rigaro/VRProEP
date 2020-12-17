@@ -138,14 +138,14 @@ MonoBehaviour:
   experimentCenter: {fileID: 8645427431186587858}
   playerOrientation: 0
   restTime: 60
-  restIterations: 300
+  restIterations: 80
   iterationsPerSession: 00000000
   trainingPerSession: 01000000
   taskDataFormat: 
   ablebodiedDataFormat: loc,t,aDotE,bDotE,gDotE,aE,bE,gE,xE,yE,zE,aDotUA,bDotUA,gDotUA,aUA,bUA,gUA,xUA,yUA,zUA,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,xHand,yHand,zHand,aHand,bHand,gHand
   gridManager: {fileID: 9140484503144454110}
   startShoulderAngle: 0
-  startElbowAngle: 90
+  startElbowAngle: 0
   startTolerance: 5
   iterationsPerTarget: 1
   gridCloseDistanceFactor: 0.75
@@ -415,7 +415,7 @@ PrefabInstance:
     - target: {fileID: 7499521206575350260, guid: f9ec67302367e7b4bbb4fbde9ab2dbfa,
         type: 3}
       propertyPath: targetType
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f9ec67302367e7b4bbb4fbde9ab2dbfa, type: 3}
