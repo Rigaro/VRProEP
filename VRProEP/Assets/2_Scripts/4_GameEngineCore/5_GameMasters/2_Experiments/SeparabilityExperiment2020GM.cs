@@ -156,19 +156,19 @@ public class SeparabilityExperiment2020GM : GameMaster
 
             string helpText = "";
             if (qSDiff < 0 && Mathf.Abs(qSDiff) > tolerance)
-                helpText += "UA: ++ (" + qShoulder.ToString("F0") + "/" + qShoudlerRef.ToString("F0") + ").\n";
+                helpText += "SH: up (" + qShoulder.ToString("F0") + "/" + qShoudlerRef.ToString("F0") + ").\n";
             else if (qSDiff > 0 && Mathf.Abs(qSDiff) > tolerance)
-                helpText += "UA: -- (" + qShoulder.ToString("F0") + "/" + qShoudlerRef.ToString("F0") + ").\n";
+                helpText += "SH: down (" + qShoulder.ToString("F0") + "/" + qShoudlerRef.ToString("F0") + ").\n";
             else
-                helpText += "UA: == (" + qShoulder.ToString("F0") + "/" + qShoudlerRef.ToString("F0") + ").\n";
+                helpText += "SH: ok (" + qShoulder.ToString("F0") + "/" + qShoudlerRef.ToString("F0") + ").\n";
 
 
             if (qEDiff < 0 && Mathf.Abs(qEDiff) > tolerance)
-                helpText += "LA: ++ (" + qElbow.ToString("F0") + "/" + qElbowRef.ToString("F0") + ").\n";
+                helpText += "EB: up (" + qElbow.ToString("F0") + "/" + qElbowRef.ToString("F0") + ").\n";
             else if (qEDiff > 0 && Mathf.Abs(qEDiff) > tolerance)
-                helpText += "LA: -- (" + qElbow.ToString("F0") + "/" + qElbowRef.ToString("F0") + ").\n"; 
+                helpText += "EB: down (" + qElbow.ToString("F0") + "/" + qElbowRef.ToString("F0") + ").\n"; 
             else
-                helpText += "LA: == (" + qElbow.ToString("F0") + "/" + qElbowRef.ToString("F0") + ").\n"; 
+                helpText += "EB: ok (" + qElbow.ToString("F0") + "/" + qElbowRef.ToString("F0") + ").\n"; 
             HudManager.DisplayText(helpText);
             HudManager.colour = HUDManager.HUDColour.Red;
 
@@ -425,7 +425,7 @@ public class SeparabilityExperiment2020GM : GameMaster
         yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
         InstructionManager.DisplayText("You will do 2 sessions and each contains 90 iterations." + "\n\n (Press the trigger)");
         yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-        InstructionManager.DisplayText("A 60 sec rest occurs every 60 iterations" + "\n\n (Press the trigger)");
+        InstructionManager.DisplayText("A 60 sec rest occurs every 40 iterations" + "\n\n (Press the trigger)");
         yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
 
 
@@ -433,10 +433,13 @@ public class SeparabilityExperiment2020GM : GameMaster
         //
         // Generate the targets
   
-        InstructionManager.DisplayText("First, let's set up the experiment targets set for you. \n\n (Press the trigger)");
+        InstructionManager.DisplayText("First, let's set up the experiment targets for you. \n\n (Press the trigger)");
         yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
 
-        InstructionManager.DisplayText("Extend your arms naturally forward to the desired joint positions as shown on the HUD. \n\n Format: UA - Upper arm, FA - Fore arm; in the bracket (current upper and fore arm angle / the desired one)");
+        InstructionManager.DisplayText("Extend your arms naturally forward and the desired joint positions will be shown on the HUD. \n\n (Press the trigger)");
+        yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+
+        InstructionManager.DisplayText("HUD Format: SH - Shoulder, EB - Elbow and in the bracket (current joint angle / the desired one)");
 
         for (int i = 0; i < shoulderDesiredPos.Length; i++)
         {
@@ -612,7 +615,7 @@ public class SeparabilityExperiment2020GM : GameMaster
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
             InstructionManager.DisplayText("Green: you have successfully reached the selected one." + "\n\n (Press the trigger)");
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-            InstructionManager.DisplayText("Red: you reach to the wrong one." + "\n\n (Press the trigger)");
+            InstructionManager.DisplayText("Red: you reach to the wrong one. (Don't mind if they turn read when you reaching to the blue target.)" + "\n\n (Press the trigger)");
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
             InstructionManager.DisplayText("Ok, let's have a try." + "\n\n (Press the trigger)");
             HudManager.ClearText();
@@ -621,8 +624,8 @@ public class SeparabilityExperiment2020GM : GameMaster
 
             //Start practice
             InstructionManager.DisplayText("The sphere that you need to reach will turn blue." + "\n\n (Press the trigger)");
-            gridManager.SelectTarget(0);
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            gridManager.SelectTarget(0);
             InstructionManager.DisplayText("You'll have to wait for a three second countdown. Look at the sphere and get ready!" + "\n\n (Press the trigger)");
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
             HudManager.colour = HUDManager.HUDColour.Orange;
@@ -665,8 +668,8 @@ public class SeparabilityExperiment2020GM : GameMaster
 
             //Start practice
             InstructionManager.DisplayText("The sphere that you need to reach will turn blue." + "\n\n (Press the trigger)");
-            gridManager.SelectTarget(0);
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
+            gridManager.SelectTarget(2);
             InstructionManager.DisplayText("You'll have to wait for a three second countdown. Look at the sphere and get ready!" + "\n\n (Press the trigger)");
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
             HudManager.colour = HUDManager.HUDColour.Orange;
