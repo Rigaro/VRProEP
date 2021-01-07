@@ -146,7 +146,7 @@ MonoBehaviour:
   ablebodiedDataFormat: loc,t,aDotE,bDotE,gDotE,aE,bE,gE,xE,yE,zE,aDotUA,bDotUA,gDotUA,aUA,bUA,gUA,xUA,yUA,zUA,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,xHand,yHand,zHand,aHand,bHand,gHand
   gridManager: {fileID: 9140484503144454110}
   startShoulderAngle: 0
-  startElbowAngle: 0
+  startElbowAngle: 5
   startTolerance: 5
   iterationsPerTarget: 1
   gridCloseDistanceFactor: 0.75
@@ -155,8 +155,9 @@ MonoBehaviour:
   gridHeightFactor: 0.5
   checkStartPosition: 1
   startPosPhoto: {fileID: 9025509897340019074}
-  holdAudio: {fileID: 8300000, guid: 520a431cc0f99e7478b4a53a290c28ff, type: 3}
-  returnAudio: {fileID: 8300000, guid: 3cde4d34aa934b545aef79f2da842faf, type: 3}
+  holdAudioClip: {fileID: 8300000, guid: 520a431cc0f99e7478b4a53a290c28ff, type: 3}
+  returnAudioClip: {fileID: 8300000, guid: 3cde4d34aa934b545aef79f2da842faf, type: 3}
+  testAudioClip: {fileID: 8300000, guid: 7298cdd19e7244a4f9a880e0058b5c8c, type: 3}
 --- !u!82 &2421776329618411123
 AudioSource:
   m_ObjectHideFlags: 0

@@ -4445,12 +4445,12 @@ PrefabInstance:
     - target: {fileID: 995420446278778647, guid: 20c0654ad1ca82446ae78e930c556187,
         type: 3}
       propertyPath: skipTraining
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 995420446278778647, guid: 20c0654ad1ca82446ae78e930c556187,
         type: 3}
       propertyPath: skipInstructions
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 995420446278778647, guid: 20c0654ad1ca82446ae78e930c556187,
         type: 3}
@@ -4462,6 +4462,16 @@ PrefabInstance:
       propertyPath: iterationsPerTarget
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 995420446278778647, guid: 20c0654ad1ca82446ae78e930c556187,
+        type: 3}
+      propertyPath: holdAudioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 520a431cc0f99e7478b4a53a290c28ff, type: 3}
+    - target: {fileID: 995420446278778647, guid: 20c0654ad1ca82446ae78e930c556187,
+        type: 3}
+      propertyPath: returnAudioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 3cde4d34aa934b545aef79f2da842faf, type: 3}
     - target: {fileID: 3173896575985748330, guid: 20c0654ad1ca82446ae78e930c556187,
         type: 3}
       propertyPath: m_LocalPosition.x
