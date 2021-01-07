@@ -194,7 +194,7 @@ MonoBehaviour:
   idleColor: {r: 1, g: 1, b: 1, a: 0}
   selectedColor: {r: 0.11347453, g: 0.29153177, b: 0.9622642, a: 0.6313726}
   correctColor: {r: 0.06132078, g: 1, b: 0.44227362, a: 1}
-  wrongColor: {r: 0.9433962, g: 0.07564971, b: 0.07564971, a: 1}
+  wrongColor: {r: 1, g: 0.9858491, b: 0.9858491, a: 0}
 --- !u!65 &2639130513856246488
 BoxCollider:
   m_ObjectHideFlags: 0

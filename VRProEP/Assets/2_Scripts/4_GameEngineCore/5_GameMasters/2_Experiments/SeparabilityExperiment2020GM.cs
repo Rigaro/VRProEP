@@ -72,6 +72,13 @@ public class SeparabilityExperiment2020GM : GameMaster
 
     [SerializeField]
     private GameObject startPosPhoto;
+
+    [SerializeField]
+    private AudioClip holdAudio;
+
+    [SerializeField]
+    private AudioClip returnAudio;
+
     #endregion
 
     // Delsys EMG background data collection
@@ -113,6 +120,8 @@ public class SeparabilityExperiment2020GM : GameMaster
     }
     private SeparabilityGridReachingConfigurator configurator;
 
+    //Audio
+    private AudioSource audioData;
 
     #region Private methods
     private string ConfigEMGFilePath()

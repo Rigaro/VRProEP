@@ -109,4 +109,4 @@ MonoBehaviour:
   idleColour: {r: 1, g: 1, b: 1, a: 0}
   selectedColour: {r: 0, g: 0.38288808, b: 1, a: 0.5882353}
   correctColour: {r: 0, g: 1, b: 0.10700154, a: 1}
-  wrongColour: {r: 1, g: 0, b: 0, a: 1}
+  wrongColour: {r: 0.9716981, g: 0.9487807, b: 0.9487807, a: 0}
