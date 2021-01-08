@@ -146,8 +146,8 @@ MonoBehaviour:
   ablebodiedDataFormat: loc,t,aDotE,bDotE,gDotE,aE,bE,gE,xE,yE,zE,aDotUA,bDotUA,gDotUA,aUA,bUA,gUA,xUA,yUA,zUA,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,xHand,yHand,zHand,aHand,bHand,gHand
   gridManager: {fileID: 9140484503144454110}
   startShoulderAngle: 0
-  startElbowAngle: 5
-  startTolerance: 5
+  startElbowAngle: 10
+  startTolerance: 10
   iterationsPerTarget: 1
   gridCloseDistanceFactor: 0.75
   gridMidDistanceFactor: 1

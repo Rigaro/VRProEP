@@ -421,7 +421,7 @@ public class SeparabilityExperiment2020GM : GameMaster
 
         InstructionManager.DisplayText("Test audio. \n\n (If you can hear the audio, press the trigger button to continue...)");
         audio.loop = true;
-        audio.volume = 0.2f;
+        audio.volume = 0.4f;
         audio.Play();
         
         yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
@@ -631,7 +631,7 @@ public class SeparabilityExperiment2020GM : GameMaster
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
             InstructionManager.DisplayText("The task routine is: first keep your start position for 3 seconds, and HUD will tell you when to go." + "\n\n (Press the trigger)");
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-            InstructionManager.DisplayText("Then reach to the target in <blue>." + "\n\n (Press the trigger)");
+            InstructionManager.DisplayText("Then reach to the target in <blue> using your index finger." + "\n\n (Press the trigger)");
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
             InstructionManager.DisplayText("Finally, when you reach, hold on for a while, until you hear 'Return' and HUD says 'Well done'." + "\n\n (Press the trigger)");
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
@@ -687,8 +687,8 @@ public class SeparabilityExperiment2020GM : GameMaster
             HudManager.colour = HUDManager.HUDColour.Orange;
             HUDCountDown(3);
             yield return new WaitUntil(() => CountdownDone); // And wait 
-            InstructionManager.DisplayText("Reach for it!!");
-            HudManager.DisplayText("Reach for it!!");
+            InstructionManager.DisplayText("Reach for it by index finger!!");
+            HudManager.DisplayText("Reach for it by index finger!!");
             HudManager.colour = HUDManager.HUDColour.Blue;
             yield return new WaitUntil(() => IsTaskDone());
             // Signal the subject that the task is done
