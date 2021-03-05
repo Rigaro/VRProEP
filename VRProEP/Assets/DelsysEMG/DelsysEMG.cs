@@ -272,7 +272,7 @@ public class DelsysEMG
 
         recording = false;
 
-        Debug.Log("Delsys-> " + emgDataList[0].Count + " samples recorded.");
+        Debug.Log("Delsys-> " + emgDataList[1].Count + " samples recorded.");
 
         //Write header to file
         string header = "t,";

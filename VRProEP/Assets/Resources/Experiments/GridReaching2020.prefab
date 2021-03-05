@@ -160,8 +160,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startEnable: 0
   demoMode: 0
-  skipInstructions: 0
-  skipTraining: 0
+  skipInstructions: 1
+  skipTraining: 1
   debug: 0
   debugText: {fileID: 0}
   worldOrientation: -90
@@ -190,6 +190,7 @@ MonoBehaviour:
   theta: 0.5
   ditherAmplitude: 0.05
   optimiserGain: 0.001
+  adaptiveSynergy: 1
   evaluatorType: 0
 --- !u!1001 &5916067502469450487
 PrefabInstance:

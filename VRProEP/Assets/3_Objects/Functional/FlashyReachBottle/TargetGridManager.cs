@@ -52,7 +52,15 @@ public class TargetGridManager : MonoBehaviour
 
     // Accessor
     public bool SelectedTouched { get => selectedTouched; }
-    public int TargetNumber { get => Mathf.Max(bottles.Count,balls.Count); }
+    public int TargetNumber {
+        get
+        {
+            if (targetType == TargetType.Ball)
+                return balls.Count;
+            else
+                return bottles.Count;
+        }
+                             }
     public TargetType CurrentTargetType { get => targetType; set => targetType = value; }
 
     /*
@@ -193,6 +201,8 @@ public class TargetGridManager : MonoBehaviour
     /// </summary>
     /// <param >
     /// <returns 
+    /// 
+    # region Deprecated
     public void GenerateTargetLocations()
     {
         //
@@ -240,8 +250,8 @@ public class TargetGridManager : MonoBehaviour
         // Rotations
         //
         targetRotations.Add(new Vector3(0.0f, 0.0f, 0.0f));
-        //targetRotations.Add(new Vector3(45.0f, 0.0f, 0.0f));
-        //targetRotations.Add(new Vector3(-45.0f, 0.0f, 0.0f));
+        targetRotations.Add(new Vector3(45.0f, 0.0f, 0.0f));
+        targetRotations.Add(new Vector3(-45.0f, 0.0f, 0.0f));
     }
 
     /// <summary>
@@ -296,11 +306,13 @@ public class TargetGridManager : MonoBehaviour
         return target;
     }
 
-        /// <summary>
-        /// Calculate shoulder and elbow angles of anchor position
-        /// </summary>
-        /// <param >
-        /// <returns 
+    #endregion
+
+    /// <summary>
+    /// Calculate shoulder and elbow angles of anchor position
+    /// </summary>
+    /// <param >
+    /// <returns 
     private float[] JointAngleAtAnchor(Vector3 anchorLocation)
     {
         float qShoulder = 0;

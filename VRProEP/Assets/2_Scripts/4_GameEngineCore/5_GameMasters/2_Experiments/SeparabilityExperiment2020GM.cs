@@ -484,8 +484,8 @@ public class SeparabilityExperiment2020GM : GameMaster
         }
 
         gridManager.AddTargetRotation(new Vector3(0.0f, 0.0f, 0.0f));
-        //gridManager.AddTargetRotation(new Vector3(45.0f, 0.0f, 0.0f));
-        // gridManager.AddTargetRotation(new Vector3(-45.0f, 0.0f, 0.0f));
+        gridManager.AddTargetRotation(new Vector3(45.0f, 0.0f, 0.0f));
+        gridManager.AddTargetRotation(new Vector3(-45.0f, 0.0f, 0.0f));
        
 
         // Now that you are done, set the flag to indicate we are done.
@@ -501,7 +501,7 @@ public class SeparabilityExperiment2020GM : GameMaster
     {
         #region Spawn grid
         // Spawn the grid
-        //gridManager.GenerateTargetLocations();
+        //gridManager.CurrentTargetType = TargetGridManager.TargetType.Ball; // Type is the ball
         gridManager.SpawnTargetGrid();
         gridManager.ResetTargetSelection();
         Debug.Log("Spawn the grid!");
@@ -510,14 +510,7 @@ public class SeparabilityExperiment2020GM : GameMaster
         #region Iteration settings
         // Set iterations variables for flow control.
         targetNumber = gridManager.TargetNumber;
-        //Debug.Log(iterationsPerSession.Count);
-
-        for (int i = 0; i < iterationsPerSession.Count; i++)
-        {
-            iterationsPerSession[i] = targetNumber * iterationsPerTarget;
-
-        }
-
+        iterationsPerSession[sessionNumber-1] = targetNumber * iterationsPerTarget;
 
         // Create the list of target indexes and shuffle it.
         for (int i = 0; i < targetNumber; i++)
@@ -997,6 +990,24 @@ public class SeparabilityExperiment2020GM : GameMaster
         }
 
         base.HandleSessionInitialisation();
+
+        #region Iteration settings
+        // Set iterations variables for flow control.
+        targetNumber = gridManager.TargetNumber;
+        iterationsPerSession[sessionNumber-1] = targetNumber * iterationsPerTarget;
+
+
+        // Create the list of target indexes and shuffle it.
+        for (int i = 0; i < targetNumber; i++)
+        {
+            for (int j = 0; j < iterationsPerTarget; j++)
+                targetOrder.Add(i);
+        }
+        targetOrder.Shuffle();
+
+        #endregion
+
+        
 
     }
 
