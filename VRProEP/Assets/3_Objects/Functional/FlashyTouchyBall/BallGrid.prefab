@@ -43,7 +43,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69f15a6c649ecbc46924dbeecee3ff5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  touchyBallPrefab: {fileID: 4745927119710796115, guid: eafc0d42657ecd144bd2e855582fc314,
+  touchyBallPrefab: {fileID: 4745927119710796115, guid: 48d91ca80bb827e47a11e1df822d6c26,
     type: 3}
   rows: 5
   cols: 5

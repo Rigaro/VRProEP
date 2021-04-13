@@ -243,15 +243,25 @@ public class GridReaching2020GM : GameMaster
     /// </summary>
     public override void ConfigureExperiment()
     {
+        
         string expCode = "";
         if (AvatarSystem.AvatarType == AvatarType.AbleBodied)
             expCode = "_A";
         else if (AvatarSystem.AvatarType == AvatarType.Transhumeral)
             expCode = "_P";
 
-        configAsset = Resources.Load<TextAsset>("Experiments/" + ExperimentSystem.ActiveExperimentID + expCode);
+        if (debug)
+            configAsset = Resources.Load<TextAsset>("Experiments/" + this.gameObject.name + expCode);
+        else
+            configAsset = Resources.Load<TextAsset>("Experiments/" + ExperimentSystem.ActiveExperimentID + expCode);
+
+
+       
+
+        
 
         // Convert configuration file to configuration class.
+        
         configurator = JsonUtility.FromJson<GridReachingConfigurator>(configAsset.text);
         // Load data
         gridRows = configurator.gridRows;

@@ -39,8 +39,8 @@ public class SeparabilityExperiment2020GM : GameMaster
 
     [SerializeField]
     [Tooltip("The start angle tolerance in degrees.")]
-    [Range(0.0f, 10.0f)]
-    private float startTolerance = 2.0f;
+    [Range(0.0f, 90.0f)]
+    private float startTolerance = 15.0f;
 
     [Header("Experiment configuration: Reps and Sets")]
     [SerializeField]
@@ -446,9 +446,9 @@ public class SeparabilityExperiment2020GM : GameMaster
         yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
         InstructionManager.DisplayText("Today, the experiment will require you to reach to the targets in front of you." + "\n\n (Press the trigger)");
         yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-        InstructionManager.DisplayText("You will do 2 sessions and each contains 90 iterations." + "\n\n (Press the trigger)");
+        InstructionManager.DisplayText("You will do 2 sessions, 1st 90 iterations and 2nd 270 iterations " + "\n\n (Press the trigger)");
         yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
-        InstructionManager.DisplayText("A 60 sec rest occurs every 40 iterations" + "\n\n (Press the trigger)");
+        InstructionManager.DisplayText("A 60 sec rest occurs every 35 iterations" + "\n\n (Press the trigger)");
         yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
 
 
@@ -516,10 +516,14 @@ public class SeparabilityExperiment2020GM : GameMaster
         for (int i = 0; i < targetNumber; i++)
         {
             for (int j = 0; j < iterationsPerTarget; j++)
+            {
                 targetOrder.Add(i);
+                Debug.Log(targetOrder[targetOrder.Count - 1]);
+            }
+                
         }
         targetOrder.Shuffle();
-
+        
         #endregion
     }
 
@@ -678,7 +682,7 @@ public class SeparabilityExperiment2020GM : GameMaster
             InstructionManager.DisplayText("You'll have to wait for a three second countdown. Look at the sphere and get ready!" + "\n\n (Press the trigger)");
             yield return WaitForSubjectAcknowledgement(); // And wait for the subject to cycle through them.
             HudManager.colour = HUDManager.HUDColour.Orange;
-            HUDCountDown(3);
+            HUDCountDown(1);
             yield return new WaitUntil(() => CountdownDone); // And wait 
             InstructionManager.DisplayText("Reach for it by index finger!!");
             HudManager.DisplayText("Reach for it by index finger!!");
@@ -982,7 +986,9 @@ public class SeparabilityExperiment2020GM : GameMaster
             {
                 Destroy(target);
             }
+            targetOrder.Clear();
 
+            // Generate new grid
             gridManager.CurrentTargetType = TargetGridManager.TargetType.Bottle;
             gridManager.SpawnTargetGrid();
             gridManager.ResetTargetSelection();
@@ -1001,10 +1007,16 @@ public class SeparabilityExperiment2020GM : GameMaster
         for (int i = 0; i < targetNumber; i++)
         {
             for (int j = 0; j < iterationsPerTarget; j++)
+            {
                 targetOrder.Add(i);
-        }
-        targetOrder.Shuffle();
+                Debug.Log(targetOrder[targetOrder.Count-1]);
+            }
+                
 
+        }
+
+        targetOrder.Shuffle();
+        
         #endregion
 
         

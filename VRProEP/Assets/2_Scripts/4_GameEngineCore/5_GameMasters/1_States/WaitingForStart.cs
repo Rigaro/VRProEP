@@ -14,6 +14,7 @@ namespace VRProEP.GameEngineCore
             Countdown
         }
         // Countdown management
+        private int countdownTime = 1;
         private bool counting = false;
         private bool countdownDone = false;
         private Coroutine countdownCoroutine;
@@ -81,7 +82,7 @@ namespace VRProEP.GameEngineCore
                         gm.HudManager.ClearText();
                         gm.StopHUDCountDown();
                         counting = true;
-                        gm.HUDCountDown(3);
+                        gm.HUDCountDown(countdownTime);
                         break;
                     }
                     // COUNTDOWN DONE
