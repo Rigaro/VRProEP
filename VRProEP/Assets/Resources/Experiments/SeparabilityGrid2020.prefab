@@ -148,7 +148,7 @@ MonoBehaviour:
   startShoulderAngle: 10
   startElbowAngle: 10
   startTolerance: 10
-  iterationsPerTarget: 1
+  iterationsPerTarget: 10
   gridCloseDistanceFactor: 0.75
   gridMidDistanceFactor: 1
   gridFarDistanceFactor: 1.5

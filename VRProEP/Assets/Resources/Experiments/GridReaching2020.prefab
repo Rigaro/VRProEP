@@ -160,8 +160,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startEnable: 0
   demoMode: 0
-  skipInstructions: 1
-  skipTraining: 1
+  skipInstructions: 0
+  skipTraining: 0
   debug: 0
   debugText: {fileID: 0}
   worldOrientation: -90
