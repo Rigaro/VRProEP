@@ -124,6 +124,7 @@ namespace VRProEP.ProsthesisCore
                 elbowManager.UpdateState(0, elbowState);
                 isEnabled = inputManager.IsEnabled();
             }
+
         }
 
         /// <summary>
