@@ -19,7 +19,12 @@ using VRProEP.AdaptationCore;
 using VRProEP.Utilities;
 
 public class GridReaching2020GM : GameMaster
-{
+{ 
+    // added by Damian
+    private PyTCPRequester pyTCPRequester;
+    private float[] data = { 1.0f, 1.0f, 1.0f };
+    private float[] terminateData = { 0.0f };
+
     // Here you can place all your Unity (GameObjects or similar)
     #region Unity objects
     //[Header("Experiment configuration: Data format")]
@@ -159,6 +164,56 @@ public class GridReaching2020GM : GameMaster
 
     // Here are all the methods you need to write for your experiment.
     #region GameMaster Inherited Methods
+
+    // Added by Damian
+    //private void Start()
+    //{
+
+        
+
+        //base.Start();
+    //}
+
+    // Added by Damian
+    // Fixed update method to test socket connection with matlab
+    protected override void FixedUpdate()
+    {
+
+        pyTCPRequester = new PyTCPRequester();
+        pyTCPRequester.Start();
+
+        if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            Debug.Log("Terminate client thread");
+            pyTCPRequester.newData(terminateData);
+            pyTCPRequester.Stop();
+        }
+        else if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            Debug.Log("Send new data");
+
+
+            pyTCPRequester.newData(data);
+        }
+        else
+        {
+
+            Debug.Log("Send new data");
+
+
+            pyTCPRequester.newData(data);
+
+            data[1] += 0.01f;
+            data[2] += 0.01f;
+            data[3] += 0.01f;
+        } 
+
+
+
+
+        base.FixedUpdate();
+
+    }
 
     // Place debug stuff here, for when you want to test the experiment directly from the world without 
     // having to load it from the menus.
@@ -760,7 +815,7 @@ public class GridReaching2020GM : GameMaster
     }
 
     /// <summary>
-    /// Handles task data logging which runs on FixedUpdate.
+    /// Handles task data logging which runs on Update.
     /// Logs data from sensors registered in the AvatarSystem and ExperimentSystem by default.
     /// Can be exteded to add more data by implementing an override method in the derived class which first adds data
     /// to the logData string (e.g. logData +=  myDataString + ","), and then calls base.HandleTaskDataLogging().

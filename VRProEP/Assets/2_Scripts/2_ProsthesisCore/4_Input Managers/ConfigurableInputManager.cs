@@ -20,6 +20,8 @@ namespace VRProEP.ProsthesisCore
         public const string CMD_ADD_REFGEN = "CMD_ADD_REFGEN";
         public const string CMD_SET_SYNERGY = "CMD_SET_SYNERGY";
         public const string CMD_SET_REFERENCE = "CMD_SET_REFERENCE";
+        // added by Damian
+        public const string CMD_SET_NN = "CMD_SET_NN";
         public const string VAL_SENSOR_VIVETRACKER = "VAL_SENSOR_VIVETRACKER";
         public const string VAL_SENSOR_VIVECONTROLLER = "VAL_SENSOR_VIVECONTROLLER";
         public const string VAL_SENSOR_OCULUSTOUCH = "VAL_SENSOR_OCULUSTOUCH";
@@ -31,7 +33,9 @@ namespace VRProEP.ProsthesisCore
         public const string VAL_REFGEN_INTEGRATOR = "VAL_REFGEN_INTEGRATOR";
         public const string VAL_REFGEN_POINTGRAD = "VAL_REFGEN_POINTGRAD";
         public const string VAL_REFGEN_EMGPROP = "VAL_REFGEN_EMGPROP";
-        
+        //added by Damian
+        public const string VAL_REFGEN_NN = "VAL_REFGEN_NN";
+
         /// <summary>
         /// Input manager that allows for dynamic customization of sensors and reference generators.
         /// </summary>
@@ -205,6 +209,32 @@ namespace VRProEP.ProsthesisCore
                 return activeGenerator.UpdateReference(channel, input.ToArray());
 
             }
+            //added by Damian
+            // Neural Network reference generator requires multiple sensors.
+            else if (GetActiveReferenceGeneratorType() == ReferenceGeneratorType.ANNReferenceGenerator)
+            {
+                // Save currently active sensor
+                SensorType prevSensorType = activeSensor.GetSensorType();
+                // Get residual limb velocity
+                Configure("CMD_SET_ACTIVE_SENSOR", SensorType.VIVETracker);
+                float qDotShoulder = activeSensor.GetProcessedData(0);
+                // Get enable
+                Configure("CMD_SET_ACTIVE_SENSOR", SensorType.VIVEController);
+                float enableValue = activeSensor.GetProcessedData(1);
+
+                // Combine input
+                float[] input = { qDotShoulder, enableValue };
+                //Debug.Log("The input is: qs = " + Mathf.Rad2Deg * input[0] + ", qe = " + Mathf.Rad2Deg * input[1] + ", qDotS = " + input[2] + ", enable = " + input[3]);
+
+                // Go back to previously active sensor
+                Configure("CMD_SET_ACTIVE_SENSOR", prevSensorType);
+
+                // Update enable
+                isEnabled = activeGenerator.IsEnabled();
+
+                // Generate reference
+                return activeGenerator.UpdateReference(channel, input);
+            }
             else
             {
                 // First read the angular velocity from sensor
@@ -365,6 +395,10 @@ namespace VRProEP.ProsthesisCore
                             break;
                         case VAL_REFGEN_EMGPROP:
                             SetActiveReferenceGenerator(ReferenceGeneratorType.EMGInterface);
+                            break;
+                        // added by Damian    
+                        case VAL_REFGEN_NN:
+                            SetActiveReferenceGenerator(ReferenceGeneratorType.ANNReferenceGenerator);
                             break;
                         default:
                             throw new System.ArgumentException("Invalid value provided.");

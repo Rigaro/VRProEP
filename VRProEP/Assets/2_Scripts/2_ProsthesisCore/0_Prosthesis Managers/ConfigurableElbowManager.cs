@@ -104,11 +104,10 @@ namespace VRProEP.ProsthesisCore
             inputManager.Configure("CMD_ADD_REFGEN", emgRG);
 
             // Add ANN reference generator
-            /*
-            Initiate the ANN reference generator object here
-            Configure the input manager
-            */
-
+            // added by Damian
+            // Add an ANN reference generator (currently just copys EMG reference generator)
+            ANNReferenceGenerator aNN = new ANNReferenceGenerator();
+            inputManager.Configure("CMD_ADD_REFGEN", aNN);
             // Enable
             isConfigured = true;
         }

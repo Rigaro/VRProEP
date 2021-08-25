@@ -44,7 +44,7 @@ public class PyTCPRequester : RunAbleThread
     }
 
     public PyTCPRequester(float[] data)
-    {    
+    {
         this.newData(data);
     }
 
@@ -79,7 +79,7 @@ public class PyTCPRequester : RunAbleThread
             {
                 if (newDataFlag)
                 {
-                    Debug.Log("PyRequester-> Data Sent to Python.");
+                    Debug.Log("MatlabRequester-> Data Sent to Matlab.");
                     client.SendFrame(sendData);
                     newDataFlag = false;
 
@@ -102,7 +102,7 @@ public class PyTCPRequester : RunAbleThread
                         }
 
 
-                        Debug.Log("PyRequester<- Received: " + responseStr);
+                        Debug.Log("MatlabRequester<- Received: " + responseStr);
 
                     }
                 }
