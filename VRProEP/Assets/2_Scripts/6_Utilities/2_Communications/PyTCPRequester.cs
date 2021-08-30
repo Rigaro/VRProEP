@@ -14,6 +14,7 @@ public class PyTCPRequester : RunAbleThread
     private byte[] sendData;
     private byte[] receiveData;
     private bool newDataFlag = false;
+    private float[] parsedResponse = null;
 
     /*
     public byte[] SendData
@@ -84,7 +85,7 @@ public class PyTCPRequester : RunAbleThread
                     newDataFlag = false;
 
                     byte[] response = null;
-                    double[] parsedResponse = null;
+                    parsedResponse = null;
                     bool gotResponse = false;
                     while (Running)
                     {
@@ -102,7 +103,7 @@ public class PyTCPRequester : RunAbleThread
                         }
 
 
-                        Debug.Log("MatlabRequester<- Received: " + responseStr);
+                        //Debug.Log("MatlabRequester<- Received: " + responseStr);
 
                     }
                 }
@@ -114,13 +115,17 @@ public class PyTCPRequester : RunAbleThread
         NetMQConfig.Cleanup(); // this line is needed to prevent unity freeze after one use, not sure why yet
     }
 
-    private double[] parseReceivedData(byte[] receivedData) // From python it's 64 bit float (double)
+    private float[] parseReceivedData(byte[] receivedData) // From python it's 64 bit float (double)
     {
-        double[] floatArray = new double[receivedData.Length / sizeof(double)];
+        float[] floatArray = new float[receivedData.Length / sizeof(float)];
         Buffer.BlockCopy(receivedData, 0, floatArray, 0, receivedData.Length);
 
         return floatArray;
     }
 
+    public float[] getMatlabData()
+    {
+        return parsedResponse;
+    }
 
 }

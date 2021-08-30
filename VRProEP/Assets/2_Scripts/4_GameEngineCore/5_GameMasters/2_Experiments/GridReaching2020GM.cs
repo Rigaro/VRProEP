@@ -25,6 +25,8 @@ public class GridReaching2020GM : GameMaster
     private float[] data = { 1.0f, 1.0f, 1.0f };
     private float[] terminateData = { 0.0f };
 
+
+
     // Here you can place all your Unity (GameObjects or similar)
     #region Unity objects
     //[Header("Experiment configuration: Data format")]
@@ -169,20 +171,19 @@ public class GridReaching2020GM : GameMaster
     //private void Start()
     //{
 
-        
+        //pyTCPRequester = new PyTCPRequester(data);
+        //pyTCPRequester.Start();
 
-        //base.Start();
-    //}
+       // base.Start();
+    // }
 
     // Added by Damian
     // Fixed update method to test socket connection with matlab
     protected override void FixedUpdate()
     {
 
-        pyTCPRequester = new PyTCPRequester();
-        pyTCPRequester.Start();
 
-        if (Input.GetKeyDown(KeyCode.DownArrow))
+        /*if (Input.GetKeyDown(KeyCode.DownArrow))
         {
             Debug.Log("Terminate client thread");
             pyTCPRequester.newData(terminateData);
@@ -206,7 +207,7 @@ public class GridReaching2020GM : GameMaster
             data[1] += 0.01f;
             data[2] += 0.01f;
             data[3] += 0.01f;
-        } 
+        } */
 
 
 
@@ -253,7 +254,9 @@ public class GridReaching2020GM : GameMaster
             // Set the reference generator to jacobian-based.
             //elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
             // Set the reference generator to linear synergy.
-            elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
+
+            // Set the reference generator to neural network (added by Damian
+            elbowManager.ChangeReferenceGenerator("VAL_REFGEN_NN");
             
         }
 
@@ -459,7 +462,7 @@ public class GridReaching2020GM : GameMaster
             elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
             // Set the reference generator to linear synergy.
             elbowManager.ChangeSensor("VAL_SENSOR_VIVETRACKER");
-            elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
+            elbowManager.ChangeReferenceGenerator("VAL_REFGEN_NN");
 
             // Create the personalisation algorithm object
             elbowManager.SetSynergy(theta);

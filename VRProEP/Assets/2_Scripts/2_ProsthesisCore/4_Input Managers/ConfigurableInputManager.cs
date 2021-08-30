@@ -224,6 +224,7 @@ namespace VRProEP.ProsthesisCore
 
                 // Combine input
                 float[] input = { qDotShoulder, enableValue };
+                //float[] input = { Mathf.Deg2Rad * -90.0f, enableValue};
                 //Debug.Log("The input is: qs = " + Mathf.Rad2Deg * input[0] + ", qe = " + Mathf.Rad2Deg * input[1] + ", qDotS = " + input[2] + ", enable = " + input[3]);
 
                 // Go back to previously active sensor
@@ -231,6 +232,8 @@ namespace VRProEP.ProsthesisCore
 
                 // Update enable
                 isEnabled = activeGenerator.IsEnabled();
+
+                //Debug.Log("4");
 
                 // Generate reference
                 return activeGenerator.UpdateReference(channel, input);
@@ -270,10 +273,14 @@ namespace VRProEP.ProsthesisCore
         private void SetLinKinSynergy(int channel, float theta)
         {
             // Check that the active reference generator is of the right type
-            if (GetActiveReferenceGeneratorType() == ReferenceGeneratorType.LinearKinematicSynergy)
+            if (GetActiveReferenceGeneratorType() == ReferenceGeneratorType.ANNReferenceGenerator)
             {
                 // Type cast to be able to access the right method
-                LinearKinematicSynergy typeCastActiveGenerator = (LinearKinematicSynergy)activeGenerator;
+
+                //LinearKinematicSynergy typeCastActiveGenerator = (LinearKinematicSynergy)activeGenerator;
+
+                //added by Damian
+                ANNReferenceGenerator typeCastActiveGenerator = (ANNReferenceGenerator)activeGenerator;
                 typeCastActiveGenerator.UpdateParameter(channel, theta);
             }
             else
@@ -400,6 +407,7 @@ namespace VRProEP.ProsthesisCore
                         case VAL_REFGEN_NN:
                             SetActiveReferenceGenerator(ReferenceGeneratorType.ANNReferenceGenerator);
                             break;
+
                         default:
                             throw new System.ArgumentException("Invalid value provided.");
                     }
