@@ -167,15 +167,7 @@ public class GridReaching2020GM : GameMaster
     // Here are all the methods you need to write for your experiment.
     #region GameMaster Inherited Methods
 
-    // Added by Damian
-    //private void Start()
-    //{
-
-        //pyTCPRequester = new PyTCPRequester(data);
-        //pyTCPRequester.Start();
-
-       // base.Start();
-    // }
+    
 
     // Added by Damian
     // Fixed update method to test socket connection with matlab
@@ -183,32 +175,7 @@ public class GridReaching2020GM : GameMaster
     {
 
 
-        /*if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            Debug.Log("Terminate client thread");
-            pyTCPRequester.newData(terminateData);
-            pyTCPRequester.Stop();
-        }
-        else if (Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            Debug.Log("Send new data");
-
-
-            pyTCPRequester.newData(data);
-        }
-        else
-        {
-
-            Debug.Log("Send new data");
-
-
-            pyTCPRequester.newData(data);
-
-            data[1] += 0.01f;
-            data[2] += 0.01f;
-            data[3] += 0.01f;
-        } */
-
+       
 
 
 
@@ -249,6 +216,12 @@ public class GridReaching2020GM : GameMaster
             AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
             // Initialize prosthesis
             GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+
+
+       
+
+
+
             ConfigurableElbowManager elbowManager = prosthesisManagerGO.AddComponent<ConfigurableElbowManager>();
             elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + SaveSystem.ActiveUser.handLength / 2.0f));
             // Set the reference generator to jacobian-based.
@@ -434,7 +407,8 @@ public class GridReaching2020GM : GameMaster
         // Add arm motion trackers for able-bodied case.
         //
         if (experimentType == ExperimentType.TypeOne)
-        { 
+        {
+            
             // Lower limb motion tracker
             GameObject llMotionTrackerGO = GameObject.FindGameObjectWithTag("ForearmTracker");
             lowerArmTracker = new VIVETrackerManager(llMotionTrackerGO.transform);
@@ -447,14 +421,25 @@ public class GridReaching2020GM : GameMaster
         }
         else if (experimentType == ExperimentType.TypeTwo)
         {
+
+
             // Get active sensors from avatar system and get the vive tracker being used for the UA
-            foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
+            /*foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
             {
                 if (sensor is VIVETrackerManager)
                     upperArmTracker = (VIVETrackerManager)sensor;
             }
             if (upperArmTracker == null)
-                throw new System.NullReferenceException("The residual limb tracker was not found.");
+                throw new System.NullReferenceException("The residual limb tracker was not found.");*/
+
+            
+
+            // Upper limb motion tracker
+            GameObject ulMotionTrackerGO = AvatarSystem.AddMotionTracker();
+            upperArmTracker = new VIVETrackerManager(ulMotionTrackerGO.transform);
+            ExperimentSystem.AddSensor(upperArmTracker);
+
+            
 
             // Set VIVE tracker and Linear synergy as active.
             // Get prosthesis

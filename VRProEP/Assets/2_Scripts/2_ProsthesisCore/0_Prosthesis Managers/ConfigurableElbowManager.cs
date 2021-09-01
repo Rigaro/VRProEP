@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using VRProEP.GameEngineCore;
+using VRProEP.ExperimentCore;
 
 namespace VRProEP.ProsthesisCore
 {
@@ -24,6 +25,7 @@ namespace VRProEP.ProsthesisCore
         private float[] xMax = { Mathf.Deg2Rad * -0.1f };
 
 
+
         /// <summary>
         /// Initializes the Elbow prosthesis with basic functionality.
         /// Must be called only after the avatar is available.
@@ -37,10 +39,36 @@ namespace VRProEP.ProsthesisCore
             GameObject residualLimbTrackerGO = GameObject.FindGameObjectWithTag("ResidualLimbTracker");
             // Create a VIVETracker with the obtained transform
             VIVETrackerManager trackerManager = new VIVETrackerManager(residualLimbTrackerGO.transform);
+
+            // Shoulder acromium head tracker
+            GameObject motionTrackerGO1 = AvatarSystem.AddMotionTracker();
+            VIVETrackerManager shoulderTracker = new VIVETrackerManager(motionTrackerGO1.transform);
+            AvatarSystem.AddActiveSensor(shoulderTracker);
+            //ExperimentSystem.AddSensor(shoulderTracker);
+
+            // C7 tracker
+            GameObject motionTrackerGO2 = AvatarSystem.AddMotionTracker();
+            VIVETrackerManager c7Tracker = new VIVETrackerManager(motionTrackerGO2.transform);
+            AvatarSystem.AddActiveSensor(c7Tracker);
+            //ExperimentSystem.AddSensor(c7Tracker);
+
+
+
+
+            // add trackers
             // Create a basic reference generator: Integrator.
             IntegratorReferenceGenerator integratorRG = new IntegratorReferenceGenerator(xBar, xMin, xMax);
             // Create configurable input manager with the created sensor and RG.
-            inputManager = new ConfigurableInputManager(trackerManager, integratorRG);
+            List<ISensor> sensorList = new List<ISensor>();
+            sensorList.Add(trackerManager);
+            sensorList.Add(shoulderTracker);
+            sensorList.Add(c7Tracker);
+
+            List<IReferenceGenerator> RGList = new List<IReferenceGenerator>();
+
+            RGList.Add(integratorRG);
+            inputManager = new ConfigurableInputManager(sensorList, RGList);
+
 
             //
             // ElbowManager

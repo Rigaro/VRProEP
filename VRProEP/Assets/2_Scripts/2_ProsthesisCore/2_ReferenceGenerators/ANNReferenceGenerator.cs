@@ -47,10 +47,10 @@ namespace VRProEP.ProsthesisCore
 
         public override float UpdateReference(int channel, float[] input) {
 
-            float[] matlab_data = pyTCPRequester.getMatlabData();
+            //float[] matlab_data = pyTCPRequester.getMatlabData();
 
 
-            Debug.Log("MatlabRequester<- Received: " + matlab_data[0]);
+            //Debug.Log("MatlabRequester<- Received: " + matlab_data[0]);
             //Debug.Log("The input is: qs = " + Mathf.Rad2Deg * input[0] + ", qe = " + Mathf.Rad2Deg * input[1] + ", qDotS = " + input[2] + ", enable = " + input[3]);
 
 
@@ -61,22 +61,13 @@ namespace VRProEP.ProsthesisCore
                 pyTCPRequester.Stop();
             }
 
-            else
-            {
-
-                Debug.Log("Send new data");
-
-
-                pyTCPRequester.newData(input);
-
-                
-            }
+            
 
             //Debug.Log(input.Length);
             //Debug.Log(xBar.Length);
 
             // Check validity of the provided channel
-            if (channel >= channelSize)
+            /*if (channel >= channelSize)
                 throw new System.ArgumentOutOfRangeException("The requested channel number is greater than the available number of channels.");
             else if (channel < 0)
                 throw new System.ArgumentOutOfRangeException("The channel number should be greater or equal to 0.");
@@ -84,11 +75,12 @@ namespace VRProEP.ProsthesisCore
             // Check validity of the provided input
             if (!IsInputValid(input))
                 throw new System.ArgumentOutOfRangeException("The length of the parameters does not match the number of reference channels.");
+                */ 
 
             // Extract input
             float qDotShoulder = leftySign * input[0];
             bool enable = false;
-            if (input[1] >= 1.0f)
+            if (input[3] >= 1.0f)
                 enable = true;
 
 
@@ -115,23 +107,37 @@ namespace VRProEP.ProsthesisCore
             // Only update when enabled, otherwise just use the same fixed reference.
             if (isEnabled)
             {
-                xBar[channel] = TestNN(channel, qDotShoulder);
+            
+
+                Debug.Log("Send new data");
+
+
+                pyTCPRequester.newData(input);
+
+
+                
+                xBar[channel] = TestNN(channel);
                 //Debug.Log(Mathf.Rad2Deg * xBar[channel]);
             }
 
 
 
-            Debug.Log(xBar[channel]);
+            //Debug.Log(xBar[channel]);
             return xBar[channel];
 
 
             
         }
 
-        private float TestNN(int channel, float input)
+        private float TestNN(int channel)
         {
             // Calculate reference from 1D synergy.
-            float tempXBar = xBar[channel] + GetParameter(channel) * input * Time.fixedDeltaTime; ;
+            float[] tempXBarArray = pyTCPRequester.getMatlabData();
+
+            float tempXBar = tempXBarArray[0];
+            Debug.Log(tempXBar);
+
+            //float tempXBar = xBar[channel] + GetParameter(channel) * input * Time.fixedDeltaTime; ;
             // Saturate reference
             if (tempXBar > xMax[channel])
                 tempXBar = xMax[channel];

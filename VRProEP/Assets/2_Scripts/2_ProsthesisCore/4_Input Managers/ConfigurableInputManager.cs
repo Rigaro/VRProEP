@@ -36,11 +36,14 @@ namespace VRProEP.ProsthesisCore
         //added by Damian
         public const string VAL_REFGEN_NN = "VAL_REFGEN_NN";
 
+
+
         /// <summary>
         /// Input manager that allows for dynamic customization of sensors and reference generators.
         /// </summary>
         /// <param name="sensor">A sensor to initialize the manager with.</param>
         /// <param name="referenceGenerator">A reference generator to initialize the manager with.</param>
+        
         public ConfigurableInputManager(ISensor sensor, IReferenceGenerator referenceGenerator)
         {
             if (sensor == null)
@@ -71,10 +74,11 @@ namespace VRProEP.ProsthesisCore
             {
                 if (sensor == null)
                     throw new System.ArgumentNullException("The provided sensor object is empty.");
-
+                Debug.Log("test10");
                 AddSensor(sensor);
             }
             // Set the first sensor as active
+            
             activeSensor = sensorList[0];
 
             // Add all ref gens in list.
@@ -97,6 +101,15 @@ namespace VRProEP.ProsthesisCore
         {
             ISensor sensor;
             if (GetSensor(sensorType, out sensor))
+                activeSensor = sensor;
+            else
+                throw new System.ArgumentException("Sensor " + sensorType.ToString() + " unavailable.");
+        }
+
+        private void SetActiveSensor(SensorType sensorType, int num)
+        {
+            ISensor sensor;
+            if (GetSensor(sensorType, num, out sensor))
                 activeSensor = sensor;
             else
                 throw new System.ArgumentException("Sensor " + sensorType.ToString() + " unavailable.");
@@ -213,20 +226,31 @@ namespace VRProEP.ProsthesisCore
             // Neural Network reference generator requires multiple sensors.
             else if (GetActiveReferenceGeneratorType() == ReferenceGeneratorType.ANNReferenceGenerator)
             {
+
+
+                float qDotShoulder_Z = 0.0f;
+                float qDotShoulder_X = 0.0f;
+                float qDotShoulder_Y = 0.0f;
+
                 // Save currently active sensor
                 SensorType prevSensorType = activeSensor.GetSensorType();
+                int[] numarray = { 1, 2, 3 };
                 // Get residual limb velocity
-                Configure("CMD_SET_ACTIVE_SENSOR", SensorType.VIVETracker);
-                float qDotShoulder = activeSensor.GetProcessedData(0);
+                Configure("CMD_SET_ACTIVE_SENSOR", SensorType.VIVETracker, 1);
+                qDotShoulder_Z = activeSensor.GetProcessedData(0);
+                qDotShoulder_X = activeSensor.GetProcessedData(1);
+                qDotShoulder_Y = activeSensor.GetProcessedData(2);
+                Debug.Log("qDotShoulder = " + qDotShoulder_Z + ", " + qDotShoulder_X + ", " + qDotShoulder_Y);
+
+                
+                //Debug.Log(data.Length);
                 // Get enable
                 Configure("CMD_SET_ACTIVE_SENSOR", SensorType.VIVEController);
                 float enableValue = activeSensor.GetProcessedData(1);
 
                 // Combine input
-                float[] input = { qDotShoulder, enableValue };
-                //float[] input = { Mathf.Deg2Rad * -90.0f, enableValue};
-                //Debug.Log("The input is: qs = " + Mathf.Rad2Deg * input[0] + ", qe = " + Mathf.Rad2Deg * input[1] + ", qDotS = " + input[2] + ", enable = " + input[3]);
-
+                float[] input = { qDotShoulder_Z, qDotShoulder_X, qDotShoulder_Y, enableValue };
+                
                 // Go back to previously active sensor
                 Configure("CMD_SET_ACTIVE_SENSOR", prevSensorType);
 
@@ -319,6 +343,62 @@ namespace VRProEP.ProsthesisCore
                 case CMD_SET_ACTIVE_SENSOR:
                     if (value is SensorType)
                         SetActiveSensor(value);
+                    else
+                        throw new System.ArgumentException("Invalid value provided.");
+                    break;
+                case CMD_SET_ACTIVE_REFGEN:
+                    if (value is ReferenceGeneratorType)
+                        SetActiveReferenceGenerator(value);
+                    else
+                        throw new System.ArgumentException("Invalid value provided.");
+                    break;
+                case CMD_SET_SYNERGY:
+                    if (value is float)
+                        SetLinKinSynergy(0, value);
+                    else
+                        throw new System.ArgumentException("Invalid value provided.");
+                    break;
+                case CMD_SET_REFERENCE:
+                    if (value is float)
+                        activeGenerator.SetReference(0, value);
+                    else
+                        throw new System.ArgumentException("Invalid value provided.");
+                    break;
+                /*
+                 * 
+                 * Add commands for removing sensors and reference generators. 
+                 * 
+                 */
+                default:
+                    throw new System.ArgumentException("Invalid command provided.");
+            }
+        }
+
+        public void Configure(string command, dynamic value, int num)
+        {
+            switch (command)
+            {
+                case CMD_ADD_SENSOR:
+                    if (value is ISensor)
+                    {
+                        AddSensor(value);
+                        if (value is EMGWiFiManager)
+                            emgSensorType = SensorType.EMGWiFi;
+                        else if (value is ThalmicMyobandManager)
+                            emgSensorType = SensorType.ThalmicMyo;
+                    }
+                    else
+                        throw new System.ArgumentException("Invalid value provided.");
+                    break;
+                case CMD_ADD_REFGEN:
+                    if (value is IReferenceGenerator)
+                        AddReferenceGenerator(value);
+                    else
+                        throw new System.ArgumentException("Invalid value provided.");
+                    break;
+                case CMD_SET_ACTIVE_SENSOR:
+                    if (value is SensorType)
+                        SetActiveSensor(value, num);
                     else
                         throw new System.ArgumentException("Invalid value provided.");
                     break;
