@@ -28,7 +28,7 @@ namespace VRProEP.ProsthesisCore
         private float leftySign = 1.0f;
 
         private PyTCPRequester pyTCPRequester;
-        private float[] data = { 1.0f, 1.0f, 1.0f };
+        private float[] data = { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
         private float[] terminateData = { 0.0f };
 
 
@@ -63,7 +63,7 @@ namespace VRProEP.ProsthesisCore
 
             
 
-            //Debug.Log(input.Length);
+            //Debug.Log(input[4]);
             //Debug.Log(xBar.Length);
 
             // Check validity of the provided channel
@@ -117,7 +117,7 @@ namespace VRProEP.ProsthesisCore
 
                 
                 xBar[channel] = TestNN(channel);
-                //Debug.Log(Mathf.Rad2Deg * xBar[channel]);
+                Debug.Log(Mathf.Rad2Deg * xBar[channel]);
             }
 
 
@@ -134,8 +134,8 @@ namespace VRProEP.ProsthesisCore
             // Calculate reference from 1D synergy.
             float[] tempXBarArray = pyTCPRequester.getMatlabData();
 
-            float tempXBar = tempXBarArray[0];
-            Debug.Log(tempXBar);
+            float tempXBar = xBar[channel] - GetParameter(channel) * tempXBarArray[0] * Time.fixedDeltaTime;
+            //Debug.Log(tempXBar);
 
             //float tempXBar = xBar[channel] + GetParameter(channel) * input * Time.fixedDeltaTime; ;
             // Saturate reference

@@ -230,7 +230,9 @@ public class GridReaching2020GM : GameMaster
 
             // Set the reference generator to neural network (added by Damian
             elbowManager.ChangeReferenceGenerator("VAL_REFGEN_NN");
-            
+
+            //elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
+
         }
 
     }
@@ -435,9 +437,9 @@ public class GridReaching2020GM : GameMaster
             
 
             // Upper limb motion tracker
-            GameObject ulMotionTrackerGO = AvatarSystem.AddMotionTracker();
+            /*GameObject ulMotionTrackerGO = AvatarSystem.AddMotionTracker();
             upperArmTracker = new VIVETrackerManager(ulMotionTrackerGO.transform);
-            ExperimentSystem.AddSensor(upperArmTracker);
+            ExperimentSystem.AddSensor(upperArmTracker);*/
 
             
 
@@ -448,6 +450,7 @@ public class GridReaching2020GM : GameMaster
             // Set the reference generator to linear synergy.
             elbowManager.ChangeSensor("VAL_SENSOR_VIVETRACKER");
             elbowManager.ChangeReferenceGenerator("VAL_REFGEN_NN");
+            //elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
 
             // Create the personalisation algorithm object
             elbowManager.SetSynergy(theta);
@@ -475,7 +478,7 @@ public class GridReaching2020GM : GameMaster
         }
 
         // Debug?
-        if (!debug)
+        /*if (!debug)
         {
             // Shoulder acromium head tracker
             GameObject motionTrackerGO1 = AvatarSystem.AddMotionTracker();
@@ -485,7 +488,7 @@ public class GridReaching2020GM : GameMaster
             GameObject motionTrackerGO2 = AvatarSystem.AddMotionTracker();
             c7Tracker = new VIVETrackerManager(motionTrackerGO2.transform);
             ExperimentSystem.AddSensor(c7Tracker);
-        }
+        }*/
 
         //
         // Hand tracking sensor

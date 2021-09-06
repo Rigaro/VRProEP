@@ -228,36 +228,77 @@ namespace VRProEP.ProsthesisCore
             {
 
 
-                float qDotShoulder_Z = 0.0f;
-                float qDotShoulder_X = 0.0f;
-                float qDotShoulder_Y = 0.0f;
+                float Z_dot_value = 0.0f;
+                float X_dot_value = 0.0f;
+                float Y_dot_value = 0.0f;
+                float Z_value = 0.0f;
+                float X_value = 0.0f;
+                float Y_value = 0.0f;
+
+                float[] input = new float[16];
 
                 // Save currently active sensor
                 SensorType prevSensorType = activeSensor.GetSensorType();
-                int[] numarray = { 1, 2, 3 };
+                int[] numarray = { 1, 3 };
                 // Get residual limb velocity
-                Configure("CMD_SET_ACTIVE_SENSOR", SensorType.VIVETracker, 1);
-                qDotShoulder_Z = activeSensor.GetProcessedData(0);
-                qDotShoulder_X = activeSensor.GetProcessedData(1);
-                qDotShoulder_Y = activeSensor.GetProcessedData(2);
-                Debug.Log("qDotShoulder = " + qDotShoulder_Z + ", " + qDotShoulder_X + ", " + qDotShoulder_Y);
 
-                
-                //Debug.Log(data.Length);
-                // Get enable
-                Configure("CMD_SET_ACTIVE_SENSOR", SensorType.VIVEController);
-                float enableValue = activeSensor.GetProcessedData(1);
+                foreach (int num in numarray)
+                {
+                    Configure("CMD_SET_ACTIVE_SENSOR", SensorType.VIVETracker, num);
+                    Z_dot_value = activeSensor.GetProcessedData(0);
+                    X_dot_value = activeSensor.GetProcessedData(1);
+                    Y_dot_value = activeSensor.GetProcessedData(2);
 
-                // Combine input
-                float[] input = { qDotShoulder_Z, qDotShoulder_X, qDotShoulder_Y, enableValue };
-                
-                // Go back to previously active sensor
-                Configure("CMD_SET_ACTIVE_SENSOR", prevSensorType);
+                    Z_value = activeSensor.GetProcessedData(3);
+                    X_value = activeSensor.GetProcessedData(4);
+                    Y_value = activeSensor.GetProcessedData(5);
+                    //Debug.Log("qDotShoulder = " + qDotShoulder_Z + ", " + qDotShoulder_X + ", " + qDotShoulder_Y);
 
-                // Update enable
-                isEnabled = activeGenerator.IsEnabled();
 
-                //Debug.Log("4");
+                    //Debug.Log(data.Length);
+                    // Get enable
+                    Configure("CMD_SET_ACTIVE_SENSOR", SensorType.VIVEController);
+                    float enableValue = activeSensor.GetProcessedData(1);
+
+                    // Combine input
+                    if (num == 3)
+                    {
+                        // angular vel
+                        input[0] = Z_dot_value;
+                        input[1] = X_dot_value;
+                        input[2] = Y_dot_value;
+                        input[3] = enableValue;
+
+                        // angular pos
+                        input[4] = Z_value;
+                        input[5] = X_value;
+                        input[6] = Y_value;
+                        input[7] = enableValue;
+                    } else if (num==1) {
+
+                        // angular vel
+                        input[8] = Z_dot_value;
+                        input[9] = X_dot_value;
+                        input[10] = Y_dot_value;
+                        input[11] = enableValue;
+
+                        // angular pos
+                        input[12] = Z_value;
+                        input[13] = X_value;
+                        input[14] = Y_value;
+                        input[15] = enableValue;
+                    }
+
+                    //= { qDotShoulder_Z, qDotShoulder_X, qDotShoulder_Y, enableValue};
+
+                    // Go back to previously active sensor
+                    Configure("CMD_SET_ACTIVE_SENSOR", prevSensorType);
+
+                    // Update enable
+                    isEnabled = activeGenerator.IsEnabled();
+
+                    //Debug.Log("4");
+                }
 
                 // Generate reference
                 return activeGenerator.UpdateReference(channel, input);
@@ -307,6 +348,15 @@ namespace VRProEP.ProsthesisCore
                 ANNReferenceGenerator typeCastActiveGenerator = (ANNReferenceGenerator)activeGenerator;
                 typeCastActiveGenerator.UpdateParameter(channel, theta);
             }
+
+            /*if (GetActiveReferenceGeneratorType() == ReferenceGeneratorType.LinearKinematicSynergy)
+            {
+                // Type cast to be able to access the right method
+
+                LinearKinematicSynergy typeCastActiveGenerator = (LinearKinematicSynergy)activeGenerator;
+                
+                typeCastActiveGenerator.UpdateParameter(channel, theta);
+            }*/
             else
                 throw new System.ArgumentException("Invalid value reference generator. Active RG type: " + GetActiveReferenceGeneratorType());
         }

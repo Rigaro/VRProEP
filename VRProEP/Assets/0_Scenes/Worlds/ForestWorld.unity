@@ -4022,7 +4022,7 @@ PrefabInstance:
     - target: {fileID: 8072093157744520089, guid: 540437a41962c494392435d9a166ad65,
         type: 3}
       propertyPath: demoMode
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8072093157744520089, guid: 540437a41962c494392435d9a166ad65,
         type: 3}
