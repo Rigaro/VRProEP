@@ -40,17 +40,29 @@ namespace VRProEP.ProsthesisCore
             // Create a VIVETracker with the obtained transform
             VIVETrackerManager trackerManager = new VIVETrackerManager(residualLimbTrackerGO.transform);
 
+            // Find ShoulderTracker GameObject and extract its Transform.
+            /*GameObject shoulderTrackerGO = GameObject.FindGameObjectWithTag("shoulderTracker");
+            // Create a VIVETracker with the obtained transform
+            VIVETrackerManager shoulderTracker = new VIVETrackerManager(residualLimbTrackerGO.transform);
+
+            // Find c7Tracker GameObject and extract its Transform.
+            GameObject c7TrackerGO = GameObject.FindGameObjectWithTag("c7Tracker");
+            // Create a VIVETracker with the obtained transform
+            VIVETrackerManager c7Tracker = new VIVETrackerManager(residualLimbTrackerGO.transform);*/
+
+
+
             // Shoulder acromium head tracker
             GameObject motionTrackerGO1 = AvatarSystem.AddMotionTracker();
             VIVETrackerManager shoulderTracker = new VIVETrackerManager(motionTrackerGO1.transform);
             AvatarSystem.AddActiveSensor(shoulderTracker);
-            //ExperimentSystem.AddSensor(shoulderTracker);
+            ExperimentSystem.AddSensor(shoulderTracker);
 
             // C7 tracker
             GameObject motionTrackerGO2 = AvatarSystem.AddMotionTracker();
             VIVETrackerManager c7Tracker = new VIVETrackerManager(motionTrackerGO2.transform);
             AvatarSystem.AddActiveSensor(c7Tracker);
-            //ExperimentSystem.AddSensor(c7Tracker);
+            ExperimentSystem.AddSensor(c7Tracker);
 
 
 
@@ -104,8 +116,13 @@ namespace VRProEP.ProsthesisCore
             // Add joint encoder as sensor for jacobian synergy
             inputManager.Configure("CMD_ADD_SENSOR", virtualEncoder);
 
+            inputManager.Configure("CMD_ADD_SENSOR", shoulderTracker);
+            inputManager.Configure("CMD_ADD_SENSOR", c7Tracker);
+
             // Add the created sensors to the list of available sensors.
             AvatarSystem.AddActiveSensor(trackerManager);
+            //AvatarSystem.AddActiveSensor(shoulderTracker);
+            //AvatarSystem.AddActiveSensor(c7Tracker);
             AvatarSystem.AddActiveSensor(virtualEncoder);
             //AvatarSystem.AddActiveSensor(controllerManager);
 
@@ -117,19 +134,19 @@ namespace VRProEP.ProsthesisCore
             float[] theta = { -synValue };
             float[] thetaMin = { -3.5f };
             float[] thetaMax = { -0.1f };
-            LinearKinematicSynergy linSyn = new LinearKinematicSynergy(xBar, xMin, xMax, theta, thetaMin, thetaMax);
-            inputManager.Configure("CMD_ADD_REFGEN", linSyn);
+            //LinearKinematicSynergy linSyn = new LinearKinematicSynergy(xBar, xMin, xMax, theta, thetaMin, thetaMax);
+            //inputManager.Configure("CMD_ADD_REFGEN", linSyn);
 
             // Add a Jacobian based Kinematic Synergy
-            JacobianSynergy jacSyn = new JacobianSynergy(xBar, xMin, xMax, upperArmLength, lowerArmLength);
-            inputManager.Configure("CMD_ADD_REFGEN", jacSyn);
+            //JacobianSynergy jacSyn = new JacobianSynergy(xBar, xMin, xMax, upperArmLength, lowerArmLength);
+            //inputManager.Configure("CMD_ADD_REFGEN", jacSyn);
 
             // Add an EMG reference generator
-            List<float> emgGains = new List<float>(1);
+            //List<float> emgGains = new List<float>(1);
             // emgGains.Add(1.3f); // single site
-            emgGains.Add(0.015f);
-            EMGInterfaceReferenceGenerator emgRG = new EMGInterfaceReferenceGenerator(xBar, xMin, xMax, emgGains, EMGInterfaceType.dualSiteProportional);
-            inputManager.Configure("CMD_ADD_REFGEN", emgRG);
+            //emgGains.Add(0.015f);
+            //EMGInterfaceReferenceGenerator emgRG = new EMGInterfaceReferenceGenerator(xBar, xMin, xMax, emgGains, EMGInterfaceType.dualSiteProportional);
+            //inputManager.Configure("CMD_ADD_REFGEN", emgRG);
 
             // Add ANN reference generator
             // added by Damian

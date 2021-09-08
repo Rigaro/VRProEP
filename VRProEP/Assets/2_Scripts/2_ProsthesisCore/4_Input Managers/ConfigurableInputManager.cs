@@ -74,12 +74,13 @@ namespace VRProEP.ProsthesisCore
             {
                 if (sensor == null)
                     throw new System.ArgumentNullException("The provided sensor object is empty.");
-                Debug.Log("test10");
+                
                 AddSensor(sensor);
+                Debug.Log("Sensor added");
             }
             // Set the first sensor as active
             
-            activeSensor = sensorList[0];
+            activeSensor = (ISensor)sensorList[0];
 
             // Add all ref gens in list.
             foreach (IReferenceGenerator refGen in referenceGeneratorList)
@@ -248,6 +249,9 @@ namespace VRProEP.ProsthesisCore
                     Z_dot_value = activeSensor.GetProcessedData(0);
                     X_dot_value = activeSensor.GetProcessedData(1);
                     Y_dot_value = activeSensor.GetProcessedData(2);
+                    //Debug.Log(num);
+                
+                        
 
                     Z_value = activeSensor.GetProcessedData(3);
                     X_value = activeSensor.GetProcessedData(4);
@@ -274,6 +278,7 @@ namespace VRProEP.ProsthesisCore
                         input[5] = X_value;
                         input[6] = Y_value;
                         input[7] = enableValue;
+
                     } else if (num==1) {
 
                         // angular vel

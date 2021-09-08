@@ -89,22 +89,30 @@ namespace VRProEP.ProsthesisCore
         private bool TryGetTrackerAngularVelocity(out Vector3 localAngVel)
         {
             // Get VR tracking nodes states
+            //Debug.Log("1");
             InputTracking.GetNodeStates(xrNodes);
+            //Debug.Log("2");
             //
             // Look for Hardware trackers
             //
             // Generate a list with tracker indexes
+            Debug.Log("TotalTrackerNumber = " + totalTrackerNumber.ToString());
             List<float> trackerIndexes = new List<float>(totalTrackerNumber);
             for (int i = 1; i <= totalTrackerNumber; i++)
+            {
                 trackerIndexes.Add(i);
+            }
             // Look for trackers
+            //Debug.Log("3");
             int currentTracker = 1;
             foreach (XRNodeState ns in xrNodes)
             {
+                //Debug.Log(currentTracker);
                 // If a hardware tracker is found, and matches index.
-                //Debug.Log(ns.nodeType.ToString() + " " + currentTracker + " " + trackerIndexes[trackerNumber - 1]);
+                
                 if (ns.nodeType == XRNode.HardwareTracker && currentTracker == (trackerIndexes[trackerNumber - 1]))
                 {
+                    Debug.Log(ns.nodeType.ToString() + " " + currentTracker + " " + trackerIndexes[trackerNumber - 1]);
                     //Debug.Log(currentTracker.ToString());
                     if (ns.TryGetAngularVelocity(out localAngVel))
                         return true;

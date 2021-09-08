@@ -21,9 +21,9 @@ using VRProEP.Utilities;
 public class GridReaching2020GM : GameMaster
 { 
     // added by Damian
-    private PyTCPRequester pyTCPRequester;
+    /*private PyTCPRequester pyTCPRequester;
     private float[] data = { 1.0f, 1.0f, 1.0f };
-    private float[] terminateData = { 0.0f };
+    private float[] terminateData = { 0.0f };*/
 
 
 
@@ -218,11 +218,13 @@ public class GridReaching2020GM : GameMaster
             GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
 
 
-       
 
+            Debug.Log("AWAKE");
 
 
             ConfigurableElbowManager elbowManager = prosthesisManagerGO.AddComponent<ConfigurableElbowManager>();
+
+            
             elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + SaveSystem.ActiveUser.handLength / 2.0f));
             // Set the reference generator to jacobian-based.
             //elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
@@ -355,15 +357,16 @@ public class GridReaching2020GM : GameMaster
         taskDataLogger.AddNewLogFile(sessionNumber, iterationNumber, taskDataFormat); // Add file
 
         // Restart UDP threads
-        foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
+        /*foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
         {
+            Debug.Log("£");
             if (sensor is UDPSensorManager udpSensor)
             {
                 //Debug.Log(wifiSensor.RunThread);
                 udpSensor.StartSensorReading();
                 //Debug.Log(wifiSensor.RunThread);
             }
-        }
+        }*/
 
         // Send the player to the experiment centre position
         TeleportToStartPosition();
@@ -425,28 +428,53 @@ public class GridReaching2020GM : GameMaster
         {
 
 
+            
             // Get active sensors from avatar system and get the vive tracker being used for the UA
-            /*foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
+            foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
             {
+                Debug.Log("sensor found");
                 if (sensor is VIVETrackerManager)
+                {
+
                     upperArmTracker = (VIVETrackerManager)sensor;
+                }
             }
             if (upperArmTracker == null)
-                throw new System.NullReferenceException("The residual limb tracker was not found.");*/
+                throw new System.NullReferenceException("The residual limb tracker was not found.");
 
-            
+
 
             // Upper limb motion tracker
-            /*GameObject ulMotionTrackerGO = AvatarSystem.AddMotionTracker();
+            GameObject ulMotionTrackerGO = AvatarSystem.AddMotionTracker();
             upperArmTracker = new VIVETrackerManager(ulMotionTrackerGO.transform);
-            ExperimentSystem.AddSensor(upperArmTracker);*/
+            ExperimentSystem.AddSensor(upperArmTracker);
 
+            // Shoulder motion tracker
+            /*GameObject shoulderMotionTrackerGO = AvatarSystem.AddMotionTracker();
+            shoulderMotionTrackerGO.tag = "shoulderTracker";
+            shoulderTracker = new VIVETrackerManager(shoulderMotionTrackerGO.transform);
+            ExperimentSystem.AddSensor(shoulderTracker);
+
+            // c7 motion tracker
+            GameObject c7MotionTrackerGO = AvatarSystem.AddMotionTracker();
+            c7MotionTrackerGO.tag = "c7Tracker";
+            c7Tracker = new VIVETrackerManager(c7MotionTrackerGO.transform);
+            ExperimentSystem.AddSensor(c7Tracker);*/
+
+            GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+
+
+            ConfigurableElbowManager elbowManager = prosthesisManagerGO.AddComponent<ConfigurableElbowManager>();
+
+
+            elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + SaveSystem.ActiveUser.handLength / 2.0f));
+            
             
 
             // Set VIVE tracker and Linear synergy as active.
             // Get prosthesis
-            prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
-            elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
+            //prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+            //elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
             // Set the reference generator to linear synergy.
             elbowManager.ChangeSensor("VAL_SENSOR_VIVETRACKER");
             elbowManager.ChangeReferenceGenerator("VAL_REFGEN_NN");
@@ -493,9 +521,11 @@ public class GridReaching2020GM : GameMaster
         //
         // Hand tracking sensor
         //
+
+        /*
         GameObject handGO = GameObject.FindGameObjectWithTag("Hand");
         handTracker = new VirtualPositionTracker(handGO.transform);
-        ExperimentSystem.AddSensor(handTracker);
+        ExperimentSystem.AddSensor(handTracker);*/
 
         // Spawn grid
         gridManager.SpawnGrid(gridRows, gridColumns, gridSpacing);
