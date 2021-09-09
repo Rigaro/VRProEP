@@ -55,14 +55,14 @@ namespace VRProEP.ProsthesisCore
             // Shoulder acromium head tracker
             GameObject motionTrackerGO1 = AvatarSystem.AddMotionTracker();
             VIVETrackerManager shoulderTracker = new VIVETrackerManager(motionTrackerGO1.transform);
-            AvatarSystem.AddActiveSensor(shoulderTracker);
-            ExperimentSystem.AddSensor(shoulderTracker);
+            motionTrackerGO1.tag = "shoulderTracker";
+
 
             // C7 tracker
             GameObject motionTrackerGO2 = AvatarSystem.AddMotionTracker();
             VIVETrackerManager c7Tracker = new VIVETrackerManager(motionTrackerGO2.transform);
-            AvatarSystem.AddActiveSensor(c7Tracker);
-            ExperimentSystem.AddSensor(c7Tracker);
+
+            
 
 
 
@@ -121,11 +121,14 @@ namespace VRProEP.ProsthesisCore
 
             // Add the created sensors to the list of available sensors.
             AvatarSystem.AddActiveSensor(trackerManager);
-            //AvatarSystem.AddActiveSensor(shoulderTracker);
-            //AvatarSystem.AddActiveSensor(c7Tracker);
+            
             AvatarSystem.AddActiveSensor(virtualEncoder);
+            AvatarSystem.AddActiveSensor(shoulderTracker);
+            AvatarSystem.AddActiveSensor(c7Tracker);
             //AvatarSystem.AddActiveSensor(controllerManager);
 
+            //ExperimentSystem.AddSensor(shoulderTracker);
+            //ExperimentSystem.AddSensor(c7Tracker);
 
             //
             // Reference generators

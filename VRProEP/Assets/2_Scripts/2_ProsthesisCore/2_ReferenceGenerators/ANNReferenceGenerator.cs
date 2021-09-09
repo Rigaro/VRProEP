@@ -84,6 +84,8 @@ namespace VRProEP.ProsthesisCore
                 enable = true;
 
 
+            
+
             // Check if requested to enable the synergy
             if (enable && !enableRequested && !isEnabled)
             {
