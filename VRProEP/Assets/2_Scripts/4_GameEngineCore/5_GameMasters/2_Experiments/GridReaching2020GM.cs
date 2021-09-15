@@ -25,7 +25,8 @@ public class GridReaching2020GM : GameMaster
     private float[] data = { 1.0f, 1.0f, 1.0f };
     private float[] terminateData = { 0.0f };*/
 
-
+        
+    public int is_first_time=0;
 
     // Here you can place all your Unity (GameObjects or similar)
     #region Unity objects
@@ -83,7 +84,12 @@ public class GridReaching2020GM : GameMaster
     [SerializeField]
     [Tooltip("The start angle tolerance in degrees.")]
     [Range(0.0f, 10.0f)]
-    private float startTolerance = 2.0f;
+    private float startToleranceG = 5.0f;
+
+    [SerializeField]
+    [Tooltip("The start angle tolerance in degrees.")]
+    [Range(0.0f, 10.0f)]
+    private float startToleranceAB = 5.0f;
 
     [SerializeField]
     private GameObject startPosPhoto;
@@ -102,6 +108,7 @@ public class GridReaching2020GM : GameMaster
     private VIVETrackerManager lowerArmTracker;
     private VIVETrackerManager shoulderTracker;
     private VIVETrackerManager c7Tracker;
+    private VIVEControllerManager handPos;
     private VirtualPositionTracker handTracker;
 
     // Target management variables
@@ -199,7 +206,7 @@ public class GridReaching2020GM : GameMaster
             //
             // Debug able
             //
-            SaveSystem.LoadUserData("DG1997184"); // Load the test/demo user (Mr Demo)
+            SaveSystem.LoadUserData("YH1998169"); // Load the test/demo user (Mr Demo)
             //
             // Debug using able-bodied configuration
             //
@@ -435,18 +442,7 @@ public class GridReaching2020GM : GameMaster
            
 
 
-            // Get active sensors from avatar system and get the vive tracker being used for the UA
-            foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
-            {
-                Debug.Log("sensor found");
-                if (sensor is VIVETrackerManager)
-                {
-
-                    upperArmTracker = (VIVETrackerManager)sensor;
-                }
-            }
-            if (upperArmTracker == null)
-                throw new System.NullReferenceException("The residual limb tracker was not found.");
+           
 
 
 
@@ -477,6 +473,8 @@ public class GridReaching2020GM : GameMaster
             // Get prosthesis
             prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
             elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
+            
+
             // Set the reference generator to linear synergy.
             elbowManager.ChangeSensor("VAL_SENSOR_VIVETRACKER");
             elbowManager.ChangeReferenceGenerator("VAL_REFGEN_NN");
@@ -752,17 +750,53 @@ public class GridReaching2020GM : GameMaster
     /// <returns>True if ready to start.</returns>
     public override bool IsReadyToStart()
     {
+        
+        // Get active sensors from avatar system and get the vive tracker being used for the UA
+        int num = 0;
+        foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
+        {
+            
+            Debug.Log("sensor found");
+            if (sensor is VIVETrackerManager)
+            {
+                Debug.Log(num);
+                if (num==0)
+                {
+                    upperArmTracker = (VIVETrackerManager)sensor;
+                }
+                num++;
+            }
+            else if (sensor is VIVEControllerManager)
+            {
+                handPos = (VIVEControllerManager)sensor;
+            }
+            
+        }
+        /*if (upperArmTracker == null)
+            throw new System.NullReferenceException("The residual limb tracker was not found.");*/
+
         // Check that upper and lower arms are within the tolerated start position.
-        float qShoulder = leftySign * Mathf.Rad2Deg * (upperArmTracker.GetProcessedData(5) + Mathf.PI); // Offsetting to horizontal position being 0.
+        //float qShoulder = leftySign * Mathf.Rad2Deg * (upperArmTracker.GetProcessedData(5) + Mathf.PI); // Offsetting to horizontal position being 0.
+        float qShoulderA = leftySign * (upperArmTracker.GetRawData(3));
+        float qShoulderB = leftySign * (upperArmTracker.GetRawData(4));
+        float qShoulderG = leftySign * (upperArmTracker.GetRawData(5)); // Offsetting to horizontal position being 0.
+
+        float[] xHand = handPos.GetAllProcessedData();
+
+
+        
         float qElbow = 0;
 
         if (experimentType == ExperimentType.TypeOne)
-            qElbow = Mathf.Rad2Deg * (lowerArmTracker.GetProcessedData(5)) - qShoulder; // Offsetting to horizontal position being 0.
+            qElbow = Mathf.Rad2Deg * (lowerArmTracker.GetProcessedData(5)) - qShoulderG; // Offsetting to horizontal position being 0.
         else if (experimentType == ExperimentType.TypeTwo)
             qElbow = -Mathf.Rad2Deg * elbowManager.GetElbowAngle();
-        
+
         // The difference to the start position
-        float qSDiff = qShoulder - startShoulderAngle;
+        //float qSDiff = qShoulder - startShoulderAngle;
+        float qSDiffA = qShoulderA;
+        float qSDiffB = qShoulderB;
+        float qSDiffG = qShoulderG;
         float qEDiff = qElbow - startElbowAngle;
         
         //
@@ -773,7 +807,7 @@ public class GridReaching2020GM : GameMaster
             debugText.text = experimentState.ToString() + "\n";
             if (experimentState == ExperimentState.WaitingForStart)
                 debugText.text += waitState.ToString() + "\n";
-            debugText.text += qShoulder.ToString() + "\n";
+            debugText.text += qShoulderG.ToString() + "\n";
             debugText.text += qElbow.ToString() + "\n";
         }
 
@@ -786,7 +820,7 @@ public class GridReaching2020GM : GameMaster
                 HudManager.centreColour = HUDManager.HUDCentreColour.None;
         }
 
-        if (Mathf.Abs(qSDiff) < startTolerance && Mathf.Abs(qEDiff) < startTolerance)
+        if (Mathf.Abs(qSDiffA) < startToleranceAB && Mathf.Abs(qSDiffB) < startToleranceAB && Mathf.Abs(qSDiffG) < startToleranceG)
         {
             HudManager.colour = HUDManager.HUDColour.Orange;
             return true;
@@ -795,15 +829,25 @@ public class GridReaching2020GM : GameMaster
         else
         {
             string helpText = "";
-            if (qSDiff < 0 && Mathf.Abs(qSDiff) > startTolerance)
-                helpText += "UA: ++.\n";
-            else if (qSDiff > 0 && Mathf.Abs(qSDiff) > startTolerance)
-                helpText += "UA: --.\n";
+            if (qSDiffA < 0 && Mathf.Abs(qSDiffA) > startToleranceAB)
+                helpText += "UA_A: ++." + qSDiffA.ToString() + "\n";
+            else if (qSDiffA > 0 && Mathf.Abs(qSDiffA) > startToleranceAB)
+                helpText += "UA_A: --." + qSDiffA.ToString() + "\n";
 
-            if (qEDiff < 0 && Mathf.Abs(qEDiff) > startTolerance)
-                helpText += "LA: ++.\n";
-            else if (qEDiff > 0 && Mathf.Abs(qEDiff) > startTolerance)
-                helpText += "LA: --.\n";
+            if (qSDiffB < 0 && Mathf.Abs(qSDiffB) > startToleranceAB)
+                helpText += "UA_B: ++." + qSDiffB.ToString() + "\n";
+            else if (qSDiffB > 0 && Mathf.Abs(qSDiffB) > startToleranceAB)
+                helpText += "UA_B: --." + qSDiffB.ToString() + "\n";
+
+            if (qSDiffG < 0 && Mathf.Abs(qSDiffG) > startToleranceG)
+                helpText += "UA_G: ++." + qSDiffG.ToString() + "\n";
+            else if (qSDiffG > 0 && Mathf.Abs(qSDiffG) > startToleranceG)
+                helpText += "UA_G: --." + qSDiffG.ToString() + "\n";
+
+            /*if (qEDiff < 0 && Mathf.Abs(qEDiff) > startToleranceG)
+                helpText += "LA: ++.\n" + qEDiff.ToString() + "\n";
+            else if (qEDiff > 0 && Mathf.Abs(qEDiff) > startToleranceG)
+                helpText += "LA: --.\n" + qEDiff.ToString() + "\n";*/
 
             HudManager.DisplayText(helpText);
             HudManager.colour = HUDManager.HUDColour.Red;
@@ -902,6 +946,8 @@ public class GridReaching2020GM : GameMaster
         if (gridManager.SelectedTouched && !hasReached)
             StartCoroutine(EndTaskCoroutine());
 
+        // stop neural network from running when target is reached
+        //elbowManager.SetEnableValueToZero();
         return taskComplete;
     }
 
@@ -913,7 +959,7 @@ public class GridReaching2020GM : GameMaster
     private IEnumerator EndTaskCoroutine()
     {
         hasReached = true;
-        yield return new WaitForSecondsRealtime(1.0f);
+        yield return new WaitForSecondsRealtime(1f);
         taskComplete = true;
     }
 

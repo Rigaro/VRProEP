@@ -107,8 +107,9 @@ public class PyTCPRequester : RunAbleThread
 
                     }
                 }
-
+                //Debug.Log("connected");
             }
+
 
         }
 

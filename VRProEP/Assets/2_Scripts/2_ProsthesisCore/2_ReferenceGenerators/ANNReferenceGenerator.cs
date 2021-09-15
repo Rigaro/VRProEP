@@ -26,6 +26,7 @@ namespace VRProEP.ProsthesisCore
 
         private bool enableRequested = false;
         private float leftySign = 1.0f;
+        private bool enable = false;
 
         private PyTCPRequester pyTCPRequester;
         private float[] data = { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
@@ -79,14 +80,17 @@ namespace VRProEP.ProsthesisCore
 
             // Extract input
             float qDotShoulder = leftySign * input[0];
-            bool enable = false;
+
             if (input[3] >= 1.0f)
-                enable = true;
+            {
+                isEnabled = true;
+            }
+            else
+            {
+                isEnabled = false;
+            }
 
-
-            
-
-            // Check if requested to enable the synergy
+            /*// Check if requested to enable the synergy
             if (enable && !enableRequested && !isEnabled)
             {
                 // Requested to enable, get button down
@@ -104,7 +108,7 @@ namespace VRProEP.ProsthesisCore
                 // Requested to disable, get button down
                 enableRequested = true;
                 isEnabled = false;
-            }
+            }*/
 
             // Only update when enabled, otherwise just use the same fixed reference.
             if (isEnabled)
@@ -136,7 +140,7 @@ namespace VRProEP.ProsthesisCore
             // Calculate reference from 1D synergy.
             float[] tempXBarArray = pyTCPRequester.getMatlabData();
 
-            float tempXBar = xBar[channel] - GetParameter(channel) * tempXBarArray[0] * Time.fixedDeltaTime;
+            float tempXBar = xBar[channel] + tempXBarArray[0] * Time.fixedDeltaTime;
             //Debug.Log(tempXBar);
 
             //float tempXBar = xBar[channel] + GetParameter(channel) * input * Time.fixedDeltaTime; ;
@@ -174,6 +178,11 @@ namespace VRProEP.ProsthesisCore
                 return false;
             else
                 return true;
+        }
+
+        public void setEnableValue()
+        {
+            enable = false;
         }
     }
 }

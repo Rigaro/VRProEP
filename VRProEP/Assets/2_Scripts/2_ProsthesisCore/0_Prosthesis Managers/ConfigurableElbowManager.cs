@@ -13,6 +13,8 @@ namespace VRProEP.ProsthesisCore
         //private ElbowManager elbowManager;
         private IdealElbowManager elbowManager;
 
+        private ANNReferenceGenerator aNN;
+
         private float elbowState = 0.0f;
 
         private bool isConfigured = false;
@@ -125,7 +127,7 @@ namespace VRProEP.ProsthesisCore
             AvatarSystem.AddActiveSensor(virtualEncoder);
             AvatarSystem.AddActiveSensor(shoulderTracker);
             AvatarSystem.AddActiveSensor(c7Tracker);
-            //AvatarSystem.AddActiveSensor(controllerManager);
+            AvatarSystem.AddActiveSensor(controllerManager);
 
             //ExperimentSystem.AddSensor(shoulderTracker);
             //ExperimentSystem.AddSensor(c7Tracker);
@@ -154,7 +156,7 @@ namespace VRProEP.ProsthesisCore
             // Add ANN reference generator
             // added by Damian
             // Add an ANN reference generator (currently just copys LinSyn reference generator)
-            ANNReferenceGenerator aNN = new ANNReferenceGenerator(xBar, xMin, xMax, theta, thetaMin, thetaMax);
+            aNN = new ANNReferenceGenerator(xBar, xMin, xMax, theta, thetaMin, thetaMax);
        
             inputManager.Configure("CMD_ADD_REFGEN", aNN);
             // Enable
@@ -255,6 +257,12 @@ namespace VRProEP.ProsthesisCore
 
             inputManager.Configure("CMD_SET_REFERENCE", elbowAngle);
             elbowState = elbowAngle;
+        }
+
+
+        public void SetEnableValueToZero()
+        {
+            aNN.setEnableValue();
         }
     }
 }

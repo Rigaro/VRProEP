@@ -263,6 +263,7 @@ namespace VRProEP.ProsthesisCore
                     // Get enable
                     Configure("CMD_SET_ACTIVE_SENSOR", SensorType.VIVEController);
                     float enableValue = activeSensor.GetProcessedData(1);
+                    Debug.Log(enableValue);
 
                     // Combine input
                     if (num == 3)

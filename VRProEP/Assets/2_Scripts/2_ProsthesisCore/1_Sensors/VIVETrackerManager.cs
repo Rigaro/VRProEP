@@ -54,7 +54,7 @@ namespace VRProEP.ProsthesisCore
             InputTracking.GetNodeStates(xrNodes);
             foreach (XRNodeState ns in xrNodes)
             {
-                Debug.Log(ns.nodeType.ToString());
+                //Debug.Log(ns.nodeType.ToString());
             }
         }
 
@@ -96,7 +96,7 @@ namespace VRProEP.ProsthesisCore
             // Look for Hardware trackers
             //
             // Generate a list with tracker indexes
-            Debug.Log("TotalTrackerNumber = " + totalTrackerNumber.ToString());
+            //Debug.Log("TotalTrackerNumber = " + totalTrackerNumber.ToString());
             List<float> trackerIndexes = new List<float>(totalTrackerNumber);
             for (int i = 1; i <= totalTrackerNumber; i++)
             {
@@ -112,7 +112,7 @@ namespace VRProEP.ProsthesisCore
                 
                 if (ns.nodeType == XRNode.HardwareTracker && currentTracker == (trackerIndexes[trackerNumber - 1]))
                 {
-                    Debug.Log(ns.nodeType.ToString() + " " + currentTracker + " " + trackerIndexes[trackerNumber - 1]);
+                    //Debug.Log(ns.nodeType.ToString() + " " + currentTracker + " " + trackerIndexes[trackerNumber - 1]);
                     //Debug.Log(currentTracker.ToString());
                     if (ns.TryGetAngularVelocity(out localAngVel))
                         return true;
@@ -146,7 +146,7 @@ namespace VRProEP.ProsthesisCore
             {
                 if (ns.nodeType == XRNode.HardwareTracker && currentTracker == (trackerIndexes[trackerNumber - 1]))
                 {
-                    Debug.Log(currentTracker.ToString());
+                    //Debug.Log(currentTracker.ToString());
                     if (ns.TryGetRotation(out localAngPos))
                         return true;
                 }
