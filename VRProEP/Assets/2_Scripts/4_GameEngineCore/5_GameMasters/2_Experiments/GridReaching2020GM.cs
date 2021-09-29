@@ -19,13 +19,15 @@ using VRProEP.AdaptationCore;
 using VRProEP.Utilities;
 
 public class GridReaching2020GM : GameMaster
-{ 
+{
     // added by Damian
     /*private PyTCPRequester pyTCPRequester;
     private float[] data = { 1.0f, 1.0f, 1.0f };
     private float[] terminateData = { 0.0f };*/
 
-        
+
+
+
     public int is_first_time=0;
 
     // Here you can place all your Unity (GameObjects or similar)
@@ -85,6 +87,11 @@ public class GridReaching2020GM : GameMaster
     [Tooltip("The start angle tolerance in degrees.")]
     [Range(0.0f, 10.0f)]
     private float startToleranceG = 5.0f;
+
+    [SerializeField]
+    [Tooltip("The start angle tolerance in degrees.")]
+    [Range(0.0f, 10.0f)]
+    private float startToleranceBeta = 3.0f;
 
     [SerializeField]
     [Tooltip("The start angle tolerance in degrees.")]
@@ -206,7 +213,7 @@ public class GridReaching2020GM : GameMaster
             //
             // Debug able
             //
-            SaveSystem.LoadUserData("YH1998169"); // Load the test/demo user (Mr Demo)
+            SaveSystem.LoadUserData("DG1997184"); // Load the test/demo user (Mr Demo)
             //
             // Debug using able-bodied configuration
             //
@@ -750,27 +757,31 @@ public class GridReaching2020GM : GameMaster
     /// <returns>True if ready to start.</returns>
     public override bool IsReadyToStart()
     {
-        
+
         // Get active sensors from avatar system and get the vive tracker being used for the UA
         int num = 0;
         foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
         {
-            
+
             Debug.Log("sensor found");
             if (sensor is VIVETrackerManager)
             {
                 Debug.Log(num);
-                if (num==0)
+                if (num == 0)
                 {
                     upperArmTracker = (VIVETrackerManager)sensor;
                 }
                 num++;
+                if (num == 3)
+                {
+                    c7Tracker = (VIVETrackerManager)sensor;
+                }
             }
             else if (sensor is VIVEControllerManager)
             {
                 handPos = (VIVEControllerManager)sensor;
             }
-            
+
         }
         /*if (upperArmTracker == null)
             throw new System.NullReferenceException("The residual limb tracker was not found.");*/
@@ -781,10 +792,95 @@ public class GridReaching2020GM : GameMaster
         float qShoulderB = leftySign * (upperArmTracker.GetRawData(4));
         float qShoulderG = leftySign * (upperArmTracker.GetRawData(5)); // Offsetting to horizontal position being 0.
 
+        // c7 data
+        float qTrunkA = leftySign * Mathf.Deg2Rad * (c7Tracker.GetRawData(3));
+        float qTrunkB = leftySign * Mathf.Deg2Rad * (c7Tracker.GetRawData(4));
+        float qTrunkG = leftySign * Mathf.Deg2Rad * (c7Tracker.GetRawData(5));
+
+        /* // rotation matrix for trunk to world
+        Ry[0][0] = Mathf.Cos(qTrunkB);
+        Ry[0][1] = 0.0f;
+        Ry[0][2] = Mathf.Sin(qTrunkB);
+        Ry[1][0] = 0.0f;
+        Ry[1][1] = 1.0f;
+        Ry[1][2] = 0.0f;
+        Ry[2][0] = -Mathf.Sin(qTrunkB);
+        Ry[2][1] = 0.0f;
+        Ry[2][2] = Mathf.Cos(qTrunkB);
+
+
+        Rx[0][0] = 1.0f;
+        Rx[0][1] = 0.0f;
+        Rx[0][2] = 0.0f;
+        Rx[1][0] = 0.0f;
+        Rx[1][1] = Mathf.Cos(qTrunkA);
+        Rx[1][2] = -Mathf.Sin(qTrunkA);
+        Rx[2][0] = 0.0f;
+        Rx[2][1] = Mathf.Sin(qTrunkA);
+        Rx[2][2] = Mathf.Cos(qTrunkA);
+
+        Rz[0][0] = Mathf.Cos(qTrunkG);
+        Rz[0][1] = -Mathf.Sin(qTrunkG);
+        Rz[0][2] = 0.0f;
+        Rz[1][0] = Mathf.Sin(qTrunkG);
+        Rz[1][1] = Mathf.Cos(qTrunkG);
+        Rz[1][2] = 0.0f;
+        Rz[2][0] = 0.0f;
+        Rz[2][1] = 0.0f;
+        Rz[2][2] = 1.0f;*/
+
+
+
         float[] xHand = handPos.GetAllProcessedData();
 
+        Matrix4x4 Ry = new Matrix4x4();
+        Vector4 row1_y = new Vector4(Mathf.Cos(qTrunkB), 0.0f, Mathf.Sin(qTrunkB), 0.0f );
+        Vector4 row2_y = new Vector4(0.0f, 1.0f, 0.0f, 0.0f);
+        Vector4 row3_y = new Vector4(-Mathf.Sin(qTrunkB), 0.0f, Mathf.Cos(qTrunkB), 0.0f);
+        Vector4 row4 = new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
+        Ry.SetRow(0,row1_y);
+        Ry.SetRow(1, row2_y);
+        Ry.SetRow(2, row3_y);
+        Ry.SetRow(3, row4);
 
-        
+        Matrix4x4 Rx = new Matrix4x4();
+        Vector4 row1_x = new Vector4(1.0f, 0.0f, 0.0f, 0.0f);
+        Vector4 row2_x = new Vector4(0.0f, Mathf.Cos(qTrunkA), -Mathf.Sin(qTrunkA), 0.0f);
+        Vector4 row3_x = new Vector4(0.0f, Mathf.Sin(qTrunkA), Mathf.Cos(qTrunkA), 0.0f);
+        Rx.SetRow(0, row1_x);
+        Rx.SetRow(1, row2_x);
+        Rx.SetRow(2, row3_x);
+        Rx.SetRow(3, row4);
+
+        Matrix4x4 Rz = new Matrix4x4();
+        Vector4 row1_z = new Vector4(Mathf.Cos(qTrunkG), -Mathf.Sin(qTrunkG), 0.0f, 0.0f);
+        Vector4 row2_z = new Vector4(Mathf.Sin(qTrunkG), Mathf.Cos(qTrunkG), 0.0f, 0.0f);
+        Vector4 row3_z = new Vector4(0.0f, 0.0f, 1.0f, 0.0f);
+        Rz.SetRow(0, row1_z);
+        Rz.SetRow(1, row2_z);
+        Rz.SetRow(2, row3_z);
+        Rz.SetRow(3, row4);
+
+        Matrix4x4 R_temp = Ry * Rx;
+        Matrix4x4 R = R_temp * Rz;
+
+        /*Debug.Log("Row1" + R.GetRow(0));
+        Debug.Log("Row2" + R.GetRow(1));
+        Debug.Log("Row3" + R.GetRow(2));
+        Debug.Log("Row4" + R.GetRow(3));*/
+
+        Vector3 alpha = new Vector3(R[0,0],0.0f,R[2,0]);
+
+        //Debug.Log(alpha);
+
+        Vector3 alpha_normalized = alpha.normalized;
+
+        //Debug.Log(alpha_normalized);
+
+        float beta = Mathf.Rad2Deg * Mathf.Asin(alpha_normalized[0]);
+
+        Debug.Log(beta);
+
         float qElbow = 0;
 
         if (experimentType == ExperimentType.TypeOne)
@@ -820,7 +916,9 @@ public class GridReaching2020GM : GameMaster
                 HudManager.centreColour = HUDManager.HUDCentreColour.None;
         }
 
-        if (Mathf.Abs(qSDiffA) < startToleranceAB && Mathf.Abs(qSDiffB) < startToleranceAB && Mathf.Abs(qSDiffG) < startToleranceG)
+        // if (Mathf.Abs(qSDiffA) < startToleranceAB && Mathf.Abs(qSDiffB) < startToleranceAB && Mathf.Abs(qSDiffG) < startToleranceG && Mathf.Abs(beta) < startToleranceBeta)
+
+        if (Mathf.Abs(qSDiffG) < startToleranceG && Mathf.Abs(beta) < startToleranceBeta)
         {
             HudManager.colour = HUDManager.HUDColour.Orange;
             return true;
@@ -828,8 +926,10 @@ public class GridReaching2020GM : GameMaster
         // Provide instructions when not there yet
         else
         {
+
             string helpText = "";
-            if (qSDiffA < 0 && Mathf.Abs(qSDiffA) > startToleranceAB)
+
+            /*if (qSDiffA < 0 && Mathf.Abs(qSDiffA) > startToleranceAB)
                 helpText += "UA_A: ++." + qSDiffA.ToString() + "\n";
             else if (qSDiffA > 0 && Mathf.Abs(qSDiffA) > startToleranceAB)
                 helpText += "UA_A: --." + qSDiffA.ToString() + "\n";
@@ -837,12 +937,17 @@ public class GridReaching2020GM : GameMaster
             if (qSDiffB < 0 && Mathf.Abs(qSDiffB) > startToleranceAB)
                 helpText += "UA_B: ++." + qSDiffB.ToString() + "\n";
             else if (qSDiffB > 0 && Mathf.Abs(qSDiffB) > startToleranceAB)
-                helpText += "UA_B: --." + qSDiffB.ToString() + "\n";
+                helpText += "UA_B: --." + qSDiffB.ToString() + "\n";*/
 
             if (qSDiffG < 0 && Mathf.Abs(qSDiffG) > startToleranceG)
                 helpText += "UA_G: ++." + qSDiffG.ToString() + "\n";
             else if (qSDiffG > 0 && Mathf.Abs(qSDiffG) > startToleranceG)
                 helpText += "UA_G: --." + qSDiffG.ToString() + "\n";
+
+            if (beta < 0 && Mathf.Abs(beta) > startToleranceBeta)
+                helpText += "Beta: ++." + beta.ToString() + "\n";
+            else if (beta > 0 && Mathf.Abs(beta) > startToleranceBeta)
+                helpText += "Beta: --." + beta.ToString() + "\n";
 
             /*if (qEDiff < 0 && Mathf.Abs(qEDiff) > startToleranceG)
                 helpText += "LA: ++.\n" + qEDiff.ToString() + "\n";

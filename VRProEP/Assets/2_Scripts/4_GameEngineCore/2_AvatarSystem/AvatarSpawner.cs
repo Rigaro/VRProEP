@@ -44,6 +44,9 @@ namespace VRProEP.GameEngineCore
             GameObject shoulderMarkerGO = GameObject.Find("ShoulderJointMarker");
             GameObject elbowMarkerGO = GameObject.Find("ElbowJointMarker");
             GameObject trackerModelGO = GameObject.Find("TrackerModel");
+            GameObject handTrackerGO = GameObject.Find("handTracker");
+
+
             if (elbowMarkerGO == null || shoulderMarkerGO == null || trackerModelGO == null)
                 throw new System.Exception("The joint markers were not found.");
 
@@ -53,7 +56,8 @@ namespace VRProEP.GameEngineCore
             // Deactivate
             shoulderMarkerMR.enabled = false;
             elbowMarkerMR.enabled = false;
-            trackerModelGO.SetActive(false);
+            trackerModelGO.SetActive(true);
+
             
         }
 

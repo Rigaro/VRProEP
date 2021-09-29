@@ -122,7 +122,7 @@ namespace VRProEP.GameEngineCore
         public void MaximizeHUD()
         {
             hudText.SetActive(true);
-            hudGraphics.transform.localScale = new Vector3(1.0f, 1.0f);
+            hudGraphics.transform.localScale = new Vector3(3.0f, 3.0f);
         }
 
         public void DisplayText(string text, float time)

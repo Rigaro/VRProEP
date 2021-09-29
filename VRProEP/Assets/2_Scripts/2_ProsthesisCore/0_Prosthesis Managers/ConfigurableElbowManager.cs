@@ -112,8 +112,11 @@ namespace VRProEP.ProsthesisCore
             //
 
             // Add VIVE controller as sensor to enable manual inputs.
+            GameObject handTrackerGO = AvatarSystem.AddMotionTracker();
+            
             VIVEControllerManager controllerManager = new VIVEControllerManager();
             inputManager.Configure("CMD_ADD_SENSOR", controllerManager);
+            
 
             // Add joint encoder as sensor for jacobian synergy
             inputManager.Configure("CMD_ADD_SENSOR", virtualEncoder);
@@ -128,6 +131,10 @@ namespace VRProEP.ProsthesisCore
             AvatarSystem.AddActiveSensor(shoulderTracker);
             AvatarSystem.AddActiveSensor(c7Tracker);
             AvatarSystem.AddActiveSensor(controllerManager);
+
+            
+
+            handTrackerGO.SetActive(true);
 
             //ExperimentSystem.AddSensor(shoulderTracker);
             //ExperimentSystem.AddSensor(c7Tracker);
