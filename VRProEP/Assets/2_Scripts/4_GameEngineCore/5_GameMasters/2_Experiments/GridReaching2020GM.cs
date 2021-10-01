@@ -879,7 +879,7 @@ public class GridReaching2020GM : GameMaster
 
         float beta = Mathf.Rad2Deg * Mathf.Asin(alpha_normalized[0]);
 
-        Debug.Log(beta);
+        //Debug.Log(beta);
 
         float qElbow = 0;
 

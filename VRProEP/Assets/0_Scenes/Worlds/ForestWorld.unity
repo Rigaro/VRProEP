@@ -4022,7 +4022,7 @@ PrefabInstance:
     - target: {fileID: 8072093157744520089, guid: 540437a41962c494392435d9a166ad65,
         type: 3}
       propertyPath: demoMode
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8072093157744520089, guid: 540437a41962c494392435d9a166ad65,
         type: 3}
@@ -4033,6 +4033,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8072093157744520089, guid: 540437a41962c494392435d9a166ad65,
+        type: 3}
+      propertyPath: prostheticDataFormat
+      value: loc,t,aDotUA,bDotUA,gDotUA,aUA,bUA,gUA,xUA,yUA,zUA,qE,qDotE,aDotSH,bDotSH,gDotSH,aSH,bSH,gSH,xSH,ySH,zSH,aDotUB,bDotUB,gDotUB,aUB,bUB,gUB,xUB,yUB,zUB,trackPad,enable,xHand,yHand,zHand,aHand,bHand,gHand
       objectReference: {fileID: 0}
     - target: {fileID: 8247319642344124534, guid: 540437a41962c494392435d9a166ad65,
         type: 3}
