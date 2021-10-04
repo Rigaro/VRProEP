@@ -56,7 +56,7 @@ namespace VRProEP.GameEngineCore
             // Deactivate
             shoulderMarkerMR.enabled = false;
             elbowMarkerMR.enabled = false;
-            trackerModelGO.SetActive(true);
+            trackerModelGO.SetActive(false);
 
             
         }
