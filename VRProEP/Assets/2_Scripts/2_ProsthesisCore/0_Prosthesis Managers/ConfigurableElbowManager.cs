@@ -111,8 +111,7 @@ namespace VRProEP.ProsthesisCore
             // Sensors
             //
 
-            // Add VIVE controller as sensor to enable manual inputs.
-            GameObject handTrackerGO = AvatarSystem.AddMotionTracker();
+            
             
             VIVEControllerManager controllerManager = new VIVEControllerManager();
             inputManager.Configure("CMD_ADD_SENSOR", controllerManager);
@@ -132,9 +131,11 @@ namespace VRProEP.ProsthesisCore
             AvatarSystem.AddActiveSensor(c7Tracker);
             AvatarSystem.AddActiveSensor(controllerManager);
 
-            
 
-            handTrackerGO.SetActive(true);
+
+            // Add VIVE controller as sensor to enable manual inputs.
+            //GameObject handTrackerGO = AvatarSystem.AddMotionTracker();
+            //handTrackerGO.SetActive(false);
 
             //ExperimentSystem.AddSensor(shoulderTracker);
             //ExperimentSystem.AddSensor(c7Tracker);

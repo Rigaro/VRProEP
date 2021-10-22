@@ -213,7 +213,7 @@ public class GridReaching2020GM : GameMaster
             //
             // Debug able
             //
-            SaveSystem.LoadUserData("DG1997184"); // Load the test/demo user (Mr Demo)
+            SaveSystem.LoadUserData("YH1998169"); // Load the test/demo user (Mr Demo)
             //
             // Debug using able-bodied configuration
             //
@@ -757,6 +757,8 @@ public class GridReaching2020GM : GameMaster
     /// <returns>True if ready to start.</returns>
     public override bool IsReadyToStart()
     {
+        
+
 
         // Get active sensors from avatar system and get the vive tracker being used for the UA
         int num = 0;
@@ -920,6 +922,7 @@ public class GridReaching2020GM : GameMaster
 
         if (Mathf.Abs(qSDiffG) < startToleranceG && Mathf.Abs(beta) < startToleranceBeta)
         {
+           
             HudManager.colour = HUDManager.HUDColour.Orange;
             return true;
         }
