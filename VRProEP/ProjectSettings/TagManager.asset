@@ -28,6 +28,11 @@ TagManager:
   - ForearmTracker
   - Floor
   - Boundary
+  - Bottle
+  - IndexFingerCollider
+  - ReachBottle
+  - TouchyBall
+  - shoulderTracker
   layers:
   - Default
   - TransparentFX

@@ -10,7 +10,7 @@ namespace VRProEP.ProsthesisCore
     /// </summary>
     public abstract class ComplexInputManagerManager : IInputManager
     {
-        protected List<ISensor> sensorManagers = new List<ISensor>(1);
+        protected List<ISensor> sensorManagers = new List<ISensor>();
         private int sensorNum;
         protected List<IReferenceGenerator> referenceGenerators = new List<IReferenceGenerator>(1);
         private int refGenNum;
@@ -56,7 +56,7 @@ namespace VRProEP.ProsthesisCore
         {
             if (sensor == null)
                 throw new System.ArgumentNullException("The provided sensor object is empty.");
-
+            
             sensorManagers.Add(sensor);
             sensorNum++;
         }
@@ -149,21 +149,53 @@ namespace VRProEP.ProsthesisCore
         /// <param name="sensorType">The type of sensor to look for.</param>
         /// <param name="outSensor">The sensor object to put the found sensor in.</param>
         /// <returns>True if a sensor was found.</returns>
-        protected bool GetSensor(SensorType sensorType, out ISensor outSensor)
+        protected bool GetSensor(SensorType sensorType, int num, out ISensor outSensor)
         {
+
+            int sensor_count = 1;
             // Look for a sensor with the given type.
             foreach (ISensor sensor in sensorManagers)
             {
-                // If found set it to the referenced sensor and return true.
-                if (sensor.GetSensorType().Equals(sensorType))
+                // check how many sensor of sensorType exist
+                if (sensor.GetSensorType().Equals(sensorType) & sensor_count==num)
                 {
                     outSensor = sensor;
                     return true;
                 }
+                else
+                {
+                    sensor_count++;
+                }
+
             }
+
+            
             // Failed to find a sensor with the provided type.
             outSensor = null;
             return false;
+
+        }
+
+        protected bool GetSensor(SensorType sensorType, out ISensor outSensor)
+        {
+
+
+                // Look for a sensor with the given type.
+                foreach (ISensor sensor in sensorManagers)
+                {
+                    // If found set it to the referenced sensor and return true.
+                    if (sensor.GetSensorType().Equals(sensorType))
+                    {
+                        outSensor = sensor;
+                        return true;
+                    }
+                }
+
+            
+            // Failed to find a sensor with the provided type.
+            outSensor = null;
+            return false;
+
         }
 
         /// <summary>

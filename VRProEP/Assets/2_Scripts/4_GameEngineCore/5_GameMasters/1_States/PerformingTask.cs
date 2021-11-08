@@ -26,6 +26,7 @@ namespace VRProEP.GameEngineCore
             if(gm.IsTaskDone())
             {
                 gm.HandleTaskCompletion();
+                
                 stateStage = EVENT.EXIT;
             }
         }

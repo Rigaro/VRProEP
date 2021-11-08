@@ -9,7 +9,8 @@ namespace VRProEP.ProsthesisCore
         LinearKinematicSynergy,
         JacobianSynergy,
         EMGInterface,
-        BoneConduction
+        BoneConduction,
+        ANNReferenceGenerator
     }
     /// <summary>
     /// Abstract reference generator to add basic variables used across all generators.

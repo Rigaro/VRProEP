@@ -94,7 +94,7 @@ namespace VRProEP.ExperimentCore
         {
             if (sensor == null)
                 throw new System.ArgumentNullException("The provided sensor is empty.");
-
+            
             experimentSensors.Add(sensor);
         }
 

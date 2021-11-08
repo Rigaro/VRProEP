@@ -8,6 +8,7 @@ namespace VRProEP.ProsthesisCore
         OculusSensor,
         VIVEController,
         VIVETracker,
+        VIVETracker1,
         VirtualEncoder,
         EMGWiFi,
         VirtualPositionTracker,

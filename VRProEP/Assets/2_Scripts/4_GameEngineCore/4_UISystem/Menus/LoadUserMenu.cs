@@ -22,11 +22,21 @@ public class LoadUserMenu : MonoBehaviour {
     {
         // Get the data folder
         userDataFolder =  Application.persistentDataPath + "/UserData";
+
         // Empty all options.
         availableUserDropdown.ClearOptions();
 
         // Get all available user IDs
-        string[] availableUsers = Directory.GetDirectories(userDataFolder);
+        string[] availableUsers = null;
+        try
+        {
+            availableUsers = Directory.GetDirectories(userDataFolder);
+        }
+        catch
+        {
+            Directory.CreateDirectory(userDataFolder);
+            availableUsers = Directory.GetDirectories(userDataFolder);
+        }
         // Clear list
         userList.Clear();
         // Add an empty one as default to force selection.

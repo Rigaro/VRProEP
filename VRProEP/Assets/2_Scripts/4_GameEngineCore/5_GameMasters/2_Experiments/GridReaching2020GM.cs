@@ -20,6 +20,16 @@ using VRProEP.Utilities;
 
 public class GridReaching2020GM : GameMaster
 {
+    // added by Damian
+    /*private PyTCPRequester pyTCPRequester;
+    private float[] data = { 1.0f, 1.0f, 1.0f };
+    private float[] terminateData = { 0.0f };*/
+
+
+
+
+    public int is_first_time=0;
+
     // Here you can place all your Unity (GameObjects or similar)
     #region Unity objects
     //[Header("Experiment configuration: Data format")]
@@ -76,7 +86,17 @@ public class GridReaching2020GM : GameMaster
     [SerializeField]
     [Tooltip("The start angle tolerance in degrees.")]
     [Range(0.0f, 10.0f)]
-    private float startTolerance = 2.0f;
+    private float startToleranceG = 5.0f;
+
+    [SerializeField]
+    [Tooltip("The start angle tolerance in degrees.")]
+    [Range(0.0f, 10.0f)]
+    private float startToleranceBeta = 3.0f;
+
+    [SerializeField]
+    [Tooltip("The start angle tolerance in degrees.")]
+    [Range(0.0f, 10.0f)]
+    private float startToleranceAB = 5.0f;
 
     [SerializeField]
     private GameObject startPosPhoto;
@@ -95,6 +115,7 @@ public class GridReaching2020GM : GameMaster
     private VIVETrackerManager lowerArmTracker;
     private VIVETrackerManager shoulderTracker;
     private VIVETrackerManager c7Tracker;
+    private VIVEControllerManager handPos;
     private VirtualPositionTracker handTracker;
 
     // Target management variables
@@ -160,6 +181,22 @@ public class GridReaching2020GM : GameMaster
     // Here are all the methods you need to write for your experiment.
     #region GameMaster Inherited Methods
 
+    
+
+    // Added by Damian
+    // Fixed update method to test socket connection with matlab
+    protected override void FixedUpdate()
+    {
+
+
+       
+
+
+
+        base.FixedUpdate();
+
+    }
+
     // Place debug stuff here, for when you want to test the experiment directly from the world without 
     // having to load it from the menus.
     private void Awake()
@@ -176,26 +213,45 @@ public class GridReaching2020GM : GameMaster
             //
             // Debug able
             //
-            SaveSystem.LoadUserData("DB1942174"); // Load the test/demo user (Mr Demo)
+            SaveSystem.LoadUserData("YH1998169"); // Load the test/demo user (Mr Demo)
             //
             // Debug using able-bodied configuration
             //
+            /*
             AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
             AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied);
+            */
 
             //
             // Debug prosthetic
             //
-            //AvatarSystem.LoadPlayer(UserType.Ablebodied, AvatarType.Transhumeral);
-            //AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
-            //// Initialize prosthesis
+            
+            AvatarSystem.LoadPlayer(UserType.Ablebodied, AvatarType.Transhumeral);
+            AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.Transhumeral);
+            // Initialize prosthesis
             //GameObject prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+            prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
+            elbowManager = prosthesisManagerGO.AddComponent<ConfigurableElbowManager>();
+            elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + SaveSystem.ActiveUser.handLength / 2.0f));
+
+
+            Debug.Log("AWAKE");
+
+
             //ConfigurableElbowManager elbowManager = prosthesisManagerGO.AddComponent<ConfigurableElbowManager>();
             //elbowManager.InitializeProsthesis(SaveSystem.ActiveUser.upperArmLength, (SaveSystem.ActiveUser.forearmLength + SaveSystem.ActiveUser.handLength / 2.0f));
-            //// Set the reference generator to jacobian-based.
-            ////elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
-            //// Set the reference generator to linear synergy.
+
+
+            // Set the reference generator to jacobian-based.
+            //elbowManager.ChangeReferenceGenerator("VAL_REFGEN_JACOBIANSYN");
+            // Set the reference generator to linear synergy.
+
+            // Set the reference generator to neural network (added by Damian
+
+            //elbowManager.ChangeReferenceGenerator("VAL_REFGEN_NN");
+
             //elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
+
         }
 
     }
@@ -243,15 +299,25 @@ public class GridReaching2020GM : GameMaster
     /// </summary>
     public override void ConfigureExperiment()
     {
+        
         string expCode = "";
         if (AvatarSystem.AvatarType == AvatarType.AbleBodied)
             expCode = "_A";
         else if (AvatarSystem.AvatarType == AvatarType.Transhumeral)
             expCode = "_P";
 
-        configAsset = Resources.Load<TextAsset>("Experiments/" + ExperimentSystem.ActiveExperimentID + expCode);
+        if (debug)
+            configAsset = Resources.Load<TextAsset>("Experiments/" + this.gameObject.name + expCode);
+        else
+            configAsset = Resources.Load<TextAsset>("Experiments/" + ExperimentSystem.ActiveExperimentID + expCode);
+
+
+       
+
+        
 
         // Convert configuration file to configuration class.
+        
         configurator = JsonUtility.FromJson<GridReachingConfigurator>(configAsset.text);
         // Load data
         gridRows = configurator.gridRows;
@@ -308,15 +374,16 @@ public class GridReaching2020GM : GameMaster
         taskDataLogger.AddNewLogFile(sessionNumber, iterationNumber, taskDataFormat); // Add file
 
         // Restart UDP threads
-        foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
+        /*foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
         {
+            Debug.Log("£");
             if (sensor is UDPSensorManager udpSensor)
             {
                 //Debug.Log(wifiSensor.RunThread);
                 udpSensor.StartSensorReading();
                 //Debug.Log(wifiSensor.RunThread);
             }
-        }
+        }*/
 
         // Send the player to the experiment centre position
         TeleportToStartPosition();
@@ -362,7 +429,8 @@ public class GridReaching2020GM : GameMaster
         // Add arm motion trackers for able-bodied case.
         //
         if (experimentType == ExperimentType.TypeOne)
-        { 
+        {
+            
             // Lower limb motion tracker
             GameObject llMotionTrackerGO = GameObject.FindGameObjectWithTag("ForearmTracker");
             lowerArmTracker = new VIVETrackerManager(llMotionTrackerGO.transform);
@@ -373,24 +441,51 @@ public class GridReaching2020GM : GameMaster
             upperArmTracker = new VIVETrackerManager(ulMotionTrackerGO.transform);
             ExperimentSystem.AddSensor(upperArmTracker);
         }
+
         else if (experimentType == ExperimentType.TypeTwo)
         {
-            // Get active sensors from avatar system and get the vive tracker being used for the UA
-            foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
-            {
-                if (sensor is VIVETrackerManager)
-                    upperArmTracker = (VIVETrackerManager)sensor;
-            }
-            if (upperArmTracker == null)
-                throw new System.NullReferenceException("The residual limb tracker was not found.");
+
+
+           
+
+
+           
+
+
+
+            // Upper limb motion tracker
+            //GameObject ulMotionTrackerGO = AvatarSystem.AddMotionTracker();
+            //upperArmTracker = new VIVETrackerManager(ulMotionTrackerGO.transform);
+            //ExperimentSystem.AddSensor(upperArmTracker);
+
+            // Shoulder motion tracker
+            /*GameObject shoulderMotionTrackerGO = AvatarSystem.AddMotionTracker();
+            shoulderMotionTrackerGO.tag = "shoulderTracker";
+            shoulderTracker = new VIVETrackerManager(shoulderMotionTrackerGO.transform);
+            ExperimentSystem.AddSensor(shoulderTracker);
+
+            // c7 motion tracker
+            GameObject c7MotionTrackerGO = AvatarSystem.AddMotionTracker();
+            c7MotionTrackerGO.tag = "c7Tracker";
+            c7Tracker = new VIVETrackerManager(c7MotionTrackerGO.transform);
+            ExperimentSystem.AddSensor(c7Tracker);*/
+
+            /*
+            GameObject shTrackerGO = GameObject.FindGameObjectWithTag("shoulderTracker");
+            VIVETrackerManager shTracker = new VIVETrackerManager(shTrackerGO.transform);
+            ExperimentSystem.AddSensor(shTracker);
+            */
 
             // Set VIVE tracker and Linear synergy as active.
             // Get prosthesis
             prosthesisManagerGO = GameObject.FindGameObjectWithTag("ProsthesisManager");
             elbowManager = prosthesisManagerGO.GetComponent<ConfigurableElbowManager>();
+            
+
             // Set the reference generator to linear synergy.
             elbowManager.ChangeSensor("VAL_SENSOR_VIVETRACKER");
-            elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
+            elbowManager.ChangeReferenceGenerator("VAL_REFGEN_NN");
+            //elbowManager.ChangeReferenceGenerator("VAL_REFGEN_LINKINSYN");
 
             // Create the personalisation algorithm object
             elbowManager.SetSynergy(theta);
@@ -418,7 +513,7 @@ public class GridReaching2020GM : GameMaster
         }
 
         // Debug?
-        if (!debug)
+        /*if (!debug)
         {
             // Shoulder acromium head tracker
             GameObject motionTrackerGO1 = AvatarSystem.AddMotionTracker();
@@ -428,11 +523,13 @@ public class GridReaching2020GM : GameMaster
             GameObject motionTrackerGO2 = AvatarSystem.AddMotionTracker();
             c7Tracker = new VIVETrackerManager(motionTrackerGO2.transform);
             ExperimentSystem.AddSensor(c7Tracker);
-        }
+        }*/
 
         //
         // Hand tracking sensor
         //
+
+        
         GameObject handGO = GameObject.FindGameObjectWithTag("Hand");
         handTracker = new VirtualPositionTracker(handGO.transform);
         ExperimentSystem.AddSensor(handTracker);
@@ -660,17 +757,144 @@ public class GridReaching2020GM : GameMaster
     /// <returns>True if ready to start.</returns>
     public override bool IsReadyToStart()
     {
+        
+
+
+        // Get active sensors from avatar system and get the vive tracker being used for the UA
+        int num = 0;
+        foreach (ISensor sensor in AvatarSystem.GetActiveSensors())
+        {
+
+            Debug.Log("sensor found");
+            if (sensor is VIVETrackerManager)
+            {
+                Debug.Log(num);
+                if (num == 0)
+                {
+                    upperArmTracker = (VIVETrackerManager)sensor;
+                }
+                num++;
+                if (num == 3)
+                {
+                    c7Tracker = (VIVETrackerManager)sensor;
+                }
+            }
+            else if (sensor is VIVEControllerManager)
+            {
+                handPos = (VIVEControllerManager)sensor;
+            }
+
+        }
+        /*if (upperArmTracker == null)
+            throw new System.NullReferenceException("The residual limb tracker was not found.");*/
+
         // Check that upper and lower arms are within the tolerated start position.
-        float qShoulder = leftySign * Mathf.Rad2Deg * (upperArmTracker.GetProcessedData(5) + Mathf.PI); // Offsetting to horizontal position being 0.
+        //float qShoulder = leftySign * Mathf.Rad2Deg * (upperArmTracker.GetProcessedData(5) + Mathf.PI); // Offsetting to horizontal position being 0.
+        float qShoulderA = leftySign * (upperArmTracker.GetRawData(3));
+        float qShoulderB = leftySign * (upperArmTracker.GetRawData(4));
+        float qShoulderG = leftySign * (upperArmTracker.GetRawData(5)); // Offsetting to horizontal position being 0.
+
+        // c7 data
+        float qTrunkA = leftySign * Mathf.Deg2Rad * (c7Tracker.GetRawData(3));
+        float qTrunkB = leftySign * Mathf.Deg2Rad * (c7Tracker.GetRawData(4));
+        float qTrunkG = leftySign * Mathf.Deg2Rad * (c7Tracker.GetRawData(5));
+
+        /* // rotation matrix for trunk to world
+        Ry[0][0] = Mathf.Cos(qTrunkB);
+        Ry[0][1] = 0.0f;
+        Ry[0][2] = Mathf.Sin(qTrunkB);
+        Ry[1][0] = 0.0f;
+        Ry[1][1] = 1.0f;
+        Ry[1][2] = 0.0f;
+        Ry[2][0] = -Mathf.Sin(qTrunkB);
+        Ry[2][1] = 0.0f;
+        Ry[2][2] = Mathf.Cos(qTrunkB);
+
+
+        Rx[0][0] = 1.0f;
+        Rx[0][1] = 0.0f;
+        Rx[0][2] = 0.0f;
+        Rx[1][0] = 0.0f;
+        Rx[1][1] = Mathf.Cos(qTrunkA);
+        Rx[1][2] = -Mathf.Sin(qTrunkA);
+        Rx[2][0] = 0.0f;
+        Rx[2][1] = Mathf.Sin(qTrunkA);
+        Rx[2][2] = Mathf.Cos(qTrunkA);
+
+        Rz[0][0] = Mathf.Cos(qTrunkG);
+        Rz[0][1] = -Mathf.Sin(qTrunkG);
+        Rz[0][2] = 0.0f;
+        Rz[1][0] = Mathf.Sin(qTrunkG);
+        Rz[1][1] = Mathf.Cos(qTrunkG);
+        Rz[1][2] = 0.0f;
+        Rz[2][0] = 0.0f;
+        Rz[2][1] = 0.0f;
+        Rz[2][2] = 1.0f;*/
+
+
+
+        float[] xHand = handPos.GetAllProcessedData();
+
+        Matrix4x4 Ry = new Matrix4x4();
+        Vector4 row1_y = new Vector4(Mathf.Cos(qTrunkB), 0.0f, Mathf.Sin(qTrunkB), 0.0f );
+        Vector4 row2_y = new Vector4(0.0f, 1.0f, 0.0f, 0.0f);
+        Vector4 row3_y = new Vector4(-Mathf.Sin(qTrunkB), 0.0f, Mathf.Cos(qTrunkB), 0.0f);
+        Vector4 row4 = new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
+        Ry.SetRow(0,row1_y);
+        Ry.SetRow(1, row2_y);
+        Ry.SetRow(2, row3_y);
+        Ry.SetRow(3, row4);
+
+        Matrix4x4 Rx = new Matrix4x4();
+        Vector4 row1_x = new Vector4(1.0f, 0.0f, 0.0f, 0.0f);
+        Vector4 row2_x = new Vector4(0.0f, Mathf.Cos(qTrunkA), -Mathf.Sin(qTrunkA), 0.0f);
+        Vector4 row3_x = new Vector4(0.0f, Mathf.Sin(qTrunkA), Mathf.Cos(qTrunkA), 0.0f);
+        Rx.SetRow(0, row1_x);
+        Rx.SetRow(1, row2_x);
+        Rx.SetRow(2, row3_x);
+        Rx.SetRow(3, row4);
+
+        Matrix4x4 Rz = new Matrix4x4();
+        Vector4 row1_z = new Vector4(Mathf.Cos(qTrunkG), -Mathf.Sin(qTrunkG), 0.0f, 0.0f);
+        Vector4 row2_z = new Vector4(Mathf.Sin(qTrunkG), Mathf.Cos(qTrunkG), 0.0f, 0.0f);
+        Vector4 row3_z = new Vector4(0.0f, 0.0f, 1.0f, 0.0f);
+        Rz.SetRow(0, row1_z);
+        Rz.SetRow(1, row2_z);
+        Rz.SetRow(2, row3_z);
+        Rz.SetRow(3, row4);
+
+        Matrix4x4 R_temp = Ry * Rx;
+        Matrix4x4 R = R_temp * Rz;
+
+        /*Debug.Log("Row1" + R.GetRow(0));
+        Debug.Log("Row2" + R.GetRow(1));
+        Debug.Log("Row3" + R.GetRow(2));
+        Debug.Log("Row4" + R.GetRow(3));*/
+
+        Vector3 alpha = new Vector3(R[0,0],0.0f,R[2,0]);
+
+        //Debug.Log(alpha);
+
+        Vector3 alpha_normalized = alpha.normalized;
+
+        //Debug.Log(alpha_normalized);
+
+        float beta = Mathf.Rad2Deg * Mathf.Asin(alpha_normalized[0]);
+
+        //Debug.Log(beta);
+
         float qElbow = 0;
 
         if (experimentType == ExperimentType.TypeOne)
-            qElbow = Mathf.Rad2Deg * (lowerArmTracker.GetProcessedData(5)) - qShoulder; // Offsetting to horizontal position being 0.
+            qElbow = Mathf.Rad2Deg * (lowerArmTracker.GetProcessedData(5)) - qShoulderG; // Offsetting to horizontal position being 0.
         else if (experimentType == ExperimentType.TypeTwo)
             qElbow = -Mathf.Rad2Deg * elbowManager.GetElbowAngle();
-        
+
         // The difference to the start position
-        float qSDiff = qShoulder - startShoulderAngle;
+        //float qSDiff = qShoulder - startShoulderAngle;
+        float qSDiffA = qShoulderA;
+        float qSDiffB = qShoulderB;
+        float qSDiffG = qShoulderG;
         float qEDiff = qElbow - startElbowAngle;
         
         //
@@ -681,7 +905,7 @@ public class GridReaching2020GM : GameMaster
             debugText.text = experimentState.ToString() + "\n";
             if (experimentState == ExperimentState.WaitingForStart)
                 debugText.text += waitState.ToString() + "\n";
-            debugText.text += qShoulder.ToString() + "\n";
+            debugText.text += qShoulderG.ToString() + "\n";
             debugText.text += qElbow.ToString() + "\n";
         }
 
@@ -694,24 +918,44 @@ public class GridReaching2020GM : GameMaster
                 HudManager.centreColour = HUDManager.HUDCentreColour.None;
         }
 
-        if (Mathf.Abs(qSDiff) < startTolerance && Mathf.Abs(qEDiff) < startTolerance)
+        // if (Mathf.Abs(qSDiffA) < startToleranceAB && Mathf.Abs(qSDiffB) < startToleranceAB && Mathf.Abs(qSDiffG) < startToleranceG && Mathf.Abs(beta) < startToleranceBeta)
+
+        if (Mathf.Abs(qSDiffG) < startToleranceG && Mathf.Abs(beta) < startToleranceBeta)
         {
+           
             HudManager.colour = HUDManager.HUDColour.Orange;
             return true;
         }
         // Provide instructions when not there yet
         else
         {
-            string helpText = "";
-            if (qSDiff < 0 && Mathf.Abs(qSDiff) > startTolerance)
-                helpText += "UA: ++.\n";
-            else if (qSDiff > 0 && Mathf.Abs(qSDiff) > startTolerance)
-                helpText += "UA: --.\n";
 
-            if (qEDiff < 0 && Mathf.Abs(qEDiff) > startTolerance)
-                helpText += "LA: ++.\n";
-            else if (qEDiff > 0 && Mathf.Abs(qEDiff) > startTolerance)
-                helpText += "LA: --.\n";
+            string helpText = "";
+
+            /*if (qSDiffA < 0 && Mathf.Abs(qSDiffA) > startToleranceAB)
+                helpText += "UA_A: ++." + qSDiffA.ToString() + "\n";
+            else if (qSDiffA > 0 && Mathf.Abs(qSDiffA) > startToleranceAB)
+                helpText += "UA_A: --." + qSDiffA.ToString() + "\n";
+
+            if (qSDiffB < 0 && Mathf.Abs(qSDiffB) > startToleranceAB)
+                helpText += "UA_B: ++." + qSDiffB.ToString() + "\n";
+            else if (qSDiffB > 0 && Mathf.Abs(qSDiffB) > startToleranceAB)
+                helpText += "UA_B: --." + qSDiffB.ToString() + "\n";*/
+
+            if (qSDiffG < 0 && Mathf.Abs(qSDiffG) > startToleranceG)
+                helpText += "UA_G: ++." + qSDiffG.ToString() + "\n";
+            else if (qSDiffG > 0 && Mathf.Abs(qSDiffG) > startToleranceG)
+                helpText += "UA_G: --." + qSDiffG.ToString() + "\n";
+
+            if (beta < 0 && Mathf.Abs(beta) > startToleranceBeta)
+                helpText += "Beta: ++." + beta.ToString() + "\n";
+            else if (beta > 0 && Mathf.Abs(beta) > startToleranceBeta)
+                helpText += "Beta: --." + beta.ToString() + "\n";
+
+            /*if (qEDiff < 0 && Mathf.Abs(qEDiff) > startToleranceG)
+                helpText += "LA: ++.\n" + qEDiff.ToString() + "\n";
+            else if (qEDiff > 0 && Mathf.Abs(qEDiff) > startToleranceG)
+                helpText += "LA: --.\n" + qEDiff.ToString() + "\n";*/
 
             HudManager.DisplayText(helpText);
             HudManager.colour = HUDManager.HUDColour.Red;
@@ -746,7 +990,7 @@ public class GridReaching2020GM : GameMaster
     }
 
     /// <summary>
-    /// Handles task data logging which runs on FixedUpdate.
+    /// Handles task data logging which runs on Update.
     /// Logs data from sensors registered in the AvatarSystem and ExperimentSystem by default.
     /// Can be exteded to add more data by implementing an override method in the derived class which first adds data
     /// to the logData string (e.g. logData +=  myDataString + ","), and then calls base.HandleTaskDataLogging().
@@ -761,6 +1005,8 @@ public class GridReaching2020GM : GameMaster
         base.HandleTaskDataLogging();
 
         // Performance evaluation data buffering
+
+        /*
         if (!debug)
         {
             if (evaluatorType == EvaluatorType.Compensation)
@@ -775,6 +1021,7 @@ public class GridReaching2020GM : GameMaster
                 throw new System.NotImplementedException("KE method not yet implemented");
             }
         }
+        */
     }
 
     /// <summary>
@@ -807,6 +1054,8 @@ public class GridReaching2020GM : GameMaster
         if (gridManager.SelectedTouched && !hasReached)
             StartCoroutine(EndTaskCoroutine());
 
+        // stop neural network from running when target is reached
+        //elbowManager.SetEnableValueToZero();
         return taskComplete;
     }
 
@@ -818,7 +1067,7 @@ public class GridReaching2020GM : GameMaster
     private IEnumerator EndTaskCoroutine()
     {
         hasReached = true;
-        yield return new WaitForSecondsRealtime(1.0f);
+        yield return new WaitForSecondsRealtime(1f);
         taskComplete = true;
     }
 

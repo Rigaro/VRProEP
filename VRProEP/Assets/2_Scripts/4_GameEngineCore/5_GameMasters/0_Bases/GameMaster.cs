@@ -418,6 +418,7 @@ public abstract class GameMaster : MonoBehaviour
     public virtual void HandleTaskCompletion()
     {
         // Make sure the log is closed properly
+        Debug.Log("file closed");
         taskDataLogger.CloseLog();
     }
 

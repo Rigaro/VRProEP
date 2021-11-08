@@ -13,7 +13,7 @@ public class ModeSelectionMenu : MonoBehaviour {
     public void LoadPlayground()
     {
         // Load player and able bodied avatar (without adaptive tracker).
-        SaveSystem.LoadUserData("MD1942");
+        SaveSystem.LoadUserData("DB1942174");
         AvatarSystem.LoadPlayer(SaveSystem.ActiveUser.type, AvatarType.AbleBodied);
         AvatarSystem.LoadAvatar(SaveSystem.ActiveUser, AvatarType.AbleBodied, false);
         // Change the number for the forearm tracker being used

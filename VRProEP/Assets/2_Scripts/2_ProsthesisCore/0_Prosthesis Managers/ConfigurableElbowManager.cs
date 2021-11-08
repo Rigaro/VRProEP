@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using VRProEP.GameEngineCore;
+using VRProEP.ExperimentCore;
 
 namespace VRProEP.ProsthesisCore
 {
@@ -11,6 +12,8 @@ namespace VRProEP.ProsthesisCore
         private ConfigurableInputManager inputManager;
         //private ElbowManager elbowManager;
         private IdealElbowManager elbowManager;
+
+        private ANNReferenceGenerator aNN;
 
         private float elbowState = 0.0f;
 
@@ -22,6 +25,7 @@ namespace VRProEP.ProsthesisCore
         private float[] xBar = { Mathf.Deg2Rad * -90.0f };
         private float[] xMin = { Mathf.Deg2Rad * -145.0f };
         private float[] xMax = { Mathf.Deg2Rad * -0.1f };
+
 
 
         /// <summary>
@@ -37,10 +41,48 @@ namespace VRProEP.ProsthesisCore
             GameObject residualLimbTrackerGO = GameObject.FindGameObjectWithTag("ResidualLimbTracker");
             // Create a VIVETracker with the obtained transform
             VIVETrackerManager trackerManager = new VIVETrackerManager(residualLimbTrackerGO.transform);
+
+            // Find ShoulderTracker GameObject and extract its Transform.
+            /*GameObject shoulderTrackerGO = GameObject.FindGameObjectWithTag("shoulderTracker");
+            // Create a VIVETracker with the obtained transform
+            VIVETrackerManager shoulderTracker = new VIVETrackerManager(residualLimbTrackerGO.transform);
+
+            // Find c7Tracker GameObject and extract its Transform.
+            GameObject c7TrackerGO = GameObject.FindGameObjectWithTag("c7Tracker");
+            // Create a VIVETracker with the obtained transform
+            VIVETrackerManager c7Tracker = new VIVETrackerManager(residualLimbTrackerGO.transform);*/
+
+
+
+            // Shoulder acromium head tracker
+            GameObject motionTrackerGO1 = AvatarSystem.AddMotionTracker();
+            VIVETrackerManager shoulderTracker = new VIVETrackerManager(motionTrackerGO1.transform);
+            motionTrackerGO1.tag = "shoulderTracker";
+
+
+            // C7 tracker
+            GameObject motionTrackerGO2 = AvatarSystem.AddMotionTracker();
+            VIVETrackerManager c7Tracker = new VIVETrackerManager(motionTrackerGO2.transform);
+
+            
+
+
+
+
+            // add trackers
             // Create a basic reference generator: Integrator.
             IntegratorReferenceGenerator integratorRG = new IntegratorReferenceGenerator(xBar, xMin, xMax);
             // Create configurable input manager with the created sensor and RG.
-            inputManager = new ConfigurableInputManager(trackerManager, integratorRG);
+            List<ISensor> sensorList = new List<ISensor>();
+            sensorList.Add(trackerManager);
+            sensorList.Add(shoulderTracker);
+            sensorList.Add(c7Tracker);
+
+            List<IReferenceGenerator> RGList = new List<IReferenceGenerator>();
+
+            RGList.Add(integratorRG);
+            inputManager = new ConfigurableInputManager(sensorList, RGList);
+
 
             //
             // ElbowManager
@@ -69,18 +111,34 @@ namespace VRProEP.ProsthesisCore
             // Sensors
             //
 
-            // Add VIVE controller as sensor to enable manual inputs.
+            
+            
             VIVEControllerManager controllerManager = new VIVEControllerManager();
             inputManager.Configure("CMD_ADD_SENSOR", controllerManager);
+            
 
             // Add joint encoder as sensor for jacobian synergy
             inputManager.Configure("CMD_ADD_SENSOR", virtualEncoder);
 
+            inputManager.Configure("CMD_ADD_SENSOR", shoulderTracker);
+            inputManager.Configure("CMD_ADD_SENSOR", c7Tracker);
+
             // Add the created sensors to the list of available sensors.
             AvatarSystem.AddActiveSensor(trackerManager);
+            
             AvatarSystem.AddActiveSensor(virtualEncoder);
-            //AvatarSystem.AddActiveSensor(controllerManager);
+            AvatarSystem.AddActiveSensor(shoulderTracker);
+            AvatarSystem.AddActiveSensor(c7Tracker);
+            AvatarSystem.AddActiveSensor(controllerManager);
 
+
+
+            // Add VIVE controller as sensor to enable manual inputs.
+            //GameObject handTrackerGO = AvatarSystem.AddMotionTracker();
+            //handTrackerGO.SetActive(false);
+
+            //ExperimentSystem.AddSensor(shoulderTracker);
+            //ExperimentSystem.AddSensor(c7Tracker);
 
             //
             // Reference generators
@@ -89,20 +147,26 @@ namespace VRProEP.ProsthesisCore
             float[] theta = { -synValue };
             float[] thetaMin = { -3.5f };
             float[] thetaMax = { -0.1f };
-            LinearKinematicSynergy linSyn = new LinearKinematicSynergy(xBar, xMin, xMax, theta, thetaMin, thetaMax);
-            inputManager.Configure("CMD_ADD_REFGEN", linSyn);
+            //LinearKinematicSynergy linSyn = new LinearKinematicSynergy(xBar, xMin, xMax, theta, thetaMin, thetaMax);
+            //inputManager.Configure("CMD_ADD_REFGEN", linSyn);
 
             // Add a Jacobian based Kinematic Synergy
-            JacobianSynergy jacSyn = new JacobianSynergy(xBar, xMin, xMax, upperArmLength, lowerArmLength);
-            inputManager.Configure("CMD_ADD_REFGEN", jacSyn);
+            //JacobianSynergy jacSyn = new JacobianSynergy(xBar, xMin, xMax, upperArmLength, lowerArmLength);
+            //inputManager.Configure("CMD_ADD_REFGEN", jacSyn);
 
             // Add an EMG reference generator
-            List<float> emgGains = new List<float>(1);
+            //List<float> emgGains = new List<float>(1);
             // emgGains.Add(1.3f); // single site
-            emgGains.Add(0.015f);
-            EMGInterfaceReferenceGenerator emgRG = new EMGInterfaceReferenceGenerator(xBar, xMin, xMax, emgGains, EMGInterfaceType.dualSiteProportional);
-            inputManager.Configure("CMD_ADD_REFGEN", emgRG);
+            //emgGains.Add(0.015f);
+            //EMGInterfaceReferenceGenerator emgRG = new EMGInterfaceReferenceGenerator(xBar, xMin, xMax, emgGains, EMGInterfaceType.dualSiteProportional);
+            //inputManager.Configure("CMD_ADD_REFGEN", emgRG);
 
+            // Add ANN reference generator
+            // added by Damian
+            // Add an ANN reference generator (currently just copys LinSyn reference generator)
+            aNN = new ANNReferenceGenerator(xBar, xMin, xMax, theta, thetaMin, thetaMax);
+       
+            inputManager.Configure("CMD_ADD_REFGEN", aNN);
             // Enable
             isConfigured = true;
         }
@@ -119,6 +183,7 @@ namespace VRProEP.ProsthesisCore
                 elbowManager.UpdateState(0, elbowState);
                 isEnabled = inputManager.IsEnabled();
             }
+
         }
 
         /// <summary>
@@ -200,6 +265,12 @@ namespace VRProEP.ProsthesisCore
 
             inputManager.Configure("CMD_SET_REFERENCE", elbowAngle);
             elbowState = elbowAngle;
+        }
+
+
+        public void SetEnableValueToZero()
+        {
+            aNN.setEnableValue();
         }
     }
 }
